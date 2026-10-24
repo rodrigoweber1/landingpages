@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="House flip">
-<title>Simulador house flip</title>
+<meta name="apple-mobile-web-app-title" content="Flipping Fam">
+<title>Simulador Flipping Fam – RJ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto:wght@400;500&display=swap">
 <style>
@@ -50,6 +50,27 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 .calc{display:flex;justify-content:space-between;align-items:baseline;gap:12px;background:var(--bg1);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
 .calc span:first-child{font-family:var(--ui);font-size:13px;color:var(--n80)}
 .calc span:last-child{font-size:16px;font-weight:500;color:var(--n100);white-space:nowrap}
+.more{border-top:1px solid var(--line);margin:0 -12px -4px;padding:0 12px}
+.more summary{display:flex;align-items:center;justify-content:space-between;min-height:44px;list-style:none;cursor:pointer;font-family:var(--ui);font-size:14px;font-weight:500;color:var(--primary);-webkit-tap-highlight-color:transparent}
+.more summary::-webkit-details-marker{display:none}
+.more summary::after{content:"";width:8px;height:8px;margin-right:4px;border-right:2px solid var(--primary);border-bottom:2px solid var(--primary);transform:rotate(45deg) translateY(-2px);transition:transform 140ms ease-out}
+.more[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.more summary:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.more-body{display:flex;flex-direction:column;gap:12px;padding:4px 0 8px}
+.groupbox{padding-top:4px;padding-bottom:4px;gap:0}
+.more:not([open]) .more-body,.groupbox:not([open]) .subsec{display:none}
+.groupbox summary{display:flex;align-items:center;justify-content:space-between;min-height:44px;list-style:none;cursor:pointer;font-family:var(--ui);font-size:16px;font-weight:700;color:var(--n100);-webkit-tap-highlight-color:transparent}
+.groupbox summary::-webkit-details-marker{display:none}
+.groupbox summary::after{content:"";width:8px;height:8px;margin-right:4px;border-right:2px solid var(--primary);border-bottom:2px solid var(--primary);transform:rotate(45deg) translateY(-2px);transition:transform 140ms ease-out}
+.groupbox[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.groupbox summary:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.groupbox[open]{gap:12px;padding-bottom:16px}
+.subsec{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);margin:0 -12px;padding:12px 12px 0}
+.subsec h3{margin:0;font-family:var(--ui);font-size:14px;font-weight:700;color:var(--n100)}
+.more-scen{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;padding:0 12px;border:1px dashed var(--stroke);border-radius:6px;background:#fff;font-family:var(--ui);font-size:14px;font-weight:500;color:var(--primary);text-align:left}
+.more-scen::after{content:"";width:8px;height:8px;margin-right:4px;border-right:2px solid var(--primary);border-bottom:2px solid var(--primary);transform:rotate(45deg) translateY(-2px)}
+.more-scen[aria-expanded="true"]::after{transform:rotate(-135deg) translateY(-2px)}
+.more-scen:hover{background:var(--primary-tint)}
 .btn-outline{height:44px;border:1px solid var(--primary);border-radius:6px;background:#fff;color:var(--primary);font-size:14px;font-weight:500}
 .btn-outline:hover{background:var(--primary-tint)}
 .hint{margin:0;font-size:12px;line-height:1.4;color:var(--n60);text-align:center}
@@ -92,7 +113,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 <body>
 <header>
   <div class="wrap">
-    <h1>Simulador house flip · RJ</h1>
+    <h1>Simulador Flipping Fam – RJ</h1>
     <p id="summary"></p>
   </div>
 </header>
@@ -129,7 +150,8 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     corretagem: '5', irGanho: '15', gestor: '20', venda: '1180000', partEdson: '50',
     retAplic: '14', irAplic: '15',
     jurosUsd: '5,5', cobertura: '100', cambio: '1', dolBase: '5,6455', dolAlta: '10', dolBaixa: '-10', port: '11',
-    finPct: '80', finTaxa: '13,4', finPrazo: '360', tarifas: '2100'
+    finPct: '80', finTaxa: '13,4', finPrazo: '360', tarifas: '2100',
+    irPort: '15', saldoBR: '600000', portExt: '600000'
   };
 
   // Campos: [chave, rótulo, unidade, observação] ou ['=', id do cálculo, rótulo]
@@ -138,8 +160,8 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
       ['compra', 'Preço de compra', 'R$', 'Valor de aquisição do imóvel'],
       ['reformaPct', 'Custo da reforma', '%', '% do preço de compra'],
       ['=', 'reforma', 'Custo da reforma'],
-      ['itbi', 'ITBI', '%', '% da compra. Alíquota do Rio de Janeiro'],
-      ['escritura', 'Escritura e registro', '%', '% da compra. Cartório + RGI'],
+      ['itbi', 'ITBI', '%', '% da compra. Alíquota do Rio de Janeiro', 'h'],
+      ['escritura', 'Escritura e registro', '%', '% da compra. Cartório + RGI', 'h'],
       ['carreg', 'IPTU + condomínio + contas', 'R$', 'Por mês'],
       ['prazo', 'Prazo do ciclo', 'meses', 'Compra, reforma e venda'],
       ['=', 'custoTotal', 'Custo total do projeto']
@@ -147,9 +169,9 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     { title: 'Venda', items: [
       ['venda', 'Preço de venda', 'R$', 'Preço de venda esperado'],
       ['=', 'roiBruto', 'ROI bruto sobre compra + reforma'],
-      ['corretagem', 'Corretagem na venda', '%', '% da venda. Mercado: 5–6%'],
-      ['irGanho', 'IR sobre ganho de capital', '%', 'PF: 15% até R$ 5 mi de ganho'],
-      ['gestor', 'Remuneração gestor flip', '%', '% do lucro líquido']
+      ['corretagem', 'Corretagem na venda', '%', '% da venda. Mercado: 5–6%', 'h'],
+      ['irGanho', 'IR sobre ganho de capital', '%', 'PF: 15% até R$ 5 mi de ganho', 'h'],
+      ['gestor', 'Remuneração gestor flip', '%', '% do lucro líquido', 'h']
     ] },
     { title: 'Investidores', items: [
       ['partEdson', 'Participação do Edson', '%', 'O restante fica com o Rodrigo'],
@@ -157,31 +179,38 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
       ['=', 'D14', 'Custo do projeto – Edson'],
       ['=', 'I14', 'Custo do projeto – Rodrigo']
     ] },
-    { title: 'Fonte 1 – Capital próprio', items: [
-      ['retAplic', 'Retorno esperado da aplicação', '% a.a.', 'Custo de oportunidade do capital próprio'],
-      ['irAplic', 'IR sobre rendimento da aplicação', '%', '15% para prazo acima de 720 dias; 20% para 6–12 meses']
+    { title: 'Fonte 1 – Capital próprio', group: true, items: [
+      ['retAplic', 'Retorno esperado da aplicação', '% a.a.', 'Custo de oportunidade do capital próprio', 'h'],
+      ['irAplic', 'IR sobre rendimento da aplicação', '%', '15% para prazo acima de 720 dias; 20% para 6–12 meses', 'h']
     ] },
-    { title: 'Fonte 2 – Empréstimo em USD', items: [
+    { title: 'Fonte 2 – Empréstimo em USD', group: true, items: [
       ['jurosUsd', 'Taxa de juros em USD', '% a.a.', 'Juros e principal pagos na venda'],
       ['cobertura', 'Parcela do projeto coberta', '%', 'Compra + ITBI + escritura + reforma'],
       ['cambio', 'Custo de câmbio por conversão', '%', 'IOF + spread, na entrada e na saída'],
       ['dolBase', 'Variação do dólar – base', '% a.a.', 'Mediana das janelas de 5 anos desde jan/1999'],
       ['dolAlta', 'Variação do dólar – alta', '% a.a.', 'Real se desvaloriza'],
       ['dolBaixa', 'Variação do dólar – baixa', '% a.a.', 'Real se valoriza'],
-      ['port', 'Rendimento do portfólio no exterior', '% a.a.', 'Carteira na IB, mantida como colateral']
+      ['port', 'Rendimento do portfólio no exterior', '% a.a.', 'Carteira na IB, mantida como colateral'],
+      ['irPort', 'IR sobre rendimento do portfólio no exterior', '%', 'Lei 14.754/23 (PF). Não entra no cálculo do comparativo', 'h']
     ] },
-    { title: 'Fonte 3 – Financiamento imobiliário', items: [
+    { title: 'Fonte 3 – Financiamento imobiliário', group: true, items: [
       ['finPct', 'Parcela financiada', '%', 'Aplicada sobre o custo do projeto'],
       ['=', 'finTotal', 'Valor financiado (projeto inteiro)'],
       ['finTaxa', 'Taxa efetiva com TR e seguros', '% a.a.', 'Juros pagos nas parcelas durante o ciclo'],
       ['finPrazo', 'Prazo do financiamento (SAC)', 'meses', 'Saldo quitado na venda, sem multa'],
       ['tarifas', 'Tarifas de avaliação e contratação', 'R$', 'Por imóvel. Confirmar com o banco']
+    ] },
+    { title: 'Patrimônio (para conciliação)', group: true, items: [
+      ['saldoBR', 'Saldo aplicado no Brasil', 'R$', 'Deve ser ≥ custo do projeto', 'h'],
+      ['portExt', 'Portfólio no exterior (R$ equivalente)', 'R$', 'Deve ser ≥ dívida em USD', 'h']
     ] }
   ];
 
   var v = Object.assign({}, DEFAULTS);
   try { var saved = localStorage.getItem(KEY); if (saved) v = Object.assign({}, DEFAULTS, JSON.parse(saved)); } catch (e) {}
   var sel = 'r_base';
+  var HIDDEN_SCEN = ['r_alta', 'r_baixa', 'r_usd'];
+  var moreScen = false;
   var $ = function (id) { return document.getElementById(id); };
 
   function num(s) {
@@ -386,8 +415,25 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   }
 
   function buildPremissas() {
-    var html = SECTIONS.map(function (sec) {
-      var items = sec.items.map(function (it) {
+    var grouped = SECTIONS.filter(function (sec) { return sec.group; });
+    var html = SECTIONS.filter(function (sec) { return !sec.group; }).map(function (sec) {
+      var hidden = sec.items.filter(function (it) { return it[4] === 'h'; });
+      var shown = sec.items.filter(function (it) { return it[4] !== 'h'; });
+      var more = hidden.length
+        ? '<details class="more"><summary>Mais premissas (' + hidden.length + ')</summary><div class="more-body">' + hidden.map(itemHtml).join('') + '</div></details>'
+        : '';
+      return '<section class="card"><h2>' + sec.title + '</h2>' + shown.map(itemHtml).join('') + more + '</section>';
+    }).join('');
+    if (grouped.length) {
+      html += '<details class="card groupbox"><summary><span>Fontes de capital e patrimônio</span></summary>' +
+        grouped.map(function (sec) {
+          return '<div class="subsec"><h3>' + sec.title + '</h3>' + sec.items.map(itemHtml).join('') + '</div>';
+        }).join('') + '</details>';
+    }
+    $('sections').innerHTML = html;
+    fillInputs();
+
+    function itemHtml(it) {
         if (it[0] === '=') {
           return '<div class="calc"><span>' + it[2] + '</span><span id="calc-' + it[1] + '"></span></div>';
         }
@@ -398,11 +444,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
         return '<div class="field"><div class="txt"><label for="in-' + k + '">' + it[1] + '</label>' +
           (note ? '<p class="note">' + note + '</p>' : '') + '</div>' +
           '<div class="box">' + pre + '<input id="in-' + k + '" data-k="' + k + '" type="text" inputmode="' + mode + '" enterkeyhint="next" autocomplete="off">' + suf + '</div></div>';
-      }).join('');
-      return '<section class="card"><h2>' + sec.title + '</h2>' + items + '</section>';
-    }).join('');
-    $('sections').innerHTML = html;
-    fillInputs();
+    }
   }
 
   function fillInputs() {
@@ -446,8 +488,13 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
         (on ? '<div class="detail">' + rowsHtml(s.rows) + '</div>' : '');
     }
     function group(title, sub, inv) {
+      var mine = list.filter(function (s) { return s.inv === inv; });
+      var hidden = mine.filter(function (s) { return HIDDEN_SCEN.indexOf(s.id) >= 0; });
+      var more = hidden.length
+        ? '<button type="button" class="more-scen" aria-expanded="' + moreScen + '">' + (moreScen ? 'Menos cenários' : 'Mais cenários (' + hidden.length + ')') + '</button>'
+        : '';
       return '<div class="group"><div class="group-h"><h3>' + title + '</h3><span>' + sub + '</span></div>' +
-        list.filter(function (s) { return s.inv === inv; }).map(scen).join('') + '</div>';
+        mine.filter(function (s) { return moreScen || HIDDEN_SCEN.indexOf(s.id) < 0; }).map(scen).join('') + more + '</div>';
     }
     var kpis = [
       ['Custo total do projeto', brl(m.custoTotal), false],
@@ -460,7 +507,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
       M('ITBI', m.itbi),
       M('Escritura e registro', m.escritura),
       M('Reforma', m.reforma),
-      M('Carregamento no período', m.carreg),
+      M('Carregamento no período (IPTU & Condomínio)', m.carreg),
       M('Custo total do projeto', m.custoTotal, true),
       M('Preço de venda', m.venda),
       M('(−) Corretagem', m.corretagem),
@@ -506,11 +553,12 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   $('sections').addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
     e.preventDefault();
-    var all = Array.prototype.slice.call(document.querySelectorAll('input[data-k]'));
+    var all = Array.prototype.slice.call(document.querySelectorAll('input[data-k]')).filter(function (el) { return !el.closest('details:not([open])'); });
     var next = all[all.indexOf(e.target) + 1];
     if (next) next.focus(); else e.target.blur();
   });
   $('view-c').addEventListener('click', function (e) {
+    if (e.target.closest('.more-scen')) { moreScen = !moreScen; update(); return; }
     var b = e.target.closest('.scen');
     if (!b) return;
     sel = sel === b.dataset.id ? 'none' : b.dataset.id;
