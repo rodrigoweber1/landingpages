@@ -18,7 +18,20 @@
   --stroke:#C7CCD1;--line:#E3E6E8;--bg:#F5F5F5;--bg1:#FAFAFA;--white:#FFFFFF;
   --nav:#2E3338;--error:#D7263D;
   --ui:Inter,system-ui,sans-serif;--body:Roboto,system-ui,sans-serif;
+  --surface:#FFFFFF;--on-primary:#FFFFFF;--danger-tint:#FFE9E9;--scrim:rgba(21,21,21,.45);
 }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --primary:#A593F0;--primary-hover:#BBADF4;--primary-tint:#2B2545;
+  --n100:#F1F2F3;--n80:#C6CCD2;--n60:#9AA5AF;
+  --stroke:#4B535A;--line:#30363B;--bg:#141719;--bg1:#22272B;--surface:#1B1F22;
+  --nav:#0E1012;--error:#FF7085;--on-primary:#141719;--danger-tint:#3A1F25;--scrim:rgba(0,0,0,.6);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --primary:#A593F0;--primary-hover:#BBADF4;--primary-tint:#2B2545;
+  --n100:#F1F2F3;--n80:#C6CCD2;--n60:#9AA5AF;
+  --stroke:#4B535A;--line:#30363B;--bg:#141719;--bg1:#22272B;--surface:#1B1F22;
+  --nav:#0E1012;--error:#FF7085;--on-primary:#141719;--danger-tint:#3A1F25;--scrim:rgba(0,0,0,.6);
+  color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg)}
 body{font-family:var(--body);color:var(--n80);font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
@@ -30,12 +43,13 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--primary);outlin
 header{background:var(--nav);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
 header h1{margin:0;font-family:var(--ui);font-size:20px;font-weight:700;letter-spacing:-0.009em}
 header p{margin:2px 0 0;font-size:12px;line-height:1.4;color:var(--line)}
-nav{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--line);padding:8px 16px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--nav)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--surface);border-bottom:1px solid var(--line);padding:8px 16px}
 .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--bg);border-radius:8px;padding:4px}
 .tabs button{height:40px;border:0;border-radius:6px;font-family:var(--ui);font-size:13px;font-weight:500;background:transparent;color:var(--n80);padding:0 4px}
 .simbar{display:flex;gap:6px;overflow-x:auto;padding-top:8px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
 .simbar::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;height:40px;max-width:180px;padding:0 14px;border:1px solid var(--stroke);border-radius:250px;background:#fff;font-family:var(--ui);font-size:13px;font-weight:500;color:var(--n80);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{flex:0 0 auto;height:40px;max-width:180px;padding:0 14px;border:1px solid var(--stroke);border-radius:250px;background:var(--surface);font-family:var(--ui);font-size:13px;font-weight:500;color:var(--n80);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chip[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-tint);color:var(--primary)}
 .chip.add{border-style:dashed;color:var(--primary)}
 .chip:hover{border-color:var(--primary)}
@@ -44,10 +58,29 @@ nav{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(
 .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .btn-outline:disabled{opacity:.3;cursor:default}
 .btn-outline.danger{border-color:var(--error);color:var(--error)}
-.btn-outline.danger:hover{background:#FFE9E9}
+.btn-outline.danger:hover{background:var(--danger-tint)}
+.dlg{position:fixed;inset:0;z-index:20;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.dlg-box{width:100%;max-width:420px;background:var(--surface);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:16px;box-shadow:0 4px 12px rgba(21,21,21,.10)}
+.dlg-box p{margin:0;font-size:15px;line-height:1.45;color:var(--n100)}
+.import-panel{display:flex;flex-direction:column;gap:8px}
+.import-panel label{font-family:var(--ui);font-size:13px;font-weight:500;color:var(--n100)}
+.import-panel textarea{width:100%;min-height:96px;border:1px solid var(--stroke);border-radius:6px;padding:8px 10px;background:var(--surface);color:var(--n100);font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+.cloud-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 0;font-size:12px;color:var(--line)}
+.cloud-line .bad{color:#FFB3BE}
+.cloud-line button{flex:0 0 auto;height:32px;padding:0 12px;border:1px solid rgba(255,255,255,.35);border-radius:6px;background:transparent;color:#FFFFFF;font-size:12px}
+.login{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;align-items:flex-start;justify-content:center;padding:calc(48px + env(safe-area-inset-top)) 16px 16px;overflow:auto}
+.login-box{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px 16px;display:flex;flex-direction:column;gap:12px}
+.login-box h2{margin:0;font-family:var(--ui);font-size:20px;font-weight:700;color:var(--n100)}
+.login-box label{font-family:var(--ui);font-size:14px;font-weight:500;color:var(--n100)}
+.login-box input{height:44px;border:1px solid var(--stroke);border-radius:6px;padding:0 12px;background:var(--surface);color:var(--n100);font-size:16px}
+.login-box input:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.login-box .btn-primary{width:100%}
+.login-box .btn-primary:disabled{opacity:.3}
+.login-msg{margin:0;font-size:13px;line-height:1.45;color:var(--n80);min-height:1em}
+.btn-ghost{height:44px;border:0;border-radius:6px;background:transparent;color:var(--n80);font-size:14px;font-weight:500}
 .cmp-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;-webkit-overflow-scrolling:touch}
 .cmp-wrap table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
-.cmp-wrap th,.cmp-wrap td{padding:10px 10px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right;color:var(--n100);background:#fff}
+.cmp-wrap th,.cmp-wrap td{padding:10px 10px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right;color:var(--n100);background:var(--surface)}
 .cmp-wrap tbody th{position:sticky;left:0;z-index:1;text-align:left;white-space:normal;min-width:132px;max-width:150px;font-weight:400;color:var(--n80);border-right:1px solid var(--line);line-height:1.3}
 .cmp-wrap thead th{background:var(--bg1);font-family:var(--ui);font-weight:700;vertical-align:bottom}
 .cmp-wrap thead th:first-child{position:sticky;left:0;z-index:2;text-align:left;color:var(--n60);font-weight:500;border-right:1px solid var(--line)}
@@ -55,16 +88,16 @@ nav{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(
 .cmp-wrap tr:last-child th,.cmp-wrap tr:last-child td{border-bottom:0}
 .cmp-wrap td.best{color:var(--primary);font-weight:700}
 .th-link{border:0;background:transparent;padding:4px 0;font:inherit;font-weight:700;color:var(--primary);text-decoration:underline;text-underline-offset:3px;max-width:120px;white-space:normal;text-align:right}
-.tabs button[aria-pressed="true"]{background:var(--primary);color:#fff}
+.tabs button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
 main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
 .stack{display:flex;flex-direction:column;gap:12px}
-.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px 12px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 12px;display:flex;flex-direction:column;gap:12px}
 .card h2{margin:0;font-family:var(--ui);font-size:16px;font-weight:700;color:var(--n100)}
 .field{display:flex;align-items:center;gap:12px}
 .field .txt{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:2px}
 .field label{font-family:var(--ui);font-size:14px;font-weight:500;line-height:1.3;color:var(--n100)}
 .field .note{margin:0;font-size:12px;line-height:1.35;color:var(--n60)}
-.box{flex:0 0 auto;width:148px;display:flex;align-items:center;gap:6px;height:44px;border:1px solid var(--stroke);border-radius:6px;background:#fff;padding:0 10px}
+.box{flex:0 0 auto;width:148px;display:flex;align-items:center;gap:6px;height:44px;border:1px solid var(--stroke);border-radius:6px;background:var(--surface);padding:0 10px}
 .box:focus-within{border-color:var(--primary)}
 .box span{font-size:12px;color:var(--n60);white-space:nowrap}
 .box input{flex:1 1 auto;min-width:0;width:100%;height:40px;border:0;padding:0;background:transparent;font-size:16px;color:var(--n100);text-align:right}
@@ -89,23 +122,23 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 .groupbox[open]{gap:12px;padding-bottom:16px}
 .subsec{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);margin:0 -12px;padding:12px 12px 0}
 .subsec h3{margin:0;font-family:var(--ui);font-size:14px;font-weight:700;color:var(--n100)}
-.more-scen{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;padding:0 12px;border:1px dashed var(--stroke);border-radius:6px;background:#fff;font-family:var(--ui);font-size:14px;font-weight:500;color:var(--primary);text-align:left}
+.more-scen{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;padding:0 12px;border:1px dashed var(--stroke);border-radius:6px;background:var(--surface);font-family:var(--ui);font-size:14px;font-weight:500;color:var(--primary);text-align:left}
 .more-scen::after{content:"";width:8px;height:8px;margin-right:4px;border-right:2px solid var(--primary);border-bottom:2px solid var(--primary);transform:rotate(45deg) translateY(-2px)}
 .more-scen[aria-expanded="true"]::after{transform:rotate(-135deg) translateY(-2px)}
 .more-scen:hover{background:var(--primary-tint)}
-.btn-outline{height:44px;border:1px solid var(--primary);border-radius:6px;background:#fff;color:var(--primary);font-size:14px;font-weight:500}
+.btn-outline{height:44px;border:1px solid var(--primary);border-radius:6px;background:var(--surface);color:var(--primary);font-size:14px;font-weight:500}
 .btn-outline:hover{background:var(--primary-tint)}
 .hint{margin:0;font-size:12px;line-height:1.4;color:var(--n60);text-align:center}
-.footbar{position:fixed;left:0;right:0;bottom:0;z-index:3;background:#fff;border-top:1px solid var(--line);box-shadow:0 -2px 4px rgba(21,21,21,.08);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.footbar{position:fixed;left:0;right:0;bottom:0;z-index:3;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -2px 4px rgba(21,21,21,.08);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
 .footbar .wrap{display:flex;align-items:center;gap:12px}
 .footbar .kp{flex:1 1 0;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .footbar .kp div{display:flex;flex-direction:column;gap:2px}
 .footbar .kp span:first-child{font-family:var(--ui);font-size:11px;color:var(--n60)}
 .footbar .kp span:last-child{font-family:var(--ui);font-size:15px;font-weight:700;white-space:nowrap;color:var(--n100)}
-.btn-primary{flex:0 0 auto;height:44px;padding:0 14px;border:0;border-radius:6px;background:var(--primary);color:#fff;font-size:14px;font-weight:500}
+.btn-primary{flex:0 0 auto;height:44px;padding:0 14px;border:0;border-radius:6px;background:var(--primary);color:var(--on-primary);font-size:14px;font-weight:500}
 .btn-primary:hover{background:var(--primary-hover)}
 .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:4px}
 .kpi span:first-child{font-family:var(--ui);font-size:12px;color:var(--n60)}
 .kpi span:last-child{font-family:var(--ui);font-size:18px;font-weight:700;color:var(--n100)}
 .muted{margin:0;font-size:12px;line-height:1.4;color:var(--n60)}
@@ -113,7 +146,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 .group-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-top:4px}
 .group-h h3{margin:0;font-family:var(--ui);font-size:14px;font-weight:700;color:var(--n100)}
 .group-h span{font-size:12px;color:var(--n60)}
-.scen{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left;padding:12px;border-radius:6px;border:1px solid var(--line);background:#fff}
+.scen{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left;padding:12px;border-radius:6px;border:1px solid var(--line);background:var(--surface)}
 .scen[aria-expanded="true"]{border-color:var(--primary);background:var(--primary-tint);border-radius:6px 6px 0 0}
 .scen .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .scen .name{font-family:var(--ui);font-size:14px;font-weight:500;color:var(--n100)}
@@ -122,7 +155,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 .fill{display:block;height:6px;border-radius:3px;background:var(--primary)}
 .scen .sub{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--n60)}
 .scen .sub span:last-child{white-space:nowrap;color:var(--primary)}
-.detail{margin:-8px 0 4px;padding:4px 12px 8px;border:1px solid var(--primary);border-top:0;border-radius:0 0 6px 6px;background:#fff}
+.detail{margin:-8px 0 4px;padding:4px 12px 8px;border:1px solid var(--primary);border-top:0;border-radius:0 0 6px 6px;background:var(--surface)}
 .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
 .row span:first-child{font-size:13px;line-height:1.35;color:var(--n80)}
 .row span:last-child{font-size:14px;white-space:nowrap;color:var(--n100)}
@@ -137,6 +170,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   <div class="wrap">
     <h1>Simulador Flipping Fam – RJ</h1>
     <p id="summary"></p>
+    <p class="cloud-line" id="cloud-line" hidden><span id="cloud-status"></span><button type="button" id="logout">Sair</button></p>
   </div>
 </header>
 <nav>
@@ -168,10 +202,18 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     <button type="button" class="btn-outline" id="reset">Restaurar valores da planilha</button>
     <section class="card">
       <h2>Guardar e levar para outro aparelho</h2>
-      <p class="muted">As simulações ficam salvas automaticamente neste aparelho e navegador. Para fazer backup ou abrir no computador ou em outro celular, exporte o arquivo e importe lá.</p>
+      <p class="muted">As simulações ficam salvas automaticamente neste aparelho e navegador. Para fazer backup ou abrir em outro aparelho, exporte aqui e importe lá. Exportar baixa um arquivo e também copia os dados, para você colar numa nota se o download não for permitido.</p>
       <div class="actions">
         <button type="button" class="btn-outline" id="export">Exportar</button>
         <button type="button" class="btn-outline" id="import">Importar</button>
+      </div>
+      <div class="import-panel" id="import-panel" hidden>
+        <label for="import-text">Cole os dados exportados ou escolha o arquivo</label>
+        <textarea id="import-text" spellcheck="false" autocomplete="off"></textarea>
+        <div class="actions">
+          <button type="button" class="btn-outline" id="import-pick">Escolher arquivo</button>
+          <button type="button" class="btn-primary" id="import-load">Carregar</button>
+        </div>
       </div>
       <input type="file" id="import-file" accept="application/json,.json" hidden>
     </section>
@@ -179,6 +221,25 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   <div id="view-c" class="stack" hidden></div>
   <div id="view-s" class="stack" hidden></div>
 </main>
+<div class="login" id="login" hidden>
+  <form class="login-box" id="login-form" novalidate>
+    <h2>Simulador Flipping Fam – RJ</h2>
+    <p class="muted">Entre com o seu e-mail. Você recebe um link de acesso; não precisa de senha. Só e-mails cadastrados veem as simulações.</p>
+    <label for="login-email">E-mail</label>
+    <input id="login-email" type="email" inputmode="email" autocomplete="email" required>
+    <button type="submit" class="btn-primary" id="login-send">Enviar link de acesso</button>
+    <p class="login-msg" id="login-msg" role="status"></p>
+  </form>
+</div>
+<div class="dlg" id="dlg" hidden>
+  <div class="dlg-box" role="alertdialog" aria-modal="true" aria-labelledby="dlg-msg">
+    <p id="dlg-msg"></p>
+    <div class="actions">
+      <button type="button" class="btn-ghost" id="dlg-cancel">Cancelar</button>
+      <button type="button" class="btn-primary" id="dlg-ok">OK</button>
+    </div>
+  </div>
+</div>
 <div class="footbar" id="footbar">
   <div class="wrap">
     <div class="kp">
@@ -190,8 +251,24 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 </div>
 
 <script>
+  // SUPABASE: cole aqui os dados do seu projeto (Supabase > Project Settings > API).
+  // Deixe em branco para usar só neste aparelho, sem login.
+  window.FLIP_CONFIG = {
+    supabaseUrl: 'https://xxxx.supabase.co',
+    supabaseAnonKey: 'sb_publishable_wCT2KBYZ6EFkz9CEq1_-7A_pw5faQKj'
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
 (function () {
   'use strict';
+  var CFG = window.FLIP_CONFIG || {};
+  var cloud = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+  var sb = null;
+  if (cloud) {
+    try { sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey); } catch (e) { sb = null; }
+  }
+  var userEmail = null;
   var KEY = 'flippingfam-rj-v2';
   var OLD_KEY = 'houseflip-rj-v1';
   var DEFAULTS = {
@@ -257,7 +334,13 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 
   var MAX_SIMS = 5;
 
-  function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function newId() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 3 | 8)).toString(16);
+    });
+  }
   function makeSim(name, vals) { return { id: newId(), name: name, v: Object.assign({}, DEFAULTS, vals || {}) }; }
   function nextName() {
     var n = 1;
@@ -539,6 +622,18 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     el.classList.toggle('neg', !!neg);
   }
 
+  // Confirmação dentro da página (o visualizador do Claude não mostra confirm/alert).
+  var dlgAction = null;
+  function ask(msg, okLabel, onOk) {
+    $('dlg-msg').textContent = msg;
+    $('dlg-ok').textContent = okLabel || 'OK';
+    $('dlg-cancel').hidden = !onOk;
+    dlgAction = onOk || null;
+    $('dlg').hidden = false;
+    $('dlg-ok').focus();
+  }
+  function closeDlg() { $('dlg').hidden = true; dlgAction = null; }
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
   }
@@ -570,6 +665,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     var s = copyFrom ? makeSim(copyFrom.name + ' (cópia)', copyFrom.v) : makeSim(nextName());
     store.sims.push(s);
     activate(s.id);
+    saveSim(s);
   }
 
   function renderLado() {
@@ -697,9 +793,146 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 
   function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
 
+  // ---- Supabase: login, salvamento na nuvem e atualização ao vivo ----
+  var pending = {};
+
+  function setStatus(msg, bad) {
+    if (!cloud) return;
+    $('cloud-status').textContent = msg;
+    $('cloud-status').classList.toggle('bad', !!bad);
+  }
+
+  function saveSim(sim) {
+    save();
+    if (!sb || !userEmail || !sim) return;
+    clearTimeout(pending[sim.id]);
+    setStatus('Salvando…');
+    pending[sim.id] = setTimeout(function () {
+      delete pending[sim.id];
+      sb.from('simulacoes')
+        .upsert({ id: sim.id, nome: sim.name || 'Sem nome', valores: sim.v, updated_by: userEmail })
+        .then(function (r) {
+          if (r.error) setStatus('Não foi possível salvar. Verifique a internet e tente de novo.', true);
+          else setStatus('Salvo · ' + userEmail);
+        });
+    }, 700);
+  }
+
+  function deleteRemote(id) {
+    save();
+    if (!sb || !userEmail) return;
+    sb.from('simulacoes').delete().eq('id', id).then(function (r) {
+      setStatus(r.error ? 'Não foi possível excluir na nuvem. Tente de novo.' : 'Excluído · ' + userEmail, !!r.error);
+    });
+  }
+
+  function rowToSim(row) {
+    return { id: row.id, name: row.nome || 'Sem nome', v: Object.assign({}, DEFAULTS, row.valores || {}) };
+  }
+
+  function showLogin(msg) {
+    $('login').hidden = false;
+    $('login-msg').textContent = msg || '';
+    $('cloud-line').hidden = true;
+  }
+
+  function onSignedIn(session) {
+    if (userEmail === session.user.email) return;
+    userEmail = session.user.email;
+    $('login').hidden = true;
+    $('cloud-line').hidden = false;
+    setStatus('Carregando…');
+    sb.from('membros').select('email').limit(1).then(function (m) {
+      if (m.error || !m.data || !m.data.length) {
+        setStatus('O e-mail ' + userEmail + ' não tem acesso. Peça para incluí-lo na lista de membros.', true);
+        return;
+      }
+      sb.from('simulacoes').select('*').order('created_at', { ascending: true }).then(function (r) {
+        if (r.error) { setStatus('Não foi possível carregar as simulações. Recarregue a página.', true); return; }
+        var prevActive = store.active;
+        if (!r.data.length) {
+          var first = makeSim('Imóvel 1');
+          store = { sims: [first], active: first.id };
+          saveSim(first);
+        } else {
+          var sims = r.data.map(rowToSim);
+          store = { sims: sims, active: sims.some(function (s) { return s.id === prevActive; }) ? prevActive : sims[0].id };
+        }
+        v = cur().v;
+        save();
+        fillInputs();
+        renderSimBar();
+        update();
+        setStatus('Conectado · ' + userEmail);
+        subscribe();
+      });
+    });
+  }
+
+  function subscribe() {
+    sb.channel('simulacoes-ao-vivo')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'simulacoes' }, function (p) {
+        if (p.eventType === 'DELETE') {
+          var gone = p.old && p.old.id;
+          if (!gone || !store.sims.some(function (s) { return s.id === gone; })) return;
+          store.sims = store.sims.filter(function (s) { return s.id !== gone; });
+          if (!store.sims.length) { var s0 = makeSim('Imóvel 1'); store.sims.push(s0); saveSim(s0); }
+          if (store.active === gone) { activate(store.sims[0].id); } else { save(); renderSimBar(); update(); }
+          return;
+        }
+        var row = p.new;
+        if (!row || pending[row.id]) return;
+        var incoming = rowToSim(row);
+        var local = null;
+        store.sims.forEach(function (s) { if (s.id === row.id) local = s; });
+        if (local && local.name === incoming.name && JSON.stringify(local.v) === JSON.stringify(incoming.v)) return;
+        if (local) { local.name = incoming.name; local.v = incoming.v; }
+        else store.sims.push(incoming);
+        if (store.active === row.id) { v = cur().v; fillInputs(); }
+        save();
+        renderSimBar();
+        update();
+        if (row.updated_by && row.updated_by !== userEmail) setStatus('Atualizado por ' + row.updated_by);
+      })
+      .subscribe();
+  }
+
+  function startCloud() {
+    if (!sb) {
+      $('cloud-line').hidden = false;
+      setStatus('Não foi possível carregar a conexão com o Supabase. Usando só este aparelho.', true);
+      cloud = false;
+      return;
+    }
+    sb.auth.getSession().then(function (r) {
+      var session = r && r.data && r.data.session;
+      if (session) onSignedIn(session); else showLogin();
+    });
+    sb.auth.onAuthStateChange(function (event, session) {
+      if (session) onSignedIn(session);
+      else if (event === 'SIGNED_OUT') { userEmail = null; showLogin(); }
+    });
+  }
+
   buildPremissas();
   renderSimBar();
   update();
+  if (cloud) startCloud();
+
+  $('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = $('login-email').value.trim();
+    if (!email || email.indexOf('@') < 1) { $('login-msg').textContent = 'Digite um e-mail válido.'; return; }
+    $('login-send').disabled = true;
+    $('login-msg').textContent = 'Enviando…';
+    sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
+      $('login-send').disabled = false;
+      $('login-msg').textContent = r.error
+        ? 'Não foi possível enviar: ' + r.error.message
+        : 'Link enviado para ' + email + '. Abra o e-mail neste mesmo aparelho e toque no link.';
+    });
+  });
+  $('logout').addEventListener('click', function () { if (sb) sb.auth.signOut(); });
 
   $('simbar').addEventListener('click', function (e) {
     var b = e.target.closest('button');
@@ -709,18 +942,24 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   });
   $('sim-name').addEventListener('input', function (e) {
     cur().name = e.target.value.slice(0, 40);
-    save();
+    saveSim(cur());
     Array.prototype.forEach.call(document.querySelectorAll('.chip[data-sim="' + store.active + '"]'), function (c) { c.textContent = cur().name || 'Sem nome'; });
     update();
   });
   $('sim-dup').addEventListener('click', function () { addSim(cur()); });
   $('sim-del').addEventListener('click', function () {
     if (store.sims.length <= 1) return;
-    if (!window.confirm('Excluir a simulação "' + (cur().name || 'Sem nome') + '"? Esta ação não pode ser desfeita.')) return;
     var id = store.active;
-    store.sims = store.sims.filter(function (s) { return s.id !== id; });
-    activate(store.sims[0].id);
+    ask('Excluir a simulação "' + (cur().name || 'Sem nome') + '"? Esta ação não pode ser desfeita.', 'Excluir', function () {
+      store.sims = store.sims.filter(function (s) { return s.id !== id; });
+      activate(store.sims[0].id);
+      deleteRemote(id);
+    });
   });
+  $('dlg-ok').addEventListener('click', function () { var fn = dlgAction; closeDlg(); if (fn) fn(); });
+  $('dlg-cancel').addEventListener('click', closeDlg);
+  $('dlg').addEventListener('click', function (e) { if (e.target === $('dlg')) closeDlg(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('dlg').hidden) closeDlg(); });
   $('view-s').addEventListener('click', function (e) {
     var b = e.target.closest('[data-open]');
     if (!b) return;
@@ -728,36 +967,70 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     showTab('p');
   });
   $('export').addEventListener('click', function () {
-    var blob = new Blob([JSON.stringify({ app: 'flipping-fam-rj', version: 2, savedAt: new Date().toISOString(), sims: store.sims, active: store.active }, null, 2)], { type: 'application/json' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'flipping-fam-simulacoes.json';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    var json = JSON.stringify({ app: 'flipping-fam-rj', version: 2, savedAt: new Date().toISOString(), sims: store.sims, active: store.active });
+    try {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+      a.download = 'flipping-fam-simulacoes.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    } catch (x) {}
+    var copied = function () { ask('Dados de ' + store.sims.length + ' imóveis copiados. Se o arquivo não baixou, cole os dados numa nota para guardar ou para importar em outro aparelho.'); };
+    var manual = function () {
+      $('import-panel').hidden = false;
+      $('import-text').value = json;
+      $('import-text').select();
+      ask('Os dados estão selecionados no campo abaixo de "Importar". Copie e cole numa nota para guardar.');
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(json).then(copied, manual);
+      else manual();
+    } catch (x) { manual(); }
   });
-  $('import').addEventListener('click', function () { $('import-file').click(); });
+  $('import').addEventListener('click', function () {
+    $('import-panel').hidden = !$('import-panel').hidden;
+    if (!$('import-panel').hidden) $('import-text').focus();
+  });
+  $('import-pick').addEventListener('click', function () { $('import-file').click(); });
   $('import-file').addEventListener('change', function (e) {
     var f = e.target.files && e.target.files[0];
     e.target.value = '';
     if (!f) return;
     var r = new FileReader();
-    r.onload = function () {
-      var next = null;
-      try { next = cleanStore(JSON.parse(r.result)); } catch (x) {}
-      if (!next) { window.alert('Não foi possível ler este arquivo. Use um arquivo exportado por este simulador.'); return; }
-      if (!window.confirm('Substituir as ' + store.sims.length + ' simulações deste aparelho pelas ' + next.sims.length + ' do arquivo?')) return;
-      store = next;
-      activate(store.active);
-    };
+    r.onload = function () { $('import-text').value = String(r.result || ''); loadImport(); };
     r.readAsText(f);
   });
+  $('import-load').addEventListener('click', loadImport);
+  function loadImport() {
+    var next = null;
+    try { next = cleanStore(JSON.parse($('import-text').value)); } catch (x) {}
+    if (!next) { ask('Não foi possível ler esses dados. Use o texto ou o arquivo gerado por "Exportar" neste simulador.'); return; }
+    if (cloud && userEmail) {
+      var room = MAX_SIMS - store.sims.length;
+      if (room <= 0) { ask('Já existem ' + MAX_SIMS + ' imóveis. Exclua algum antes de importar.'); return; }
+      var add = next.sims.slice(0, room);
+      ask('Adicionar ' + add.length + ' imóvel(is) importado(s) às simulações compartilhadas?' + (next.sims.length > room ? ' Só cabem ' + room + '.' : ''), 'Adicionar', function () {
+        add.forEach(function (s) { var c = makeSim(s.name, s.v); store.sims.push(c); saveSim(c); });
+        $('import-text').value = '';
+        $('import-panel').hidden = true;
+        activate(store.sims[store.sims.length - 1].id);
+      });
+      return;
+    }
+    ask('Substituir as ' + store.sims.length + ' simulações deste aparelho pelas ' + next.sims.length + ' importadas?', 'Substituir', function () {
+      store = next;
+      $('import-text').value = '';
+      $('import-panel').hidden = true;
+      activate(store.active);
+    });
+  }
 
   $('sections').addEventListener('input', function (e) {
     var k = e.target.dataset && e.target.dataset.k;
     if (!k) return;
     v[k] = e.target.value;
-    save();
+    saveSim(cur());
     update();
   });
   $('sections').addEventListener('focusin', function (e) {
@@ -783,12 +1056,13 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   $('tab-s').addEventListener('click', function () { showTab('s'); });
   $('go-c').addEventListener('click', function () { showTab('c'); });
   $('reset').addEventListener('click', function () {
-    if (!window.confirm('Voltar "' + (cur().name || 'Sem nome') + '" aos valores da planilha?')) return;
-    cur().v = Object.assign({}, DEFAULTS);
-    v = cur().v;
-    save();
-    fillInputs();
-    update();
+    ask('Voltar "' + (cur().name || 'Sem nome') + '" aos valores da planilha?', 'Restaurar', function () {
+      cur().v = Object.assign({}, DEFAULTS);
+      v = cur().v;
+      saveSim(cur());
+      fillInputs();
+      update();
+    });
   });
 })();
 </script>
