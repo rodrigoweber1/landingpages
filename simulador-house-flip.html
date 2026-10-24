@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2E3338">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="House flip">
+<title>Simulador house flip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto:wght@400;500&display=swap">
+<style>
+:root{
+  --primary:#624ABB;--primary-hover:#4E3B96;--primary-tint:#F4F0FA;
+  --n100:#191716;--n80:#454D54;--n60:#73808C;
+  --stroke:#C7CCD1;--line:#E3E6E8;--bg:#F5F5F5;--bg1:#FAFAFA;--white:#FFFFFF;
+  --nav:#2E3338;--error:#D7263D;
+  --ui:Inter,system-ui,sans-serif;--body:Roboto,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg)}
+body{font-family:var(--body);color:var(--n80);font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+button,input{font:inherit;-webkit-tap-highlight-color:transparent}
+button{cursor:pointer;touch-action:manipulation;transition:background-color 140ms ease-out,border-color 140ms ease-out}
+input:focus-visible,button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto}
+header{background:var(--nav);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
+header h1{margin:0;font-family:var(--ui);font-size:20px;font-weight:700;letter-spacing:-0.009em}
+header p{margin:2px 0 0;font-size:12px;line-height:1.4;color:var(--line)}
+nav{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--line);padding:8px 16px}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;background:var(--bg);border-radius:8px;padding:4px}
+.tabs button{height:40px;border:0;border-radius:6px;font-family:var(--ui);font-size:14px;font-weight:500;background:transparent;color:var(--n80)}
+.tabs button[aria-pressed="true"]{background:var(--primary);color:#fff}
+main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px 12px;display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0;font-family:var(--ui);font-size:16px;font-weight:700;color:var(--n100)}
+.field{display:flex;align-items:center;gap:12px}
+.field .txt{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:2px}
+.field label{font-family:var(--ui);font-size:14px;font-weight:500;line-height:1.3;color:var(--n100)}
+.field .note{margin:0;font-size:12px;line-height:1.35;color:var(--n60)}
+.box{flex:0 0 auto;width:148px;display:flex;align-items:center;gap:6px;height:44px;border:1px solid var(--stroke);border-radius:6px;background:#fff;padding:0 10px}
+.box:focus-within{border-color:var(--primary)}
+.box span{font-size:12px;color:var(--n60);white-space:nowrap}
+.box input{flex:1 1 auto;min-width:0;width:100%;height:40px;border:0;padding:0;background:transparent;font-size:16px;color:var(--n100);text-align:right}
+.box input:focus-visible{outline:none}
+.calc{display:flex;justify-content:space-between;align-items:baseline;gap:12px;background:var(--bg1);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.calc span:first-child{font-family:var(--ui);font-size:13px;color:var(--n80)}
+.calc span:last-child{font-size:16px;font-weight:500;color:var(--n100);white-space:nowrap}
+.btn-outline{height:44px;border:1px solid var(--primary);border-radius:6px;background:#fff;color:var(--primary);font-size:14px;font-weight:500}
+.btn-outline:hover{background:var(--primary-tint)}
+.hint{margin:0;font-size:12px;line-height:1.4;color:var(--n60);text-align:center}
+.footbar{position:fixed;left:0;right:0;bottom:0;z-index:3;background:#fff;border-top:1px solid var(--line);box-shadow:0 -2px 4px rgba(21,21,21,.08);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.footbar .wrap{display:flex;align-items:center;gap:12px}
+.footbar .kp{flex:1 1 0;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.footbar .kp div{display:flex;flex-direction:column;gap:2px}
+.footbar .kp span:first-child{font-family:var(--ui);font-size:11px;color:var(--n60)}
+.footbar .kp span:last-child{font-family:var(--ui);font-size:15px;font-weight:700;white-space:nowrap;color:var(--n100)}
+.btn-primary{flex:0 0 auto;height:44px;padding:0 14px;border:0;border-radius:6px;background:var(--primary);color:#fff;font-size:14px;font-weight:500}
+.btn-primary:hover{background:var(--primary-hover)}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.kpi span:first-child{font-family:var(--ui);font-size:12px;color:var(--n60)}
+.kpi span:last-child{font-family:var(--ui);font-size:18px;font-weight:700;color:var(--n100)}
+.muted{margin:0;font-size:12px;line-height:1.4;color:var(--n60)}
+.group{display:flex;flex-direction:column;gap:8px}
+.group-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-top:4px}
+.group-h h3{margin:0;font-family:var(--ui);font-size:14px;font-weight:700;color:var(--n100)}
+.group-h span{font-size:12px;color:var(--n60)}
+.scen{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left;padding:12px;border-radius:6px;border:1px solid var(--line);background:#fff}
+.scen[aria-expanded="true"]{border-color:var(--primary);background:var(--primary-tint);border-radius:6px 6px 0 0}
+.scen .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.scen .name{font-family:var(--ui);font-size:14px;font-weight:500;color:var(--n100)}
+.scen .val{font-size:16px;font-weight:500;white-space:nowrap;color:var(--n100)}
+.track{display:block;height:6px;border-radius:3px;background:var(--line)}
+.fill{display:block;height:6px;border-radius:3px;background:var(--primary)}
+.scen .sub{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--n60)}
+.scen .sub span:last-child{white-space:nowrap;color:var(--primary)}
+.detail{margin:-8px 0 4px;padding:4px 12px 8px;border:1px solid var(--primary);border-top:0;border-radius:0 0 6px 6px;background:#fff}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.row span:first-child{font-size:13px;line-height:1.35;color:var(--n80)}
+.row span:last-child{font-size:14px;white-space:nowrap;color:var(--n100)}
+.row.strong{border-top-color:var(--stroke)}
+.row.strong span{font-weight:700}
+.neg{color:var(--error)!important}
+.fill.neg{background:var(--error)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Simulador house flip · RJ</h1>
+    <p id="summary"></p>
+  </div>
+</header>
+<nav>
+  <div class="wrap tabs">
+    <button type="button" id="tab-p" aria-pressed="true">Premissas</button>
+    <button type="button" id="tab-c" aria-pressed="false">Comparativo</button>
+  </div>
+</nav>
+<main class="wrap">
+  <div id="view-p" class="stack">
+    <div id="sections" class="stack"></div>
+    <button type="button" class="btn-outline" id="reset">Restaurar valores da planilha</button>
+    <p class="hint">Os valores ficam salvos neste aparelho.</p>
+  </div>
+  <div id="view-c" class="stack" hidden></div>
+</main>
+<div class="footbar" id="footbar">
+  <div class="wrap">
+    <div class="kp">
+      <div><span>Lucro do projeto</span><span id="f-lucro"></span></div>
+      <div><span>ROI bruto</span><span id="f-roi"></span></div>
+    </div>
+    <button type="button" class="btn-primary" id="go-c">Ver cenários</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var KEY = 'houseflip-rj-v1';
+  var DEFAULTS = {
+    compra: '750000', reformaPct: '17', itbi: '3', escritura: '1,5', carreg: '1600', prazo: '6',
+    corretagem: '5', irGanho: '15', gestor: '20', venda: '1180000', partEdson: '50',
+    retAplic: '14', irAplic: '15',
+    jurosUsd: '5,5', cobertura: '100', cambio: '1', dolBase: '5,6455', dolAlta: '10', dolBaixa: '-10', port: '11',
+    finPct: '80', finTaxa: '13,4', finPrazo: '360', tarifas: '2100'
+  };
+
+  // Campos: [chave, rótulo, unidade, observação] ou ['=', id do cálculo, rótulo]
+  var SECTIONS = [
+    { title: 'Imóvel e reforma', items: [
+      ['compra', 'Preço de compra', 'R$', 'Valor de aquisição do imóvel'],
+      ['reformaPct', 'Custo da reforma', '%', '% do preço de compra'],
+      ['=', 'reforma', 'Custo da reforma'],
+      ['itbi', 'ITBI', '%', '% da compra. Alíquota do Rio de Janeiro'],
+      ['escritura', 'Escritura e registro', '%', '% da compra. Cartório + RGI'],
+      ['carreg', 'IPTU + condomínio + contas', 'R$', 'Por mês'],
+      ['prazo', 'Prazo do ciclo', 'meses', 'Compra, reforma e venda'],
+      ['=', 'custoTotal', 'Custo total do projeto']
+    ] },
+    { title: 'Venda', items: [
+      ['venda', 'Preço de venda', 'R$', 'Preço de venda esperado'],
+      ['=', 'roiBruto', 'ROI bruto sobre compra + reforma'],
+      ['corretagem', 'Corretagem na venda', '%', '% da venda. Mercado: 5–6%'],
+      ['irGanho', 'IR sobre ganho de capital', '%', 'PF: 15% até R$ 5 mi de ganho'],
+      ['gestor', 'Remuneração gestor flip', '%', '% do lucro líquido']
+    ] },
+    { title: 'Investidores', items: [
+      ['partEdson', 'Participação do Edson', '%', 'O restante fica com o Rodrigo'],
+      ['=', 'p2', 'Participação do Rodrigo'],
+      ['=', 'D14', 'Custo do projeto – Edson'],
+      ['=', 'I14', 'Custo do projeto – Rodrigo']
+    ] },
+    { title: 'Fonte 1 – Capital próprio', items: [
+      ['retAplic', 'Retorno esperado da aplicação', '% a.a.', 'Custo de oportunidade do capital próprio'],
+      ['irAplic', 'IR sobre rendimento da aplicação', '%', '15% para prazo acima de 720 dias; 20% para 6–12 meses']
+    ] },
+    { title: 'Fonte 2 – Empréstimo em USD', items: [
+      ['jurosUsd', 'Taxa de juros em USD', '% a.a.', 'Juros e principal pagos na venda'],
+      ['cobertura', 'Parcela do projeto coberta', '%', 'Compra + ITBI + escritura + reforma'],
+      ['cambio', 'Custo de câmbio por conversão', '%', 'IOF + spread, na entrada e na saída'],
+      ['dolBase', 'Variação do dólar – base', '% a.a.', 'Mediana das janelas de 5 anos desde jan/1999'],
+      ['dolAlta', 'Variação do dólar – alta', '% a.a.', 'Real se desvaloriza'],
+      ['dolBaixa', 'Variação do dólar – baixa', '% a.a.', 'Real se valoriza'],
+      ['port', 'Rendimento do portfólio no exterior', '% a.a.', 'Carteira na IB, mantida como colateral']
+    ] },
+    { title: 'Fonte 3 – Financiamento imobiliário', items: [
+      ['finPct', 'Parcela financiada', '%', 'Aplicada sobre o custo do projeto'],
+      ['=', 'finTotal', 'Valor financiado (projeto inteiro)'],
+      ['finTaxa', 'Taxa efetiva com TR e seguros', '% a.a.', 'Juros pagos nas parcelas durante o ciclo'],
+      ['finPrazo', 'Prazo do financiamento (SAC)', 'meses', 'Saldo quitado na venda, sem multa'],
+      ['tarifas', 'Tarifas de avaliação e contratação', 'R$', 'Por imóvel. Confirmar com o banco']
+    ] }
+  ];
+
+  var v = Object.assign({}, DEFAULTS);
+  try { var saved = localStorage.getItem(KEY); if (saved) v = Object.assign({}, DEFAULTS, JSON.parse(saved)); } catch (e) {}
+  var sel = 'r_base';
+  var $ = function (id) { return document.getElementById(id); };
+
+  function num(s) {
+    s = String(s == null ? '' : s).replace(/\s/g, '');
+    if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.');
+    var n = parseFloat(s);
+    return isFinite(n) ? n : 0;
+  }
+  function brl(n) {
+    var r = Math.round(n);
+    if (r === 0) return 'R$ 0';
+    return (r < 0 ? '−' : '') + 'R$ ' + Math.abs(r).toLocaleString('pt-BR');
+  }
+  function pct(n, d) {
+    if (!isFinite(n)) return 'n/a';
+    var dd = d == null ? 1 : d;
+    return (n < 0 ? '−' : '') + Math.abs(n * 100).toLocaleString('pt-BR', { minimumFractionDigits: dd, maximumFractionDigits: dd }) + '%';
+  }
+
+  function compute() {
+    var N = function (k) { return num(v[k]); };
+    var P = function (k) { return num(v[k]) / 100; };
+    var m = {};
+    var prazo = N('prazo') || 1;
+    var t = prazo / 12;
+    m.prazo = prazo;
+    m.compra = N('compra');
+    m.reforma = m.compra * P('reformaPct');
+    m.itbi = m.compra * P('itbi');
+    m.escritura = m.compra * P('escritura');
+    m.carreg = N('carreg') * prazo;
+    m.custoTotal = m.compra + m.reforma + m.itbi + m.escritura + m.carreg;
+    m.venda = N('venda');
+    m.roiBruto = (m.compra + m.reforma) ? m.venda / (m.compra + m.reforma) - 1 : 0;
+    m.corretagem = -m.venda * P('corretagem');
+    m.irGanho = -Math.max(0, m.venda + m.corretagem - (m.compra + m.itbi + m.escritura + m.reforma)) * P('irGanho');
+    m.vendaLiq = m.venda + m.corretagem + m.irGanho;
+    m.finTotal = P('finPct') * m.custoTotal;
+
+    var p1 = P('partEdson'), p2 = 1 - p1;
+    m.p1 = p1; m.p2 = p2;
+    var gestor = P('gestor');
+    var ra = P('retAplic'), irA = P('irAplic');
+    var annual = function (r) { return r <= -1 ? -1 : Math.pow(1 + r, 12 / prazo) - 1; };
+    var fx = function (r) { return Math.pow(1 + r, t) - 1; };
+
+    // Investidor Edson
+    var D14 = m.custoTotal * p1;
+    m.D14 = D14;
+    var C34 = m.vendaLiq * p1 - D14;
+    var C43 = gestor * C34;
+    var e1 = { capital: D14, lucro: C34, gestorV: C43 };
+    e1.roi = D14 ? C34 / D14 : 0;
+    e1.roiA = annual(e1.roi);
+    e1.total = C34 - C43;
+
+    var D21 = P('finPct') * D14;
+    var D24 = D21 > 0 ? N('tarifas') : 0;
+    var D25 = D21 * fx(P('finTaxa'));
+    var D26 = D24 + D25;
+    var D28 = N('finPrazo') ? D21 * prazo / N('finPrazo') : 0;
+    var D33 = D14 - D21 + D28 + D26;
+    var D34 = m.vendaLiq * p1 - D14 - D26;
+    var D46 = ((D21 - D24) * fx(ra) - (D28 + D25) * (Math.pow(1 + ra, ((prazo - 1) / 2) / 12) - 1)) * (1 - irA);
+    var e2 = { entrada: D14 - D21, financiado: D21, tarifas: D24, juros: D25, custoDivida: D26, amort: D28, saldo: D21 - D28, capital: D33, lucro: D34, gestorV: C43, rendBR: D46 };
+    e2.roi = D33 ? D34 / D33 : 0;
+    e2.roiA = annual(e2.roi);
+    e2.total = D34 - C43 + D46;
+
+    // Investidor Rodrigo
+    var I14 = m.custoTotal * p2;
+    m.I14 = I14;
+    var cambio = P('cambio'), port = P('port');
+    var g = Math.pow(1 + P('jurosUsd'), t);
+    var I21 = cambio < 1 ? P('cobertura') * I14 / (1 - cambio) : 0;
+    var H34 = m.vendaLiq * p2 - I14;
+    var H43 = gestor * H34;
+    var rS = { capital: I14, lucro: H34, gestorV: H43, rendEUA: I21 * fx(port) };
+    rS.roi = I14 ? H34 / I14 : 0;
+    rS.roiA = annual(rS.roi);
+    rS.total = H34 - H43 + rS.rendEUA;
+
+    var rendBR = I14 * fx(ra) * (1 - irA);
+    function usd(rate) {
+      var dv = fx(rate);
+      var o = { dv: dv, divida: I21 };
+      o.varCambial = I21 * g * dv;
+      o.custoCambio = cambio * (I21 + I21 * g * (1 + dv));
+      o.custoDivida = o.varCambial + o.custoCambio;
+      o.pagos = cambio * I21;
+      o.saldo = I21;
+      o.capital = I14 - I21 + o.pagos;
+      o.lucro = m.vendaLiq * p2 - I14 - o.custoDivida;
+      o.roiCol = I21 ? (o.lucro - I21 * (g - 1)) / I21 : 0;
+      o.roiColA = annual(o.roiCol);
+      o.gestorV = H43;
+      o.rendBR = rendBR;
+      o.rendEUA = I21 * (Math.pow(1 + port, t) - g);
+      o.total = o.lucro - H43 + rendBR + o.rendEUA;
+      return o;
+    }
+    var rB = usd(P('dolBase')), rA = usd(P('dolAlta')), rL = usd(P('dolBaixa'));
+    var den = I21 * g * (1 + cambio);
+    var be = den ? rB.dv + (rB.total - rS.total) / den : NaN;
+    rB.be = rA.be = rL.be = be;
+
+    var dvB = fx(P('dolBase'));
+    var L24 = cambio * I14;
+    var L33 = I14 + L24;
+    var L34 = m.vendaLiq * p2 - I14 - L24;
+    var rU = { dv: dvB, custoCambio: L24, capital: L33, lucro: L34, gestorV: H43, rendBR: rendBR, rendEUA: -L33 * dvB };
+    rU.roi = L33 ? L34 / L33 : 0;
+    rU.roiA = annual(rU.roi);
+    rU.total = L34 - H43 + rendBR + rU.rendEUA;
+
+    m.e1 = e1; m.e2 = e2; m.rS = rS; m.rB = rB; m.rA = rA; m.rL = rL; m.rU = rU;
+    return m;
+  }
+
+  // Linhas: [rótulo, valor formatado, negativo?, destaque?]
+  function M(l, n, s) { return [l, brl(n), Math.round(n) < 0, !!s]; }
+  function R(l, n, s) { return [l, pct(n), n < 0, !!s]; }
+
+  function scenarios(m) {
+    function usdRows(o) {
+      return [
+        R('Variação do dólar no ciclo', o.dv),
+        M('Dívida contratada (projeto + conversão de ida)', o.divida),
+        M('Variação cambial sobre a dívida', o.varCambial),
+        M('Custo de câmbio (IOF + spread, ida e volta)', o.custoCambio),
+        M('Custo total da dívida', o.custoDivida),
+        M('Custos da dívida pagos no ciclo', o.pagos),
+        M('Saldo devedor quitado na venda', o.saldo),
+        M('Capital próprio investido', o.capital),
+        M('Lucro líquido da operação', o.lucro),
+        R('ROI sobre colateral acima da aplicação (ciclo)', o.roiCol),
+        R('ROI sobre colateral anualizado', o.roiColA),
+        M('(−) Remuneração gestor flip', -o.gestorV),
+        M('Rendimento mantido aplicado no Brasil', o.rendBR),
+        M('Rendimento mantido aplicado nos EUA', o.rendEUA),
+        M('Resultado total', o.total, true),
+        ['Ponto de equilíbrio do câmbio no ciclo', isFinite(o.be) ? pct(o.be, 2) : 'n/a – sem dívida USD', false, false]
+      ];
+    }
+    function usdHint(o) { return 'Dólar ' + pct(o.dv) + ' no ciclo · colateral ' + pct(o.roiColA) + ' a.a.'; }
+    return [
+      { id: 'e_cap', inv: 'Edson', name: 'Saque portfólio (R$)', total: m.e1.total, hint: 'ROI anualizado ' + pct(m.e1.roiA), rows: [
+        M('Capital próprio investido', m.e1.capital),
+        M('Lucro líquido da operação', m.e1.lucro),
+        R('ROI sobre capital próprio (ciclo)', m.e1.roi),
+        R('ROI anualizado', m.e1.roiA),
+        M('(−) Remuneração gestor flip', -m.e1.gestorV),
+        M('Resultado total', m.e1.total, true)
+      ] },
+      { id: 'e_fin', inv: 'Edson', name: 'Financiamento imobiliário', total: m.e2.total, hint: 'ROI anualizado ' + pct(m.e2.roiA), rows: [
+        M('Valor da entrada', m.e2.entrada),
+        M('Valor financiado', m.e2.financiado),
+        M('Avaliação / tarifas', m.e2.tarifas),
+        M('Juros do financiamento no ciclo', m.e2.juros),
+        M('Custo total da dívida', m.e2.custoDivida),
+        M('Amortização paga no ciclo', m.e2.amort),
+        M('Saldo devedor quitado na venda', m.e2.saldo),
+        M('Capital próprio investido', m.e2.capital),
+        M('Lucro líquido da operação', m.e2.lucro),
+        R('ROI sobre capital próprio (ciclo)', m.e2.roi),
+        R('ROI anualizado', m.e2.roiA),
+        M('(−) Remuneração gestor flip', -m.e2.gestorV),
+        M('Rendimento mantido aplicado no Brasil', m.e2.rendBR),
+        M('Resultado total', m.e2.total, true)
+      ] },
+      { id: 'r_saque', inv: 'Rodrigo', name: 'Saque portfólio (R$)', total: m.rS.total, hint: 'ROI anualizado ' + pct(m.rS.roiA), rows: [
+        M('Capital próprio investido', m.rS.capital),
+        M('Lucro líquido da operação', m.rS.lucro),
+        R('ROI sobre capital próprio (ciclo)', m.rS.roi),
+        R('ROI anualizado', m.rS.roiA),
+        M('(−) Remuneração gestor flip', -m.rS.gestorV),
+        M('Rendimento mantido aplicado nos EUA', m.rS.rendEUA),
+        M('Resultado total', m.rS.total, true)
+      ] },
+      { id: 'r_base', inv: 'Rodrigo', name: 'Empréstimo USD – base', total: m.rB.total, hint: usdHint(m.rB), rows: usdRows(m.rB) },
+      { id: 'r_alta', inv: 'Rodrigo', name: 'Empréstimo USD – alta', total: m.rA.total, hint: usdHint(m.rA), rows: usdRows(m.rA) },
+      { id: 'r_baixa', inv: 'Rodrigo', name: 'Empréstimo USD – baixa', total: m.rL.total, hint: usdHint(m.rL), rows: usdRows(m.rL) },
+      { id: 'r_usd', inv: 'Rodrigo', name: 'Saque portfólio (USD)', total: m.rU.total, hint: 'ROI anualizado ' + pct(m.rU.roiA), rows: [
+        R('Variação do dólar no ciclo', m.rU.dv),
+        M('Custo de câmbio (IOF + spread)', m.rU.custoCambio),
+        M('Capital próprio investido', m.rU.capital),
+        M('Lucro líquido da operação', m.rU.lucro),
+        R('ROI sobre capital próprio (ciclo)', m.rU.roi),
+        R('ROI anualizado', m.rU.roiA),
+        M('(−) Remuneração gestor flip', -m.rU.gestorV),
+        M('Rendimento mantido aplicado no Brasil', m.rU.rendBR),
+        M('Rendimento mantido aplicado nos EUA', m.rU.rendEUA),
+        M('Resultado total', m.rU.total, true)
+      ] }
+    ];
+  }
+
+  function rowsHtml(rows) {
+    return rows.map(function (r) {
+      return '<div class="row' + (r[3] ? ' strong' : '') + '"><span>' + r[0] + '</span><span' + (r[2] ? ' class="neg"' : '') + '>' + r[1] + '</span></div>';
+    }).join('');
+  }
+
+  function buildPremissas() {
+    var html = SECTIONS.map(function (sec) {
+      var items = sec.items.map(function (it) {
+        if (it[0] === '=') {
+          return '<div class="calc"><span>' + it[2] + '</span><span id="calc-' + it[1] + '"></span></div>';
+        }
+        var k = it[0], unit = it[2], note = it[3];
+        var mode = /^dol/.test(k) ? 'text' : 'decimal';
+        var pre = unit === 'R$' ? '<span>R$</span>' : '';
+        var suf = unit === 'R$' ? '' : '<span>' + unit + '</span>';
+        return '<div class="field"><div class="txt"><label for="in-' + k + '">' + it[1] + '</label>' +
+          (note ? '<p class="note">' + note + '</p>' : '') + '</div>' +
+          '<div class="box">' + pre + '<input id="in-' + k + '" data-k="' + k + '" type="text" inputmode="' + mode + '" enterkeyhint="next" autocomplete="off">' + suf + '</div></div>';
+      }).join('');
+      return '<section class="card"><h2>' + sec.title + '</h2>' + items + '</section>';
+    }).join('');
+    $('sections').innerHTML = html;
+    fillInputs();
+  }
+
+  function fillInputs() {
+    Array.prototype.forEach.call(document.querySelectorAll('input[data-k]'), function (el) { el.value = v[el.dataset.k]; });
+  }
+
+  function setText(id, txt, neg) {
+    var el = $(id);
+    if (!el) return;
+    el.textContent = txt;
+    el.classList.toggle('neg', !!neg);
+  }
+
+  function update() {
+    var m = compute();
+    $('summary').textContent = 'Ciclo de ' + m.prazo + ' meses · Compra ' + brl(m.compra) + ' · Reforma ' + brl(m.reforma) + ' · ROI bruto ' + pct(m.roiBruto, 0);
+    setText('calc-reforma', brl(m.reforma));
+    setText('calc-custoTotal', brl(m.custoTotal));
+    setText('calc-roiBruto', pct(m.roiBruto), m.roiBruto < 0);
+    setText('calc-p2', pct(m.p2, 0), m.p2 < 0);
+    setText('calc-D14', brl(m.D14));
+    setText('calc-I14', brl(m.I14));
+    setText('calc-finTotal', brl(m.finTotal));
+    var lucro = m.vendaLiq - m.custoTotal;
+    setText('f-lucro', brl(lucro), lucro < 0);
+    setText('f-roi', pct(m.roiBruto), m.roiBruto < 0);
+    renderComparativo(m, lucro);
+  }
+
+  function renderComparativo(m, lucro) {
+    var list = scenarios(m);
+    var maxAbs = 1;
+    list.forEach(function (s) { maxAbs = Math.max(maxAbs, Math.abs(s.total)); });
+    function scen(s) {
+      var on = s.id === sel, neg = s.total < 0;
+      var w = Math.max(2, Math.round(Math.abs(s.total) / maxAbs * 100));
+      return '<button type="button" class="scen" data-id="' + s.id + '" aria-expanded="' + on + '">' +
+        '<span class="top"><span class="name">' + s.name + '</span><span class="val' + (neg ? ' neg' : '') + '">' + brl(s.total) + '</span></span>' +
+        '<span class="track"><span class="fill' + (neg ? ' neg' : '') + '" style="width:' + w + '%"></span></span>' +
+        '<span class="sub"><span>' + s.hint + '</span><span>' + (on ? 'Fechar' : 'Detalhe') + '</span></span></button>' +
+        (on ? '<div class="detail">' + rowsHtml(s.rows) + '</div>' : '');
+    }
+    function group(title, sub, inv) {
+      return '<div class="group"><div class="group-h"><h3>' + title + '</h3><span>' + sub + '</span></div>' +
+        list.filter(function (s) { return s.inv === inv; }).map(scen).join('') + '</div>';
+    }
+    var kpis = [
+      ['Custo total do projeto', brl(m.custoTotal), false],
+      ['Venda líquida', brl(m.vendaLiq), m.vendaLiq < 0],
+      ['Lucro do projeto', brl(lucro), lucro < 0],
+      ['ROI bruto', pct(m.roiBruto), m.roiBruto < 0]
+    ].map(function (k) { return '<div class="kpi"><span>' + k[0] + '</span><span' + (k[2] ? ' class="neg"' : '') + '>' + k[1] + '</span></div>'; }).join('');
+    var projeto = [
+      M('Preço de compra', m.compra),
+      M('ITBI', m.itbi),
+      M('Escritura e registro', m.escritura),
+      M('Reforma', m.reforma),
+      M('Carregamento no período', m.carreg),
+      M('Custo total do projeto', m.custoTotal, true),
+      M('Preço de venda', m.venda),
+      M('(−) Corretagem', m.corretagem),
+      M('(−) IR sobre ganho de capital', m.irGanho),
+      M('Venda líquida', m.vendaLiq, true)
+    ];
+    $('view-c').innerHTML =
+      '<div class="kpis">' + kpis + '</div>' +
+      '<section class="card"><h2>Resultado total por cenário</h2>' +
+      '<p class="muted">Flip + rendimento do que ficou aplicado, após a remuneração do gestor. Toque num cenário para abrir o detalhe.</p>' +
+      group('Investidor Edson', pct(m.p1, 0) + ' · ' + brl(m.D14), 'Edson') +
+      group('Investidor Rodrigo', pct(m.p2, 0) + ' · ' + brl(m.I14), 'Rodrigo') +
+      '</section>' +
+      '<section class="card"><h2>Projeto (comum a todos os cenários)</h2><div>' + rowsHtml(projeto) + '</div></section>';
+  }
+
+  function showTab(t) {
+    var p = t === 'p';
+    $('view-p').hidden = !p;
+    $('view-c').hidden = p;
+    $('footbar').hidden = !p;
+    $('tab-p').setAttribute('aria-pressed', String(p));
+    $('tab-c').setAttribute('aria-pressed', String(!p));
+    window.scrollTo(0, 0);
+  }
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} }
+
+  buildPremissas();
+  update();
+
+  $('sections').addEventListener('input', function (e) {
+    var k = e.target.dataset && e.target.dataset.k;
+    if (!k) return;
+    v[k] = e.target.value;
+    save();
+    update();
+  });
+  $('sections').addEventListener('focusin', function (e) {
+    var el = e.target;
+    if (el.tagName === 'INPUT') setTimeout(function () { try { el.select(); } catch (x) {} }, 0);
+  });
+  $('sections').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+    e.preventDefault();
+    var all = Array.prototype.slice.call(document.querySelectorAll('input[data-k]'));
+    var next = all[all.indexOf(e.target) + 1];
+    if (next) next.focus(); else e.target.blur();
+  });
+  $('view-c').addEventListener('click', function (e) {
+    var b = e.target.closest('.scen');
+    if (!b) return;
+    sel = sel === b.dataset.id ? 'none' : b.dataset.id;
+    update();
+  });
+  $('tab-p').addEventListener('click', function () { showTab('p'); });
+  $('tab-c').addEventListener('click', function () { showTab('c'); });
+  $('go-c').addEventListener('click', function () { showTab('c'); });
+  $('reset').addEventListener('click', function () {
+    v = Object.assign({}, DEFAULTS);
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    fillInputs();
+    update();
+  });
+})();
+</script>
+</body>
+</html>
