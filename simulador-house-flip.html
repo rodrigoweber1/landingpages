@@ -31,8 +31,30 @@ header{background:var(--nav);color:#fff;padding:calc(12px + env(safe-area-inset-
 header h1{margin:0;font-family:var(--ui);font-size:20px;font-weight:700;letter-spacing:-0.009em}
 header p{margin:2px 0 0;font-size:12px;line-height:1.4;color:var(--line)}
 nav{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--line);padding:8px 16px}
-.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;background:var(--bg);border-radius:8px;padding:4px}
-.tabs button{height:40px;border:0;border-radius:6px;font-family:var(--ui);font-size:14px;font-weight:500;background:transparent;color:var(--n80)}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--bg);border-radius:8px;padding:4px}
+.tabs button{height:40px;border:0;border-radius:6px;font-family:var(--ui);font-size:13px;font-weight:500;background:transparent;color:var(--n80);padding:0 4px}
+.simbar{display:flex;gap:6px;overflow-x:auto;padding-top:8px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.simbar::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;height:40px;max-width:180px;padding:0 14px;border:1px solid var(--stroke);border-radius:250px;background:#fff;font-family:var(--ui);font-size:13px;font-weight:500;color:var(--n80);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-tint);color:var(--primary)}
+.chip.add{border-style:dashed;color:var(--primary)}
+.chip:hover{border-color:var(--primary)}
+.name-box{width:180px}
+.name-box input{text-align:left}
+.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.btn-outline:disabled{opacity:.3;cursor:default}
+.btn-outline.danger{border-color:var(--error);color:var(--error)}
+.btn-outline.danger:hover{background:#FFE9E9}
+.cmp-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;-webkit-overflow-scrolling:touch}
+.cmp-wrap table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
+.cmp-wrap th,.cmp-wrap td{padding:10px 10px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right;color:var(--n100);background:#fff}
+.cmp-wrap tbody th{position:sticky;left:0;z-index:1;text-align:left;white-space:normal;min-width:132px;max-width:150px;font-weight:400;color:var(--n80);border-right:1px solid var(--line);line-height:1.3}
+.cmp-wrap thead th{background:var(--bg1);font-family:var(--ui);font-weight:700;vertical-align:bottom}
+.cmp-wrap thead th:first-child{position:sticky;left:0;z-index:2;text-align:left;color:var(--n60);font-weight:500;border-right:1px solid var(--line)}
+.cmp-wrap tr.sec th,.cmp-wrap tr.sec td{background:var(--bg1);font-family:var(--ui);font-weight:700;color:var(--n100);font-size:12px;padding-top:8px;padding-bottom:8px}
+.cmp-wrap tr:last-child th,.cmp-wrap tr:last-child td{border-bottom:0}
+.cmp-wrap td.best{color:var(--primary);font-weight:700}
+.th-link{border:0;background:transparent;padding:4px 0;font:inherit;font-weight:700;color:var(--primary);text-decoration:underline;text-underline-offset:3px;max-width:120px;white-space:normal;text-align:right}
 .tabs button[aria-pressed="true"]{background:var(--primary);color:#fff}
 main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
 .stack{display:flex;flex-direction:column;gap:12px}
@@ -118,18 +140,44 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   </div>
 </header>
 <nav>
-  <div class="wrap tabs">
-    <button type="button" id="tab-p" aria-pressed="true">Premissas</button>
-    <button type="button" id="tab-c" aria-pressed="false">Comparativo</button>
+  <div class="wrap">
+    <div class="tabs">
+      <button type="button" id="tab-p" aria-pressed="true">Premissas</button>
+      <button type="button" id="tab-c" aria-pressed="false">Comparativo</button>
+      <button type="button" id="tab-s" aria-pressed="false">Lado a lado</button>
+    </div>
+    <div class="simbar" id="simbar" aria-label="Imóveis simulados"></div>
   </div>
 </nav>
 <main class="wrap">
   <div id="view-p" class="stack">
+    <section class="card">
+      <div class="field">
+        <div class="txt">
+          <label for="sim-name">Nome do imóvel</label>
+          <p class="note" id="sim-count"></p>
+        </div>
+        <div class="box name-box"><input id="sim-name" type="text" maxlength="40" autocomplete="off" enterkeyhint="done"></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn-outline" id="sim-dup">Duplicar</button>
+        <button type="button" class="btn-outline danger" id="sim-del">Excluir</button>
+      </div>
+    </section>
     <div id="sections" class="stack"></div>
     <button type="button" class="btn-outline" id="reset">Restaurar valores da planilha</button>
-    <p class="hint">Os valores ficam salvos neste aparelho.</p>
+    <section class="card">
+      <h2>Guardar e levar para outro aparelho</h2>
+      <p class="muted">As simulações ficam salvas automaticamente neste aparelho e navegador. Para fazer backup ou abrir no computador ou em outro celular, exporte o arquivo e importe lá.</p>
+      <div class="actions">
+        <button type="button" class="btn-outline" id="export">Exportar</button>
+        <button type="button" class="btn-outline" id="import">Importar</button>
+      </div>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+    </section>
   </div>
   <div id="view-c" class="stack" hidden></div>
+  <div id="view-s" class="stack" hidden></div>
 </main>
 <div class="footbar" id="footbar">
   <div class="wrap">
@@ -144,7 +192,8 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 <script>
 (function () {
   'use strict';
-  var KEY = 'houseflip-rj-v1';
+  var KEY = 'flippingfam-rj-v2';
+  var OLD_KEY = 'houseflip-rj-v1';
   var DEFAULTS = {
     compra: '750000', reformaPct: '17', itbi: '3', escritura: '1,5', carreg: '1600', prazo: '6',
     corretagem: '5', irGanho: '15', gestor: '20', venda: '1180000', partEdson: '50',
@@ -206,8 +255,40 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     ] }
   ];
 
-  var v = Object.assign({}, DEFAULTS);
-  try { var saved = localStorage.getItem(KEY); if (saved) v = Object.assign({}, DEFAULTS, JSON.parse(saved)); } catch (e) {}
+  var MAX_SIMS = 5;
+
+  function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function makeSim(name, vals) { return { id: newId(), name: name, v: Object.assign({}, DEFAULTS, vals || {}) }; }
+  function nextName() {
+    var n = 1;
+    var names = store.sims.map(function (s) { return s.name; });
+    while (names.indexOf('Imóvel ' + n) >= 0) n++;
+    return 'Imóvel ' + n;
+  }
+  function cleanStore(raw) {
+    if (!raw || !Array.isArray(raw.sims) || !raw.sims.length) return null;
+    var sims = raw.sims.slice(0, MAX_SIMS).map(function (s, i) {
+      return { id: String(s.id || newId()), name: String(s.name || ('Imóvel ' + (i + 1))).slice(0, 40), v: Object.assign({}, DEFAULTS, s.v || {}) };
+    });
+    var active = sims.some(function (s) { return s.id === raw.active; }) ? raw.active : sims[0].id;
+    return { sims: sims, active: active };
+  }
+
+  // Simulações guardadas no aparelho. A versão antiga (um imóvel só) vira o "Imóvel 1".
+  var store = null;
+  try { store = cleanStore(JSON.parse(localStorage.getItem(KEY) || 'null')); } catch (e) {}
+  if (!store) {
+    var old = null;
+    try { old = JSON.parse(localStorage.getItem(OLD_KEY) || 'null'); } catch (e) {}
+    var first = makeSim('Imóvel 1', old);
+    store = { sims: [first], active: first.id };
+  }
+  function cur() {
+    for (var i = 0; i < store.sims.length; i++) if (store.sims[i].id === store.active) return store.sims[i];
+    return store.sims[0];
+  }
+  var v = cur().v;
+  var tab = 'p';
   var sel = 'r_base';
   var HIDDEN_SCEN = ['r_alta', 'r_baixa', 'r_usd'];
   var moreScen = false;
@@ -230,9 +311,9 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     return (n < 0 ? '−' : '') + Math.abs(n * 100).toLocaleString('pt-BR', { minimumFractionDigits: dd, maximumFractionDigits: dd }) + '%';
   }
 
-  function compute() {
-    var N = function (k) { return num(v[k]); };
-    var P = function (k) { return num(v[k]) / 100; };
+  function compute(src) {
+    var N = function (k) { return num(src[k]); };
+    var P = function (k) { return num(src[k]) / 100; };
     var m = {};
     var prazo = N('prazo') || 1;
     var t = prazo / 12;
@@ -458,9 +539,88 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     el.classList.toggle('neg', !!neg);
   }
 
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+  }
+
+  function renderSimBar() {
+    var chips = store.sims.map(function (s) {
+      return '<button type="button" class="chip" data-sim="' + s.id + '" aria-pressed="' + (s.id === store.active) + '">' + esc(s.name || 'Sem nome') + '</button>';
+    }).join('');
+    if (store.sims.length < MAX_SIMS) chips += '<button type="button" class="chip add" id="sim-add">+ Novo imóvel</button>';
+    $('simbar').innerHTML = chips;
+    $('sim-name').value = cur().name;
+    $('sim-count').textContent = store.sims.length + ' de ' + MAX_SIMS + ' imóveis';
+    $('sim-dup').disabled = store.sims.length >= MAX_SIMS;
+    $('sim-del').disabled = store.sims.length <= 1;
+  }
+
+  function activate(id) {
+    store.active = id;
+    v = cur().v;
+    sel = 'r_base';
+    save();
+    fillInputs();
+    renderSimBar();
+    update();
+  }
+
+  function addSim(copyFrom) {
+    if (store.sims.length >= MAX_SIMS) return;
+    var s = copyFrom ? makeSim(copyFrom.name + ' (cópia)', copyFrom.v) : makeSim(nextName());
+    store.sims.push(s);
+    activate(s.id);
+  }
+
+  function renderLado() {
+    var sims = store.sims;
+    var data = sims.map(function (s) {
+      var m = compute(s.v);
+      return { s: s, m: m, list: scenarios(m), lucro: m.vendaLiq - m.custoTotal };
+    });
+    // [rótulo, função valor, formato, destacar o maior?]
+    var rows = [
+      ['sec', 'Projeto'],
+      ['Preço de compra', function (d) { return d.m.compra; }, 'brl'],
+      ['Custo total do projeto', function (d) { return d.m.custoTotal; }, 'brl'],
+      ['Preço de venda', function (d) { return d.m.venda; }, 'brl'],
+      ['Venda líquida', function (d) { return d.m.vendaLiq; }, 'brl'],
+      ['Lucro do projeto', function (d) { return d.lucro; }, 'brl', true],
+      ['ROI bruto', function (d) { return d.m.roiBruto; }, 'pct', true],
+      ['Prazo do ciclo', function (d) { return d.m.prazo; }, 'meses']
+    ];
+    [['Edson', 'Resultado total – Edson'], ['Rodrigo', 'Resultado total – Rodrigo']].forEach(function (g) {
+      rows.push(['sec', g[1]]);
+      data[0].list.filter(function (sc) { return sc.inv === g[0]; }).forEach(function (sc) {
+        rows.push([sc.name, function (d) { for (var i = 0; i < d.list.length; i++) if (d.list[i].id === sc.id) return d.list[i].total; return 0; }, 'brl', true]);
+      });
+    });
+    var fmt = { brl: brl, pct: function (n) { return pct(n); }, meses: function (n) { return n + ' meses'; } };
+    var head = '<tr><th scope="col">Indicador</th>' + data.map(function (d) {
+      return '<th scope="col"><button type="button" class="th-link" data-open="' + d.s.id + '">' + esc(d.s.name || 'Sem nome') + '</button></th>';
+    }).join('') + '</tr>';
+    var body = rows.map(function (r) {
+      if (r[0] === 'sec') return '<tr class="sec"><th scope="row">' + r[1] + '</th>' + data.map(function () { return '<td></td>'; }).join('') + '</tr>';
+      var vals = data.map(r[1]);
+      var best = r[3] && data.length > 1 ? Math.max.apply(null, vals) : null;
+      return '<tr><th scope="row">' + r[0] + '</th>' + vals.map(function (x) {
+        var cls = [];
+        if (best !== null && x === best) cls.push('best');
+        if (x < 0) cls.push('neg');
+        return '<td' + (cls.length ? ' class="' + cls.join(' ') + '"' : '') + '>' + fmt[r[2]](x) + '</td>';
+      }).join('') + '</tr>';
+    }).join('');
+    $('view-s').innerHTML =
+      '<section class="card"><h2>Imóveis lado a lado</h2>' +
+      '<p class="muted">' + (data.length > 1
+        ? 'Em roxo, o melhor resultado de cada linha. Deslize a tabela para o lado. Toque no nome de um imóvel para editá-lo.'
+        : 'Só há um imóvel. Toque em "+ Novo imóvel" no alto para criar outro e comparar.') + '</p>' +
+      '<div class="cmp-wrap"><table><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div></section>';
+  }
+
   function update() {
-    var m = compute();
-    $('summary').textContent = 'Ciclo de ' + m.prazo + ' meses · Compra ' + brl(m.compra) + ' · Reforma ' + brl(m.reforma) + ' · ROI bruto ' + pct(m.roiBruto, 0);
+    var m = compute(v);
+    $('summary').textContent = (cur().name || 'Sem nome') + ' · Ciclo de ' + m.prazo + ' meses · Compra ' + brl(m.compra) + ' · Reforma ' + brl(m.reforma) + ' · ROI bruto ' + pct(m.roiBruto, 0);
     setText('calc-reforma', brl(m.reforma));
     setText('calc-custoTotal', brl(m.custoTotal));
     setText('calc-roiBruto', pct(m.roiBruto), m.roiBruto < 0);
@@ -472,6 +632,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     setText('f-lucro', brl(lucro), lucro < 0);
     setText('f-roi', pct(m.roiBruto), m.roiBruto < 0);
     renderComparativo(m, lucro);
+    renderLado();
   }
 
   function renderComparativo(m, lucro) {
@@ -525,19 +686,72 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   }
 
   function showTab(t) {
-    var p = t === 'p';
-    $('view-p').hidden = !p;
-    $('view-c').hidden = p;
-    $('footbar').hidden = !p;
-    $('tab-p').setAttribute('aria-pressed', String(p));
-    $('tab-c').setAttribute('aria-pressed', String(!p));
+    tab = t;
+    ['p', 'c', 's'].forEach(function (k) {
+      $('view-' + k).hidden = k !== t;
+      $('tab-' + k).setAttribute('aria-pressed', String(k === t));
+    });
+    $('footbar').hidden = t !== 'p';
     window.scrollTo(0, 0);
   }
 
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
 
   buildPremissas();
+  renderSimBar();
   update();
+
+  $('simbar').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    if (b.id === 'sim-add') addSim(null);
+    else if (b.dataset.sim && b.dataset.sim !== store.active) activate(b.dataset.sim);
+  });
+  $('sim-name').addEventListener('input', function (e) {
+    cur().name = e.target.value.slice(0, 40);
+    save();
+    Array.prototype.forEach.call(document.querySelectorAll('.chip[data-sim="' + store.active + '"]'), function (c) { c.textContent = cur().name || 'Sem nome'; });
+    update();
+  });
+  $('sim-dup').addEventListener('click', function () { addSim(cur()); });
+  $('sim-del').addEventListener('click', function () {
+    if (store.sims.length <= 1) return;
+    if (!window.confirm('Excluir a simulação "' + (cur().name || 'Sem nome') + '"? Esta ação não pode ser desfeita.')) return;
+    var id = store.active;
+    store.sims = store.sims.filter(function (s) { return s.id !== id; });
+    activate(store.sims[0].id);
+  });
+  $('view-s').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-open]');
+    if (!b) return;
+    activate(b.dataset.open);
+    showTab('p');
+  });
+  $('export').addEventListener('click', function () {
+    var blob = new Blob([JSON.stringify({ app: 'flipping-fam-rj', version: 2, savedAt: new Date().toISOString(), sims: store.sims, active: store.active }, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'flipping-fam-simulacoes.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  });
+  $('import').addEventListener('click', function () { $('import-file').click(); });
+  $('import-file').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      var next = null;
+      try { next = cleanStore(JSON.parse(r.result)); } catch (x) {}
+      if (!next) { window.alert('Não foi possível ler este arquivo. Use um arquivo exportado por este simulador.'); return; }
+      if (!window.confirm('Substituir as ' + store.sims.length + ' simulações deste aparelho pelas ' + next.sims.length + ' do arquivo?')) return;
+      store = next;
+      activate(store.active);
+    };
+    r.readAsText(f);
+  });
 
   $('sections').addEventListener('input', function (e) {
     var k = e.target.dataset && e.target.dataset.k;
@@ -566,10 +780,13 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   });
   $('tab-p').addEventListener('click', function () { showTab('p'); });
   $('tab-c').addEventListener('click', function () { showTab('c'); });
+  $('tab-s').addEventListener('click', function () { showTab('s'); });
   $('go-c').addEventListener('click', function () { showTab('c'); });
   $('reset').addEventListener('click', function () {
-    v = Object.assign({}, DEFAULTS);
-    try { localStorage.removeItem(KEY); } catch (e) {}
+    if (!window.confirm('Voltar "' + (cur().name || 'Sem nome') + '" aos valores da planilha?')) return;
+    cur().v = Object.assign({}, DEFAULTS);
+    v = cur().v;
+    save();
     fillInputs();
     update();
   });
