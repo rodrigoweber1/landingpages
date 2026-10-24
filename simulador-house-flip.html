@@ -77,6 +77,8 @@ nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--
 .login-box .btn-primary{width:100%}
 .login-box .btn-primary:disabled{opacity:.3}
 .login-msg{margin:0;font-size:13px;line-height:1.45;color:var(--n80);min-height:1em}
+.backup-card{padding-top:12px;padding-bottom:12px;gap:8px}
+.backup-card h2{font-size:14px}
 .btn-ghost{height:44px;border:0;border-radius:6px;background:transparent;color:var(--n80);font-size:14px;font-weight:500}
 .cmp-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;-webkit-overflow-scrolling:touch}
 .cmp-wrap table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
@@ -200,11 +202,11 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     </section>
     <div id="sections" class="stack"></div>
     <button type="button" class="btn-outline" id="reset">Restaurar valores da planilha</button>
-    <section class="card">
-      <h2>Guardar e levar para outro aparelho</h2>
-      <p class="muted">As simulações ficam salvas automaticamente neste aparelho e navegador. Para fazer backup ou abrir em outro aparelho, exporte aqui e importe lá. Exportar baixa um arquivo e também copia os dados, para você colar numa nota se o download não for permitido.</p>
+    <section class="card backup-card">
+      <h2 id="backup-title">Guardar e levar para outro aparelho</h2>
+      <p class="muted" id="backup-text">As simulações ficam salvas automaticamente neste aparelho e navegador. Para fazer backup ou abrir em outro aparelho, exporte aqui e importe lá. Exportar baixa um arquivo e também copia os dados, para você colar numa nota se o download não for permitido.</p>
       <div class="actions">
-        <button type="button" class="btn-outline" id="export">Exportar</button>
+        <button type="button" class="btn-outline" id="export">Exportar cópia</button>
         <button type="button" class="btn-outline" id="import">Importar</button>
       </div>
       <div class="import-panel" id="import-panel" hidden>
@@ -898,6 +900,8 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   }
 
   function startCloud() {
+    $('backup-title').textContent = 'Cópia de segurança';
+    $('backup-text').textContent = 'As simulações ficam salvas no Supabase e aparecem para todos os membros, em qualquer aparelho. Use "Exportar cópia" só se quiser guardar um backup fora dele. "Importar" adiciona imóveis de uma cópia.';
     if (!sb) {
       $('cloud-line').hidden = false;
       setStatus('Não foi possível carregar a conexão com o Supabase. Usando só este aparelho.', true);
