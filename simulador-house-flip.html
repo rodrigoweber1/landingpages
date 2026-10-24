@@ -77,6 +77,18 @@ nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--
 .login-box .btn-primary{width:100%}
 .login-box .btn-primary:disabled{opacity:.3}
 .login-msg{margin:0;font-size:13px;line-height:1.45;color:var(--n80);min-height:1em}
+.login-field{display:flex;flex-direction:column;gap:6px}
+.login-links{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border-top:1px solid var(--line);padding-top:8px}
+.link-btn{min-height:40px;border:0;background:transparent;padding:0;font-size:14px;font-weight:500;color:var(--primary);text-align:left;text-decoration:underline;text-underline-offset:3px}
+.cloud-btns{display:flex;gap:6px;flex:0 0 auto}
+.pick-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pick-h span{font-size:12px;color:var(--n60)}
+.pick{display:flex;flex-wrap:wrap;gap:6px}
+.pick-chip{min-height:40px;max-width:100%;padding:0 12px 0 10px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--stroke);border-radius:250px;background:var(--surface);font-family:var(--ui);font-size:13px;font-weight:500;color:var(--n80);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pick-chip::before{content:"";flex:0 0 auto;width:14px;height:14px;border:1.5px solid var(--stroke);border-radius:3px;background:var(--surface)}
+.pick-chip[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-tint);color:var(--primary)}
+.pick-chip[aria-pressed="true"]::before{border-color:var(--primary);background:var(--primary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3 7.2l2.6 2.6L11 4.4' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat}
+.pick-actions{display:flex;gap:16px}
 .backup-card{padding-top:12px;padding-bottom:12px;gap:8px}
 .backup-card h2{font-size:14px}
 .btn-ghost{height:44px;border:0;border-radius:6px;background:transparent;color:var(--n80);font-size:14px;font-weight:500}
@@ -172,7 +184,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   <div class="wrap">
     <h1>Simulador Flipping Fam – RJ</h1>
     <p id="summary"></p>
-    <p class="cloud-line" id="cloud-line" hidden><span id="cloud-status"></span><button type="button" id="logout">Sair</button></p>
+    <p class="cloud-line" id="cloud-line" hidden><span id="cloud-status"></span><span class="cloud-btns"><button type="button" id="setpw">Senha</button><button type="button" id="logout">Sair</button></span></p>
   </div>
 </header>
 <nav>
@@ -226,11 +238,24 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 <div class="login" id="login" hidden>
   <form class="login-box" id="login-form" novalidate>
     <h2>Simulador Flipping Fam – RJ</h2>
-    <p class="muted">Entre com o seu e-mail. Você recebe um link de acesso; não precisa de senha. Só e-mails cadastrados veem as simulações.</p>
-    <label for="login-email">E-mail</label>
-    <input id="login-email" type="email" inputmode="email" autocomplete="email" required>
-    <button type="submit" class="btn-primary" id="login-send">Enviar link de acesso</button>
+    <p class="muted" id="login-intro"></p>
+    <div class="login-field" id="email-wrap">
+      <label for="login-email">E-mail</label>
+      <input id="login-email" type="email" inputmode="email" autocomplete="username" autocapitalize="off" required>
+    </div>
+    <div class="login-field" id="pass-wrap">
+      <label for="login-pass" id="login-pass-label">Senha</label>
+      <input id="login-pass" type="password" autocomplete="current-password" minlength="6">
+    </div>
+    <button type="submit" class="btn-primary" id="login-send">Entrar</button>
     <p class="login-msg" id="login-msg" role="status"></p>
+    <div class="login-links">
+      <button type="button" class="link-btn" data-mode="login">Voltar para entrar com senha</button>
+      <button type="button" class="link-btn" data-mode="signup">Primeiro acesso: criar senha</button>
+      <button type="button" class="link-btn" data-mode="forgot">Esqueci a senha</button>
+      <button type="button" class="link-btn" data-mode="magic">Entrar com link por e-mail</button>
+      <button type="button" class="link-btn" id="setpw-cancel">Cancelar</button>
+    </div>
   </form>
 </div>
 <div class="dlg" id="dlg" hidden>
@@ -334,7 +359,13 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     ] }
   ];
 
-  var MAX_SIMS = 5;
+  var MAX_SIMS = 10;
+  var CMP_KEY = 'flippingfam-rj-fora-da-comparacao';
+
+  // Imóveis tirados da comparação lado a lado (escolha de cada aparelho; novos imóveis entram por padrão).
+  var cmpOff = [];
+  try { cmpOff = JSON.parse(localStorage.getItem(CMP_KEY) || '[]') || []; } catch (e) { cmpOff = []; }
+  function saveCmp() { try { localStorage.setItem(CMP_KEY, JSON.stringify(cmpOff)); } catch (e) {} }
 
   function newId() {
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -671,7 +702,18 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   }
 
   function renderLado() {
-    var sims = store.sims;
+    var sims = store.sims.filter(function (s) { return cmpOff.indexOf(s.id) < 0; });
+    var picker = '<section class="card"><div class="pick-h"><h2>Imóveis na comparação</h2><span>' + sims.length + ' de ' + store.sims.length + '</span></div>' +
+      '<div class="pick">' + store.sims.map(function (s) {
+        var on = cmpOff.indexOf(s.id) < 0;
+        return '<button type="button" class="pick-chip" data-cmp="' + s.id + '" aria-pressed="' + on + '">' + esc(s.name || 'Sem nome') + '</button>';
+      }).join('') + '</div>' +
+      '<div class="pick-actions"><button type="button" class="link-btn" data-cmp-all="1">Marcar todos</button>' +
+      '<button type="button" class="link-btn" data-cmp-none="1">Desmarcar todos</button></div></section>';
+    if (!sims.length) {
+      $('view-s').innerHTML = picker + '<section class="card"><p class="muted">Nenhum imóvel selecionado. Toque nos nomes acima para escolher quais comparar.</p></section>';
+      return;
+    }
     var data = sims.map(function (s) {
       var m = compute(s.v);
       return { s: s, m: m, list: scenarios(m), lucro: m.vendaLiq - m.custoTotal };
@@ -708,11 +750,13 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
         return '<td' + (cls.length ? ' class="' + cls.join(' ') + '"' : '') + '>' + fmt[r[2]](x) + '</td>';
       }).join('') + '</tr>';
     }).join('');
-    $('view-s').innerHTML =
+    $('view-s').innerHTML = picker +
       '<section class="card"><h2>Imóveis lado a lado</h2>' +
       '<p class="muted">' + (data.length > 1
         ? 'Em roxo, o melhor resultado de cada linha. Deslize a tabela para o lado. Toque no nome de um imóvel para editá-lo.'
-        : 'Só há um imóvel. Toque em "+ Novo imóvel" no alto para criar outro e comparar.') + '</p>' +
+        : (store.sims.length > 1
+          ? 'Só um imóvel selecionado. Marque outros acima para comparar.'
+          : 'Só há um imóvel. Toque em "+ Novo imóvel" no alto para criar outro e comparar.')) + '</p>' +
       '<div class="cmp-wrap"><table><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div></section>';
   }
 
@@ -832,10 +876,47 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     return { id: row.id, name: row.nome || 'Sem nome', v: Object.assign({}, DEFAULTS, row.valores || {}) };
   }
 
-  function showLogin(msg) {
-    $('login').hidden = false;
+  // Telas do login: login (e-mail + senha), signup (criar senha), forgot (esqueci),
+  // magic (link por e-mail) e setpw (definir nova senha, já conectado).
+  var loginMode = 'login';
+  var MODES = {
+    login: { intro: 'Entre com e-mail e senha. Você fica conectado neste aparelho até tocar em "Sair".', btn: 'Entrar', pass: true, passLabel: 'Senha', ac: 'current-password' },
+    signup: { intro: 'Primeiro acesso: escolha uma senha com pelo menos 6 caracteres. Use o e-mail cadastrado no grupo.', btn: 'Criar senha e entrar', pass: true, passLabel: 'Nova senha', ac: 'new-password' },
+    forgot: { intro: 'Digite o seu e-mail. Você recebe um link para criar uma nova senha.', btn: 'Enviar link para nova senha', pass: false },
+    magic: { intro: 'Digite o seu e-mail. Você recebe um link de acesso. Abra o link no mesmo navegador em que digitou o e-mail.', btn: 'Enviar link de acesso', pass: false },
+    setpw: { intro: 'Escolha a sua senha, com pelo menos 6 caracteres. Depois use e-mail e senha para entrar em qualquer aparelho.', btn: 'Salvar senha', pass: true, passLabel: 'Nova senha', ac: 'new-password', noEmail: true }
+  };
+  function setMode(mode, msg) {
+    loginMode = mode;
+    var c = MODES[mode];
+    $('login-intro').textContent = c.intro;
+    $('login-send').textContent = c.btn;
+    $('email-wrap').hidden = !!c.noEmail;
+    $('pass-wrap').hidden = !c.pass;
+    $('login-pass-label').textContent = c.passLabel || 'Senha';
+    $('login-pass').setAttribute('autocomplete', c.ac || 'current-password');
+    $('login-pass').value = '';
     $('login-msg').textContent = msg || '';
-    $('cloud-line').hidden = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.link-btn[data-mode]'), function (b) {
+      b.hidden = mode === 'setpw' || b.dataset.mode === mode;
+    });
+    $('setpw-cancel').hidden = mode !== 'setpw';
+  }
+
+  function showLogin(msg, mode) {
+    setMode(mode || 'login', msg);
+    $('login').hidden = false;
+    if (mode !== 'setpw') $('cloud-line').hidden = true;
+  }
+
+  function authMessage(err) {
+    var m = (err && err.message) || '';
+    if (/invalid login credentials/i.test(m)) return 'E-mail ou senha incorretos. Se ainda não tem senha, toque em "Primeiro acesso" ou "Esqueci a senha".';
+    if (/email not confirmed/i.test(m)) return 'Confirme o seu e-mail pelo link que o Supabase enviou e depois entre com a senha.';
+    if (/password should be at least|weak/i.test(m)) return 'A senha precisa ter pelo menos 6 caracteres.';
+    if (/rate limit/i.test(m)) return 'Muitos e-mails enviados em pouco tempo. Espere alguns minutos e tente de novo.';
+    if (/load failed|failed to fetch|network/i.test(m)) return 'Sem conexão com o Supabase. Verifique a internet.';
+    return 'Não foi possível concluir: ' + m;
   }
 
   function onSignedIn(session) {
@@ -915,6 +996,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     sb.auth.onAuthStateChange(function (event, session) {
       if (session) onSignedIn(session);
       else if (event === 'SIGNED_OUT') { userEmail = null; showLogin(); }
+      if (event === 'PASSWORD_RECOVERY') showLogin('', 'setpw');
     });
   }
 
@@ -925,17 +1007,57 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 
   $('login-form').addEventListener('submit', function (e) {
     e.preventDefault();
+    var c = MODES[loginMode];
     var email = $('login-email').value.trim();
-    if (!email || email.indexOf('@') < 1) { $('login-msg').textContent = 'Digite um e-mail válido.'; return; }
+    var pass = $('login-pass').value;
+    var back = location.origin + location.pathname;
+    var msg = function (t) { $('login-msg').textContent = t; };
+    if (!c.noEmail && (!email || email.indexOf('@') < 1)) { msg('Digite um e-mail válido.'); return; }
+    if (c.pass && pass.length < 6) { msg('A senha precisa ter pelo menos 6 caracteres.'); return; }
     $('login-send').disabled = true;
-    $('login-msg').textContent = 'Enviando…';
-    sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
-      $('login-send').disabled = false;
-      $('login-msg').textContent = r.error
-        ? 'Não foi possível enviar: ' + r.error.message
-        : 'Link enviado para ' + email + '. Abra o e-mail neste mesmo aparelho e toque no link.';
-    });
+    msg('Aguarde…');
+    var done = function () { $('login-send').disabled = false; };
+    if (loginMode === 'login') {
+      sb.auth.signInWithPassword({ email: email, password: pass }).then(function (r) {
+        done();
+        if (r.error) msg(authMessage(r.error));
+      });
+    } else if (loginMode === 'signup') {
+      sb.auth.signUp({ email: email, password: pass, options: { emailRedirectTo: back } }).then(function (r) {
+        done();
+        if (r.error) { msg(authMessage(r.error)); return; }
+        if (r.data && r.data.session) return;
+        var exists = r.data && r.data.user && r.data.user.identities && r.data.user.identities.length === 0;
+        setMode(exists ? 'forgot' : 'login', exists
+          ? 'Este e-mail já tem cadastro. Use "Esqueci a senha" para criar a sua senha.'
+          : 'Enviamos um e-mail de confirmação para ' + email + '. Toque no link uma vez e depois entre aqui com a senha.');
+        $('login-email').value = email;
+      });
+    } else if (loginMode === 'forgot') {
+      sb.auth.resetPasswordForEmail(email, { redirectTo: back }).then(function (r) {
+        done();
+        msg(r.error ? authMessage(r.error) : 'Link enviado para ' + email + '. Abra o e-mail, toque no link e escolha a nova senha.');
+      });
+    } else if (loginMode === 'magic') {
+      sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: back } }).then(function (r) {
+        done();
+        msg(r.error ? authMessage(r.error) : 'Link enviado para ' + email + '. Abra o e-mail neste mesmo navegador e toque no link.');
+      });
+    } else if (loginMode === 'setpw') {
+      sb.auth.updateUser({ password: pass }).then(function (r) {
+        done();
+        if (r.error) { msg(authMessage(r.error)); return; }
+        $('login').hidden = true;
+        $('cloud-line').hidden = false;
+        setStatus('Senha salva · ' + userEmail);
+      });
+    }
   });
+  Array.prototype.forEach.call(document.querySelectorAll('.link-btn[data-mode]'), function (b) {
+    b.addEventListener('click', function () { setMode(b.dataset.mode); });
+  });
+  $('setpw-cancel').addEventListener('click', function () { $('login').hidden = true; });
+  $('setpw').addEventListener('click', function () { showLogin('', 'setpw'); });
   $('logout').addEventListener('click', function () { if (sb) sb.auth.signOut(); });
 
   $('simbar').addEventListener('click', function (e) {
@@ -965,6 +1087,16 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   $('dlg').addEventListener('click', function (e) { if (e.target === $('dlg')) closeDlg(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('dlg').hidden) closeDlg(); });
   $('view-s').addEventListener('click', function (e) {
+    var c = e.target.closest('[data-cmp]');
+    if (c) {
+      var id = c.dataset.cmp, i = cmpOff.indexOf(id);
+      if (i >= 0) cmpOff.splice(i, 1); else cmpOff.push(id);
+      saveCmp();
+      renderLado();
+      return;
+    }
+    if (e.target.closest('[data-cmp-all]')) { cmpOff = []; saveCmp(); renderLado(); return; }
+    if (e.target.closest('[data-cmp-none]')) { cmpOff = store.sims.map(function (s) { return s.id; }); saveCmp(); renderLado(); return; }
     var b = e.target.closest('[data-open]');
     if (!b) return;
     activate(b.dataset.open);
