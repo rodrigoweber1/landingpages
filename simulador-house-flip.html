@@ -19,18 +19,21 @@
   --nav:#2E3338;--error:#D7263D;
   --ui:Inter,system-ui,sans-serif;--body:Roboto,system-ui,sans-serif;
   --surface:#FFFFFF;--on-primary:#FFFFFF;--danger-tint:#FFE9E9;--scrim:rgba(21,21,21,.45);
+  --ok:#0A7A3A;--warn-text:#8A5A00;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --primary:#A593F0;--primary-hover:#BBADF4;--primary-tint:#2B2545;
   --n100:#F1F2F3;--n80:#C6CCD2;--n60:#9AA5AF;
   --stroke:#4B535A;--line:#30363B;--bg:#141719;--bg1:#22272B;--surface:#1B1F22;
   --nav:#0E1012;--error:#FF7085;--on-primary:#141719;--danger-tint:#3A1F25;--scrim:rgba(0,0,0,.6);
+  --ok:#157A40;--warn-text:#F2C46B;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --primary:#A593F0;--primary-hover:#BBADF4;--primary-tint:#2B2545;
   --n100:#F1F2F3;--n80:#C6CCD2;--n60:#9AA5AF;
   --stroke:#4B535A;--line:#30363B;--bg:#141719;--bg1:#22272B;--surface:#1B1F22;
   --nav:#0E1012;--error:#FF7085;--on-primary:#141719;--danger-tint:#3A1F25;--scrim:rgba(0,0,0,.6);
+  --ok:#157A40;--warn-text:#F2C46B;
   color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg)}
@@ -45,8 +48,62 @@ header h1{margin:0;font-family:var(--ui);font-size:20px;font-weight:700;letter-s
 header p{margin:2px 0 0;font-size:12px;line-height:1.4;color:var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--nav)}
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--surface);border-bottom:1px solid var(--line);padding:8px 16px}
-.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--bg);border-radius:8px;padding:4px}
-.tabs button{height:40px;border:0;border-radius:6px;font-family:var(--ui);font-size:13px;font-weight:500;background:transparent;color:var(--n80);padding:0 4px}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:var(--bg);border-radius:8px;padding:4px}
+.tabs button{height:40px;border:0;border-radius:6px;font-family:var(--ui);font-size:12px;font-weight:500;background:transparent;color:var(--n80);padding:0 2px}
+/* Aba Visita */
+.v-head{gap:8px}
+.v-head h2{font-size:16px}
+.v-meta{margin:0;font-size:12px;color:var(--n60)}
+.v-prog{display:flex;flex-direction:column;gap:6px}
+.v-prog-row{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--n80)}
+.v-extras{margin:0;font-size:13px;color:var(--n100)}
+.v-alert{background:var(--danger-tint);border:1px solid var(--error);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.v-alert strong{font-family:var(--ui);font-size:14px;color:var(--error)}
+.v-alert ul{margin:0;padding-left:18px;font-size:13px;line-height:1.4;color:var(--n100)}
+.vsec{padding-top:4px;padding-bottom:4px;gap:0}
+.vsec[open]{gap:10px;padding-bottom:14px}
+.vsec summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;list-style:none;cursor:pointer;font-family:var(--ui);font-size:15px;font-weight:700;color:var(--n100)}
+.vsec summary::-webkit-details-marker{display:none}
+.vsec summary .cnt{font-size:12px;font-weight:500;color:var(--n60);white-space:nowrap}
+.vsec summary::after{content:"";flex:0 0 auto;width:8px;height:8px;margin-right:4px;border-right:2px solid var(--primary);border-bottom:2px solid var(--primary);transform:rotate(45deg) translateY(-2px)}
+.vsec[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.vsec:not([open]) > :not(summary){display:none}
+.v-note{margin:0;font-size:12px;line-height:1.4;color:var(--n60)}
+.v-sub{margin:4px 0 0;font-family:var(--ui);font-size:12px;font-weight:700;color:var(--n60);letter-spacing:.04em;text-transform:uppercase}
+.vitem{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.vrow{display:flex;align-items:flex-start;gap:10px}
+.vtext{flex:1 1 0;min-width:0;border:0;background:transparent;padding:6px 0;text-align:left;font-size:14px;line-height:1.35;color:var(--n100);display:flex;gap:6px;align-items:flex-start}
+.vtext .dot{flex:0 0 auto;width:7px;height:7px;margin-top:6px;border-radius:50%;background:var(--primary)}
+.vtext .pen{flex:0 0 auto;margin-left:auto;margin-top:2px;color:var(--n60)}
+.seg{flex:0 0 auto;display:inline-grid;grid-template-columns:repeat(3,1fr);width:132px;height:32px;border:1px solid var(--stroke);border-radius:6px;overflow:hidden;margin-top:1px}
+.seg button{position:relative;border:0;background:var(--surface);font-size:13px;font-weight:500;color:var(--n80);padding:0}
+.seg button+button{border-left:1px solid var(--stroke)}
+.seg button::after{content:"";position:absolute;inset:-6px 0}
+.seg button[data-v="sim"][aria-pressed="true"]{background:var(--ok);color:#FFFFFF}
+.seg button[data-v="nao"][aria-pressed="true"]{background:var(--error);color:#FFFFFF}
+.seg button[data-v="na"][aria-pressed="true"]{background:var(--n60);color:var(--surface)}
+.seg button[data-v="na"]{font-size:12px}
+.vbody{display:flex;flex-direction:column;gap:8px;padding-left:2px}
+.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:640px){.vgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.vf{display:flex;flex-direction:column;gap:3px;min-width:0}
+.vf label{font-family:var(--ui);font-size:11px;font-weight:500;color:var(--n60)}
+.vf .in{display:flex;align-items:center;gap:4px;height:36px;border:1px solid var(--stroke);border-radius:6px;padding:0 8px;background:var(--surface)}
+.vf .in:focus-within{border-color:var(--primary)}
+.vf .in span{font-size:11px;color:var(--n60);white-space:nowrap}
+.vf input,.vf select{flex:1 1 auto;min-width:0;width:100%;height:32px;border:0;background:transparent;color:var(--n100);font-size:16px;padding:0}
+.vf input:focus-visible,.vf select:focus-visible{outline:none}
+.vf.wide{grid-column:1/-1}
+.vta{width:100%;min-height:36px;border:1px solid var(--stroke);border-radius:6px;padding:7px 8px;background:var(--surface);color:var(--n100);font:16px/1.35 var(--body);resize:none;overflow:hidden}
+.vta:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.vcalc{margin:0;font-size:13px;color:var(--n100);display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.vcalc.warn{color:var(--warn-text)}
+.btn-small{height:32px;padding:0 10px;border:1px solid var(--primary);border-radius:6px;background:var(--surface);color:var(--primary);font-size:12px;font-weight:500}
+.vcom label{font-family:var(--ui);font-size:12px;font-weight:500;color:var(--n80)}
+.vcom{display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);padding-top:10px}
+.vdec{display:flex;flex-direction:column;gap:6px}
+.vdec button{min-height:44px;border:1px solid var(--stroke);border-radius:6px;background:var(--surface);text-align:left;padding:0 12px;font-size:14px;color:var(--n100)}
+.vdec button[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-tint);color:var(--primary);font-weight:500}
 .simbar{display:flex;gap:6px;overflow-x:auto;padding-top:8px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
 .simbar::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;height:40px;max-width:180px;padding:0 14px;border:1px solid var(--stroke);border-radius:250px;background:var(--surface);font-family:var(--ui);font-size:13px;font-weight:500;color:var(--n80);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -193,6 +250,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
       <button type="button" id="tab-p" aria-pressed="true">Premissas</button>
       <button type="button" id="tab-c" aria-pressed="false">Comparativo</button>
       <button type="button" id="tab-s" aria-pressed="false">Lado a lado</button>
+      <button type="button" id="tab-v" aria-pressed="false">Visita</button>
     </div>
     <div class="simbar" id="simbar" aria-label="Imóveis simulados"></div>
   </div>
@@ -234,6 +292,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   </div>
   <div id="view-c" class="stack" hidden></div>
   <div id="view-s" class="stack" hidden></div>
+  <div id="view-v" class="stack" hidden></div>
 </main>
 <div class="login" id="login" hidden>
   <form class="login-box" id="login-form" novalidate>
@@ -687,6 +746,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     store.active = id;
     v = cur().v;
     sel = 'r_base';
+    vOpen = {};
     save();
     fillInputs();
     renderSimBar();
@@ -735,7 +795,24 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
         rows.push([sc.name, function (d) { for (var i = 0; i < d.list.length; i++) if (d.list[i].id === sc.id) return d.list[i].total; return 0; }, 'brl', true]);
       });
     });
-    var fmt = { brl: brl, pct: function (n) { return pct(n); }, meses: function (n) { return n + ' meses'; } };
+    data.forEach(function (d) { d.k = visitCalc(d.s); });
+    var decTxt = { proposta: 'Proposta', vistoria: 'Vistoria / 2ª visita', descartar: 'Descartar' };
+    rows.push(['sec', 'Visita']);
+    rows.push(['Itens respondidos', function (d) { return d.k.answered; }, 'resp']);
+    rows.push(['Sinais de alerta', function (d) { return d.k.alerts.length; }, 'alert']);
+    rows.push(['Metragem', function (d) { return d.k.metragem; }, 'm2']);
+    rows.push(['Preço/m² do anúncio', function (d) { return d.k.pm2Anuncio; }, 'brlz']);
+    rows.push(['Preço potencial de venda', function (d) { return d.k.potencial; }, 'brlz']);
+    rows.push(['Custos extras da visita', function (d) { return d.k.extras; }, 'brlz']);
+    rows.push(['Decisão', function (d) { return d.k.decisao; }, 'dec']);
+    var fmt = {
+      brl: brl, pct: function (n) { return pct(n); }, meses: function (n) { return n + ' meses'; },
+      resp: function (n) { return n + '/' + VITEMS.length; },
+      alert: function (n) { return String(n); },
+      m2: function (n) { return n ? vfmt(n, 'num') + ' m²' : '—'; },
+      brlz: function (n) { return n ? brl(n) : '—'; },
+      dec: function (s) { return s ? decTxt[s] : '—'; }
+    };
     var head = '<tr><th scope="col">Indicador</th>' + data.map(function (d) {
       return '<th scope="col"><button type="button" class="th-link" data-open="' + d.s.id + '">' + esc(d.s.name || 'Sem nome') + '</button></th>';
     }).join('') + '</tr>';
@@ -746,7 +823,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
       return '<tr><th scope="row">' + r[0] + '</th>' + vals.map(function (x) {
         var cls = [];
         if (best !== null && x === best) cls.push('best');
-        if (x < 0) cls.push('neg');
+        if (x < 0 || (r[2] === 'alert' && x > 0)) cls.push('neg');
         return '<td' + (cls.length ? ' class="' + cls.join(' ') + '"' : '') + '>' + fmt[r[2]](x) + '</td>';
       }).join('') + '</tr>';
     }).join('');
@@ -775,6 +852,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     setText('f-roi', pct(m.roiBruto), m.roiBruto < 0);
     renderComparativo(m, lucro);
     renderLado();
+    renderVisit();
   }
 
   function renderComparativo(m, lucro) {
@@ -829,7 +907,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
 
   function showTab(t) {
     tab = t;
-    ['p', 'c', 's'].forEach(function (k) {
+    ['p', 'c', 's', 'v'].forEach(function (k) {
       $('view-' + k).hidden = k !== t;
       $('tab-' + k).setAttribute('aria-pressed', String(k === t));
     });
@@ -881,7 +959,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
   var loginMode = 'login';
   var MODES = {
     login: { intro: 'Entre com e-mail e senha. Você fica conectado neste aparelho até tocar em "Sair".', btn: 'Entrar', pass: true, passLabel: 'Senha', ac: 'current-password' },
-    signup: { intro: 'Primeiro acesso: escolha uma senha com pelo menos 6 caracteres. Use o e-mail cadastrado no grupo.', btn: 'Criar senha e entrar', pass: true, passLabel: 'Nova senha', ac: 'new-password' },
+    signup: { intro: 'Primeiro acesso: escolha uma senha com pelo menos 6 caracteres. Use o e-mail cadastrado no grupo. Se o administrador já criou a sua conta, volte e entre com a senha provisória.', btn: 'Criar senha e entrar', pass: true, passLabel: 'Nova senha', ac: 'new-password' },
     forgot: { intro: 'Digite o seu e-mail. Você recebe um link para criar uma nova senha.', btn: 'Enviar link para nova senha', pass: false },
     magic: { intro: 'Digite o seu e-mail. Você recebe um link de acesso. Abra o link no mesmo navegador em que digitou o e-mail.', btn: 'Enviar link de acesso', pass: false },
     setpw: { intro: 'Escolha a sua senha, com pelo menos 6 caracteres. Depois use e-mail e senha para entrar em qualquer aparelho.', btn: 'Salvar senha', pass: true, passLabel: 'Nova senha', ac: 'new-password', noEmail: true }
@@ -914,6 +992,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     if (/invalid login credentials/i.test(m)) return 'E-mail ou senha incorretos. Se ainda não tem senha, toque em "Primeiro acesso" ou "Esqueci a senha".';
     if (/email not confirmed/i.test(m)) return 'Confirme o seu e-mail pelo link que o Supabase enviou e depois entre com a senha.';
     if (/password should be at least|weak/i.test(m)) return 'A senha precisa ter pelo menos 6 caracteres.';
+    if (/signups? not allowed|signup is disabled|user not found/i.test(m)) return 'Este e-mail ainda não tem acesso. Peça ao administrador do simulador para criar a sua conta.';
     if (/rate limit/i.test(m)) return 'Muitos e-mails enviados em pouco tempo. Espere alguns minutos e tente de novo.';
     if (/load failed|failed to fetch|network/i.test(m)) return 'Sem conexão com o Supabase. Verifique a internet.';
     return 'Não foi possível concluir: ' + m;
@@ -948,6 +1027,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
         update();
         setStatus('Conectado · ' + userEmail);
         subscribe();
+        loadCloudChecklists();
       });
     });
   }
@@ -977,6 +1057,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
         update();
         if (row.updated_by && row.updated_by !== userEmail) setStatus('Atualizado por ' + row.updated_by);
       })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'checklists' }, function (p) { onCkChange(p); })
       .subscribe();
   }
 
@@ -998,6 +1079,390 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
       else if (event === 'SIGNED_OUT') { userEmail = null; showLogin(); }
       if (event === 'PASSWORD_RECOVERY') showLogin('', 'setpw');
     });
+  }
+
+  // ---- Aba Visita: checklist de visita por imóvel ----
+  // Itens: [id, texto, campos?]; campo = [chave, rótulo, tipo, unidade, opções?]
+  var ORIENT = ['Norte', 'Sul', 'Leste', 'Oeste', 'Nordeste', 'Noroeste', 'Sudeste', 'Sudoeste'];
+  var REPARO = [['custo_reparo', 'Custo estimado do reparo', 'num', 'R$']];
+  var VSECS = [
+    { id: 'antes', title: 'Antes da visita', items: [
+      ['antes_01', 'Dados do anúncio conferidos', [['metragem', 'Metragem', 'num', 'm²'], ['andar', 'Andar', 'int', ''], ['ano_predio', 'Ano do prédio', 'year', ''], ['quartos', 'Quartos', 'int', ''], ['banheiros', 'Banheiros', 'int', '']]],
+      ['antes_02', 'Preços de venda reais de imóveis comparáveis da região (não só anunciados)', [['preco_m2_vendidos', 'Preço/m² dos vendidos', 'num', 'R$/m²'], ['preco_potencial', 'Preço potencial de venda', 'num', 'R$'], ['fonte_comparaveis', 'Fonte', 'text', '']]],
+      ['antes_05', 'Fotos e vídeo de cada cômodo, incluindo teto, rodapés, quadro elétrico e registros', [['link_fotos', 'Link das fotos', 'url', '']]]
+    ] },
+    { id: 'local', title: 'Localização e entorno', items: [
+      ['local_01', 'Transporte público, comércio, escolas e serviços a pé'],
+      ['local_02', 'Segurança percebida em horários diferentes (dia e noite)'],
+      ['local_03', 'Ruído de rua, bares, obras ou tráfego no entorno'],
+      ['local_04', 'Obras públicas ou construções novas previstas que possam afetar vista, ruído ou valor'],
+      ['local_05', 'Estado das ruas e dos prédios vizinhos (bairro em valorização ou em queda)'],
+      ['local_06', 'Tempo que imóveis parecidos levam para vender na região', [['tempo_venda_meses', 'Tempo médio de venda', 'num', 'meses']]],
+      ['local_07', 'Vagas de garagem e facilidade de estacionar na rua', [['vagas', 'Vagas do imóvel', 'int', '']]]
+    ] },
+    { id: 'predio', title: 'Edifício e condomínio', items: [
+      ['predio_01', 'Fachada, hall, escadas e áreas comuns bem conservados'],
+      ['predio_02', 'Elevador (existe? funciona? o prédio exige?) e acessibilidade'],
+      ['predio_03', 'Fissuras visíveis na fachada, no muro ou nas áreas comuns'],
+      ['predio_04', 'Obras ou reformas grandes aprovadas no condomínio (rateios futuros)', [['rateio_previsto', 'Rateio previsto', 'num', 'R$']]],
+      ['predio_05', 'Dívidas do condomínio e do proprietário atual', [['dividas', 'Dívidas encontradas', 'num', 'R$']]],
+      ['predio_06', 'Regras para obras: horários, taxa de entulho, responsável técnico, aprovação prévia'],
+      ['predio_07', 'Regras de uso do imóvel (aluguel por temporada, animais)'],
+      ['predio_08', 'Acesso para carga de materiais e entulho (elevador de serviço, escada, distância da rua)']
+    ] },
+    { id: 'estrutura', title: 'Estrutura, umidade e infiltrações', note: 'Aqui estão as surpresas mais caras. Se algo for duvidoso, registre e peça avaliação técnica antes de oferecer.', items: [
+      ['estrutura_01', 'Manchas, bolhas na tinta, mofo ou cheiro de umidade em tetos, cantos e atrás de móveis', REPARO],
+      ['estrutura_02', 'Teto do último andar: sinais de goteira ou problema de telhado ou laje', REPARO],
+      ['estrutura_03', 'Fissuras em paredes: finas e superficiais, ou diagonais, largas e que se repetem', REPARO],
+      ['estrutura_04', 'Paredes que possam ser estruturais (derrubar parede só com projeto e autorização)', REPARO],
+      ['estrutura_05', 'Pisos nivelados (testar com nível ou bolinha) e sem afundamento', REPARO],
+      ['estrutura_06', 'Gesso, forro e rebocos com sinais de descolamento', REPARO],
+      ['estrutura_07', 'Cheiro de esgoto ou umidade em banheiros e cozinha', REPARO],
+      ['estrutura_08', 'Janelas e paredes externas com condensação ou escorrimento', REPARO]
+    ] },
+    { id: 'instal', title: 'Instalações elétricas e hidráulicas', items: [
+      ['sub', 'Elétrica'],
+      ['instal_01', 'Quadro elétrico: idade, organização, disjuntores identificados, proteção contra choque (DR)', REPARO],
+      ['instal_02', 'Fiação visível antiga, emendas, tomadas soltas, fios sem aterramento', REPARO],
+      ['instal_03', 'Número de tomadas e pontos de luz por cômodo atende ao uso atual', REPARO],
+      ['instal_04', 'Capacidade para ar-condicionado, forno elétrico e demais cargas', REPARO],
+      ['instal_05', 'Testar interruptores, tomadas e campainha', REPARO],
+      ['sub', 'Hidráulica'],
+      ['instal_06', 'Torneiras e chuveiros: pressão, vazão e tempo para chegar água quente', REPARO],
+      ['instal_07', 'Descargas, ralos e sifões: velocidade de escoamento e cheiro', REPARO],
+      ['instal_08', 'Material das tubulações (cobre, PVC, ferro galvanizado ou chumbo)', REPARO],
+      ['instal_09', 'Vazamentos sob pias, atrás de vasos e em registros', REPARO],
+      ['instal_10', 'Aquecimento de água: tipo, idade e estado do aquecedor', REPARO],
+      ['instal_11', 'Prédio antigo: considerar a troca de toda a instalação e orçar isso', REPARO]
+    ] },
+    { id: 'planta', title: 'Luz, ruído, esquadrias e planta', items: [
+      ['planta_01', 'Orientação solar e luz natural em cada cômodo', [['orientacao', 'Orientação', 'select', '', ORIENT]]],
+      ['planta_02', 'Ventilação cruzada e janelas em todos os cômodos principais, incluindo banheiros'],
+      ['planta_03', 'Janelas e portas: abrem e fecham bem, vedação, vidros, caixilhos, isolamento acústico'],
+      ['planta_04', 'Ruído de vizinhos (paredes, piso e teto) e de rua com janelas fechadas'],
+      ['planta_05', 'Pé-direito e sensação de amplitude', [['pe_direito', 'Pé-direito', 'dec1', 'm']]],
+      ['planta_06', 'Planta funcional: circulação, corredores perdidos, cozinha que poderia integrar com a sala'],
+      ['planta_07', 'Potencial de reconfigurar: ganhar um quarto, closet, suíte ou área de serviço'],
+      ['planta_08', 'Espaço para armários e para um layout moderno de cozinha e banheiros'],
+      ['planta_09', 'Áreas externas: varanda, terraço, depósito ou garagem que agreguem valor', [['area_externa', 'Área externa', 'num', 'm²']]]
+    ] },
+    { id: 'docs', title: 'Documentação e questões legais', note: 'Confirme os detalhes com um advogado ou contador.', items: [
+      ['docs_01', 'Proprietário é quem diz ser e tem poder para vender (mais de um dono, herdeiros, inventário)'],
+      ['docs_02', 'Imóvel livre de penhoras, hipotecas, dívidas, ações judiciais ou ocupantes'],
+      ['docs_03', 'Metragem e descrição batem com o registro (RGI); construções ou ampliações irregulares', [['metragem_rgi', 'Metragem no registro', 'num', 'm²']]],
+      ['docs_04', 'IPTU e taxas do imóvel em dia'],
+      ['docs_05', 'Condomínio em dia, com declaração de quitação'],
+      ['docs_06', 'Inquilino ou ocupante atual: prazo, contrato e se desocupa na entrega', [['data_desocupacao', 'Data prevista de desocupação', 'date', '']]],
+      ['docs_07', 'Licença ou autorização necessária para a reforma pretendida'],
+      ['docs_08', 'Vistorias, certificados ou laudos exigidos na venda']
+    ] },
+    { id: 'alertas', title: 'Sinais de alerta', note: 'Sim = o problema foi encontrado.', items: [
+      ['alertas_01', 'Umidade ou infiltração sem causa clara'],
+      ['alertas_02', 'Problema estrutural suspeito (fissuras diagonais, afundamento, paredes duvidosas)'],
+      ['alertas_03', 'Documentação confusa, dono duvidoso ou ocupante que não sai'],
+      ['alertas_04', 'Instalações elétricas e hidráulicas antigas e sem orçamento previsto'],
+      ['alertas_05', 'Condomínio com dívidas, obras caras previstas ou regras que travam a reforma'],
+      ['alertas_06', 'Preço de venda que depende de acabamento acima do padrão do bairro']
+    ] }
+  ];
+  var DECISOES = [['proposta', 'Seguir para proposta'], ['vistoria', 'Pedir vistoria técnica ou segunda visita antes de decidir'], ['descartar', 'Descartar']];
+  var VITEMS = [];
+  var VFIELDS = {};
+  VSECS.forEach(function (sec) {
+    sec.items.forEach(function (it) {
+      if (it[0] === 'sub') return;
+      VITEMS.push({ id: it[0], text: it[1], sec: sec.id });
+      (it[2] || []).forEach(function (f) { VFIELDS[it[0] + '.' + f[0]] = f; });
+    });
+  });
+
+  var CK_KEY = 'flippingfam-rj-checklists';
+  var CK = {};
+  try { CK = JSON.parse(localStorage.getItem(CK_KEY) || '{}') || {}; } catch (e) { CK = {}; }
+  var ckCloud = false;
+  var ckPending = {};
+  var vOpen = {};
+  var vClosedSecs = {};
+  var vDirty = false;
+
+  function blankCk() { return { respostas: {}, dados: {}, notas: {}, comentarios: {}, decisao: null, updated_at: null, updated_by: null }; }
+  function getCk(id) {
+    if (!CK[id]) CK[id] = blankCk();
+    var c = CK[id];
+    ['respostas', 'dados', 'notas', 'comentarios'].forEach(function (k) { if (!c[k] || typeof c[k] !== 'object') c[k] = {}; });
+    return c;
+  }
+  function saveCkLocal() { try { localStorage.setItem(CK_KEY, JSON.stringify(CK)); } catch (e) {} }
+
+  // Número digitado em pt-BR: "750.000", "1.234,5", "85" ou "85,5"
+  function vnum(s) {
+    s = String(s == null ? '' : s).replace(/\s/g, '');
+    if (!s) return null;
+    if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.');
+    else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+    var n = parseFloat(s);
+    return isFinite(n) ? n : null;
+  }
+  function vfmt(n, type) {
+    if (n == null || n === '') return '';
+    if (type === 'year') return String(n);
+    if (type === 'int') return Number(n).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+    if (type === 'dec1') return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return Number(n).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+  }
+
+  // Grava um valor: local na hora e, com Supabase, um valor por vez depois de 0,7 s.
+  function ckSet(simId, campo, item, sub, valor) {
+    var c = getCk(simId);
+    if (campo === 'decisao') c.decisao = valor;
+    else if (campo === 'dados') {
+      var d = Object.assign({}, c.dados[item] || {});
+      if (valor == null || valor === '') delete d[sub]; else d[sub] = valor;
+      if (Object.keys(d).length) c.dados[item] = d; else delete c.dados[item];
+    } else {
+      if (valor == null || valor === '') delete c[campo][item]; else c[campo][item] = valor;
+    }
+    c.updated_at = new Date().toISOString();
+    c.updated_by = userEmail;
+    saveCkLocal();
+    if (!ckCloud) return;
+    var key = simId + '|' + campo + '|' + item + '|' + (sub || '');
+    clearTimeout(ckPending[key]);
+    setStatus('Salvando…');
+    ckPending[key] = setTimeout(function () {
+      delete ckPending[key];
+      var p = (valor == null || valor === '') ? null : valor;
+      sb.rpc('checklist_set', { p_sim: simId, p_campo: campo, p_item: item || '', p_sub: sub || '', p_valor: p }).then(function (r) {
+        if (r.error) setStatus('Não foi possível salvar o checklist. Verifique a internet.', true);
+        else setStatus('Salvo · ' + userEmail);
+      });
+    }, 700);
+  }
+  function ckBusy(simId) {
+    return Object.keys(ckPending).some(function (k) { return k.indexOf(simId + '|') === 0; });
+  }
+
+  function visitCalc(sim) {
+    var c = getCk(sim.id);
+    var compra = num(sim.v.compra);
+    var dd = function (item, k) { var o = c.dados[item]; return o && o[k] != null && o[k] !== '' ? Number(o[k]) : null; };
+    var answered = VITEMS.filter(function (it) { return c.respostas[it.id]; }).length;
+    var alerts = VITEMS.filter(function (it) { return it.sec === 'alertas' && c.respostas[it.id] === 'sim'; });
+    var extras = 0;
+    VITEMS.forEach(function (it) {
+      if (it.sec === 'estrutura' || it.sec === 'instal') extras += dd(it.id, 'custo_reparo') || 0;
+    });
+    extras += (dd('predio_04', 'rateio_previsto') || 0) + (dd('predio_05', 'dividas') || 0);
+    var metragem = dd('antes_01', 'metragem');
+    var pm2v = dd('antes_02', 'preco_m2_vendidos');
+    var sugerido = metragem && pm2v ? metragem * pm2v : null;
+    var potencial = dd('antes_02', 'preco_potencial');
+    var rgi = dd('docs_03', 'metragem_rgi');
+    return {
+      answered: answered, total: VITEMS.length, alerts: alerts, extras: extras,
+      extrasPct: compra ? extras / compra : 0,
+      metragem: metragem, pm2Anuncio: metragem && compra ? compra / metragem : null,
+      sugerido: sugerido, potencial: potencial != null ? potencial : sugerido,
+      rgiDiff: metragem && rgi ? rgi - metragem : null,
+      decisao: c.decisao
+    };
+  }
+
+  function fieldHtml(simId, itemId, f, c) {
+    var key = f[0], label = f[1], type = f[2], unit = f[3];
+    var val = c.dados[itemId] ? c.dados[itemId][key] : null;
+    var id = 'vf-' + itemId + '-' + key;
+    var attrs = ' id="' + id + '" data-f="' + itemId + '" data-sub="' + key + '"';
+    var input;
+    if (type === 'select') {
+      input = '<select' + attrs + '><option value="">—</option>' + f[4].map(function (o) {
+        return '<option' + (val === o ? ' selected' : '') + '>' + o + '</option>';
+      }).join('') + '</select>';
+    } else if (type === 'date') {
+      input = '<input type="date"' + attrs + ' value="' + esc(val || '') + '">';
+    } else if (type === 'url') {
+      input = '<input type="url" inputmode="url" autocapitalize="off" placeholder="https://"' + attrs + ' value="' + esc(val || '') + '">';
+    } else if (type === 'text') {
+      input = '<input type="text" maxlength="120"' + attrs + ' value="' + esc(val || '') + '">';
+    } else {
+      var mode = (type === 'int' || type === 'year') ? 'numeric' : 'decimal';
+      input = '<input type="text" inputmode="' + mode + '" autocomplete="off"' + (type === 'year' ? ' maxlength="4"' : '') + attrs + ' value="' + esc(vfmt(val, type)) + '">';
+    }
+    var pre = unit === 'R$' ? '<span>R$</span>' : '';
+    var suf = unit && unit !== 'R$' ? '<span>' + unit + '</span>' : '';
+    var link = type === 'url' && val ? ' <a href="' + esc(val) + '" target="_blank" rel="noopener">abrir</a>' : '';
+    return '<div class="vf' + (type === 'url' || type === 'text' ? ' wide' : '') + '"><label for="' + id + '">' + label + link + '</label><div class="in">' + pre + input + suf + '</div></div>';
+  }
+
+  function calcHtml(itemId, k) {
+    if (itemId === 'antes_01') return '<p class="vcalc" id="vcalc-antes_01"' + (k.pm2Anuncio ? '' : ' hidden') + '>Preço/m² do anúncio: <strong>' + (k.pm2Anuncio ? brl(k.pm2Anuncio) : '') + '</strong></p>';
+    if (itemId === 'antes_02') return '<p class="vcalc" id="vcalc-antes_02"' + (k.sugerido || k.potencial ? '' : ' hidden') + '>' +
+      '<span id="vcalc-sug">' + (k.sugerido ? 'Preço potencial sugerido: <strong>' + brl(k.sugerido) + '</strong>' : '') + '</span>' +
+      '<button type="button" class="btn-small" data-use-price="1">Usar no simulador</button></p>';
+    if (itemId === 'docs_03') return '<p class="vcalc warn" id="vcalc-docs_03"' + (k.rgiDiff ? '' : ' hidden') + '>' + (k.rgiDiff ? 'Metragem do anúncio difere do registro em ' + vfmt(Math.abs(k.rgiDiff), 'num') + ' m²' : '') + '</p>';
+    return '';
+  }
+
+  function hasData(c, id) { return !!((c.dados[id] && Object.keys(c.dados[id]).length) || c.notas[id]); }
+
+  function renderVisit() {
+    var el = $('view-v');
+    if (!el) return;
+    if (el.contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { vDirty = true; return; }
+    vDirty = false;
+    var sim = cur(), c = getCk(sim.id), k = visitCalc(sim);
+    var meta = c.updated_at
+      ? 'Última alteração: ' + new Date(c.updated_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + (c.updated_by ? ' · ' + esc(c.updated_by) : '')
+      : 'Nenhuma resposta ainda.';
+    var html = '<section class="card v-head"><h2>' + esc(sim.name || 'Sem nome') + '</h2><p class="v-meta" id="v-meta">' + meta + '</p>' +
+      '<div class="v-prog"><div class="v-prog-row"><span id="v-prog-txt">' + k.answered + ' de ' + k.total + ' itens respondidos</span><span id="v-prog-pct">' + Math.round(k.answered / k.total * 100) + '%</span></div>' +
+      '<span class="track"><span class="fill" id="v-prog-bar" style="width:' + (k.answered / k.total * 100) + '%"></span></span></div>' +
+      '<p class="v-meta">Respostas: Sim · Não · N/A (não se aplica). Toque de novo para desmarcar.</p>' +
+      '<p class="v-extras" id="v-extras">Custos extras encontrados na visita: <strong>' + brl(k.extras) + '</strong> · equivale a +' + pct(k.extrasPct) + ' de reforma</p></section>';
+    html += '<div class="v-alert" id="v-alert"' + (k.alerts.length ? '' : ' hidden') + '><strong id="v-alert-t">' + k.alerts.length + ' sina' + (k.alerts.length === 1 ? 'l' : 'is') + ' de alerta encontrado' + (k.alerts.length === 1 ? '' : 's') + '</strong><ul id="v-alert-l">' +
+      k.alerts.map(function (a) { return '<li>' + a.text + '</li>'; }).join('') + '</ul></div>';
+    VSECS.forEach(function (sec) {
+      var items = VITEMS.filter(function (it) { return it.sec === sec.id; });
+      var done = items.filter(function (it) { return c.respostas[it.id]; }).length;
+      html += '<details class="card vsec" data-sec="' + sec.id + '"' + (vClosedSecs[sec.id] ? '' : ' open') + '><summary><span>' + sec.title + '</span><span class="cnt" id="vcnt-' + sec.id + '">' + done + '/' + items.length + '</span></summary>';
+      if (sec.note) html += '<p class="v-note">' + sec.note + '</p>';
+      sec.items.forEach(function (it) {
+        if (it[0] === 'sub') { html += '<p class="v-sub">' + it[1] + '</p>'; return; }
+        var id = it[0], ans = c.respostas[id], data = hasData(c, id);
+        var open = vOpen[id] === true || (vOpen[id] !== false && data);
+        html += '<div class="vitem"><div class="vrow">' +
+          '<button type="button" class="vtext" data-toggle="' + id + '" aria-expanded="' + open + '">' +
+          '<span class="dot" id="vdot-' + id + '"' + (data ? '' : ' hidden') + '></span><span>' + it[1] + '</span>' +
+          '<svg class="pen" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M11.5 2.5l2 2L6 12H4v-2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></button>' +
+          '<div class="seg" role="group" aria-label="Resposta">' +
+          '<button type="button" data-ans="' + id + '" data-v="sim" aria-pressed="' + (ans === 'sim') + '">Sim</button>' +
+          '<button type="button" data-ans="' + id + '" data-v="nao" aria-pressed="' + (ans === 'nao') + '">Não</button>' +
+          '<button type="button" data-ans="' + id + '" data-v="na" aria-pressed="' + (ans === 'na') + '" aria-label="Não se aplica" title="Não se aplica">N/A</button></div></div>';
+        if (open) {
+          html += '<div class="vbody">';
+          if (it[2] && it[2].length) html += '<div class="vgrid">' + it[2].map(function (f) { return fieldHtml(sim.id, id, f, c); }).join('') + '</div>';
+          html += calcHtml(id, k);
+          html += '<textarea class="vta" rows="1" maxlength="300" placeholder="Anote o que encontrou" aria-label="Observação" data-nota="' + id + '">' + esc(c.notas[id] || '') + '</textarea>';
+          html += '</div>';
+        }
+        html += '</div>';
+      });
+      html += '<div class="vcom"><label for="vcom-' + sec.id + '">Comentários da seção</label>' +
+        '<textarea class="vta" id="vcom-' + sec.id + '" rows="2" maxlength="2000" placeholder="Anote o que viu, o que não deu para ver e o que precisa confirmar." data-com="' + sec.id + '">' + esc(c.comentarios[sec.id] || '') + '</textarea></div>';
+      html += '</details>';
+    });
+    html += '<section class="card"><h2>Decisão</h2><div class="vdec">' + DECISOES.map(function (d) {
+      return '<button type="button" data-dec="' + d[0] + '" aria-pressed="' + (c.decisao === d[0]) + '">' + d[1] + '</button>';
+    }).join('') + '</div></section>';
+    el.innerHTML = html;
+    Array.prototype.forEach.call(el.querySelectorAll('.vta'), autosize);
+  }
+
+  function autosize(t) { t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; }
+
+  // Atualiza números e contadores sem redesenhar (para não tirar o foco de quem digita).
+  function refreshVisit() {
+    var sim = cur(), c = getCk(sim.id), k = visitCalc(sim);
+    var set = function (id, html, show) { var e = $(id); if (!e) return; if (html != null) e.innerHTML = html; if (show != null) e.hidden = !show; };
+    set('v-prog-txt', k.answered + ' de ' + k.total + ' itens respondidos');
+    set('v-prog-pct', Math.round(k.answered / k.total * 100) + '%');
+    if ($('v-prog-bar')) $('v-prog-bar').style.width = (k.answered / k.total * 100) + '%';
+    set('v-extras', 'Custos extras encontrados na visita: <strong>' + brl(k.extras) + '</strong> · equivale a +' + pct(k.extrasPct) + ' de reforma');
+    set('vcalc-antes_01', 'Preço/m² do anúncio: <strong>' + (k.pm2Anuncio ? brl(k.pm2Anuncio) : '') + '</strong>', !!k.pm2Anuncio);
+    set('vcalc-sug', k.sugerido ? 'Preço potencial sugerido: <strong>' + brl(k.sugerido) + '</strong>' : '');
+    set('vcalc-antes_02', null, !!(k.sugerido || k.potencial));
+    set('vcalc-docs_03', k.rgiDiff ? 'Metragem do anúncio difere do registro em ' + vfmt(Math.abs(k.rgiDiff), 'num') + ' m²' : '', !!k.rgiDiff);
+    VITEMS.forEach(function (it) { var d = $('vdot-' + it.id); if (d) d.hidden = !hasData(c, it.id); });
+    renderLado();
+  }
+
+  $('view-v').addEventListener('click', function (e) {
+    var sim = cur(), c = getCk(sim.id);
+    var a = e.target.closest('[data-ans]');
+    if (a) {
+      var nv = c.respostas[a.dataset.ans] === a.dataset.v ? null : a.dataset.v;
+      ckSet(sim.id, 'respostas', a.dataset.ans, null, nv);
+      renderVisit(); renderLado();
+      return;
+    }
+    var t = e.target.closest('[data-toggle]');
+    if (t) { vOpen[t.dataset.toggle] = t.getAttribute('aria-expanded') !== 'true'; renderVisit(); return; }
+    var d = e.target.closest('[data-dec]');
+    if (d) { ckSet(sim.id, 'decisao', 'decisao', null, c.decisao === d.dataset.dec ? null : d.dataset.dec); renderVisit(); renderLado(); return; }
+    if (e.target.closest('[data-use-price]')) {
+      var k = visitCalc(sim);
+      if (!k.potencial) { ask('Preencha a metragem e o preço/m² dos vendidos, ou o preço potencial de venda.'); return; }
+      ask('Usar ' + brl(k.potencial) + ' como preço de venda de "' + (sim.name || 'Sem nome') + '" no simulador?', 'Usar', function () {
+        sim.v.venda = String(Math.round(k.potencial));
+        v = cur().v;
+        saveSim(sim);
+        fillInputs();
+        update();
+      });
+    }
+  });
+  $('view-v').addEventListener('toggle', function (e) {
+    var s = e.target.closest && e.target.closest('details.vsec');
+    if (s && e.target === s) vClosedSecs[s.dataset.sec] = !s.open;
+  }, true);
+  $('view-v').addEventListener('input', function (e) {
+    var sim = cur(), t = e.target;
+    if (t.dataset.nota) { autosize(t); ckSet(sim.id, 'notas', t.dataset.nota, null, t.value.slice(0, 300)); refreshVisit(); return; }
+    if (t.dataset.com) { autosize(t); ckSet(sim.id, 'comentarios', t.dataset.com, null, t.value.slice(0, 2000)); return; }
+    if (t.dataset.f) {
+      var f = VFIELDS[t.dataset.f + '.' + t.dataset.sub], type = f[2], val;
+      if (type === 'num' || type === 'dec1') val = vnum(t.value);
+      else if (type === 'int' || type === 'year') { val = vnum(t.value); val = val == null ? null : Math.round(val); }
+      else val = t.value.trim() || null;
+      ckSet(sim.id, 'dados', t.dataset.f, t.dataset.sub, val);
+      refreshVisit();
+    }
+  });
+  $('view-v').addEventListener('change', function (e) {
+    if (e.target.tagName === 'SELECT' && e.target.dataset.f) { ckSet(cur().id, 'dados', e.target.dataset.f, e.target.dataset.sub, e.target.value || null); refreshVisit(); }
+  });
+  $('view-v').addEventListener('focusout', function (e) {
+    var t = e.target;
+    if (t.dataset && t.dataset.f) {
+      var f = VFIELDS[t.dataset.f + '.' + t.dataset.sub];
+      if (f && /num|int|dec1/.test(f[2])) { var n = vnum(t.value); t.value = vfmt(n, f[2]); }
+    }
+    setTimeout(function () {
+      var el = $('view-v');
+      if (vDirty && !(el.contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))) renderVisit();
+    }, 0);
+  });
+  $('tab-v').addEventListener('click', function () { showTab('v'); });
+
+  // Supabase: carrega e acompanha os checklists
+  function rowToCk(row) {
+    return { respostas: row.respostas || {}, dados: row.dados || {}, notas: row.notas || {}, comentarios: row.comentarios || {}, decisao: row.decisao || null, updated_at: row.updated_at, updated_by: row.updated_by };
+  }
+  function loadCloudChecklists() {
+    sb.from('checklists').select('*').then(function (r) {
+      if (r.error) {
+        ckCloud = false;
+        setStatus('Checklist salvo só neste aparelho: falta criar a tabela no Supabase (supabase-checklist.sql).', true);
+        return;
+      }
+      ckCloud = true;
+      var ids = {};
+      r.data.forEach(function (row) { CK[row.simulacao_id] = rowToCk(row); ids[row.simulacao_id] = true; });
+      store.sims.forEach(function (s) { if (!ids[s.id]) CK[s.id] = blankCk(); });
+      saveCkLocal();
+      renderVisit();
+      renderLado();
+    });
+  }
+  function onCkChange(p) {
+    if (p.eventType === 'DELETE') { if (p.old && p.old.simulacao_id) { delete CK[p.old.simulacao_id]; saveCkLocal(); renderVisit(); renderLado(); } return; }
+    var row = p.new;
+    if (!row || ckBusy(row.simulacao_id)) return;
+    CK[row.simulacao_id] = rowToCk(row);
+    saveCkLocal();
+    if (row.simulacao_id === store.active) { renderVisit(); if (vDirty) refreshVisit(); }
+    renderLado();
+    if (row.updated_by && row.updated_by !== userEmail) setStatus('Atualizado por ' + row.updated_by);
   }
 
   buildPremissas();
@@ -1039,7 +1504,7 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
         msg(r.error ? authMessage(r.error) : 'Link enviado para ' + email + '. Abra o e-mail, toque no link e escolha a nova senha.');
       });
     } else if (loginMode === 'magic') {
-      sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: back } }).then(function (r) {
+      sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: back, shouldCreateUser: false } }).then(function (r) {
         done();
         msg(r.error ? authMessage(r.error) : 'Link enviado para ' + email + '. Abra o e-mail neste mesmo navegador e toque no link.');
       });
@@ -1078,6 +1543,8 @@ main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:flex;fle
     var id = store.active;
     ask('Excluir a simulação "' + (cur().name || 'Sem nome') + '"? Esta ação não pode ser desfeita.', 'Excluir', function () {
       store.sims = store.sims.filter(function (s) { return s.id !== id; });
+      delete CK[id];
+      saveCkLocal();
       activate(store.sims[0].id);
       deleteRemote(id);
     });
