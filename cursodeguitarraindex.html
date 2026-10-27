@@ -57,6 +57,32 @@ body.home #side{display:none}
 #app main p{font-size:15px!important;line-height:23px!important}
 #app header{padding-left:16px!important;padding-right:16px!important}
 }
+
+#themeBtn{position:fixed;bottom:76px;right:12px;opacity:.94;z-index:60;width:40px;height:40px;border-radius:250px;border:1px solid #D9D9D9;background:#121212;color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+body.dark #themeBtn{background:#FFC400;color:#121212;border-color:#FFC400}
+@media (min-width:900px){#themeBtn{right:18px}}
+body.dark,body.dark html{background:#121212}
+html.dk{background:#121212}
+body.dark #app{background:#121212;box-shadow:0 0 0 1px #333}
+body.dark #side{background:#161616;border-right-color:#333;color:#F2F2F2}
+body.dark .sd-head a.home{color:#FF6B70}
+body.dark .sd-head img{filter:invert(1)}
+body.dark .sd-nav details{border-top-color:#333}
+body.dark .sd-nav summary .n{background:#3B300C;color:#FFC400}
+body.dark .sd-nav a.it{color:#F2F2F2}
+body.dark .sd-nav a.it:hover{background:#2A2A2A}
+body.dark .sd-nav a.it.on{background:#3B300C}
+body.dark .sd-foot{border-top-color:#333}
+body.dark .sd-foot a{background:#1E1E1E;border-color:#3F3F3F}
+body.dark .sd-foot a small,body.dark .sd-key{color:#B8B8B8}
+body.dark .sd-foot a span{color:#F2F2F2}
+body.dark .sd-tabs{background:#2A2A2A}
+body.dark .sd-tabs a{color:#D0D0D0}
+body.dark .sd-tabs a.on{background:#1E1E1E;color:#FF6B70}
+body.dark .sd-nav .chev{stroke:#B8B8B8}
+body.dark #app img{filter:invert(1)}
+body.dark .sd-logo svg [stroke="#121212"]{stroke:#F2F2F2}
+body.dark .sd-logo svg [fill="#121212"]{fill:#F2F2F2}
 a{text-decoration:none;touch-action:manipulation}
 a:hover{text-decoration:none}
 a.cta:hover{background:#B3121A}
@@ -67,6 +93,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #E31B23;outline-offset:2p
 </style>
 </head>
 <body>
+<button id="themeBtn" type="button"></button>
 <nav id="side" aria-label="Navegación"></nav>
 <div id="stage"><div id="app" aria-live="off"></div></div>
 <noscript>Esta aplicación necesita JavaScript. / This app needs JavaScript.</noscript>
@@ -10703,6 +10730,115 @@ function unmount() {
   current = null;
 }
 
+let dark = false;
+try { dark = localStorage.getItem('guitar.theme') === 'dark'; } catch (e) {}
+const D_BG = { 'FFFFFF': '1E1E1E', 'FAFAFA': '1E1E1E', 'F2F2F2': '2A2A2A', 'FFF1CC': '3B300C', 'FEF2DB': '3B300C', 'F4EDDD': '2A2620', 'E6E6E6': '333333', 'D9D9D9': '3F3F3F', 'E3FFEE': '0F3320', 'E9E9E9': '2A2A2A', '121212': '2C2C2C' };
+const D_KEEP_BG = { 'E31B23': 1, 'B3121A': 1, 'C8321C': 1, '9E2412': 1, 'FFC400': 1, 'E0A800': 1, 'FFE08A': 1, 'B07A00': 1, '121212': 1, '2B2B2B': 1, '262626': 1, '8A8A8A': 1, 'BDBDBD': 1, 'F04A4F': 1, '8F0F15': 1, '006828': 1, '038A37': 1 };
+const D_FG = { '121212': 'F2F2F2', '1A1410': 'F2F2F2', '3A3A3A': 'D0D0D0', '5A5A5A': 'B8B8B8', 'B3121A': 'FF6B70', 'E31B23': 'FF5A60', '9E2412': 'FF8470', '4A4036': 'CFC6B8', '6B5F52': 'A89C8C', 'B07A00': 'FFC400', '006828': '4FD08A', 'C8321C': 'FF7A66' };
+const D_BD = { 'E6E6E6': '333333', 'D9D9D9': '3F3F3F', 'E9E0CC': '3A3328', 'D3C7AE': '4A4030', '121212': '8A8A8A', '5A5A5A': '8A8A8A', 'FFFFFF': '3F3F3F', 'B3121A': 'FF5A60' };
+const D_SVG = { '8A7D6B': '8A7D6B', 'BFB29A': '6B6254' };
+function rgbHex(c) {
+  const m = /rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)(?:[,\s/]+([\d.]+%?))?/.exec(c || '');
+  if (!m) return null;
+  let a = m[4] === undefined ? 1 : (/%$/.test(m[4]) ? parseFloat(m[4]) / 100 : parseFloat(m[4]));
+  const h = (n) => ('0' + (+n).toString(16)).slice(-2);
+  return { hex: (h(m[1]) + h(m[2]) + h(m[3])).toUpperCase(), a: a };
+}
+function darken() {
+  const els = app.querySelectorAll('*');
+  const n = els.length, rec = new Array(n);
+  const obg = new Map();
+  for (let i = 0; i < n; i++) {
+    const el = els[i], cs = getComputedStyle(el);
+    const isSvg = el instanceof SVGElement;
+    const r = { el: el, svg: isSvg };
+    const par = el.parentElement && el.parentElement !== app ? obg.get(el.parentElement) : null;
+    let eff = par || null;
+    if (!isSvg || el.tagName === 'svg') {
+      const b = rgbHex(cs.backgroundColor);
+      if (b && b.a > 0.05) { r.bg = b.hex; eff = b.hex; }
+      r.fg = (rgbHex(cs.color) || {}).hex;
+      if (!isSvg) {
+        r.bd = [];
+        ['Top', 'Right', 'Bottom', 'Left'].forEach((sd) => { if (parseFloat(cs['border' + sd + 'Width']) > 0) { const c = rgbHex(cs['border' + sd + 'Color']); r.bd.push(c ? c.hex : null); } else r.bd.push(null); });
+      }
+    }
+    if (isSvg) {
+      const f = cs.fill, st = cs.stroke;
+      r.fill = f && f !== 'none' ? (rgbHex(f) || {}).hex : null;
+      r.stroke = st && st !== 'none' ? (rgbHex(st) || {}).hex : null;
+      r.tag = el.tagName.toLowerCase();
+    }
+    obg.set(el, eff);
+    r.eff = eff;
+    rec[i] = r;
+  }
+  const isTop = (el) => el.parentElement === app;
+  for (let i = 0; i < n; i++) {
+    const r = rec[i], el = r.el, st = el.style;
+    if (!r.svg) {
+      if (r.bg) {
+        const nb = isTop(el) && r.bg === 'FFFFFF' ? '121212' : D_BG[r.bg];
+        if (nb) st.backgroundColor = '#' + nb;
+      }
+      const keepFg = r.eff && D_KEEP_BG[r.eff] && r.eff !== '8A8A8A' && r.eff !== 'BDBDBD' && r.eff !== '121212' && r.eff !== '2B2B2B' && r.eff !== '262626';
+      if (r.fg && !keepFg && D_FG[r.fg]) st.color = '#' + D_FG[r.fg];
+      if (r.bd) {
+        const sides = ['Top', 'Right', 'Bottom', 'Left'];
+        r.bd.forEach((c, k) => { if (c && D_BD[c]) { if (c === '121212' && r.bg === '121212') return; st['border' + sides[k] + 'Color'] = '#' + D_BD[c]; } });
+      }
+    } else {
+      if (r.tag === 'svg' && r.bg && D_BG[r.bg]) st.backgroundColor = '#' + D_BG[r.bg];
+      if (r.tag === 'svg') { if (r.fg && D_FG[r.fg] && !(r.eff && D_KEEP_BG[r.eff])) st.color = '#' + D_FG[r.fg]; }
+      const isText = r.tag === 'text' || r.tag === 'tspan';
+      if (r.fill) {
+        let nf = null;
+        if (isText) {
+          if (r.fill === 'FFFFFF') {
+            let p = el.previousElementSibling;
+            while (p && !/^(circle|rect|path|ellipse|polygon)$/.test(p.tagName)) p = p.previousElementSibling;
+            const pi = p ? rec[Array.prototype.indexOf.call(els, p)] : null;
+            if (pi && pi.fill === '121212') nf = '121212';
+          } else if (D_FG[r.fill]) nf = D_FG[r.fill];
+        } else {
+          if (r.fill === 'FFFFFF') nf = '1E1E1E';
+          else if (r.fill === '121212') nf = 'F2F2F2';
+          else if (r.fill === '1A1410') nf = 'F2F2F2';
+          else if (D_BG[r.fill]) nf = D_BG[r.fill];
+          else if (r.fill === '5A5A5A') nf = 'B8B8B8';
+        }
+        if (nf) st.fill = '#' + nf;
+      }
+      if (r.stroke) {
+        let ns = null;
+        if (r.stroke === '121212' || r.stroke === '1A1410') ns = 'F2F2F2';
+        else if (r.stroke === 'FFFFFF') ns = '1E1E1E';
+        else if (D_BG[r.stroke]) ns = D_BG[r.stroke];
+        else if (D_SVG[r.stroke]) ns = D_SVG[r.stroke];
+        else if (r.stroke === '5A5A5A') ns = 'B8B8B8';
+        if (ns) st.stroke = '#' + ns;
+      }
+    }
+  }
+}
+const themeBtn = document.getElementById('themeBtn');
+function themeUI(lang) {
+  document.body.classList.toggle('dark', dark);
+  document.documentElement.classList.toggle('dk', dark);
+  const en = lang === 'en';
+  const lb = dark ? (en ? 'Switch to white background' : 'Cambiar a fondo blanco') : (en ? 'Switch to dark background' : 'Cambiar a fondo oscuro');
+  themeBtn.setAttribute('aria-label', lb); themeBtn.title = lb;
+  themeBtn.innerHTML = dark
+    ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+    : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+}
+themeBtn.addEventListener('click', () => {
+  dark = !dark;
+  try { localStorage.setItem('guitar.theme', dark ? 'dark' : 'light'); } catch (e) {}
+  themeUI(document.documentElement.lang || 'es');
+  if (window.__rerender) window.__rerender();
+});
+
 function mount(name, q) {
   unmount();
   const Cmp = C[name](DCLogic);
@@ -10725,6 +10861,8 @@ function mount(name, q) {
     deskReflow(name);
     renderSide(name, l || 'es');
     followMenu(name, l || 'es');
+    themeUI(l || 'es');
+    if (dark) { try { darken(); } catch (e) {} }
     if (render.first) { render.first = false; } else { window.scrollTo(0, y); }
   };
   render.first = true;
