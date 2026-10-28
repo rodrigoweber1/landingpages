@@ -83,6 +83,29 @@ body.dark .sd-nav .chev{stroke:#B8B8B8}
 body.dark #app img:not([data-user]){filter:invert(1)}
 body.dark .sd-logo svg [stroke="#121212"]{stroke:#F2F2F2}
 body.dark .sd-logo svg [fill="#121212"]{fill:#F2F2F2}
+
+body.clean,body.clean html,html.cl{background:#F4F4F4}
+body.clean #app{background:#F4F4F4;box-shadow:none}
+body.clean #themeBtn{display:none}
+body.clean #side{background:#F4F4F4;border-right:0}
+body.clean .sd-nav details{border-top:0}
+body.clean .sd-nav a.it{border-radius:12px;border-left:0}
+body.clean .sd-nav a.it:hover{background:#EBEBEB}
+body.clean .sd-nav a.it.on{background:#FFFFFF;color:#121212;border-left:0}
+body.clean .sd-nav summary .n{background:#EBEBEB;color:#121212}
+body.clean .sd-foot{border-top:0}
+body.clean .sd-foot a{border:0;border-radius:14px;background:#FFFFFF}
+body.clean .sd-tabs{background:#E9E9E9;border-radius:999px}
+body.clean .sd-tabs a{border-radius:999px}
+body.clean .sd-tabs a.on{background:#121212;color:#FFFFFF;box-shadow:none}
+body.clean .sd-head a.home{color:#121212}
+#fnav{display:none}
+@media (max-width:899px){
+body.clean #fnav{display:flex;position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:min(358px,calc(100% - 24px));box-sizing:border-box;padding:6px;gap:4px;border-radius:999px;background:#FFFFFF;box-shadow:0 6px 24px rgba(0,0,0,.12);z-index:70}
+body.clean #fnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:52px;border-radius:999px;color:#8A8A8A;font-size:10px;line-height:12px;font-weight:500;font-family:'Roboto',system-ui,sans-serif}
+body.clean #fnav a.on{background:#EBEBEB;color:#121212}
+body.clean #app{padding-bottom:96px;box-sizing:border-box}
+}
 a{text-decoration:none;touch-action:manipulation}
 a:hover{text-decoration:none}
 a.cta:hover{background:#B3121A}
@@ -94,6 +117,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #E31B23;outline-offset:2p
 </head>
 <body>
 <button id="themeBtn" type="button"></button>
+<nav id="fnav" aria-label="Navegación"></nav>
 <nav id="side" aria-label="Navegación"></nav>
 <div id="stage"><div id="app" aria-live="off"></div></div>
 <noscript>Esta aplicación necesita JavaScript. / This app needs JavaScript.</noscript>
@@ -12343,6 +12367,62 @@ function unmount() {
   current = null;
 }
 
+const CLEAN = true;
+if (CLEAN) { document.body.classList.add('clean'); document.documentElement.classList.add('cl'); }
+function cleanify(name, lang) {
+  const els = app.querySelectorAll('*');
+  const n = els.length, rec = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const el = els[i];
+    if (el instanceof SVGElement) { rec[i] = null; continue; }
+    const cs = getComputedStyle(el);
+    const bgc = rgbHex(cs.backgroundColor);
+    const r = { el: el, tag: el.tagName, bg: bgc && bgc.a > 0.05 ? bgc.hex : null, w: el.offsetWidth, h: el.offsetHeight, bd: [] };
+    ['Top', 'Right', 'Bottom', 'Left'].forEach((sd) => { const wd = parseFloat(cs['border' + sd + 'Width']) > 0 && cs['border' + sd + 'Style'] !== 'dashed'; const c = rgbHex(cs['border' + sd + 'Color']); r.bd.push(wd && c ? c.hex : null); });
+    r.rad = parseFloat(cs.borderTopLeftRadius) || 0;
+    r.top = el.parentElement === app;
+    r.ff = cs.fontFamily;
+    rec[i] = r;
+  }
+  const LIGHT = { 'E6E6E6': 1, 'D9D9D9': 1, 'BDBDBD': 1, 'E9E9E9': 1 };
+  for (let i = 0; i < n; i++) {
+    const r = rec[i]; if (!r) continue;
+    const el = r.el, st = el.style;
+    const isBtn = r.tag === 'BUTTON' || (r.tag === 'A' && el.classList.contains('cta'));
+    if (r.top && r.bg === 'FFFFFF') st.backgroundColor = '#F4F4F4';
+    else if (isBtn && r.bg === 'E31B23') {
+      st.backgroundColor = '#121212'; st.color = '#FFFFFF';
+      st.borderRadius = (r.w > 140 && r.h >= 44) ? '999px' : '12px';
+      ['Top', 'Right', 'Bottom', 'Left'].forEach((sd) => { st['border' + sd + 'Color'] = 'transparent'; });
+    } else if (r.tag === 'BUTTON' && r.bg === 'FFFFFF') {
+      st.backgroundColor = '#E9E9E9'; st.borderRadius = r.h >= 36 ? '12px' : '10px';
+      ['Top', 'Right', 'Bottom', 'Left'].forEach((sd) => { st['border' + sd + 'Color'] = 'transparent'; });
+    } else if (r.bg === 'FFFFFF' && r.bd.some((c) => c)) {
+      st.backgroundColor = '#FFFFFF'; st.borderRadius = '16px';
+      ['Top', 'Right', 'Bottom', 'Left'].forEach((sd) => { st['border' + sd + 'Color'] = 'transparent'; });
+    } else if (r.bd.some((c) => c && LIGHT[c])) {
+      const sides = ['Top', 'Right', 'Bottom', 'Left'];
+      r.bd.forEach((c, k) => { if (c && LIGHT[c]) st['border' + sides[k] + 'Color'] = 'transparent'; });
+      if (r.rad >= 6 && r.h >= 36) st.borderRadius = '14px';
+    } else if (r.bg === 'F2F2F2' && r.rad >= 6 && r.h >= 36) st.borderRadius = '12px';
+    if (/Archivo/.test(r.ff)) { st.fontFamily = "'Roboto', system-ui, sans-serif"; st.fontWeight = '700'; st.letterSpacing = '0'; }
+  }
+  const hd = app.querySelector('header');
+  if (hd) { hd.style.borderBottomColor = 'transparent'; }
+  // floating bottom navigation
+  const en = lang === 'en';
+  const cur = name === 'Inicio' ? 'Inicio' : (menu === 'curso' ? 'Curso' : (menu === 'musica' ? 'Cancionero' : 'Main'));
+  const ic = {
+    Inicio: '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>',
+    Main: '<path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/>',
+    Curso: '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/>',
+    Cancionero: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>'
+  };
+  const lab = en ? { Inicio: 'Home', Main: 'Path', Curso: 'Course', Cancionero: 'Music' } : { Inicio: 'Inicio', Main: 'Ruta', Curso: 'Curso', Cancionero: 'Música' };
+  fnav.innerHTML = ['Inicio', 'Main', 'Curso', 'Cancionero'].map((k) => '<a href="#/' + k + '" class="' + (k === cur ? 'on' : '') + '"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ic[k] + '</svg>' + lab[k] + '</a>').join('');
+}
+const fnav = document.getElementById('fnav');
+
 let dark = false;
 try { dark = localStorage.getItem('guitar.theme') === 'dark'; } catch (e) {}
 const D_BG = { 'FFFFFF': '1E1E1E', 'FAFAFA': '1E1E1E', 'F2F2F2': '2A2A2A', 'FFF1CC': '3B300C', 'FEF2DB': '3B300C', 'F4EDDD': '2A2620', 'E6E6E6': '333333', 'D9D9D9': '3F3F3F', 'E3FFEE': '0F3320', 'E9E9E9': '2A2A2A', '121212': '2C2C2C' };
@@ -12475,7 +12555,7 @@ function mount(name, q) {
     renderSide(name, l || 'es');
     followMenu(name, l || 'es');
     themeUI(l || 'es');
-    if (dark) { try { darken(); } catch (e) {} }
+    if (CLEAN) { try { cleanify(name, l || 'es'); } catch (e) {} } else if (dark) { try { darken(); } catch (e) {} }
     if (render.first) { render.first = false; } else { window.scrollTo(0, y); }
   };
   render.first = true;
