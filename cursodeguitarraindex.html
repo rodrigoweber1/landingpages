@@ -15,6 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Archivo+Black&family=Permanent+Marker&display=swap">
 <style>
+:root{--ease-out:cubic-bezier(0.23,1,0.32,1)}
 *{-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:#FFFFFF}
 body{margin:0;background:#FFFFFF;overscroll-behavior-y:none}
@@ -34,10 +35,10 @@ body{display:grid;grid-template-columns:320px minmax(0,1fr);align-items:start}
 .sd-nav summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 8px;font-family:'Archivo Black','Roboto',sans-serif;font-size:13px;line-height:18px;letter-spacing:.01em}
 .sd-nav summary::-webkit-details-marker{display:none}
 .sd-nav summary .n{flex:none;width:22px;height:22px;border-radius:250px;background:#FFF1CC;color:#B3121A;font-family:'Roboto',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.sd-nav summary .chev{margin-left:auto;transition:transform .15s}
+.sd-nav summary .chev{margin-left:auto;transition:transform 200ms var(--ease-out)}
 .sd-nav details[open] summary .chev{transform:rotate(180deg)}
 .sd-nav a.it{display:block;padding:8px 8px 8px 38px;margin:1px 0;border-radius:6px;font-size:14px;line-height:20px;color:#121212;border-left:3px solid transparent}
-.sd-nav a.it:hover{background:#F2F2F2}
+@media (hover:hover) and (pointer:fine){.sd-nav a.it:hover{background:#F2F2F2}}
 .sd-nav a.it .sn{display:inline-block;min-width:30px;color:#B3121A;font-weight:600;font-size:12px}
 .sd-nav a.it.on{background:#FFF1CC;border-left-color:#E31B23;font-weight:700}
 .sd-foot{padding:12px 16px 16px;border-top:1px solid #E6E6E6;display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -69,9 +70,11 @@ body.home #side{display:none}
 #sbar .sb-x{display:none;border:0;background:transparent;padding:4px;cursor:pointer;color:#5A5A5A;font-size:18px;line-height:18px}
 #sbar.has .sb-x{display:block}
 #sbar .sb-r{display:none;position:absolute;left:0;right:0;top:50px;z-index:80;max-height:min(70vh,460px);overflow:auto;background:#FFFFFF;border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:6px;box-sizing:border-box}
-#sbar.has .sb-r{display:block}
+#sbar.has .sb-r{display:block;transform-origin:top center;transition:opacity 150ms var(--ease-out),transform 150ms var(--ease-out)}
+@starting-style{#sbar.has .sb-r{opacity:0;transform:translateY(-4px) scale(0.98)}}
 #sbar .sb-r a{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;color:#121212}
-#sbar .sb-r a:hover,#sbar .sb-r a:focus{background:#F2F2F2;outline:0}
+#sbar .sb-r a:focus{background:#F2F2F2;outline:0}
+@media (hover:hover) and (pointer:fine){#sbar .sb-r a:hover{background:#F2F2F2}}
 #sbar .sb-t{font-size:15px;line-height:20px;font-weight:700}
 #sbar .sb-m{font-size:12px;line-height:16px;color:#B3121A}
 #sbar .sb-s{overflow-wrap:anywhere;font-size:13px;line-height:18px;color:#3A3A3A}
@@ -90,9 +93,9 @@ body.dark .sd-head img{filter:invert(1)}
 body.dark .sd-nav details{border-top-color:#333}
 body.dark .sd-nav summary .n{background:#3B300C;color:#FFC400}
 body.dark .sd-nav a.it{color:#F2F2F2}
-body.dark .sd-nav a.it:hover{background:#2A2A2A}
-body.dark .sd-nav a.it .sn{display:inline-block;min-width:30px;color:#B3121A;font-weight:600;font-size:12px}
-.sd-nav a.it.on{background:#3B300C}
+@media (hover:hover) and (pointer:fine){body.dark .sd-nav a.it:hover{background:#2A2A2A}}
+body.dark .sd-nav a.it .sn{display:inline-block;min-width:30px;color:#FF6B70;font-weight:600;font-size:12px}
+body.dark .sd-nav a.it.on{background:#3B300C}
 body.dark .sd-foot{border-top-color:#333}
 body.dark .sd-foot a{background:#1E1E1E;border-color:#3F3F3F}
 body.dark .sd-foot a small,body.dark .sd-key{color:#B8B8B8}
@@ -111,9 +114,9 @@ body.clean #themeBtn{display:none}
 body.clean #side{background:#F4F4F4;border-right:0}
 body.clean .sd-nav details{border-top:0}
 body.clean .sd-nav a.it{border-radius:12px;border-left:0}
-body.clean .sd-nav a.it:hover{background:#EBEBEB}
+@media (hover:hover) and (pointer:fine){body.clean .sd-nav a.it:hover{background:#EBEBEB}}
 body.clean .sd-nav a.it .sn{display:inline-block;min-width:30px;color:#B3121A;font-weight:600;font-size:12px}
-.sd-nav a.it.on{background:#FFFFFF;color:#121212;border-left:0}
+body.clean .sd-nav a.it.on{background:#FFFFFF;color:#121212;border-left:0}
 body.clean .sd-nav summary .n{background:#EBEBEB;color:#121212}
 body.clean .sd-foot{border-top:0}
 body.clean .sd-foot a{border:0;border-radius:14px;background:#FFFFFF}
@@ -130,12 +133,100 @@ body.clean #app{padding-bottom:96px;box-sizing:border-box}
 }
 a{text-decoration:none;touch-action:manipulation}
 a:hover{text-decoration:none}
-a.cta:hover{background:#B3121A}
+@media (hover:hover) and (pointer:fine){a.cta:hover{background:#B3121A}}
 button{font-family:inherit;touch-action:manipulation}
+button,a.cta,#themeBtn,#fnav a,.sd-foot a,.sd-tabs a{transition:transform 160ms var(--ease-out)}
+button:active,a.cta:active,#themeBtn:active,#fnav a:active,.sd-foot a:active,.sd-tabs a:active{transform:scale(0.97)}
 button:focus-visible,a:focus-visible{outline:2px solid #E31B23;outline-offset:2px}
 #app>div{padding-bottom:env(safe-area-inset-bottom)}
 #app>div{padding-top:env(safe-area-inset-top) !important}
-@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+.thm-wrap{display:flex;align-items:center;gap:6px}
+.thm{display:flex;gap:2px;padding:2px;height:44px;box-sizing:border-box;border-radius:12px;background:#F2F2F2;font-family:'Roboto',system-ui,sans-serif}
+.thm button{width:36px;height:40px;padding:0;border:0;border-radius:10px;background:transparent;color:#8A8A8A;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.thm button[aria-pressed="true"]{background:#FFFFFF;color:#121212;box-shadow:0 1px 2px rgba(21,21,21,.08)}
+.sd-head .thm{align-self:flex-start;margin-top:4px}
+body.clean .sd-head .thm{background:#E9E9E9;border-radius:999px}
+body.clean .sd-head .thm button{border-radius:999px}
+/* night: dark version of the clean theme */
+html.cl.dk,body.clean.dark,body.clean.dark #app,body.clean.dark #side{background:#121212}
+body.clean.dark #side{color:#F2F2F2}
+body.clean.dark .sd-head a.home,body.clean.dark .sd-nav a.it{color:#F2F2F2}
+body.clean.dark .sd-nav a.it.on{background:#1E1E1E;color:#F2F2F2}
+@media (hover:hover) and (pointer:fine){body.clean.dark .sd-nav a.it:hover{background:#1E1E1E}}
+body.clean.dark .sd-nav a.it .sn{color:#FF6B70}
+body.clean.dark .sd-nav summary .n{background:#2A2A2A;color:#F2F2F2}
+body.clean.dark .sd-foot a{background:#1E1E1E}
+body.clean.dark .sd-tabs,body.clean.dark .sd-head .thm{background:#2A2A2A}
+body.clean.dark .sd-tabs a{color:#D0D0D0}
+body.clean.dark .sd-tabs a.on{background:#F2F2F2;color:#121212}
+body.dark .thm{background:#2A2A2A}
+body.dark .thm button{color:#8A8A8A}
+body.dark .thm button[aria-pressed="true"]{background:#3F3F3F;color:#F2F2F2;box-shadow:none}
+body.clean.dark #fnav{background:#1E1E1E;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+body.clean.dark #fnav a.on{background:#2A2A2A;color:#F2F2F2}
+body.dark #sbar .sb-f{background:#2A2A2A}
+body.dark #sbar .sb-f:focus-within{background:#1E1E1E;box-shadow:0 0 0 2px #F2F2F2}
+body.dark #sbar .sb-f svg{stroke:#8A8A8A}
+body.dark #sbar input{color:#F2F2F2}
+body.dark #sbar input::placeholder{color:#8A8A8A}
+body.dark #sbar .sb-x,body.dark #sbar .sb-e{color:#B8B8B8}
+body.dark #sbar .sb-r{background:#1E1E1E;box-shadow:0 8px 28px rgba(0,0,0,.6)}
+body.dark #sbar .sb-r a{color:#F2F2F2}
+body.dark #sbar .sb-r a:focus{background:#2A2A2A}
+@media (hover:hover) and (pointer:fine){body.dark #sbar .sb-r a:hover{background:#2A2A2A}}
+body.dark #sbar .sb-m{color:#FF6B70}
+body.dark #sbar .sb-s{color:#D0D0D0}
+body.dark #sbar .sb-s mark,body.dark #sbar .sb-t mark{background:#5C4A0A;color:#FFE48A}
+/* resume card on the home screen */
+.rs{position:relative;display:flex;flex-direction:column;gap:4px;margin:10px 16px 6px;padding:16px 52px 16px 16px;border-radius:16px;background:#FFFFFF;color:#121212;font-family:'Roboto',system-ui,sans-serif;box-shadow:0 1px 2px rgba(21,21,21,.06);transition:transform 160ms var(--ease-out)}
+.rs:active{transform:scale(0.98)}
+.rs-e{font-size:12px;line-height:16px;font-weight:500;color:#B3121A}
+.rs-t{font-size:17px;line-height:22px;font-weight:700}
+.rs-m{font-size:13px;line-height:18px;color:#5A5A5A}
+.rs-p{display:flex;align-items:center;gap:10px;margin-top:6px}
+.rs-b{flex:1;height:6px;border-radius:999px;background:#EBEBEB;overflow:hidden}
+.rs-b span{display:block;height:100%;border-radius:999px;background:#E31B23}
+.rs-n{font-size:12px;line-height:16px;font-weight:500;color:#5A5A5A;font-variant-numeric:tabular-nums}
+.rs-go{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:999px;background:#121212;color:#FFFFFF;display:flex;align-items:center;justify-content:center}
+@media (min-width:900px){.rs{margin:10px 48px 6px}}
+body.dark .rs{background:#1E1E1E;color:#F2F2F2;box-shadow:none}
+body.dark .rs-e{color:#FF6B70}
+body.dark .rs-m,body.dark .rs-n{color:#B8B8B8}
+body.dark .rs-b{background:#2A2A2A}
+body.dark .rs-go{background:#F2F2F2;color:#121212}
+/* tap a note on a neck to hear it */
+#app svg[data-nk] circle[data-nt]{cursor:pointer}
+#app svg circle.lk-on{fill:#FFC400!important;stroke:#121212!important}
+#app svg text.lk-on{fill:#121212!important}
+/* licks player */
+.lk{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:16px;background:#FFFFFF;font-family:'Roboto',system-ui,sans-serif;color:#121212}
+.lk-h{display:flex;flex-direction:column;gap:2px}
+.lk-e{font-size:12px;line-height:16px;font-weight:500;color:#B3121A}
+.lk-t{font-size:16px;line-height:22px;font-weight:700}
+.lk-h p{margin:4px 0 0;font-size:14px;line-height:20px;color:#3A3A3A}
+.lk-c{display:flex;flex-wrap:wrap;gap:8px}
+.lk button{font:500 14px/20px 'Roboto',system-ui,sans-serif;border:0;cursor:pointer}
+.lk-c button{height:40px;padding:0 14px;border-radius:999px;background:#E9E9E9;color:#121212}
+.lk-c button[aria-pressed="true"]{background:#121212;color:#FFFFFF}
+.lk-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.lk-sp{display:flex;gap:2px;padding:2px;border-radius:12px;background:#F2F2F2}
+.lk-sp button{width:52px;height:40px;border-radius:10px;background:transparent;color:#5A5A5A;font-variant-numeric:tabular-nums}
+.lk-sp button[aria-pressed="true"]{background:#FFFFFF;color:#121212;box-shadow:0 1px 2px rgba(21,21,21,.08)}
+.lk-play{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;min-width:120px;padding:0 20px;border-radius:999px;background:#E31B23!important;color:#FFFFFF}
+.lk-msg{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;line-height:20px;color:#3A3A3A}
+.lk-go{height:40px;padding:0 14px;border-radius:999px;background:#121212;color:#FFFFFF}
+body.dark .lk{background:#1E1E1E;color:#F2F2F2}
+body.dark .lk-e{color:#FF6B70}
+body.dark .lk-h p,body.dark .lk-msg{color:#D0D0D0}
+body.dark .lk-c button{background:#2A2A2A;color:#F2F2F2}
+body.dark .lk-c button[aria-pressed="true"],body.dark .lk-go{background:#F2F2F2;color:#121212}
+body.dark .lk-sp{background:#2A2A2A}
+body.dark .lk-sp button{color:#B8B8B8}
+body.dark .lk-sp button[aria-pressed="true"]{background:#3F3F3F;color:#F2F2F2;box-shadow:none}
+body.dark #app svg circle.lk-on{stroke:#F2F2F2!important}
+body.dark #app svg text.lk-on{fill:#121212!important}
+@media (prefers-reduced-motion:reduce){.rs:active{transform:none}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}button:active,a.cta:active,#themeBtn:active,#fnav a:active,.sd-foot a:active,.sd-tabs a:active{transform:none}@starting-style{#sbar.has .sb-r{transform:none}}}
 </style>
 </head>
 <body>
@@ -167,7 +258,7 @@ const TPL = {
 "Afinacion": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Roboto', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div>\n<div style=\"display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{tuns}}\" as=\"c\" hint-placeholder-count=\"3\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 44px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{tunDesc}}<\/p>\n\n<div style=\"display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid #D9D9D9; border-radius: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.tnTitle}}<\/h2>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.tnIntro}}<\/p>\n<button type=\"button\" onClick=\"{{tToggle}}\" style=\"height: 48px; padding: 0 16px; border: 0; border-radius: 6px; background: {{tBtnBg}}; color: #FFFFFF; font-size: 16px; line-height: 24px; font-weight: 500; cursor: pointer\">{{tBtn}}<\/button>\n<sc-if value=\"{{tHasErr}}\"><p role=\"alert\" style=\"margin: 0; padding: 10px 12px; border-radius: 6px; background: #FDECEC; font-size: 13px; line-height: 18px; color: #8A1016\">{{tErrTxt}}<\/p><\/sc-if>\n<div style=\"display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 0\">\n<span id=\"tNote\" style=\"font-size: 44px; line-height: 48px; font-weight: 700; color: #BDBDBD\">--<\/span>\n<span id=\"tSub\" style=\"font-size: 13px; line-height: 18px; color: #5A5A5A; min-height: 18px\">&nbsp;<\/span>\n<svg viewBox=\"0 0 320 78\" style=\"display: block; width: 100%; max-width: 360px; height: auto; margin-top: 6px\" role=\"img\" aria-label=\"{{t.tnGaugeAria}}\">\n<rect x=\"10\" y=\"36\" width=\"300\" height=\"10\" rx=\"5\" fill=\"#E6E6E6\"><\/rect>\n<rect x=\"146\" y=\"36\" width=\"28\" height=\"10\" fill=\"#2E9E4F\" fill-opacity=\"0.45\"><\/rect>\n<g stroke=\"#8A8A8A\" stroke-width=\"1.5\"><line x1=\"20\" y1=\"30\" x2=\"20\" y2=\"52\"><\/line><line x1=\"90\" y1=\"32\" x2=\"90\" y2=\"50\"><\/line><line x1=\"160\" y1=\"26\" x2=\"160\" y2=\"56\"><\/line><line x1=\"230\" y1=\"32\" x2=\"230\" y2=\"50\"><\/line><line x1=\"300\" y1=\"30\" x2=\"300\" y2=\"52\"><\/line><\/g>\n<g font-size=\"12\" fill=\"#5A5A5A\" text-anchor=\"middle\" font-family=\"Inter, sans-serif\"><text x=\"20\" y=\"70\">-50<\/text><text x=\"90\" y=\"70\">-25<\/text><text x=\"160\" y=\"70\">0<\/text><text x=\"230\" y=\"70\">+25<\/text><text x=\"300\" y=\"70\">+50<\/text><\/g>\n<g id=\"tNd\" transform=\"translate(0 0)\"><line x1=\"160\" y1=\"14\" x2=\"160\" y2=\"60\" stroke=\"#8A8A8A\" stroke-width=\"4\" stroke-linecap=\"round\" id=\"tNdL\"><\/line><circle cx=\"160\" cy=\"41\" r=\"6\" fill=\"#8A8A8A\" id=\"tNdC\"><\/circle><\/g>\n<\/svg>\n<span id=\"tMsg\" role=\"status\" aria-live=\"polite\" style=\"min-height: 22px; font-size: 15px; line-height: 22px; font-weight: 700; color: #5A5A5A; text-align: center\">{{t.tnIdle}}<\/span>\n<div id=\"tLv\" aria-hidden=\"true\" style=\"height: 6px; border-radius: 3px; background: #E6E6E6; overflow: hidden\"><div id=\"tLvB\" style=\"height: 100%; width: 0%; background: #8A8A8A\"><\/div><\/div>\n<\/div>\n<div style=\"display: grid; grid-template-columns: 1.2fr repeat(6, minmax(0, 1fr)); gap: 4px\">\n<sc-for list=\"{{tChips}}\" as=\"c\" hint-placeholder-count=\"7\">\n<button type=\"button\" id=\"{{c.id}}\" aria-pressed=\"{{c.pressed}}\" aria-label=\"{{c.aria}}\" onClick=\"{{c.pick}}\" style=\"min-width: 0; height: 52px; padding: 0 2px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; cursor: pointer\">\n<span style=\"font-size: 14px; line-height: 16px; font-weight: 700\">{{c.l1}}<\/span>\n<span style=\"font-size: 11px; line-height: 14px; color: {{c.fg2}}\">{{c.l2}}<\/span>\n<\/button>\n<\/sc-for>\n<\/div>\n<div role=\"group\" aria-label=\"{{t.tnSens}}\" style=\"display: flex; align-items: center; gap: 6px\">\n<span style=\"font-size: 13px; line-height: 18px; font-weight: 700; color: #121212; margin-right: 2px\">{{t.tnSens}}<\/span>\n<sc-for list=\"{{sChips}}\" as=\"c\" hint-placeholder-count=\"3\">\n<button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"flex: 1; min-width: 0; height: 40px; box-sizing: border-box; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; font-weight: 700; cursor: pointer\">{{c.l}}<\/button>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.tnNote}}<\/p>\n<\/div>\n\n<div role=\"img\" aria-label=\"{{t.headAria}}\" style=\"position: relative; width: 342px; height: 210px\">\n<svg width=\"342\" height=\"210\" viewBox=\"0 0 342 210\" aria-hidden=\"true\" style=\"position: absolute; left: 0; top: 0\">\n<path d=\"M121 200 L121 40 Q121 4 171 4 Q221 4 221 40 L221 200 Z\" fill=\"#121212\"/>\n<rect x=\"121\" y=\"198\" width=\"100\" height=\"5\" fill=\"#121212\"/>\n<g fill=\"none\" stroke=\"#BDBDBD\" stroke-width=\"1.5\" stroke-linejoin=\"round\">\n<path d=\"M141 200 L121 140 L84 140\"/>\n<path d=\"M153 200 L121 90 L84 90\"/>\n<path d=\"M165 200 L121 40 L84 40\"/>\n<path d=\"M177 200 L221 40 L258 40\"/>\n<path d=\"M189 200 L221 90 L258 90\"/>\n<path d=\"M201 200 L221 140 L258 140\"/>\n<\/g>\n<\/svg>\n<sc-for list=\"{{pegs}}\" as=\"g\" hint-placeholder-count=\"6\">\n<div style=\"position: absolute; left: 0; top: 0; width: 342px; height: 210px; pointer-events: none\">\n<span style=\"position: absolute; left: {{g.nl}}px; top: {{g.nt}}px; width: 28px; text-align: center; font-size: 14px; line-height: 16px; font-weight: 500; color: #5A5A5A\">{{g.num}}<\/span>\n<span style=\"position: absolute; left: {{g.cl}}px; top: {{g.ct}}px; width: 44px; height: 44px; box-sizing: border-box; border-radius: 250px; border: 2px solid #E31B23; background: {{g.bg}}; color: #121212; font-size: 13px; line-height: 40px; font-weight: 700; text-align: center\">{{g.note}}<\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.headNote}}<\/p>\n\n<div style=\"display: flex; flex-direction: column\">\n<sc-for list=\"{{rows}}\" as=\"r\" hint-placeholder-count=\"6\">\n<div style=\"display: flex; align-items: center; gap: 12px; min-height: 56px; border-top: 1px solid #E6E6E6; background: {{r.bg}}\">\n<span style=\"width: 28px; height: 28px; flex: none; border-radius: 250px; background: #FFF1CC; color: #B3121A; font-size: 14px; line-height: 20px; font-weight: 500; display: flex; align-items: center; justify-content: center\">{{r.n}}<\/span>\n<span style=\"flex-grow: 1; display: flex; flex-direction: column; min-width: 0\"><span style=\"font-size: 16px; line-height: 24px; font-weight: 700; color: #121212\">{{r.note}}<\/span><span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{r.word}} · {{r.hz}}<\/span><\/span>\n<button type=\"button\" aria-label=\"{{r.aria}}\" onClick=\"{{r.play}}\" style=\"width: 44px; height: 44px; flex: none; padding: 0; border: 1px solid #E31B23; border-radius: 6px; background: #FFFFFF; color: #B3121A; display: flex; align-items: center; justify-content: center; cursor: pointer\">\n<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M8 5v14l11-7z\"/><\/svg>\n<\/button>\n<\/div>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.hzNote}}<\/p>\n\n<div style=\"display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid #D9D9D9; border-radius: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.methodTitle}}<\/h2>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.methodIntro}}<\/p>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<sc-for list=\"{{mrows}}\" as=\"m\" hint-placeholder-count=\"5\">\n<div style=\"display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 8px; border-radius: 6px; background: #F2F2F2\">\n<span style=\"flex: 1; min-width: 0; font-size: 14px; line-height: 20px; color: #121212\">{{m.a}}<\/span>\n<span style=\"font-size: 14px; line-height: 20px; color: #8A8A8A\">=<\/span>\n<span style=\"flex: 1; min-width: 0; font-size: 14px; line-height: 20px; color: #121212\">{{m.b}}<\/span>\n<span style=\"min-width: 36px; height: 24px; box-sizing: border-box; padding: 0 6px; border-radius: 250px; background: #E31B23; color: #FFFFFF; font-size: 12px; line-height: 24px; font-weight: 500; text-align: center\">{{m.note}}<\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 12px; line-height: 16px; color: #5A5A5A\">{{methodNote}}<\/p>\n<\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.vidTitle}}<\/span>\n<sc-if value=\"{{vidEmpty}}\">\n<div role=\"img\" aria-label=\"{{t.vidAria}}\" style=\"width: 100%; box-sizing: border-box; aspect-ratio: 16 / 9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; border: 2px dashed #BDBDBD; border-radius: 8px; background: #F2F2F2; text-align: center\">\n<span style=\"width: 52px; height: 52px; border-radius: 250px; background: #E31B23; display: flex; align-items: center; justify-content: center\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#FFFFFF\" aria-hidden=\"true\"><path d=\"M8 5v14l11-7z\"><\/path><\/svg><\/span>\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 500; color: #3A3A3A\">{{t.vidSoon}}<\/span>\n<\/div>\n<\/sc-if>\n<sc-if value=\"{{vidEmbed}}\"><iframe src=\"{{vidSrc}}\" title=\"{{t.vidTitle}}\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen\" allowfullscreen loading=\"lazy\" style=\"width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 8px; background: #121212\"><\/iframe><\/sc-if>\n<sc-if value=\"{{vidFile}}\"><video src=\"{{vidSrc}}\" controls playsinline preload=\"metadata\" aria-label=\"{{t.vidTitle}}\" style=\"width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; background: #121212\"><\/video><\/sc-if>\n<\/div>\n\n<a class=\"cta\" href=\"Postura.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "Postura": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Roboto', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div><div style=\"display: flex; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.c1Title}}<\/h2><svg width=\"342\" height=\"140\" viewBox=\"0 0 342 140\" role=\"img\" aria-label=\"{{t.c1Aria}}\" style=\"display: block; border-radius: 8px; background: #F2F2F2\">\n<path d=\"M168 48 L246 80 L168 112 Q158 80 168 48 Z\" fill=\"#E31B23\" stroke=\"#B3121A\" stroke-width=\"2\" stroke-linejoin=\"round\"/>\n<rect x=\"26\" y=\"40\" width=\"166\" height=\"34\" rx=\"17\" fill=\"#D9D9D9\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/>\n<rect x=\"26\" y=\"78\" width=\"166\" height=\"34\" rx=\"17\" fill=\"#BDBDBD\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/>\n<line x1=\"194\" y1=\"126\" x2=\"246\" y2=\"126\" stroke=\"#B3121A\" stroke-width=\"1.5\"/>\n<line x1=\"194\" y1=\"121\" x2=\"194\" y2=\"131\" stroke=\"#B3121A\" stroke-width=\"1.5\"/>\n<line x1=\"246\" y1=\"121\" x2=\"246\" y2=\"131\" stroke=\"#B3121A\" stroke-width=\"1.5\"/>\n<\/svg><span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.c1Cap}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.c1Text}}<\/p>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.vidTitle}}<\/span>\n<sc-if value=\"{{vidEmpty}}\">\n<div role=\"img\" aria-label=\"{{t.vidAria}}\" style=\"width: 100%; box-sizing: border-box; aspect-ratio: 16 / 9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; border: 2px dashed #BDBDBD; border-radius: 8px; background: #F2F2F2; text-align: center\">\n<span style=\"width: 52px; height: 52px; border-radius: 250px; background: #E31B23; display: flex; align-items: center; justify-content: center\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#FFFFFF\" aria-hidden=\"true\"><path d=\"M8 5v14l11-7z\"><\/path><\/svg><\/span>\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 500; color: #3A3A3A\">{{t.vidSoon}}<\/span>\n<\/div>\n<\/sc-if>\n<sc-if value=\"{{vidEmbed}}\"><iframe src=\"{{vidSrc}}\" title=\"{{t.vidTitle}}\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen\" allowfullscreen loading=\"lazy\" style=\"width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 8px; background: #121212\"><\/iframe><\/sc-if>\n<sc-if value=\"{{vidFile}}\"><video src=\"{{vidSrc}}\" controls playsinline preload=\"metadata\" aria-label=\"{{t.vidTitle}}\" style=\"width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; background: #121212\"><\/video><\/sc-if>\n<\/div><\/div><div style=\"display: flex; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.c2Title}}<\/h2><svg viewBox=\"-44 0 364 170\" width=\"100%\" role=\"img\" aria-label=\"{{t.c2Aria}}\" style=\"display: block; max-width: 520px\">\n<rect x=\"34\" y=\"13\" width=\"280\" height=\"132\" rx=\"4\" fill=\"#F2F2F2\"/>\n<sc-for list=\"{{hnInlays}}\" as=\"d\" hint-placeholder-count=\"2\"><circle cx=\"{{d.cx}}\" cy=\"{{d.cy}}\" r=\"6\" fill=\"#D9D9D9\"/><\/sc-for>\n<sc-for list=\"{{hnFrets}}\" as=\"f\" hint-placeholder-count=\"5\"><line x1=\"{{f.x}}\" y1=\"13\" x2=\"{{f.x}}\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><\/sc-for>\n<line x1=\"34\" y1=\"13\" x2=\"34\" y2=\"145\" stroke=\"{{hnNutC}}\" stroke-width=\"{{hnNutW}}\"/>\n<sc-for list=\"{{hnStrs}}\" as=\"s\" hint-placeholder-count=\"6\">\n<line x1=\"34\" y1=\"{{s.y}}\" x2=\"314\" y2=\"{{s.y}}\" stroke=\"#8A8A8A\" stroke-width=\"{{s.sw}}\"/>\n<text x=\"-6\" y=\"{{s.ty}}\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">{{s.label}}<\/text>\n<\/sc-for>\n<sc-for list=\"{{hnNums}}\" as=\"n\" hint-placeholder-count=\"5\"><text x=\"{{n.x}}\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">{{n.label}}<\/text><\/sc-for>\n<sc-for list=\"{{hnMutes}}\" as=\"x\" hint-placeholder-count=\"2\"><text x=\"{{x.cx}}\" y=\"{{x.ty}}\" text-anchor=\"middle\" font-size=\"18\" fill=\"#5A5A5A\">×<\/text><\/sc-for>\n<sc-for list=\"{{hnMarks}}\" as=\"m\" hint-placeholder-count=\"5\"><circle cx=\"{{m.cx}}\" cy=\"{{m.cy}}\" r=\"{{m.r}}\" fill=\"{{m.bg}}\" stroke=\"{{m.bd}}\" stroke-width=\"2\"/><text x=\"{{m.cx}}\" y=\"{{m.ty}}\" text-anchor=\"middle\" font-size=\"{{m.fs}}\" font-weight=\"500\" fill=\"{{m.fg}}\">{{m.label}}<\/text><\/sc-for>\n<\/svg><span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.c2Cap}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.c2Text}}<\/p><\/div><div style=\"display: flex; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.c3Title}}<\/h2><svg width=\"342\" height=\"150\" viewBox=\"0 0 342 150\" role=\"img\" aria-label=\"{{t.c3Aria}}\" style=\"display: block; border-radius: 8px; background: #F2F2F2\"><line x1=\"40\" y1=\"26\" x2=\"302\" y2=\"26\" stroke=\"#8A8A8A\" stroke-width=\"3\"/><text x=\"26\" y=\"30\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\" font-family=\"Roboto, sans-serif\">6<\/text><line x1=\"40\" y1=\"46\" x2=\"302\" y2=\"46\" stroke=\"#8A8A8A\" stroke-width=\"2.5\"/><text x=\"26\" y=\"50\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\" font-family=\"Roboto, sans-serif\">5<\/text><line x1=\"40\" y1=\"66\" x2=\"302\" y2=\"66\" stroke=\"#8A8A8A\" stroke-width=\"2\"/><text x=\"26\" y=\"70\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\" font-family=\"Roboto, sans-serif\">4<\/text><line x1=\"40\" y1=\"86\" x2=\"302\" y2=\"86\" stroke=\"#8A8A8A\" stroke-width=\"1.6\"/><text x=\"26\" y=\"90\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\" font-family=\"Roboto, sans-serif\">3<\/text><line x1=\"40\" y1=\"106\" x2=\"302\" y2=\"106\" stroke=\"#8A8A8A\" stroke-width=\"1.3\"/><text x=\"26\" y=\"110\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\" font-family=\"Roboto, sans-serif\">2<\/text><line x1=\"40\" y1=\"126\" x2=\"302\" y2=\"126\" stroke=\"#8A8A8A\" stroke-width=\"1\"/><text x=\"26\" y=\"130\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\" font-family=\"Roboto, sans-serif\">1<\/text><line x1=\"110\" y1=\"16\" x2=\"110\" y2=\"128\" stroke=\"#E31B23\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M100 118 L110 132 L120 118\" fill=\"none\" stroke=\"#E31B23\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><line x1=\"230\" y1=\"136\" x2=\"230\" y2=\"24\" stroke=\"#B07A00\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M220 34 L230 20 L240 34\" fill=\"none\" stroke=\"#B07A00\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg><span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.c3Cap}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.c3Text}}<\/p><\/div><div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.c4Title}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.c4Text}}<\/p><\/div><a class=\"cta\" href=\"Pulso.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "ComoPracticar": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Roboto', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.howTitle}}<\/h2>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<sc-for list=\"{{how}}\" as=\"s\" hint-placeholder-count=\"6\">\n<div style=\"display: flex; align-items: flex-start; gap: 12px\">\n<span style=\"width: 28px; height: 28px; flex: none; border-radius: 250px; background: #FFF1CC; color: #B3121A; font-size: 14px; line-height: 20px; font-weight: 500; display: flex; align-items: center; justify-content: center\">{{s.n}}<\/span>\n<span style=\"font-size: 14px; line-height: 20px; color: #121212\">{{s.text}}<\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.noteTitle}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.noteText}}<\/p><\/div><a class=\"cta\" href=\"Braco.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
-"Pulso": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Roboto', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div>\n<div style=\"display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; border: 1px solid #D9D9D9; border-radius: 8px\">\n<div style=\"height: 44px; display: flex; align-items: center; gap: 12px\">\n<sc-for list=\"{{dots}}\" as=\"d\" hint-placeholder-count=\"4\">\n<span style=\"width: {{d.sz}}px; height: {{d.sz}}px; box-sizing: border-box; border-radius: 250px; border: 2px solid {{d.bd}}; background: {{d.bg}}\"><\/span>\n<\/sc-for>\n<\/div>\n<div style=\"display: flex; align-items: center; gap: 16px\">\n<button type=\"button\" aria-label=\"{{t.minusAria}}\" onClick=\"{{minus}}\" style=\"height: 56px; width: 56px; flex: none; padding: 0; border: 1px solid #D9D9D9; border-radius: 6px; background: #FFFFFF; color: #121212; font-size: 28px; line-height: 28px; font-weight: 500; cursor: pointer\">−<\/button>\n<div style=\"width: 112px; display: flex; flex-direction: column; align-items: center\">\n<span style=\"font-size: 56px; line-height: 60px; font-weight: 700; color: #121212\">{{bpm}}<\/span>\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #5A5A5A\">BPM<\/span>\n<\/div>\n<button type=\"button\" aria-label=\"{{t.plusAria}}\" onClick=\"{{plus}}\" style=\"height: 56px; width: 56px; flex: none; padding: 0; border: 1px solid #D9D9D9; border-radius: 6px; background: #FFFFFF; color: #121212; font-size: 28px; line-height: 28px; font-weight: 500; cursor: pointer\">+<\/button>\n<\/div>\n<button type=\"button\" onClick=\"{{toggle}}\" style=\"width: 100%; height: 48px; border: 0; border-radius: 6px; background: {{runBg}}; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500; cursor: pointer\">{{runLabel}}<\/button>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.presetTitle}}<\/span>\n<div style=\"display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{presets}}\" as=\"c\" hint-placeholder-count=\"4\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 44px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.sigTitle}}<\/span>\n<div style=\"display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{sigs}}\" as=\"c\" hint-placeholder-count=\"3\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 44px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.sigNote}}<\/span>\n<\/div>\n\n<div style=\"display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px\">\n<span style=\"font-size: 14px; line-height: 20px; color: #121212\">{{t.sound}}<\/span>\n<button type=\"button\" role=\"switch\" aria-checked=\"{{snd}}\" aria-label=\"{{t.sound}}\" onClick=\"{{toggleSnd}}\" style=\"width: 52px; height: 32px; flex: none; padding: 2px; box-sizing: border-box; border: 0; border-radius: 250px; background: {{sndBg}}; display: flex; justify-content: {{sndJ}}; cursor: pointer\"><span style=\"width: 28px; height: 28px; border-radius: 250px; background: #FFFFFF\"><\/span><\/button>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.tipTitle}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.tipText}}<\/p><\/div><a class=\"cta\" href=\"Batidas.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
+"Pulso": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Roboto', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div>\n<div style=\"display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; border: 1px solid #D9D9D9; border-radius: 8px\">\n<div style=\"height: 44px; display: flex; align-items: center; gap: 12px\">\n<sc-for list=\"{{dots}}\" as=\"d\" hint-placeholder-count=\"4\">\n<span style=\"width: {{d.sz}}px; height: {{d.sz}}px; box-sizing: border-box; border-radius: 250px; border: 2px solid {{d.bd}}; background: {{d.bg}}\"><\/span>\n<\/sc-for>\n<\/div>\n<div style=\"display: flex; align-items: center; gap: 16px\">\n<button type=\"button\" aria-label=\"{{t.minusAria}}\" onClick=\"{{minus}}\" style=\"height: 56px; width: 56px; flex: none; padding: 0; border: 1px solid #D9D9D9; border-radius: 6px; background: #FFFFFF; color: #121212; font-size: 28px; line-height: 28px; font-weight: 500; cursor: pointer\">−<\/button>\n<div style=\"width: 112px; display: flex; flex-direction: column; align-items: center\">\n<span style=\"font-size: 56px; line-height: 60px; font-weight: 700; color: #121212\">{{bpm}}<\/span>\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #5A5A5A\">BPM<\/span>\n<\/div>\n<button type=\"button\" aria-label=\"{{t.plusAria}}\" onClick=\"{{plus}}\" style=\"height: 56px; width: 56px; flex: none; padding: 0; border: 1px solid #D9D9D9; border-radius: 6px; background: #FFFFFF; color: #121212; font-size: 28px; line-height: 28px; font-weight: 500; cursor: pointer\">+<\/button>\n<\/div>\n<button type=\"button\" aria-label=\"{{t.tapAria}}\" onClick=\"{{tap}}\" style=\"width: 100%; height: 44px; border: 1px solid #D9D9D9; border-radius: 6px; background: #FFFFFF; color: #121212; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{t.tap}}<\/button>\n<button type=\"button\" onClick=\"{{toggle}}\" style=\"width: 100%; height: 48px; border: 0; border-radius: 6px; background: {{runBg}}; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500; cursor: pointer\">{{runLabel}}<\/button>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.presetTitle}}<\/span>\n<div style=\"display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{presets}}\" as=\"c\" hint-placeholder-count=\"4\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 44px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.sigTitle}}<\/span>\n<div style=\"display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{sigs}}\" as=\"c\" hint-placeholder-count=\"3\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 44px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.sigNote}}<\/span>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #D9D9D9; border-radius: 8px\">\n<div style=\"display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px\">\n<div style=\"display: flex; flex-direction: column; gap: 2px\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.trTitle}}<\/span><span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{trNote}}<\/span><\/div>\n<button type=\"button\" role=\"switch\" aria-checked=\"{{tr}}\" aria-label=\"{{t.trTitle}}\" onClick=\"{{toggleTr}}\" style=\"width: 52px; height: 32px; flex: none; padding: 2px; box-sizing: border-box; border: 0; border-radius: 250px; background: {{trBg}}; display: flex; justify-content: {{trJ}}; cursor: pointer\"><span style=\"width: 28px; height: 28px; border-radius: 250px; background: #FFFFFF\"><\/span><\/button>\n<\/div>\n<sc-if value=\"{{tr}}\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #5A5A5A\">{{t.trStepT}}<\/span>\n<div style=\"display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{trSteps}}\" as=\"c\" hint-placeholder-count=\"3\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 40px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #5A5A5A\">{{t.trEveryT}}<\/span>\n<div style=\"display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{trEveryL}}\" as=\"c\" hint-placeholder-count=\"3\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 40px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<\/sc-if>\n<\/div>\n\n<div style=\"display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px\">\n<span style=\"font-size: 14px; line-height: 20px; color: #121212\">{{t.sound}}<\/span>\n<button type=\"button\" role=\"switch\" aria-checked=\"{{snd}}\" aria-label=\"{{t.sound}}\" onClick=\"{{toggleSnd}}\" style=\"width: 52px; height: 32px; flex: none; padding: 2px; box-sizing: border-box; border: 0; border-radius: 250px; background: {{sndBg}}; display: flex; justify-content: {{sndJ}}; cursor: pointer\"><span style=\"width: 28px; height: 28px; border-radius: 250px; background: #FFFFFF\"><\/span><\/button>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.tipTitle}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.tipText}}<\/p><\/div><a class=\"cta\" href=\"Batidas.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "Batidas": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Roboto', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div><div style=\"display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{pats}}\" as=\"c\" hint-placeholder-count=\"2\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 44px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px; padding: 16px 8px 12px; border: 1px solid #D9D9D9; border-radius: 8px\">\n<div style=\"display: flex\">\n<sc-for list=\"{{slots}}\" as=\"s\" hint-placeholder-count=\"8\">\n<div style=\"flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; border-radius: 6px; background: {{s.bg}}\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: {{s.cw}}; color: {{s.cc}}\">{{s.count}}<\/span>\n<span style=\"height: 32px; font-size: 28px; line-height: 32px; font-weight: 700; color: {{s.col}}\">{{s.sym}}<\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<div style=\"display: flex; gap: 16px; padding: 0 8px; font-size: 12px; line-height: 16px; color: #5A5A5A\">\n<span><b style=\"color: #E31B23\">↓<\/b> {{t.down}}<\/span><span><b style=\"color: #B07A00\">↑<\/b> {{t.up}}<\/span><span><b style=\"color: #BDBDBD\">·<\/b> {{t.rest}}<\/span>\n<\/div>\n<\/div>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{patDesc}}<\/p>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.bpmTitle}}<\/span>\n<div style=\"display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{bpms}}\" as=\"c\" hint-placeholder-count=\"4\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 44px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<\/div>\n<button type=\"button\" onClick=\"{{toggle}}\" style=\"height: 48px; border: 0; border-radius: 6px; background: {{runBg}}; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500; cursor: pointer\">{{runLabel}}<\/button>\n<div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.tipTitle}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.tipText}}<\/p><\/div><a class=\"cta\" href=\"Tablatura.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "Tablatura": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Roboto', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div><div style=\"display: flex; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.s1Title}}<\/h2><svg width=\"342\" height=\"134\" viewBox=\"0 0 342 134\" role=\"img\" aria-label=\"{{t.tab0Aria}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"338\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"338\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"338\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"338\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"338\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"338\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"338\" y1=\"28\" x2=\"338\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><\/svg><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.s1Text}}<\/p><\/div><div style=\"display: flex; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.s2Title}}<\/h2><svg width=\"342\" height=\"134\" viewBox=\"0 0 342 134\" role=\"img\" aria-label=\"{{t.tab1Aria}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"338\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"338\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"338\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"338\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"338\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"338\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"338\" y1=\"28\" x2=\"338\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"62.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"70\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Roboto, sans-serif\">0<\/text><rect x=\"142.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"150\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Roboto, sans-serif\">3<\/text><rect x=\"222.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"230\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Roboto, sans-serif\">5<\/text><\/svg><span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.s2Cap}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.s2Text}}<\/p><\/div><div style=\"display: flex; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.s3Title}}<\/h2><svg width=\"342\" height=\"134\" viewBox=\"0 0 342 134\" role=\"img\" aria-label=\"{{t.tab2Aria}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"338\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"338\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"338\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"338\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"338\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"338\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Roboto, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"338\" y1=\"28\" x2=\"338\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"102.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"110\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Roboto, sans-serif\">0<\/text><rect x=\"102.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"110\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Roboto, sans-serif\">2<\/text><rect x=\"102.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"110\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Roboto, sans-serif\">2<\/text><rect x=\"222.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"230\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Roboto, sans-serif\">3<\/text><rect x=\"222.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"230\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Roboto, sans-serif\">5<\/text><rect x=\"222.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"230\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Roboto, sans-serif\">5<\/text><\/svg><span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.s3Cap}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.s3Text}}<\/p><\/div><div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.s4Title}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.s4Text}}<\/p><\/div><a class=\"cta\" href=\"Cifras.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "Cifras": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Roboto', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.mapTitle}}<\/h2>\n<div style=\"display: flex; gap: 4px\">\n<sc-for list=\"{{letters}}\" as=\"x\" hint-placeholder-count=\"7\">\n<div style=\"flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 8px 0; border-radius: 6px; background: #FFF1CC\">\n<span style=\"font-size: 16px; line-height: 24px; font-weight: 700; color: #121212\">{{x.l}}<\/span>\n<span style=\"font-size: 12px; line-height: 16px; color: #3A3A3A\">{{x.n}}<\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.mapText}}<\/p>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.rowsTitle}}<\/h2>\n<div style=\"display: flex; flex-direction: column\">\n<sc-for list=\"{{rows}}\" as=\"r\" hint-placeholder-count=\"9\">\n<div style=\"display: flex; align-items: center; gap: 12px; min-height: 56px; border-top: 1px solid #E6E6E6\">\n<span style=\"width: 72px; flex: none; font-size: 18px; line-height: 24px; font-weight: 700; color: #B3121A\">{{r.sym}}<\/span>\n<span style=\"flex-grow: 1; min-width: 0; display: flex; flex-direction: column\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 500; color: #121212\">{{r.name}}<\/span><span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{r.notes}}<\/span><\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Roboto', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.chartTitle}}<\/h2>\n<div style=\"display: flex; align-items: stretch; border: 1px solid #D9D9D9; border-radius: 8px; background: #FAFAFA\">\n<sc-for list=\"{{bars}}\" as=\"b\" hint-placeholder-count=\"4\">\n<div style=\"flex: 1; min-width: 0; height: 56px; display: flex; align-items: center; justify-content: center; border-left: {{b.bl}}; font-size: 18px; line-height: 24px; font-weight: 700; color: #121212\">{{b.c}}<\/div>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.chartText}}<\/p>\n<\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.tipTitle}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.tipText}}<\/p><\/div><a class=\"cta\" href=\"Tecnicas.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
@@ -1661,7 +1752,7 @@ startAnim(from, to) {
 const beatMs = 60000 / this.state.bpm;
 let reduce = false;
 try { reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
-this._anim = { from, to, t0: performance.now(), dur: reduce ? 1 : Math.min(380, beatMs * 0.7) };
+this._anim = { from, to, t0: performance.now(), dur: reduce ? 1 : Math.min(300, beatMs * 0.7) };
 this.animLoop();
 }
 
@@ -4476,7 +4567,7 @@ constructor(props) {
 super(props);
 let lang = 'es';
 try { const v = localStorage.getItem('guitar.lang'); if (v === 'en' || v === 'es') lang = v; } catch (e) {}
-this.state = Object.assign({ lang }, { bpm: 90, sig: '4/4', run: false, cur: 0, snd: true });
+this.state = Object.assign({ lang }, { bpm: 90, sig: '4/4', run: false, cur: 0, snd: true, tr: false, trStep: 5, trEvery: 4 });
 
 }
 componentDidMount() {
@@ -4524,12 +4615,27 @@ this.beep(acc ? 1200 : 800, 0.06, 0.3, 'square');
 }
 startM() {
 this.stopM(true);
-const n = this.sigDefs()[this.state.sig].n;
 this._cur = 0;
+this._bars = 0;
 this.setState({ run: true, cur: 0 });
 this.click(0);
+this.loop();
+}
+loop() {
+if (this._tm) clearInterval(this._tm);
+const n = this.sigDefs()[this.state.sig].n;
 this._tm = setInterval(() => {
 this._cur = (this._cur + 1) % n;
+// speed trainer: raise the tempo after every few bars, without restarting the count
+if (this._cur === 0 && this.state.tr) {
+this._bars += 1;
+if (this._bars % this.state.trEvery === 0 && this.state.bpm < 220) {
+this.setState({ cur: 0, bpm: Math.min(220, this.state.bpm + this.state.trStep) });
+this.click(0);
+this.loop();
+return;
+}
+}
 this.setState({ cur: this._cur });
 this.click(this._cur);
 }, 60000 / this.state.bpm);
@@ -4542,6 +4648,16 @@ setBpm(v) {
 const b = Math.max(40, Math.min(220, v));
 this.setState({ bpm: b });
 if (this.state.run) { this.state.bpm = b; this.startM(); }
+}
+tapT() {
+const now = performance.now();
+const ts = (this._taps || []).filter((x) => now - x < 2000);
+ts.push(now);
+this._taps = ts.slice(-5);
+if (this._taps.length >= 2) {
+const a = this._taps;
+this.setBpm(Math.round(60000 / ((a[a.length - 1] - a[0]) / (a.length - 1))));
+}
 }
 setSig(k) {
 this.setState({ sig: k });
@@ -4565,6 +4681,14 @@ const D = {
   "sigTitle": "Compás",
   "sigNote": "En 6/8 cada punto es una corchea.",
   "sound": "Sonido del clic",
+  "tap": "Marcar el tempo (toca al ritmo)",
+  "tapAria": "Marcar el tempo: toca este botón varias veces al ritmo",
+  "trTitle": "Entrenador de velocidad",
+  "trOff": "Sube el tempo solo, poco a poco.",
+  "trOn": "Sube {s} BPM cada {e} compases.",
+  "trNext": "Próxima subida en {n} compás(es).",
+  "trStepT": "Cuánto sube",
+  "trEveryT": "Cada cuántos compases",
   "tipTitle": "Empieza despacio",
   "tipText": "Si fallas, baja el tempo hasta que salga limpio y súbelo poco a poco. Es más útil tocar limpio a poca velocidad que sucio a mucha.",
   "cta": "Siguiente: ritmos de acompañamiento"
@@ -4583,6 +4707,14 @@ const D = {
   "sigTitle": "Time signature",
   "sigNote": "In 6/8 each dot is an eighth note.",
   "sound": "Click sound",
+  "tap": "Tap tempo (tap along)",
+  "tapAria": "Tap tempo: tap this button several times in time",
+  "trTitle": "Speed trainer",
+  "trOff": "Raises the tempo for you, little by little.",
+  "trOn": "Adds {s} BPM every {e} bars.",
+  "trNext": "Next increase in {n} bar(s).",
+  "trStepT": "How much",
+  "trEveryT": "Every how many bars",
   "tipTitle": "Start slow",
   "tipText": "If you slip, lower the tempo until it comes out clean and raise it little by little. Playing clean at low speed beats playing messy at high speed.",
   "cta": "Next: accompaniment rhythms"
@@ -4611,8 +4743,17 @@ minus: () => this.setBpm(bpm - 1), plus: () => this.setBpm(bpm + 1),
 toggle: () => (this.state.run ? this.stopM() : this.startM()),
 runLabel: run ? t.stop : t.start, runBg: run ? '#121212' : '#E31B23',
 snd, sndBg: snd ? '#E31B23' : '#BDBDBD', sndJ: snd ? 'flex-end' : 'flex-start',
-toggleSnd: () => this.setState({ snd: !this.state.snd })
+toggleSnd: () => this.setState({ snd: !this.state.snd }),
+tap: () => this.tapT()
 };
+const tr = this.state.tr, trS = this.state.trStep, trE = this.state.trEvery;
+out.tr = tr;
+out.trBg = tr ? '#E31B23' : '#BDBDBD';
+out.trJ = tr ? 'flex-end' : 'flex-start';
+out.trNote = !tr ? t.trOff : (t.trOn.replace('{s}', trS).replace('{e}', trE) + (run ? ' ' + t.trNext.replace('{n}', trE - ((this._bars || 0) % trE)) : ''));
+out.toggleTr = () => { this._bars = 0; this.setState({ tr: !this.state.tr }); };
+out.trSteps = [2, 5, 10].map((v) => chip('+' + v, trS === v, () => { this._bars = 0; this.setState({ trStep: v }); }));
+out.trEveryL = [2, 4, 8].map((v) => chip(String(v), trE === v, () => { this._bars = 0; this.setState({ trEvery: v }); }));
 
 const langs = ['es', 'en'].map((l) => {
 const on = lang === l;
@@ -15007,9 +15148,24 @@ function cleanify(name, lang) {
 }
 const fnav = document.getElementById('fnav');
 
-let dark = false;
-try { dark = localStorage.getItem('guitar.theme') === 'dark'; } catch (e) {}
-const D_BG = { 'FFFFFF': '1E1E1E', 'FAFAFA': '1E1E1E', 'F2F2F2': '2A2A2A', 'FFF1CC': '3B300C', 'FEF2DB': '3B300C', 'F4EDDD': '2A2620', 'E6E6E6': '333333', 'D9D9D9': '3F3F3F', 'E3FFEE': '0F3320', 'E9E9E9': '2A2A2A', '121212': '2C2C2C' };
+// theme mode: 'auto' follows the device, 'light' / 'dark' are fixed
+let themeMode = 'auto';
+try { const v = localStorage.getItem('guitar.theme'); if (v === 'light' || v === 'dark') themeMode = v; } catch (e) {}
+const darkMQ = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+const isDark = () => themeMode === 'dark' || (themeMode === 'auto' && !!(darkMQ && darkMQ.matches));
+let dark = isDark();
+function setThemeMode(m) {
+  themeMode = m;
+  try { localStorage.setItem('guitar.theme', m); } catch (e) {}
+  dark = isDark();
+  themeUI(document.documentElement.lang || 'es');
+  if (window.__rerender) window.__rerender();
+}
+if (darkMQ) {
+  const onSys = () => { if (themeMode !== 'auto') return; dark = isDark(); themeUI(document.documentElement.lang || 'es'); if (window.__rerender) window.__rerender(); };
+  if (darkMQ.addEventListener) darkMQ.addEventListener('change', onSys); else if (darkMQ.addListener) darkMQ.addListener(onSys);
+}
+const D_BG = { 'F4F4F4': '121212', 'EBEBEB': '2A2A2A', 'FAF6EC': '2A2620', 'FFFFFF': '1E1E1E', 'FAFAFA': '1E1E1E', 'F2F2F2': '2A2A2A', 'FFF1CC': '3B300C', 'FEF2DB': '3B300C', 'F4EDDD': '2A2620', 'E6E6E6': '333333', 'D9D9D9': '3F3F3F', 'E3FFEE': '0F3320', 'E9E9E9': '2A2A2A', '121212': '2C2C2C' };
 const D_KEEP_BG = { 'E31B23': 1, 'B3121A': 1, 'C8321C': 1, '9E2412': 1, 'FFC400': 1, 'E0A800': 1, 'FFE08A': 1, 'B07A00': 1, '121212': 1, '2B2B2B': 1, '262626': 1, '8A8A8A': 1, 'BDBDBD': 1, 'F04A4F': 1, '8F0F15': 1, '006828': 1, '038A37': 1 };
 const D_FG = { '121212': 'F2F2F2', '1A1410': 'F2F2F2', '3A3A3A': 'D0D0D0', '5A5A5A': 'B8B8B8', 'B3121A': 'FF6B70', 'E31B23': 'FF5A60', '9E2412': 'FF8470', '4A4036': 'CFC6B8', '6B5F52': 'A89C8C', 'B07A00': 'FFC400', '006828': '4FD08A', 'C8321C': 'FF7A66' };
 const D_BD = { 'E6E6E6': '333333', 'D9D9D9': '3F3F3F', 'E9E0CC': '3A3328', 'D3C7AE': '4A4030', '121212': '8A8A8A', '5A5A5A': '8A8A8A', 'FFFFFF': '3F3F3F', 'B3121A': 'FF5A60' };
@@ -15051,11 +15207,15 @@ function darken() {
     rec[i] = r;
   }
   const isTop = (el) => el.parentElement === app;
+  const ctas = [];
   for (let i = 0; i < n; i++) {
     const r = rec[i], el = r.el, st = el.style;
     if (!r.svg) {
       if (r.bg) {
-        const nb = isTop(el) && r.bg === 'FFFFFF' ? '121212' : D_BG[r.bg];
+        let nb = isTop(el) && r.bg === 'FFFFFF' ? '121212' : D_BG[r.bg];
+        // clean: primary buttons turn light so they keep standing out
+        if (CLEAN && r.bg === '121212' && (el.tagName === 'BUTTON' || el.classList.contains('cta'))) { nb = 'F2F2F2'; ctas.push(el); }
+        else if (nb === '2A2A2A' && el.getAttribute('aria-pressed') === 'true') nb = '3F3F3F';
         if (nb) st.backgroundColor = '#' + nb;
       }
       const keepFg = r.eff && D_KEEP_BG[r.eff] && r.eff !== '8A8A8A' && r.eff !== 'BDBDBD' && r.eff !== '121212' && r.eff !== '2B2B2B' && r.eff !== '262626';
@@ -15097,11 +15257,21 @@ function darken() {
       }
     }
   }
+  ctas.forEach((b) => {
+    b.style.color = '#121212';
+    b.querySelectorAll('*').forEach((c) => {
+      const cs = getComputedStyle(c);
+      if ((rgbHex(cs.color) || {}).hex === 'FFFFFF') c.style.color = '#121212';
+      if (c instanceof SVGElement && (rgbHex(cs.fill) || {}).hex === 'FFFFFF') c.style.fill = '#121212';
+    });
+  });
 }
 const themeBtn = document.getElementById('themeBtn');
 function themeUI(lang) {
   document.body.classList.toggle('dark', dark);
   document.documentElement.classList.toggle('dk', dark);
+  const tc = document.querySelector('meta[name="theme-color"]');
+  if (tc) tc.setAttribute('content', dark ? '#121212' : (CLEAN ? '#F4F4F4' : '#FFFFFF'));
   const en = lang === 'en';
   const lb = dark ? (en ? 'Switch to white background' : 'Cambiar a fondo blanco') : (en ? 'Switch to dark background' : 'Cambiar a fondo oscuro');
   themeBtn.setAttribute('aria-label', lb); themeBtn.title = lb;
@@ -15109,13 +15279,280 @@ function themeUI(lang) {
     ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
     : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
 }
-themeBtn.addEventListener('click', () => {
-  dark = !dark;
-  try { localStorage.setItem('guitar.theme', dark ? 'dark' : 'light'); } catch (e) {}
-  themeUI(document.documentElement.lang || 'es');
-  if (window.__rerender) window.__rerender();
+themeBtn.addEventListener('click', () => setThemeMode(dark ? 'light' : 'dark'));
+
+// sun / auto / moon selector, shown on the home header and in the desktop sidebar
+const THM_IC = {
+  light: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  auto: '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
+  dark: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'
+};
+function themeSeg(lang) {
+  const en = lang === 'en';
+  const lb = en ? { light: 'Light', auto: 'Automatic (follows your device)', dark: 'Night', g: 'Theme' } : { light: 'Claro', auto: 'Automático (sigue tu dispositivo)', dark: 'Noche', g: 'Tema' };
+  const d = document.createElement('div');
+  d.className = 'thm'; d.setAttribute('role', 'group'); d.setAttribute('aria-label', lb.g);
+  d.innerHTML = ['light', 'auto', 'dark'].map((m) => '<button type="button" data-m="' + m + '" aria-pressed="' + (m === themeMode) + '" aria-label="' + lb[m] + '" title="' + lb[m] + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + THM_IC[m] + '</svg></button>').join('');
+  d.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('button[data-m]'); if (b) setThemeMode(b.getAttribute('data-m')); });
+  return d;
+}
+function attachTheme(name, lang) {
+  const hs = sideEl.querySelector('.sd-head');
+  if (hs) { const old = hs.querySelector('.thm'); if (old) old.remove(); hs.appendChild(themeSeg(lang)); }
+  if (name !== 'Inicio') return;
+  const lg = app.querySelector('header [role="group"] button[aria-label="Español"]');
+  const grp = lg && lg.parentElement;
+  if (!grp || !grp.parentElement) return;
+  const row = grp.parentElement;
+  const wrap = document.createElement('div');
+  wrap.className = 'thm-wrap';
+  if (document.documentElement.clientWidth >= DESK) {
+    row.insertBefore(wrap, grp);
+    wrap.appendChild(themeSeg(lang));
+    wrap.appendChild(grp);
+  } else {
+    // phone: logo and language fill the first row, so the selector shares the byline row
+    const by = row.nextElementSibling;
+    row.insertAdjacentElement('afterend', wrap);
+    wrap.style.justifyContent = 'space-between';
+    if (by && by.tagName === 'SPAN') wrap.appendChild(by);
+    else wrap.appendChild(document.createElement('span'));
+    wrap.appendChild(themeSeg(lang));
+  }
+}
+
+
+// ---------- resume: remember the last lesson and offer it on the home screen ----------
+const HUBS = ['Inicio', 'Main', 'Curso', 'Cancionero', 'Herramientas'];
+function saveLast(name, qs) {
+  if (HUBS.indexOf(name) >= 0 || !inMenu(menu, name)) return;
+  try { localStorage.setItem('guitar.last', JSON.stringify({ n: name, q: qs || '', m: menu })); } catch (e) {}
+}
+function attachResume(name, lang) {
+  if (name !== 'Inicio') return;
+  let last = null;
+  try { last = JSON.parse(localStorage.getItem('guitar.last') || 'null'); } catch (e) {}
+  if (!last || !C[last.n] || !SEQS[last.m]) return;
+  const nv = NAV[lang] || NAV.es;
+  const nav = last.m === 'curso' ? nv.course : (last.m === 'musica' ? nv.music : nv);
+  let label = '', mod = '';
+  nav.mods.forEach((m) => m.steps.forEach((st) => { if (!label && base(st.href) === last.n) { label = st.label; mod = m.title; } }));
+  if (!label) return;
+  const seq = SEQS[last.m].map(base);
+  const i = seq.indexOf(last.n) + 1, n = seq.length;
+  const en = lang === 'en';
+  const where = { ruta: en ? 'Path' : 'Ruta', curso: en ? 'Course' : 'Curso', musica: en ? 'Songbook' : 'Cancionero' }[last.m];
+  const a = document.createElement('a');
+  a.className = 'rs';
+  a.href = '#/' + last.n + (last.q ? '?' + last.q : '');
+  a.innerHTML = '<span class="rs-e">' + esc(en ? 'Pick up where you left off' : 'Continúa donde lo dejaste') + '</span>'
+    + '<span class="rs-t">' + esc(label) + '</span>'
+    + '<span class="rs-m">' + esc(where + (mod ? ' · ' + mod : '')) + '</span>'
+    + '<span class="rs-p"><span class="rs-b"><span style="width:' + Math.round(i / n * 100) + '%"></span></span><span class="rs-n">' + i + ' / ' + n + '</span></span>'
+    + '<span class="rs-go" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>';
+  a.addEventListener('click', () => setMenu(last.m));
+  if (SB.el && SB.el.parentElement) SB.el.insertAdjacentElement('afterend', a);
+  else { const hd = app.querySelector('header'); if (hd) hd.insertAdjacentElement('afterend', a); else app.insertBefore(a, app.firstChild); }
+}
+
+// ---------- fretboard sound: tap a note on any neck diagram to hear it ----------
+const OPEN_MIDI = [64, 59, 55, 50, 45, 40]; // strings 1 (high E) to 6 (low E)
+let pAC = null;
+const pBuf = {};
+function pAudio() {
+  if (!pAC) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; pAC = new AC(); }
+  if (pAC.state === 'suspended' && pAC.resume) pAC.resume();
+  return pAC;
+}
+// Karplus-Strong plucked string, rendered once per pitch and cached
+function pluckBuf(ac, midi) {
+  if (pBuf[midi]) return pBuf[midi];
+  const sr = ac.sampleRate, f = 440 * Math.pow(2, (midi - 69) / 12);
+  const N = Math.max(2, Math.round(sr / f)), len = Math.floor(sr * 1.8);
+  const b = ac.createBuffer(1, len, sr), d = b.getChannelData(0), ring = new Float32Array(N);
+  let prev = 0;
+  for (let i = 0; i < N; i++) { prev = prev * 0.4 + (Math.random() * 2 - 1) * 0.6; ring[i] = prev; }
+  const rho = Math.pow(10, -3 / (1.6 * f));
+  let p = 0;
+  for (let i = 0; i < len; i++) { const q = (p + 1) % N, v = ring[p]; d[i] = v; ring[p] = rho * 0.5 * (v + ring[q]); p = q; }
+  const fade = Math.floor(sr * 0.05);
+  for (let i = 0; i < fade; i++) d[len - 1 - i] *= i / fade;
+  return (pBuf[midi] = b);
+}
+function pluck(midi, when) {
+  const ac = pAudio();
+  if (!ac) return null;
+  const s = ac.createBufferSource(), g = ac.createGain();
+  s.buffer = pluckBuf(ac, midi);
+  g.gain.value = 0.55;
+  s.connect(g); g.connect(ac.destination);
+  s.start(when || 0);
+  return s;
+}
+// reads strings (6 long horizontal lines), frets (vertical lines) and the first fret number below the neck
+function neckInfo(svg) {
+  if (svg._nk !== undefined) return svg._nk;
+  const H = [], V = [];
+  svg.querySelectorAll('line').forEach((l) => {
+    const x1 = +l.getAttribute('x1'), x2 = +l.getAttribute('x2'), y1 = +l.getAttribute('y1'), y2 = +l.getAttribute('y2');
+    if (y1 === y2 && Math.abs(x2 - x1) > 80) H.push(y1);
+    else if (x1 === x2 && Math.abs(y2 - y1) > 60) V.push(x1);
+  });
+  const ys = Array.from(new Set(H)).sort((a, b) => a - b), xs = Array.from(new Set(V)).sort((a, b) => a - b);
+  let nk = null;
+  if (ys.length === 6 && xs.length >= 3) {
+    let start = 1;
+    const ts = svg.querySelectorAll('text');
+    for (let i = 0; i < ts.length; i++) {
+      const tx = ts[i].textContent.trim(), x = +ts[i].getAttribute('x'), y = +ts[i].getAttribute('y');
+      if (/^\d+$/.test(tx) && y > ys[5] + 8 && x > xs[0]) { start = +tx - (xs.filter((v) => v < x).length - 1); break; }
+    }
+    nk = { ys, xs, start };
+  }
+  svg._nk = nk;
+  return nk;
+}
+function noteAt(nk, cx, cy) {
+  const s = nk.ys.findIndex((y) => Math.abs(y - cy) <= 4);
+  if (s < 0) return null;
+  if (cx < nk.xs[0] - 1) return { s: s + 1, f: 0 };
+  const i = nk.xs.filter((x) => x < cx).length;
+  if (i >= nk.xs.length) return null;
+  return { s: s + 1, f: nk.start + i - 1 };
+}
+const isNote = (nk, c) => +c.getAttribute('r') >= 5 && nk.ys.some((y) => Math.abs(y - +c.getAttribute('cy')) <= 4);
+function noteCircle(svg, nk, s, f) {
+  const cs = svg.querySelectorAll('circle');
+  for (let i = 0; i < cs.length; i++) {
+    if (!isNote(nk, cs[i])) continue;
+    const n = noteAt(nk, +cs[i].getAttribute('cx'), +cs[i].getAttribute('cy'));
+    if (n && n.s === s && n.f === f) return cs[i];
+  }
+  return null;
+}
+const calm = () => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+function flash(c) {
+  if (calm() || !c.animate) return;
+  c.style.transformBox = 'fill-box'; c.style.transformOrigin = 'center';
+  c.animate([{ transform: 'scale(1.3)' }, { transform: 'scale(1)' }], { duration: 240, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+}
+function tagNecks() {
+  app.querySelectorAll('svg').forEach((svg) => {
+    const nk = neckInfo(svg);
+    if (!nk) return;
+    svg.setAttribute('data-nk', '');
+    svg.querySelectorAll('circle').forEach((c) => { if (isNote(nk, c)) c.setAttribute('data-nt', ''); });
+  });
+}
+app.addEventListener('click', (e) => {
+  const svg = e.target && e.target.closest ? e.target.closest('svg') : null;
+  if (!svg) return;
+  const nk = neckInfo(svg), m = svg.getScreenCTM && svg.getScreenCTM();
+  if (!nk || !m) return;
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX; pt.y = e.clientY;
+  const p = pt.matrixTransform(m.inverse());
+  let best = null, bd = 1e9;
+  svg.querySelectorAll('circle').forEach((c) => {
+    if (!isNote(nk, c)) return;
+    const d = Math.hypot(+c.getAttribute('cx') - p.x, +c.getAttribute('cy') - p.y);
+    if (d <= +c.getAttribute('r') + 4 && d < bd) { best = c; bd = d; }
+  });
+  if (!best) return;
+  const n = noteAt(nk, +best.getAttribute('cx'), +best.getAttribute('cy'));
+  if (!n) return;
+  pluck(OPEN_MIDI[n.s - 1] + n.f);
+  flash(best);
 });
 
+// ---------- licks: short phrases in box 1 that light up note by note on the page's neck ----------
+// each note: [string, fret relative to the root on the 6th string, length in beats]
+const LICKS = [
+  { es: 'Bajada clásica', en: 'Classic descent', n: [[1, 3, .5], [1, 0, .5], [2, 3, .5], [2, 0, .5], [3, 2, .5], [3, 0, .5], [4, 2, 2]] },
+  { es: 'Subida a la tónica', en: 'Climb to the root', n: [[6, 0, .5], [6, 3, .5], [5, 0, .5], [5, 2, .5], [4, 0, .5], [4, 2, 2]] },
+  { es: 'Frase de blues', en: 'Blues phrase', n: [[3, 0, .5], [3, 2, .5], [2, 0, .5], [2, 3, .5], [1, 0, 1], [2, 3, .5], [2, 0, .5], [3, 2, .5], [3, 0, .5], [4, 2, 2]] }
+];
+const LK = { i: 0, bpm: 80, play: false, tm: [], src: [], el: null };
+function lkStop() {
+  LK.tm.forEach(clearTimeout); LK.tm = [];
+  LK.src.forEach((s) => { try { s.stop(); } catch (e) {} }); LK.src = [];
+  LK.play = false;
+  app.querySelectorAll('.lk-on').forEach((c) => c.classList.remove('lk-on'));
+  if (LK.el) lkPaint();
+}
+function lkNeck() {
+  const ss = app.querySelectorAll('main svg');
+  for (let i = 0; i < ss.length; i++) { const nk = neckInfo(ss[i]); if (nk) return { svg: ss[i], nk }; }
+  return null;
+}
+function lkPlay() {
+  const ac = pAudio();
+  if (!ac || !current || !current.state) return;
+  lkStop();
+  const nk = lkNeck(), beat = 60 / LK.bpm, t0 = ac.currentTime + 0.08;
+  // root fret on the 6th string; use the octave the page's neck is showing
+  let r = (current.state.root - 4 + 12) % 12;
+  if (nk && !noteCircle(nk.svg, nk.nk, 6, r) && noteCircle(nk.svg, nk.nk, 6, r + 12)) r += 12;
+  let t = 0;
+  LK.play = true; lkPaint();
+  if (nk) { const b = nk.svg.getBoundingClientRect(); if (b.top < 0 || b.bottom > window.innerHeight) nk.svg.scrollIntoView({ block: 'nearest', behavior: calm() ? 'auto' : 'smooth' }); }
+  LICKS[LK.i].n.forEach((nt) => {
+    const f = r + nt[1], s = nt[0], at = t;
+    LK.src.push(pluck(OPEN_MIDI[s - 1] + f, t0 + at));
+    LK.tm.push(setTimeout(() => {
+      app.querySelectorAll('.lk-on').forEach((c) => c.classList.remove('lk-on'));
+      const c = nk ? noteCircle(nk.svg, nk.nk, s, f) : null;
+      if (c) {
+        c.classList.add('lk-on');
+        const tx = c.nextElementSibling;
+        if (tx && tx.tagName.toLowerCase() === 'text') tx.classList.add('lk-on');
+        flash(c);
+      }
+    }, 80 + at * 1000));
+    t += nt[2] * beat;
+  });
+  LK.tm.push(setTimeout(lkStop, 80 + t * 1000 + 400));
+}
+function lkPaint() {
+  const el = LK.el, en = document.documentElement.lang === 'en';
+  el.querySelectorAll('.lk-c button').forEach((b, i) => b.setAttribute('aria-pressed', String(i === LK.i)));
+  el.querySelectorAll('.lk-sp button').forEach((b) => b.setAttribute('aria-pressed', String(+b.getAttribute('data-b') === LK.bpm)));
+  const pl = el.querySelector('.lk-play');
+  pl.innerHTML = (LK.play
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>' + (en ? 'Stop' : 'Parar')
+    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>' + (en ? 'Play' : 'Tocar'));
+}
+function attachLicks(name, lang) {
+  if (LK.play) lkStop();
+  LK.el = null;
+  if (name !== 'Pentatonica' || !current || !current.state) return;
+  const main = app.querySelector('main'), nk = lkNeck();
+  if (!main || !nk) return;
+  const en = lang === 'en';
+  const d = document.createElement('section');
+  d.className = 'lk';
+  const box1 = current.state.box === 0;
+  d.innerHTML = '<div class="lk-h"><span class="lk-e">Licks</span><span class="lk-t">' + (en ? 'Hear phrases in box 1' : 'Escucha frases en la caja 1') + '</span>'
+    + '<p>' + (en ? 'Each note lights up on the neck above. Every lick ends on the root: the target note that makes the phrase sound finished.' : 'Cada nota se ilumina en el mástil de arriba. Todos terminan en la tónica: la nota objetivo que hace que la frase suene terminada.') + '</p></div>'
+    + (box1
+      ? '<div class="lk-c" role="group" aria-label="Licks">' + LICKS.map((k, i) => '<button type="button" data-i="' + i + '">' + esc(en ? k.en : k.es) + '</button>').join('') + '</div>'
+        + '<div class="lk-row"><div class="lk-sp" role="group" aria-label="' + (en ? 'Speed (BPM)' : 'Velocidad (BPM)') + '">' + [60, 80, 100].map((b) => '<button type="button" data-b="' + b + '">' + b + '</button>').join('') + '</div><button type="button" class="lk-play"></button></div>'
+      : '<div class="lk-msg"><span>' + (en ? 'The licks use box 1.' : 'Los licks usan la caja 1.') + '</span><button type="button" class="lk-go">' + (en ? 'Show box 1' : 'Ver caja 1') + '</button></div>');
+  d.addEventListener('click', (e) => {
+    const b = e.target.closest && e.target.closest('button');
+    if (!b) return;
+    if (b.classList.contains('lk-go')) { current.setState({ box: 0 }); return; }
+    if (b.hasAttribute('data-i')) { LK.i = +b.getAttribute('data-i'); lkPlay(); return; }
+    if (b.hasAttribute('data-b')) { LK.bpm = +b.getAttribute('data-b'); if (LK.play) lkPlay(); else lkPaint(); return; }
+    if (b.classList.contains('lk-play')) { if (LK.play) lkStop(); else lkPlay(); }
+  });
+  let host = nk.svg;
+  while (host.parentElement && host.parentElement !== main) host = host.parentElement;
+  const after = host.nextElementSibling && /Tónica|Root/.test(host.nextElementSibling.textContent) && host.nextElementSibling.textContent.length < 80 ? host.nextElementSibling : host;
+  after.insertAdjacentElement('afterend', d);
+  LK.el = d;
+  if (box1) lkPaint();
+}
 
 // ---------- search ----------
 const SB = { idx: [], lang: '', n: 0, timer: 0, q: '', name: '', el: null };
@@ -15273,8 +15710,13 @@ function mount(name, q) {
     renderSide(name, l || 'es');
     followMenu(name, l || 'es');
     themeUI(l || 'es');
-    if (CLEAN) { try { cleanify(name, l || 'es'); } catch (e) {} } else if (dark) { try { darken(); } catch (e) {} }
+    if (CLEAN) { try { cleanify(name, l || 'es'); } catch (e) {} }
+    if (dark) { try { darken(); } catch (e) {} }
+    try { attachTheme(name, l || 'es'); } catch (e) {}
     try { attachSearch(name, l || 'es'); } catch (e) {}
+    try { attachResume(name, l || 'es'); } catch (e) {}
+    try { attachLicks(name, l || 'es'); } catch (e) {}
+    try { tagNecks(); } catch (e) {}
     try { fixEyebrow(name, l || 'es'); } catch (e) {}
     try { labelBack(l || 'es'); } catch (e) {}
     for (const k in keep) { const e = document.getElementById(k); if (e) e.scrollTop = keep[k]; }
@@ -15341,6 +15783,7 @@ function route() {
   const qs = raw.indexOf('?') >= 0 ? raw.slice(raw.indexOf('?') + 1) : '';
   qs.split('&').forEach((kv) => { if (kv) { const p = kv.split('='); q[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || ''); } });
   pickMenu(name);
+  saveLast(name, qs);
   const k = name + '?' + qs;
   if (k !== currentKey) { toolsMode = currentName === 'Herramientas' && TOOLS.indexOf(name) >= 0; currentKey = k; mount(name, q); }
 }
