@@ -16017,15 +16017,15 @@ function attachMarker(name, lang) {
   // the byline is part of the wordmark, so the old text line is dropped
   const by = Array.prototype.find.call(app.querySelectorAll('header span'), (s) => /^by Arcadio Falc/.test(s.textContent.trim()));
   if (by) by.remove();
-  const ey = Array.prototype.find.call(app.querySelectorAll('a span'), (s) => /^(Nueva sección|New section)$/.test(s.textContent.trim()));
-  const card = ey && ey.closest('a');
-  if (card) {
+  // every section that is ready gets the badge; the ones still to come do not
+  app.querySelectorAll('a').forEach((card) => {
+    if (!card.querySelector('h2') || /^(Próximamente|Coming soon)$/m.test(card.innerText || '')) return;
     card.style.position = 'relative';
     const b = document.createElement('span');
     b.className = 'mk mk-badge';
     b.textContent = en ? 'New' : 'Nuevo';
     card.appendChild(b);
-  }
+  });
 }
 
 // ---------- resume: remember the last lesson and offer it on the home screen ----------
