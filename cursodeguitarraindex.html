@@ -142,6 +142,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #E31B23;outline-offset:2p
 #app>div{padding-top:env(safe-area-inset-top) !important}
 .thm-wrap{display:flex;align-items:center;gap:6px}
 .thm-col{flex-direction:column;align-items:flex-end}
+.thm-top{justify-content:flex-end;width:100%;margin:12px 0 8px}
+.thm-top .thm{margin-top:0;align-self:center}
 .thm{display:flex;gap:2px;padding:2px;height:44px;box-sizing:border-box;border-radius:12px;background:#F1F5F9;font-family:'Inter',system-ui,sans-serif}
 .thm button{width:36px;height:40px;padding:0;border:0;border-radius:10px;background:transparent;color:#8A8A8A;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .thm button[aria-pressed="true"]{background:#FFFFFF;color:#0F172A;box-shadow:0 1px 2px rgba(21,21,21,.08)}
@@ -15957,10 +15959,12 @@ function attachTheme(name, lang) {
     wrap.appendChild(themeSeg(lang));
     wrap.appendChild(grp);
   } else {
-    // phone: no room beside the logo for both, so language and theme stack on the right
-    wrap.className = 'thm-wrap thm-col';
-    wrap.appendChild(grp);
+    // phone: no room beside the logo, so theme and language get their own row above it
+    wrap.className = 'thm-wrap thm-top';
     wrap.appendChild(themeSeg(lang));
+    wrap.appendChild(grp);
+    const row = wrap.parentElement;
+    if (row && row.parentElement) row.parentElement.insertBefore(wrap, row);
   }
 }
 
