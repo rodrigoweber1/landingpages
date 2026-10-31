@@ -15759,15 +15759,16 @@ function cleanify(name, lang) {
   if (hd) { hd.style.borderBottomColor = 'transparent'; }
   // floating bottom navigation
   const en = lang === 'en';
-  const cur = name === 'Inicio' ? 'Inicio' : (menu === 'curso' ? 'Curso' : (menu === 'musica' ? 'Cancionero' : 'Main'));
+  const cur = name === 'Inicio' ? 'Inicio' : (name === 'Herramientas' || (toolsMode && TOOLS.indexOf(name) >= 0)) ? 'Herramientas' : (menu === 'curso' ? 'Curso' : (menu === 'musica' ? 'Cancionero' : 'Main'));
   const ic = {
     Inicio: '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>',
     Main: '<path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/>',
     Curso: '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/>',
-    Cancionero: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>'
+    Cancionero: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
+    Herramientas: '<path d="M7 10h3V7L6.5 3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1-3 3l-6-6a6 6 0 0 1-8-8z"/>'
   };
-  const lab = en ? { Inicio: 'Home', Main: 'Path', Curso: 'Course', Cancionero: 'Music' } : { Inicio: 'Inicio', Main: 'Ruta', Curso: 'Curso', Cancionero: 'Música' };
-  fnav.innerHTML = ['Inicio', 'Main', 'Cancionero'].map((k) => '<a href="#/' + k + '" class="' + (k === cur ? 'on' : '') + '"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ic[k] + '</svg>' + lab[k] + '</a>').join('');
+  const lab = en ? { Inicio: 'Home', Main: 'Path', Curso: 'Course', Cancionero: 'Music', Herramientas: 'Tools' } : { Inicio: 'Inicio', Main: 'Ruta', Curso: 'Curso', Cancionero: 'Música', Herramientas: 'Herramientas' };
+  fnav.innerHTML = ['Inicio', 'Main', 'Cancionero', 'Herramientas'].map((k) => '<a href="#/' + k + '" class="' + (k === cur ? 'on' : '') + '"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ic[k] + '</svg>' + lab[k] + '</a>').join('');
 }
 const fnav = document.getElementById('fnav');
 
