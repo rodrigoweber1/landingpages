@@ -204,11 +204,13 @@ body.dark .rs-go{background:#F2F2F2;color:#121212}
 /* tap a note on a neck to hear it */
 #app svg[data-nk] circle[data-nt]{cursor:pointer}
 /* neck diagrams: same instrument look in every lesson, light and night */
-#app svg[data-nk] .nk-board{fill:#5A3A28!important}
-#app svg[data-nk] .nk-fret{stroke:#C9CDD3!important;stroke-width:2!important}
+#app svg[data-nk] .nk-board{fill:#3A2A22!important}
+#app svg[data-nk] .nk-grain{pointer-events:none;clip-path:inset(0 round 4px)}
+#app svg[data-nk] .nk-fret{stroke:#9DA3AB!important;stroke-width:3.4!important}
+#app svg[data-nk] .nk-fret-hi{stroke:#F4F6F8;stroke-width:1.1;pointer-events:none}
 #app svg[data-nk] .nk-nut{stroke:#EFE6D2!important;stroke-width:5!important}
-#app svg[data-nk] .nk-plain{stroke:#ECECEC!important}
-#app svg[data-nk] .nk-wound{stroke:#D6BF92!important}
+#app svg[data-nk] .nk-plain{stroke:#EEF0F2!important}
+#app svg[data-nk] .nk-wound{stroke:#C8CBD0!important}
 #app svg[data-nk] .nk-inlay{fill:#EADFCB!important;opacity:.7}
 #app svg[data-nk] .nk-solid{stroke:#FFFFFF!important;stroke-width:1.5!important}
 #app svg[data-nk] .nk-open{fill:#FFFFFF!important;stroke:#E31B23!important;stroke-width:2!important}
@@ -12211,19 +12213,31 @@ try { localStorage.setItem('guitar.hotel.fs', String(v)); } catch (e) {}
 }
 toggleRun() {
 if (this.state.run) { this.stopRun(); return; }
-this._acc = 0;
+this._pos = -1;
 this._last = 0;
 this.setState({ run: true, mode: 'view' });
+// scroll by whole pixels and move the lines by the leftover fraction,
+// so slow speeds glide instead of stepping 1px at a time
 const tick = (ts) => {
 if (!this.state.run) return;
 if (!this._last) this._last = ts;
 const dt = Math.min(0.1, (ts - this._last) / 1000);
 this._last = ts;
-this._acc += dt * this.state.speed * 6;
-const w = Math.floor(this._acc);
 const bx = document.getElementById('lyBox');
 if (!bx) { this.stopRun(); return; }
-if (w >= 1) { this._acc -= w; bx.scrollTop += w; }
+let inner = bx.firstElementChild;
+if (!inner || !inner.classList.contains('ly-in')) {
+inner = document.createElement('div');
+inner.className = 'ly-in';
+while (bx.firstChild) inner.appendChild(bx.firstChild);
+bx.appendChild(inner);
+}
+// the reader scrolled by hand: continue from there
+if (this._pos < 0 || Math.abs(bx.scrollTop - Math.floor(this._pos)) > 2) this._pos = bx.scrollTop;
+this._pos += dt * this.state.speed * 6;
+const whole = Math.floor(this._pos);
+bx.scrollTop = whole;
+inner.style.transform = 'translateY(' + (whole - this._pos).toFixed(2) + 'px)';
 if (bx.scrollTop + bx.clientHeight >= bx.scrollHeight - 2) { this.stopRun(); return; }
 this._raf = requestAnimationFrame(tick);
 };
@@ -12232,6 +12246,8 @@ this._raf = requestAnimationFrame(tick);
 stopRun() {
 try { cancelAnimationFrame(this._raf); } catch (e) {}
 this._last = 0;
+const inner = document.querySelector('#lyBox > .ly-in');
+if (inner) inner.style.transform = '';
 if (this.state.run) this.setState({ run: false });
 }
 
@@ -15526,15 +15542,57 @@ function flash(c) {
 }
 // gives every neck diagram the same instrument look: wood board, metal frets, bone nut,
 // plain and wound strings, pearl inlays and solid note markers (colors set in CSS)
+// rosewood grain: streaks run along the neck and drift a little; drawn once, reused by every neck
+let woodURL = null;
+function woodTexture() {
+  if (woodURL) return woodURL;
+  const W = 640, H = 240, cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const g = cv.getContext('2d'), im = g.createImageData(W, H), d = im.data;
+  let seed = 11;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const N = H / 3 + 2, raw = [], rows = [];
+  for (let i = 0; i < N; i++) raw.push(rnd());
+  for (let i = 0; i < N; i++) rows.push((raw[Math.max(0, i - 1)] + 2 * raw[i] + raw[Math.min(N - 1, i + 1)]) / 4);
+  const p1 = rnd() * 6.28, p2 = rnd() * 6.28;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const yy = (y + 3 * Math.sin(x / 110 + p1) + 1.4 * Math.sin(x / 41 + y / 29 + p2)) / 3;
+      const i0 = Math.max(0, Math.min(N - 2, Math.floor(yy))), f = Math.max(0, Math.min(1, yy - i0));
+      const v = rows[i0] * (1 - f) + rows[i0 + 1] * f;
+      const k = 0.52 + v * 0.78 + rnd() * 0.07;
+      const p = (y * W + x) * 4;
+      d[p] = Math.min(255, 72 * k); d[p + 1] = Math.min(255, 52 * k); d[p + 2] = Math.min(255, 43 * k); d[p + 3] = 255;
+    }
+  }
+  g.putImageData(im, 0, 0);
+  return (woodURL = cv.toDataURL('image/jpeg', 0.85));
+}
+const SVGNS = 'http://www.w3.org/2000/svg';
 function styleNeck(svg, nk) {
   const at = (e, a) => (e.getAttribute(a) || '').toUpperCase();
   svg.querySelectorAll('rect').forEach((r) => {
-    if (Math.abs(+r.getAttribute('x') - nk.xs[0]) <= 1 && +r.getAttribute('width') > 150) r.classList.add('nk-board');
+    if (Math.abs(+r.getAttribute('x') - nk.xs[0]) <= 1 && +r.getAttribute('width') > 150) {
+      r.classList.add('nk-board');
+      const im = document.createElementNS(SVGNS, 'image');
+      ['x', 'y', 'width', 'height'].forEach((a) => im.setAttribute(a, r.getAttribute(a)));
+      im.setAttribute('href', woodTexture());
+      im.setAttribute('preserveAspectRatio', 'none');
+      im.setAttribute('class', 'nk-grain');
+      r.insertAdjacentElement('afterend', im);
+    }
   });
   svg.querySelectorAll('line').forEach((l) => {
     const x1 = +l.getAttribute('x1'), x2 = +l.getAttribute('x2'), y1 = +l.getAttribute('y1'), y2 = +l.getAttribute('y2');
     if (y1 === y2 && Math.abs(x2 - x1) > 80) { const s = nk.ys.indexOf(y1); if (s >= 0) l.classList.add('nk-str', s >= 3 ? 'nk-wound' : 'nk-plain'); }
-    else if (x1 === x2 && Math.abs(y2 - y1) > 60) l.classList.add(nk.start === 1 && x1 === nk.xs[0] ? 'nk-nut' : 'nk-fret');
+    else if (x1 === x2 && Math.abs(y2 - y1) > 60) {
+      if (nk.start === 1 && x1 === nk.xs[0]) { l.classList.add('nk-nut'); return; }
+      // fret wire: a gray bar with a bright line along its crown
+      l.classList.add('nk-fret');
+      const hi = l.cloneNode(false);
+      hi.setAttribute('class', 'nk-fret-hi');
+      l.insertAdjacentElement('afterend', hi);
+    }
   });
   const top = nk.ys[0], bot = nk.ys[5];
   svg.querySelectorAll('circle').forEach((c) => {
@@ -15547,8 +15605,10 @@ function styleNeck(svg, nk) {
     } else if (+c.getAttribute('r') < 7 && +c.getAttribute('cy') > top && +c.getAttribute('cy') < bot && +c.getAttribute('cx') > nk.xs[0]) c.classList.add('nk-inlay');
   });
 }
-function tagNecks() {
-  app.querySelectorAll('svg').forEach((svg) => {
+function tagNecks(root) {
+  const r = root || app;
+  const list = r.tagName && r.tagName.toLowerCase() === 'svg' ? [r] : r.querySelectorAll('svg');
+  Array.prototype.forEach.call(list, (svg) => {
     if (svg.hasAttribute('data-nk')) return;
     const nk = neckInfo(svg);
     if (!nk) return;
@@ -15559,8 +15619,16 @@ function tagNecks() {
 // some screens redraw their neck after the first render (animations, delayed paints): style those too
 let cxT = 0;
 try {
-  new MutationObserver(() => {
-    try { tagNecks(); } catch (e) {}
+  // only look at what was just added: an animating neck redraws every frame, and rescanning the
+  // whole screen each time would cost frames. Changes inside an SVG carry no HTML text to check.
+  new MutationObserver((muts) => {
+    let html = false;
+    muts.forEach((m) => m.addedNodes.forEach((n) => {
+      if (n.nodeType !== 1) return;
+      try { tagNecks(n); } catch (e) {}
+      if (!(n instanceof SVGElement)) html = true;
+    }));
+    if (!html) return;
     clearTimeout(cxT);
     cxT = setTimeout(() => { try { fixContrast(); } catch (e) {} }, 120);
   }).observe(app, { childList: true, subtree: true });
