@@ -396,15 +396,20 @@ body.dark .gc-hb,body.dark .gc-sw{fill:#0B1020}
  .hc-pass{margin-left:8px;font:600 12px 'Inter',system-ui,sans-serif;color:#B3121A;letter-spacing:0}
  .hc-acc{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;min-height:32px;padding:0;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-align:left;cursor:pointer}
  .rt-play.hc-ico{width:44px;height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:15px;line-height:1}
- .hc-spd{position:relative;display:inline-block}
- .hc-spd-btn{height:40px;min-width:96px}
- .hc-spd-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:40;display:flex;flex-direction:column;gap:2px;min-width:132px;padding:6px;border-radius:12px;background:#FFFFFF;box-shadow:0 10px 28px rgba(15,23,42,0.18),0 0 0 1px rgba(15,23,42,0.06)}
- .hc-spd-menu[hidden]{display:none}
- .hc-spd-menu button{height:40px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#0F172A;font:600 14px 'Inter',system-ui,sans-serif;text-align:left;cursor:pointer}
- .hc-spd-menu button[aria-selected="true"]{background:#FDE2E3;color:#B3121A}
- body.dark .hc-spd-menu{background:#1B2438;box-shadow:0 10px 28px rgba(0,0,0,0.5)}
- body.dark .hc-spd-menu button{color:#EEF2F8}
- body.dark .hc-spd-menu button[aria-selected="true"]{background:#3A1C24;color:#FF6B70} .hc-sel{height:40px;padding:0 30px 0 12px;border:1px solid #E31B23;border-radius:999px;background:#FFFFFF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B3121A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;color:#B3121A;font:600 13px 'Inter',system-ui,sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
+ .hc-spd{display:inline-flex;margin-left:auto}
+ @media (max-width:899px){.hc-spd{flex:1 0 100%;justify-content:center;margin:4px 0 0}}
+ .hc-bpm{display:flex;align-items:center;gap:16px}
+ .hc-bpm button{width:48px;height:48px;padding:0;border:0;border-radius:12px;background:#F1F5F9;color:#0F172A;font:500 26px/1 'Inter',system-ui,sans-serif;cursor:pointer;touch-action:manipulation;transition:transform 160ms var(--ease-out),background-color 160ms}
+ .hc-bpm button:active{transform:scale(0.94)}
+ .hc-bpm-v{display:flex;flex-direction:column;align-items:center;min-width:76px}
+ .hc-bpm-o{font-size:10px;line-height:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#A3AFC2}
+ .hc-bpm-n{font:800 38px/1 'Inter',system-ui,sans-serif;letter-spacing:-.02em;color:#0F172A;font-variant-numeric:tabular-nums}
+ .hc-bpm-u{margin-top:2px;font-size:11px;line-height:13px;font-weight:600;letter-spacing:.06em;color:#64748B}
+ body.dark .hc-bpm button{background:#1B2438;color:#EEF2F8}
+ body.dark .hc-bpm-n{color:#EEF2F8}
+ body.dark .hc-bpm-u{color:#9AA7BD}
+ body.dark .hc-bpm-o{color:#6B7A96}
+.hc-sel{height:40px;padding:0 30px 0 12px;border:1px solid #E31B23;border-radius:999px;background:#FFFFFF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B3121A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;color:#B3121A;font:600 13px 'Inter',system-ui,sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
  body.dark .hc-sel{background-color:#141B2D;color:#FF6B70}
  .hc-lstrip{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
  .hc-box{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:12px;background:#F1F5F9;color:#0F172A}
@@ -14131,7 +14136,8 @@ C["Hotel"] = (DCLogic) => {
 const HC_ARP = [['Em', [0, 0, 0, 2, 2, 0], 5], ['B7', [2, 0, 2, 1, 2, null], 4], ['D', [2, 3, 2, 0, null, null], 3], ['A', [0, 2, 2, 2, 0, null], 4],
 ['C', [0, 1, 0, 2, 3, null], 4], ['G', [3, 0, 0, 0, 2, 3], 5], ['Am', [0, 1, 2, 2, 0, null], 4], ['B7', [2, 0, 2, 1, 2, null], 4]];
 const HC_PAT = ['b', 2, 1, 0, 1, 2, 1, 0];
-const HC_SPEEDS = [25, 50, 60, 75, 90, 100];
+// the record's tempo: both players start here and the student moves it up or down
+const HC_BPM = 74;
 const HC_SOUND = ['Bm', 'F#7', 'A', 'E', 'G', 'D', 'Em', 'F#7'];
 class Component extends DCLogic {
 constructor(props) {
@@ -14228,8 +14234,9 @@ root.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px">'
 + '<p class="pt-p" style="margin:0;font-size:13px;line-height:18px;color:#5A5A5A">' + T.note + ' <a href="https://www.songsterr.com/a/wsa/eagles-hotel-california-tab-s447" target="_blank" rel="noopener" style="color:#B3121A;font-weight:600">' + T.link + '</a></p></div>';
 const OPEN = [64, 59, 55, 50, 45, 40];
 // playback state lives on the instance so a repaint keeps the loop settings
-const ap = this._ap = this._ap || { pos: 0, sel: [1, 1, 1, 1, 1, 1, 1, 1].map(Boolean), loop: false, playing: false, speed: 100, mute: false };
-const step = () => Math.round(360 * 100 / ap.speed);
+const ap = this._ap = this._ap || { pos: 0, sel: [1, 1, 1, 1, 1, 1, 1, 1].map(Boolean), loop: false, playing: false, bpm: HC_BPM, mute: false };
+// eight eighth notes per bar
+const step = () => Math.round(30000 / ap.bpm);
 // loop = the bars switched on in the strip, played in order
 const lo = () => ap.sel.indexOf(true) * 8;
 const inSel = (p) => !!ap.sel[Math.floor(p / 8)];
@@ -14249,7 +14256,7 @@ const mb = root.querySelector('[data-a="mute"]');
 mb.textContent = ap.mute ? '🔇' : '🔊';
 const ml = T.sound2 + ': ' + (ap.mute ? T.off : T.on); mb.setAttribute('aria-label', ml); mb.title = ml;
 mb.setAttribute('aria-pressed', String(!ap.mute));
-const sh = root.querySelector('[data-a="spd"]'); if (sh._set) sh._set(ap.speed);
+const sh = root.querySelector('[data-a="spd"]'); if (sh._set) sh._set(ap.bpm);
 root.querySelectorAll('.hc-lp').forEach((r) => { r.setAttribute('opacity', part && ap.sel[+r.getAttribute('data-bar') - 1] ? '1' : '0'); });
 };
 const stop = (rewind) => {
@@ -14273,7 +14280,7 @@ ap.pos = lo();
 this._aNext = setTimeout(tick, step());
 };
 this._apStop = () => stop(false);
-hcSpeedMenu(root.querySelector('[data-a="spd"]'), HC_SPEEDS.map((v) => ({ v, label: v === 100 ? T.orig : v + '%' })), ap.speed, (v) => { ap.speed = v; ui(); }, T.speedT);
+hcBpm(root.querySelector('[data-a="spd"]'), ap.bpm, HC_BPM, (v) => { ap.bpm = v; }, T);
 root.onclick = (e) => {
 const b = e.target.closest && e.target.closest('button[data-a]');
 if (!b) return;
@@ -14330,8 +14337,8 @@ mapCut() { (this._mOs || []).forEach((o) => { try { o.stop(); } catch (e) {} });
 mapSel() { return this.state.mapSel || (this.state.mapSel = this._secs.map(() => true)); }
 mapFirst() { const s = this.mapSel(); return this._song.findIndex((c) => s[c.s]); }
 mapNextSel(p) { const s = this.mapSel(); for (let k = p + 1; k < this._song.length; k++) if (s[this._song[k].s]) return k; return null; }
-// one strum per beat, four beats per chord; 100% = the song's ~74 BPM
-mapBeatMs() { return Math.round(60000 / 74 * 100 / (this.state.mapSpeed || 100)); }
+// one strum per beat, four beats per chord
+mapBeatMs() { return Math.round(60000 / (this.state.mapBpm || HC_BPM)); }
 mapStrum(f, accent) {
 if (this.state.mapMute) return;
 const ac = pAudio(); if (!ac) return;
@@ -15087,11 +15094,11 @@ const pairs = [['B', 'F#'], ['A', 'E'], ['G', 'D']];
 let capRel = '';
 if (ms <= 5) { const pr = pairs[Math.floor(ms / 2)]; capRel = pr[1] + ' ' + t.fifthW + ' ' + pr[0] + ': ' + t.fifthEnd; } else capRel = t.pivotW;
 const mSel = this.mapSel(), mCnt = mSel.filter(Boolean).length;
-// speed menu lives in a persisted host: build it once, then only sync the shown value
+// tempo stepper lives in a persisted host: build it once, then only sync the shown value
 if (this.__render) setTimeout(() => {
   const h = document.getElementById('hc-spd'); if (!h) return;
-  const v = this.state.mapSpeed || 100;
-  if (!h.firstChild || h._lang !== lang) { h._lang = lang; hcSpeedMenu(h, HC_SPEEDS.map((x) => ({ v: x, label: x === 100 ? (lang === 'es' ? 'Original' : 'Original') : x + '%' })), v, (x) => { this.state.mapSpeed = x; }, lang === 'es' ? 'Velocidad' : 'Speed'); }
+  const v = this.state.mapBpm || HC_BPM;
+  if (!h.firstChild || h._lang !== lang) { h._lang = lang; hcBpm(h, v, HC_BPM, (x) => { this.state.mapBpm = x; }, lang === 'es' ? { speedT: 'Tempo', orig: 'original', slower: 'Más lento', faster: 'Más rápido' } : { speedT: 'Tempo', orig: 'original', slower: 'Slower', faster: 'Faster' }); }
   else h._set(v);
 }, 0);
 const MC = lang === 'es' ? { pause: 'Pausa', stop: 'Stop', snd: 'Sonido', on: 'sí', off: 'no', loopT: 'Bucle de práctica', repeat: 'Repetir', speedT: 'Velocidad', orig: 'Original', listen: 'Escuchar', resume: 'Continuar', all: 'Todo',
@@ -15114,7 +15121,6 @@ const mapOut = {
   mapLoopAll: () => this.setState({ mapSel: mSel.map(() => true) }),
   mapLoopT: () => this.setState({ mapLoop: !st.mapLoop }), mapLoopOn: !!st.mapLoop,
   mapLoopL: MC.repeat + ': ' + (st.mapLoop ? MC.on : MC.off), mapLoopBg: st.mapLoop ? '#E31B23' : '#FFFFFF', mapLoopFg: st.mapLoop ? '#FFFFFF' : '#B3121A',
-  mapSpeeds: [25, 50, 60, 75, 90, 100].map((v) => ({ v: String(v), label: v === 100 ? MC.orig : v + '%' })),
   mapSndIco: st.mapMute ? '🔇' : '🔊',
   fretLines: Array.from({ length: 13 }, (_, k) => ({ x: FX0 + k * FW, w: k === 0 ? 4 : 1.2 })),
   strs: Array.from({ length: 6 }, (_, i) => ({ y: syp(i + 1), w: 0.8 + i * 0.35 })),
@@ -15191,13 +15197,13 @@ pick: () => this.setLang(l)
 });
 const A = lang === 'es' ? { t: 'Arpegio de la introducción', capo: 'Cejilla (capo) en el traste 7', listen: 'Escuchar', resume: 'Continuar', pause: 'Pausa', stop: 'Stop',
 loopT: 'Bucle de práctica', repeat: 'Repetir', on: 'sí', off: 'no', all: 'Todo',
-hintAll: 'Suenan los 8 compases. Toca uno para quitarlo o volver a añadirlo.', hintSome: '%n de 8 compases en el bucle. Toca para quitar o añadir.', speedT: 'Velocidad', orig: 'Original', sound2: 'Sonido',
+hintAll: 'Suenan los 8 compases. Toca uno para quitarlo o volver a añadirlo.', hintSome: '%n de 8 compases en el bucle. Toca para quitar o añadir.', speedT: 'Tempo', orig: 'original', slower: 'Más lento', faster: 'Más rápido', sound2: 'Sonido',
 x: 'Un patrón para practicar el arpegio sobre los acordes de la intro. Con capo en el 7 tocas formas fáciles y suenas en Si menor, como el disco. Los números cuentan desde el capo (0 = cuerda al aire). Bajo con el pulgar y después las cuerdas 3ª, 2ª y 1ª; deja que todo suene.',
 sound: 'Suena como:', note: 'Es un ejercicio de práctica, no la transcripción de la grabación. Cuando te salga, compáralo con la tablatura original:', link: 'Hotel California en Songsterr' }
 : { t: 'Intro arpeggio', capo: 'Capo on fret 7', listen: 'Listen', resume: 'Resume', pause: 'Pause', stop: 'Stop',
 
 loopT: 'Practice loop', repeat: 'Repeat', on: 'on', off: 'off', all: 'All',
-hintAll: 'All 8 bars play. Tap one to take it out or add it back.', hintSome: '%n of 8 bars in the loop. Tap to remove or add.', speedT: 'Speed', orig: 'Original', sound2: 'Sound',
+hintAll: 'All 8 bars play. Tap one to take it out or add it back.', hintSome: '%n of 8 bars in the loop. Tap to remove or add.', speedT: 'Tempo', orig: 'original', slower: 'Slower', faster: 'Faster', sound2: 'Sound',
 x: 'A pattern to practise arpeggios over the intro chords. With the capo on 7 you play easy shapes and sound in B minor, like the record. Numbers count from the capo (0 = open string). Bass with the thumb, then strings 3, 2 and 1; let everything ring.',
 sound: 'Sounds as:', note: 'This is a practice exercise, not a transcription of the recording. Once you have it, compare with the original tab:', link: 'Hotel California on Songsterr' };
 t.arpT = A.t;
@@ -17887,28 +17893,21 @@ function pAudio() {
   if (pAC.state !== 'running' && pAC.resume) pAC.resume();
   return pAC;
 }
-// speed picker drawn with plain buttons (the native <select> was unreliable on phones);
+// tempo stepper in BPM (− value +, steps of 5), starting from the song's original tempo;
 // host keeps a _set(v) to sync the shown value
-function hcSpeedMenu(host, opts, cur, onPick, aria) {
-  const lab = (v) => (opts.find((o) => o.v === v) || opts[opts.length - 1]).label;
-  host.innerHTML = '<button type="button" class="rt-play hc-spd-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="' + aria + '" title="' + aria + '"></button>'
-    + '<div class="hc-spd-menu" role="listbox" hidden>' + opts.map((o) => '<button type="button" role="option" data-v="' + o.v + '">' + o.label + '</button>').join('') + '</div>';
-  const btn = host.firstChild, menu = host.lastChild;
-  const open = (on) => { menu.hidden = !on; btn.setAttribute('aria-expanded', String(on)); };
-  host._set = (v) => {
-    btn.innerHTML = lab(v) + ' <span aria-hidden="true">▾</span>';
-    menu.querySelectorAll('[data-v]').forEach((b) => b.setAttribute('aria-selected', String(+b.getAttribute('data-v') === v)));
+function hcBpm(host, cur, orig, onPick, L) {
+  host.innerHTML = '<div class="hc-bpm" role="group" aria-label="' + L.speedT + '"><button type="button" data-d="-5" aria-label="' + L.slower + '">−</button>'
+    + '<div class="hc-bpm-v" aria-live="polite"><span class="hc-bpm-o">' + L.orig + '</span><b class="hc-bpm-n"></b><span class="hc-bpm-u">BPM</span></div>'
+    + '<button type="button" data-d="5" aria-label="' + L.faster + '">+</button></div>';
+  const val = host.querySelector('.hc-bpm-n'), tag = host.querySelector('.hc-bpm-o');
+  let v = cur;
+  // "original" keeps its space when hidden so the number never jumps
+  host._set = (x) => { v = x; val.textContent = x; tag.style.visibility = x === orig ? 'visible' : 'hidden'; };
+  host.onclick = (e) => {
+    const b = e.target.closest && e.target.closest('[data-d]'); if (!b) return;
+    const x = Math.max(30, Math.min(150, v + +b.getAttribute('data-d')));
+    host._set(x); onPick(x);
   };
-  btn.onclick = (e) => { e.stopPropagation(); open(menu.hidden); };
-  menu.onclick = (e) => {
-    const b = e.target.closest('[data-v]'); if (!b) return;
-    e.stopPropagation();
-    const v = +b.getAttribute('data-v');
-    host._set(v); open(false); onPick(v);
-  };
-  if (host._outside) document.removeEventListener('click', host._outside);
-  host._outside = (e) => { if (!host.contains(e.target)) open(false); };
-  document.addEventListener('click', host._outside);
   host._set(cur);
 }
 // mobile browsers only start audio inside a tap: unlock it on the first touch with a silent blip
