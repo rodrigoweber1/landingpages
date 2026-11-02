@@ -234,6 +234,12 @@ body.dark .pu-dot{background:#1F1F1F}
 body.dark .pu-dot[data-acc="true"]{border-color:#F2EDE4}
 body.dark .pu-dot[data-on="true"]{background:#E31B23}
 body.dark .pu-dot[data-on="true"][data-acc="true"]{background:#F2EDE4}
+/* tip under the first playable neck of a screen */
+.nk-hint{display:flex;align-items:center;justify-content:center;gap:6px;margin:0;font:500 12px/16px 'Inter',system-ui,sans-serif;color:#475569;text-align:center}
+.nk-hint svg{flex:none;width:14px!important;height:14px!important;max-width:none!important;margin:0!important}
+body.dark .nk-hint{color:#BDB6AA}
+/* legend copies under far necks: dark swatches get a thin ring so they show on any background */
+.nk-leg span span{box-shadow:0 0 0 1px rgba(138,138,138,.6)}
 /* licks player */
 .lk{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:16px;background:#FFFFFF;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
 .lk-h{display:flex;flex-direction:column;gap:2px}
@@ -17690,7 +17696,7 @@ if (darkMQ) {
   const onSys = () => { if (themeMode !== 'auto') return; dark = isDark(); themeUI(document.documentElement.lang || 'es'); if (window.__rerender) window.__rerender(); };
   if (darkMQ.addEventListener) darkMQ.addEventListener('change', onSys); else if (darkMQ.addListener) darkMQ.addListener(onSys);
 }
-const D_BG = { 'F4F4F4': '131209', 'EBEBEB': '272727', 'FAF6EC': '272727', 'FFFFFF': '1F1F1F', 'FAFAFA': '1F1F1F', 'F2F2F2': '272727', 'FFF1CC': '3A1E20', 'FEF2DB': '3A1E20', 'F4EDDD': '272727', 'E6E6E6': '3A3A3A', 'D9D9D9': '444444', 'E3FFEE': '0F3320', 'E9E9E9': '272727', '121212': '2B2B2B' };
+const D_BG = { 'FFE9E9': '3A1E20', 'F4F4F4': '131209', 'EBEBEB': '272727', 'FAF6EC': '272727', 'FFFFFF': '1F1F1F', 'FAFAFA': '1F1F1F', 'F2F2F2': '272727', 'FFF1CC': '3A1E20', 'FEF2DB': '3A1E20', 'F4EDDD': '272727', 'E6E6E6': '3A3A3A', 'D9D9D9': '444444', 'E3FFEE': '0F3320', 'E9E9E9': '272727', '121212': '2B2B2B' };
 const D_KEEP_BG = { 'E31B23': 1, 'B3121A': 1, 'C8321C': 1, '9E2412': 1, 'FFC400': 1, 'E0A800': 1, 'FFE08A': 1, 'B07A00': 1, '121212': 1, '2B2B2B': 1, '262626': 1, '8A8A8A': 1, 'BDBDBD': 1, 'F04A4F': 1, '8F0F15': 1, '006828': 1, '038A37': 1 };
 const D_FG = { '121212': 'F2EDE4', '1A1410': 'F2EDE4', '3A3A3A': 'D9D3C8', '5A5A5A': 'BDB6AA', 'B3121A': 'FF6B70', 'E31B23': 'FF5A60', '9E2412': 'FF8470', '4A4036': 'CFC6B8', '6B5F52': 'A89C8C', 'B07A00': 'FFC400', '006828': '4FD08A', 'C8321C': 'FF7A66' };
 const D_BD = { 'FFF1CC': '444444', 'E6E6E6': '3A3A3A', 'D9D9D9': '444444', 'E9E0CC': '3A3A3A', 'D3C7AE': '444444', '121212': 'BDB6AA', '5A5A5A': 'BDB6AA', 'FFFFFF': '444444', 'B3121A': 'FF5A60' };
@@ -17702,8 +17708,13 @@ function rgbHex(c) {
   const h = (n) => ('0' + (+n).toString(16)).slice(-2);
   return { hex: (h(m[1]) + h(m[2]) + h(m[3])).toUpperCase(), a: a };
 }
-function darken() {
-  const els = app.querySelectorAll('*');
+function themeTargets(roots, flag) {
+  const all = [];
+  (roots || [app]).forEach((r) => { if (r !== app) all.push(r); Array.prototype.push.apply(all, r.querySelectorAll('*')); });
+  return all.filter((e) => { if (e[flag]) return false; e[flag] = true; return true; });
+}
+function darken(roots) {
+  const els = themeTargets(roots, '__dk');
   const n = els.length, rec = new Array(n);
   const obg = new Map();
   for (let i = 0; i < n; i++) {
@@ -17758,12 +17769,12 @@ function darken() {
       if (r.fill) {
         let nf = null;
         if (isText) {
-          if (r.fill === 'FFFFFF') {
-            let p = el.previousElementSibling;
-            while (p && !/^(circle|rect|path|ellipse|polygon)$/.test(p.tagName)) p = p.previousElementSibling;
-            const pi = p ? rec[Array.prototype.indexOf.call(els, p)] : null;
-            if (pi && pi.fill === '121212') nf = '121212';
-          } else if (D_FG[r.fill]) nf = D_FG[r.fill];
+          let p = el.previousElementSibling;
+          while (p && !/^(circle|rect|path|ellipse|polygon)$/.test(p.tagName)) p = p.previousElementSibling;
+          const pi = p ? rec[Array.prototype.indexOf.call(els, p)] : null;
+          if (r.fill === 'FFFFFF') { if (pi && pi.fill === '121212') nf = '121212'; }
+          // dark text on a yellow or red note keeps its colour: those notes look the same at night
+          else if (D_FG[r.fill] && !(pi && pi.fill && pi.fill !== '121212' && D_KEEP_BG[pi.fill])) nf = D_FG[r.fill];
         } else {
           if (r.fill === 'FFFFFF') nf = '1F1F1F';
           else if (r.fill === '121212') nf = 'F2EDE4';
@@ -17797,8 +17808,8 @@ function darken() {
 const L_BG = { 'FFF1CC': 'FFF4D6', 'FEF2DB': 'FFF4D6', 'F2F2F2': 'F1F5F9', 'F4F4F4': 'F8FAFC', 'EBEBEB': 'EEF2F7', 'E9E9E9': 'E9EEF5', 'E6E6E6': 'E2E8F0', 'FAFAFA': 'F8FAFC' };
 const L_FG = { '121212': '0F172A', '3A3A3A': '334155', '5A5A5A': '475569' };
 const L_BD = { 'E6E6E6': 'E2E8F0', 'D9D9D9': 'CBD5E1', 'FFF1CC': 'CBD5E1' };
-function palLight() {
-  const els = app.querySelectorAll('*');
+function palLight(roots) {
+  const els = themeTargets(roots, '__lt');
   const rec = [];
   for (let i = 0; i < els.length; i++) {
     const el = els[i], cs = getComputedStyle(el);
@@ -17925,6 +17936,63 @@ function attachMarker(name, lang) {
     b.className = 'mk mk-badge';
     b.textContent = en ? 'New' : 'Nuevo';
     card.appendChild(b);
+  });
+}
+
+// ---------- tap tip: every neck plays its notes when tapped, so say so once per screen ----------
+// where to put something "right below a neck": out of single child wrappers (a neck redrawn inside its host
+// would wipe it) and past side by side necks
+function neckAnchor(svg) {
+  let at = svg;
+  while (at.parentElement && at.parentElement !== app && at.parentElement.children.length === 1) at = at.parentElement;
+  const pcs = at.parentElement && getComputedStyle(at.parentElement);
+  if (pcs && pcs.display.indexOf('flex') >= 0 && pcs.flexDirection.indexOf('row') === 0) at = at.parentElement;
+  return at.parentElement && at.parentElement !== app ? at : null;
+}
+function attachHint(name, lang) {
+  // blocks kept across re-renders (data-persist) would otherwise collect a new tip and legend on every redraw
+  app.querySelectorAll('.nk-hint, .nk-leg').forEach((e) => e.remove());
+  if (/Quiz/.test(name)) return; // in a quiz, hearing the note would give the answer away
+  const svg = Array.prototype.find.call(app.querySelectorAll('svg[data-nk]'), (sv) => sv.querySelector('circle[data-nt]'));
+  const at = svg && neckAnchor(svg);
+  if (!at) return;
+  const p = document.createElement('p');
+  p.className = 'nk-hint';
+  p.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+  p.appendChild(document.createTextNode(lang === 'en' ? 'Tap any note on the neck to hear it.' : 'Toca cualquier nota del mástil para oírla.'));
+  at.insertAdjacentElement('afterend', p);
+  try { attachLegends(); } catch (e) {}
+}
+// ---------- legend copies: the colours mean different things in different lessons, so a neck far from its
+// lesson's own legend gets a compact copy of that same legend right below it ----------
+function legendOf() {
+  const sw = (x) => { if (x.textContent.trim()) return false; const r = x.getBoundingClientRect(); return r.width >= 8 && r.width <= 40 && r.height >= 6 && r.height <= 24; };
+  const c = Array.prototype.filter.call(app.querySelectorAll('div, ul'), (e) => {
+    const t = e.innerText || '';
+    return t.length < 220 && /(T[óo]nica|Root)/.test(t) && e.children.length >= 2 && !e.querySelector('svg') && Array.prototype.filter.call(e.querySelectorAll('span, i, div'), sw).length >= 2;
+  });
+  return c.find((e) => !c.some((o) => o !== e && e.contains(o))) || null;
+}
+function attachLegends() {
+  const leg = legendOf();
+  if (!leg) return;
+  const near = (el, r) => { const q = el.getBoundingClientRect(); return q.bottom > r.top - 120 && q.top < r.bottom + 120; };
+  Array.prototype.forEach.call(app.querySelectorAll('svg[data-nk]'), (svg) => {
+    // only real chord or scale shapes; a one or two note sketch (e.g. fret = piano key) does not use the legend's code
+    if (svg.querySelectorAll('circle[data-nt]').length < 3) return;
+    const r = svg.getBoundingClientRect();
+    if (near(leg, r) || Array.prototype.some.call(app.querySelectorAll('.nk-leg'), (c) => near(c, r))) return;
+    let at = neckAnchor(svg);
+    if (!at) return;
+    if (at.nextElementSibling && at.nextElementSibling.classList.contains('nk-hint')) at = at.nextElementSibling;
+    const c = leg.cloneNode(true);
+    c.classList.add('nk-leg');
+    c.setAttribute('aria-hidden', 'true'); // screen readers already have the original legend
+    c.querySelectorAll('[id]').forEach((x) => x.removeAttribute('id'));
+    // text takes the colour of the block it sits in: some cards are painted after the theme pass and keep light colours
+    c.style.color = getComputedStyle(at.parentElement).color;
+    c.querySelectorAll('[style]').forEach((x) => { if (x.textContent.trim()) x.style.color = 'inherit'; });
+    at.insertAdjacentElement('afterend', c);
   });
 }
 
@@ -18154,11 +18222,18 @@ try {
   // whole screen each time would cost frames. Changes inside an SVG carry no HTML text to check.
   new MutationObserver((muts) => {
     let html = false;
+    const added = [];
     muts.forEach((m) => m.addedNodes.forEach((n) => {
       if (n.nodeType !== 1) return;
       try { tagNecks(n); } catch (e) {}
-      if (!(n instanceof SVGElement)) html = true;
+      if (!(n instanceof SVGElement)) { html = true; added.push(n); }
     }));
+    // blocks painted after the render (cards drawn by hand, delayed paints) get the theme colours too;
+    // this runs before the browser paints, so they never flash in the other theme
+    const live = added.filter((n) => n.isConnected);
+    if (live.length) { try { if (dark) darken(live); else palLight(live); } catch (e) {} }
+    // a neck painted after the first render gets the tap tip too
+    if (!app.querySelector('.nk-hint')) { try { attachHint(currentName, document.documentElement.lang); } catch (e) {} }
     if (!html) return;
     clearTimeout(cxT);
     cxT = setTimeout(() => { try { fixContrast(); } catch (e) {} }, 120);
@@ -18710,6 +18785,7 @@ function mount(name, q) {
     try { attachPiano(name, l || 'es'); } catch (e) {}
     try { attachChroma(name, l || 'es'); } catch (e) {}
     try { tagNecks(); } catch (e) {}
+    try { attachHint(name, l || 'es'); } catch (e) {}
     try { fixContrast(); } catch (e) {}
     try { fixEyebrow(name, l || 'es'); } catch (e) {}
     try { labelBack(l || 'es'); } catch (e) {}
