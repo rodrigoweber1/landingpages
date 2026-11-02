@@ -11,6 +11,7 @@
 <meta name="format-detection" content="telephone=no">
 <meta name="description" content="Aprende guitarra desde cero con You Rock Academy: notas en el mástil, acordes, power chords, escalas, riffs y más. ES / EN.">
 <title>You Rock Academy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 112'%3E%3Cpath d='M50 4C80 4 96 15 96 36C96 64 68 94 50 108C32 94 4 64 4 36C4 15 20 4 50 4Z' fill='%23E31B23'/%3E%3Cpath d='M50 16C72 16 84 24 84 39C84 60 63 83 50 94' fill='none' stroke='%23FFFFFF' stroke-opacity='0.3' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Archivo+Black&display=swap">
@@ -18767,8 +18768,7 @@ function mount(name, q) {
     if (app.replaceChildren) app.replaceChildren(frag); else { while (app.firstChild) app.removeChild(app.firstChild); app.appendChild(frag); }
     const l = inst.state && inst.state.lang;
     if (l) document.documentElement.lang = l;
-    const ti = vals.t && (vals.t.title || vals.t.h1);
-    document.title = name === 'Inicio' ? 'You Rock Academy' : ti ? ti + ' · You Rock Academy' : 'You Rock Academy · ' + (l === 'en' ? 'Guitar' : 'Guitarra');
+    document.title = 'You Rock Academy';
     document.body.classList.toggle('home', name === 'Inicio');
     fit();
     deskReflow(name);
