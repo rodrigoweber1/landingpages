@@ -49,8 +49,10 @@
 <style>
 :root{
   --bg:#131209; --bg-2:#1F1F1F; --card:#272727; --line:#313131;
-  --text:#F2EDE4; --muted:#BDB6AA; --accent:#E8461E; --accent-hover:#F05A30; --on-accent:#131209;
-  --focus:#F2B705; --error:#FF8A65;
+  --text:#F2EDE4; --muted:#BDB6AA; --accent:#E31B23; --accent-hover:#F0353C; --on-accent:#FFFFFF; --accent-text:#FF6B70;
+  --focus:#F2B705; --error:#FF8A65; --placeholder:#F2B705;
+  --glass:rgba(31,31,31,0.72); --hairline:rgba(242,237,228,0.08); --tint:rgba(242,237,228,0.1); --menu-bg:rgba(19,18,9,0.92);
+  --shimmer:rgba(242,237,228,0.06); --logo-filter:invert(1); --hero-from:#FFFFFF; --hero-to:#9B9B9B; --on-image:#F2EDE4; --card-on-bg:#1F1F1F;
   --ease:cubic-bezier(0.22,1,0.36,1);
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -96,8 +98,8 @@ section[id]{scroll-margin-top:96px}
   .heading-3{font-size:30px;line-height:36px}
 }
 .muted{color:var(--muted)}
-.accent{color:var(--accent)}
-.ph-text{color:var(--focus)}
+.accent{color:var(--accent-text)}
+.ph-text{color:var(--placeholder)}
 
 /* Layout */
 .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
@@ -106,7 +108,7 @@ section[id]{scroll-margin-top:96px}
 .section-head{display:flex;flex-direction:column;gap:16px;max-width:680px;margin-bottom:48px}
 .grid{display:grid;gap:24px}
 .grid-auto{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-.card{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card-on-bg);border:1px solid var(--line);border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px}
 .alt .card{background:var(--card)}
 @media (max-width:639px){
   .wrap{padding:0 16px}
@@ -133,16 +135,16 @@ section[id]{scroll-margin-top:96px}
 .btn[aria-busy="true"]{opacity:0.72;pointer-events:none}
 
 /* Navigation (B7) */
-.nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:24px;padding:8px 8px 8px 16px;border-radius:9999px;background:rgba(31,31,31,0.72);border:1px solid rgba(242,237,228,0.08);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);width:max-content;max-width:calc(100% - 32px)}
+.nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:24px;padding:8px 8px 8px 16px;border-radius:9999px;background:var(--glass);border:1px solid var(--hairline);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);width:max-content;max-width:calc(100% - 32px)}
 .logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text)}
-.logo img{height:32px;width:auto;filter:invert(1)}
+.logo img{height:32px;width:auto;filter:var(--logo-filter)}
 .logo-word{display:flex;flex-direction:column}
 .logo-word b{font-size:14px;line-height:20px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}
 .logo-word b svg{width:0.774em;height:0.875em;vertical-align:-0.05em}
 .logo-word span{font-size:12px;line-height:16px;color:var(--muted);white-space:nowrap}
 .nav-links{display:flex;align-items:center;gap:4px}
 .nav-links a,.lang a{text-decoration:none;color:var(--muted);padding:8px 12px;border-radius:9999px;transition:background-color 300ms var(--ease),color 300ms var(--ease)}
-.nav-links a[aria-current="true"],.lang a[aria-current="true"]{color:var(--text);background:rgba(242,237,228,0.1)}
+.nav-links a[aria-current="true"],.lang a[aria-current="true"]{color:var(--text);background:var(--tint)}
 @media (hover:hover) and (pointer:fine){.nav-links a:hover,.lang a:hover{color:var(--text)}}
 .lang{display:flex;gap:2px}
 .lang a{padding:8px}
@@ -153,12 +155,12 @@ section[id]{scroll-margin-top:96px}
 .toggle span:last-child{top:23px}
 .toggle[aria-expanded="true"] span:first-child{transform:translateY(4px) rotate(45deg)}
 .toggle[aria-expanded="true"] span:last-child{transform:translateY(-4px) rotate(-45deg)}
-.menu{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:96px 24px 48px;background:rgba(19,18,9,0.92);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);opacity:0;visibility:hidden;transition:opacity 500ms var(--ease),visibility 0s linear 500ms}
+.menu{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:96px 24px 48px;background:var(--menu-bg);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);opacity:0;visibility:hidden;transition:opacity 500ms var(--ease),visibility 0s linear 500ms}
 .menu.open{opacity:1;visibility:visible;transition:opacity 500ms var(--ease)}
 .menu > *{opacity:0;transform:translateY(24px);transition:opacity 500ms var(--ease),transform 500ms var(--ease);transition-delay:calc(var(--i) * 60ms)}
 .menu.open > *{opacity:1;transform:none}
 .menu a:not(.btn){text-decoration:none;padding:8px 0}
-.menu a[aria-current="true"]{color:var(--accent)}
+.menu a[aria-current="true"]{color:var(--accent-text)}
 .menu .btn{margin-top:24px;align-self:flex-start}
 @media (max-width:1199px){
   .nav{width:calc(100% - 32px);justify-content:space-between}
@@ -172,11 +174,11 @@ section[id]{scroll-margin-top:96px}
 .hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:64px;align-items:center}
 .hero-copy{display:flex;flex-direction:column;gap:24px}
 .hero h1,.hero .lead{max-width:680px}
-.hero h1{background:linear-gradient(90deg,#FFFFFF,#9B9B9B);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1{background:linear-gradient(90deg,var(--hero-from),var(--hero-to));-webkit-background-clip:text;background-clip:text;color:transparent}
 .cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
 .proof{display:flex;flex-wrap:wrap;gap:8px 16px}
 .proof span{display:inline-flex;align-items:center;gap:4px}
-.proof i{color:var(--accent);font-size:16px}
+.proof i{color:var(--accent-text);font-size:16px}
 .chips{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px}
 .chips li{padding:4px 12px;border:1px solid var(--line);border-radius:9999px;background:var(--bg-2)}
 .chips-label{display:flex;flex-direction:column;gap:8px}
@@ -207,7 +209,7 @@ figure figcaption{margin-top:12px}
 @media (max-width:959px){.split{grid-template-columns:minmax(0,1fr);gap:24px}}
 
 /* Benefits */
-.icon-box{width:48px;height:48px;border-radius:8px;background:rgba(232,70,30,0.12);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.icon-box{width:48px;height:48px;border-radius:8px;background:rgba(227,27,35,0.14);color:var(--accent-text);display:flex;align-items:center;justify-content:center}
 .icon-box i{font-size:24px}
 
 /* Tagline reveal (B11) */
@@ -216,12 +218,12 @@ figure figcaption{margin-top:12px}
 .tagline .w.on{opacity:1}
 
 /* Steps */
-.step-num{color:var(--accent)}
+.step-num{color:var(--accent-text)}
 
 /* Concerts */
 .concerts{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:24px;align-items:stretch}
 .yt-stack{display:flex;flex-direction:column;gap:24px}
-.yt-card{position:relative;flex:1;min-height:240px;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center;text-decoration:none;color:var(--text);background:var(--card) center/cover no-repeat;border:1px solid var(--line)}
+.yt-card{position:relative;flex:1;min-height:240px;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center;text-decoration:none;color:var(--on-image);background:var(--card) center/cover no-repeat;border:1px solid var(--line)}
 .yt-card::before{content:"";position:absolute;inset:0;background:rgba(19,18,9,0.62)}
 .yt-card > *{position:relative}
 .yt-play{width:64px;height:64px;border-radius:9999px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;transition:transform 500ms var(--ease)}
@@ -231,7 +233,7 @@ figure figcaption{margin-top:12px}
 .yt-frame{position:relative;flex:1;min-height:240px;border-radius:16px;overflow:hidden;background:var(--card)}
 .yt-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;transition:opacity 500ms var(--ease)}
 .yt-frame.loaded iframe{opacity:1}
-.yt-frame::after{content:"";position:absolute;inset:0;background:rgba(242,237,228,0.06);transform:translateX(-100%);animation:shimmer 1.4s var(--ease) infinite}
+.yt-frame::after{content:"";position:absolute;inset:0;background:var(--shimmer);transform:translateX(-100%);animation:shimmer 1.4s var(--ease) infinite}
 .yt-frame.loaded::after{display:none}
 @keyframes shimmer{to{transform:translateX(100%)}}
 .concert-video{max-width:460px;width:100%;margin:0 auto}
@@ -242,14 +244,15 @@ figure figcaption{margin-top:12px}
 .photo-ph{aspect-ratio:1/1;border-radius:16px;border:1px dashed var(--muted);background:var(--card);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
 .creds{list-style:none;padding:0;display:flex;flex-direction:column;gap:12px}
 .creds li{display:flex;gap:8px}
-.creds i{color:var(--accent);font-size:20px;flex:none;margin-top:2px}
+.creds i{color:var(--accent-text);font-size:20px;flex:none;margin-top:2px}
 
 /* Prices */
 .price-card{position:relative}
 .price-card.featured{border-color:var(--accent)}
-.price{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:8px}
+.price{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin-top:auto;padding-top:8px}
+.price .heading-3{white-space:nowrap}
 .badge{align-self:flex-start;padding:4px 8px;border-radius:9999px;background:var(--accent);color:var(--on-accent)}
-.badge.soft{background:rgba(242,237,228,0.08);color:var(--muted)}
+.badge.soft{background:var(--tint);color:var(--muted)}
 .after-grid{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-top:32px}
 
 /* FAQ */
@@ -271,9 +274,9 @@ figure figcaption{margin-top:12px}
 .final-copy{display:flex;flex-direction:column;gap:24px}
 .checks{list-style:none;padding:0;display:flex;flex-direction:column;gap:12px}
 .checks li{display:flex;gap:8px}
-.checks i{color:var(--accent);font-size:20px;flex:none;margin-top:2px}
+.checks i{color:var(--accent-text);font-size:20px;flex:none;margin-top:2px}
 .contact{display:flex;flex-direction:column;gap:8px}
-.contact a{overflow-wrap:anywhere;color:var(--text);text-decoration-color:var(--accent);text-underline-offset:4px}
+.contact a{overflow-wrap:anywhere;color:var(--text);text-decoration-color:var(--accent-text);text-underline-offset:4px}
 .contact span{display:flex;gap:8px;align-items:flex-start}
 .contact i{font-size:20px;color:var(--muted);flex:none;margin-top:2px}
 .form{gap:24px}
@@ -491,9 +494,9 @@ figure figcaption{margin-top:12px}
     </div>
     <div class="grid grid-auto reveal">
       <article class="card price-card featured"><span class="badge caption-3" data-i="p1b">El principal</span><h3 class="heading-5" data-i="p1t">Combos</h3><p class="body-3 muted" data-i="p1p">Canciones estándar más una elegida por cada miembro. 90 minutos a la semana, grupos de 4 a 6.</p><p class="price"><span class="heading-3">90 €</span><span class="caption-2 muted" data-i="p1u">al mes, IVA incluido</span></p></article>
-      <article class="card price-card"><span class="badge soft caption-3" data-i="pTb">Temático</span><h3 class="heading-5">The Beatles</h3><p class="body-3 muted" data-i="p2p">Seis canciones con arreglos de Guillermo Shelly. 90 minutos a la semana.</p><p class="price"><span class="heading-3">90 €</span><span class="caption-2 muted" data-i="pu">al mes</span></p></article>
-      <article class="card price-card"><span class="badge soft caption-3" data-i="pTb">Temático</span><h3 class="heading-5" data-i="p3t">El origen de todo: el Blues</h3><p class="body-3 muted" data-i="p3p">Seis estándares de blues. 90 minutos cada 2 semanas.</p><p class="price"><span class="heading-3">60 €</span><span class="caption-2 muted" data-i="pu">al mes</span></p></article>
-      <article class="card price-card"><span class="badge soft caption-3" data-i="p4b">Guitarristas</span><h3 class="heading-5" data-i="p4t">Conociendo el mástil</h3><p class="body-3 muted" data-i="p4p">Pentatónicas, pedales de efectos y solos de Beatles, Dire Straits o Pink Floyd. 90 minutos cada 2 semanas, por niveles.</p><p class="price"><span class="heading-3">60 €</span><span class="caption-2 muted" data-i="pu">al mes</span></p></article>
+      <article class="card price-card"><span class="badge soft caption-3" data-i="pTb">Temático</span><h3 class="heading-5">The Beatles</h3><p class="body-3 muted" data-i="p2p">Seis canciones con arreglos de Guillermo Shelly. 90 minutos a la semana.</p><p class="price"><span class="heading-3">90 €</span><span class="caption-2 muted" data-i="pu">al mes, IVA incluido</span></p></article>
+      <article class="card price-card"><span class="badge soft caption-3" data-i="pTb">Temático</span><h3 class="heading-5" data-i="p3t">El origen de todo: el Blues</h3><p class="body-3 muted" data-i="p3p">Seis estándares de blues. 90 minutos cada 2 semanas.</p><p class="price"><span class="heading-3">60 €</span><span class="caption-2 muted" data-i="pu">al mes, IVA incluido</span></p></article>
+      <article class="card price-card"><span class="badge soft caption-3" data-i="p4b">Guitarristas</span><h3 class="heading-5" data-i="p4t">Conociendo el mástil</h3><p class="body-3 muted" data-i="p4p">Pentatónicas, pedales de efectos y solos de Beatles, Dire Straits o Pink Floyd. 90 minutos cada 2 semanas, por niveles.</p><p class="price"><span class="heading-3">60 €</span><span class="caption-2 muted" data-i="pu">al mes, IVA incluido</span></p></article>
     </div>
     <div class="after-grid reveal">
       <p class="caption-2 muted" data-i="priNote">Tarifas publicadas para el curso 2025/26. <span class="ph-text">{{Confirmar tarifas del curso 2026/27 antes de publicar}}</span></p>
@@ -653,7 +656,7 @@ figure figcaption{margin-top:12px}
     c1: "Contemporary Writing and Production, Berklee College of Music (2018)", c2: "Over 20 years in music", c3: "Private lessons, after school programs, bands and secondary school music",
     priE: "Bands and prices", priH: "Choose your band",
     p1b: "The main one", p1t: "Bands", p1p: "Standard songs plus one picked by each member. 90 minutes a week, groups of 4 to 6.", p1u: "a month, VAT included",
-    pTb: "Themed", p2p: "Six songs arranged by Guillermo Shelly. 90 minutes a week.", pu: "a month",
+    pTb: "Themed", p2p: "Six songs arranged by Guillermo Shelly. 90 minutes a week.", pu: "a month, VAT included",
     p3t: "Where it all began: the Blues", p3p: "Six blues standards. 90 minutes every 2 weeks.",
     p4b: "Guitarists", p4t: "Know your fretboard", p4p: "Pentatonic scales, effects pedals and solos by the Beatles, Dire Straits or Pink Floyd. 90 minutes every 2 weeks, by level.",
     priNote: "Prices published for the 2025/26 year. <span class=\"ph-text\">{{Confirm 2026/27 prices before publishing}}</span>",
