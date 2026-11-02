@@ -32,7 +32,7 @@ body{display:grid;grid-template-columns:320px minmax(0,1fr);align-items:start}
 .sd-head{padding:20px 20px 12px;display:flex;flex-direction:column;gap:6px}
 .sd-logo{display:flex;align-items:center;gap:8px}.sd-head img{height:60px;width:auto;align-self:flex-start}
 .sd-head a.home{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:13px;font-weight:500;color:#B3121A}
-.sd-nav{flex:1;overflow-y:auto;padding:4px 12px 12px}
+.sd-nav{flex:1;overflow-y:auto;padding:4px 12px 72px}
 .sd-nav details{border-top:1px solid #E2E8F0}
 .sd-nav summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 8px;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;line-height:18px}
 .sd-nav summary::-webkit-details-marker{display:none}
@@ -17840,10 +17840,27 @@ function renderSide(name, lang) {
     + (prev ? '<a class="prev" href="#/' + prev + '"><small>← ' + esc(L.prev) + '</small><span>' + esc(menuLabel(lang, base(prev))) + '</span></a>' : '<a class="prev off"><small>← ' + esc(L.prev) + '</small><span>&nbsp;</span></a>')
     + (next ? '<a class="next" href="#/' + next + '"><small>' + esc(L.next) + ' →</small><span>' + esc(menuLabel(lang, base(next))) + '</span></a>' : '<a class="next off"><small>' + esc(L.next) + ' →</small><span>&nbsp;</span></a>')
     + '<div class="sd-key">' + esc(L.key) + '</div></div>';
+  // the menu keeps its scroll position when it is redrawn, so clicking a section does not make it jump
+  const oldNav = sideEl.querySelector('.sd-nav');
+  const keepTop = oldNav ? oldNav.scrollTop : null;
+  const oldIt = oldNav && oldNav.querySelector('a.it[href="#/' + name + '"]');
+  const keepY = oldIt ? oldIt.getBoundingClientRect().top : null;
   sideEl.innerHTML = h;
   sideEl.querySelectorAll('details').forEach((d) => d.addEventListener('toggle', () => { const i = +d.getAttribute('data-i'); if (d.open) opens.add(i); else opens.delete(i); }));
-  const on = sideEl.querySelector('a.it.on');
-  if (on && on.scrollIntoView) { try { on.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
+  const navEl = sideEl.querySelector('.sd-nav');
+  if (navEl && keepTop != null) navEl.scrollTop = keepTop;
+  // finish once the whole render is done (a microtask runs before the next paint, after the rest of the
+  // render has added its pieces): the clicked item stays exactly where it was; if the current screen is
+  // out of sight (arrows, Next button, a link in the page), scroll the menu just enough to show it
+  queueMicrotask(() => {
+    if (!navEl || !navEl.isConnected) return;
+    const it = navEl.querySelector('a.it.on');
+    if (!it) return;
+    if (keepY != null) navEl.scrollTop += it.getBoundingClientRect().top - keepY;
+    const nr = navEl.getBoundingClientRect(), r = it.getBoundingClientRect();
+    if (r.top < nr.top) navEl.scrollTop -= nr.top - r.top + 8;
+    else if (r.bottom > nr.bottom) navEl.scrollTop += r.bottom - nr.bottom + 8;
+  });
 }
 // in-page links follow the active menu (next button, back arrow)
 const TOOLS = ['OtrasAfinaciones', 'Pulso', 'Braco', 'Buscador', 'CambioAcordes', 'Cejillas', 'Batidas', 'Acentos', 'RitmoAvanzado', 'Aranha'];
