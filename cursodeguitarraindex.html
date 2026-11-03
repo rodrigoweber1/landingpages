@@ -63,7 +63,12 @@ body.home #side{display:none}
 }
 
 
-#sbar{position:relative;margin:10px 0 6px;font-family:'Inter',system-ui,sans-serif}
+/* the top of every screen (back, title, language, search) stays in view while the page scrolls */
+html{scroll-padding-top:calc(env(safe-area-inset-top) + 130px)}
+#app>div>header{position:sticky;top:env(safe-area-inset-top);z-index:72;background:inherit}
+#sbar{position:sticky;top:calc(env(safe-area-inset-top) + var(--hdh,56px));z-index:71;background:inherit;margin:0;padding:10px 0 6px;font-family:'Inter',system-ui,sans-serif}
+#sbar::after{content:'';position:absolute;left:0;right:0;bottom:-8px;height:8px;background:linear-gradient(rgba(0,0,0,0.06),transparent);pointer-events:none}
+body.dark #sbar::after{background:linear-gradient(rgba(0,0,0,0.35),transparent)}
 #sbar .sb-f{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:999px;background:#EEF2F7;box-sizing:border-box}
 #sbar .sb-f:focus-within{background:#FFFFFF;box-shadow:0 0 0 2px #0F172A}
 #sbar input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:400 15px/20px 'Inter',system-ui,sans-serif;color:#0F172A;padding:0}
@@ -19366,6 +19371,8 @@ function mount(name, q) {
     if (dark) { try { darken(); } catch (e) {} } else { try { palLight(); } catch (e) {} }
     try { attachTheme(name, l || 'es'); } catch (e) {}
     try { attachSearch(name, l || 'es'); } catch (e) {}
+    // the sticky search bar sits right under the sticky header, whatever height the header has on this screen
+    try { const hd = app.querySelector(':scope > div > header'); if (hd) app.firstElementChild.style.setProperty('--hdh', hd.offsetHeight + 'px'); } catch (e) {}
     try { attachMarker(name, l || 'es'); } catch (e) {}
     try { attachResume(name, l || 'es'); } catch (e) {}
     try { attachLicks(name, l || 'es'); } catch (e) {}
