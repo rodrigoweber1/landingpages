@@ -603,6 +603,44 @@ body.dark .rf-tag{background:#3A3A3A;color:#F2EDE4}
 body.dark .rf-bg{fill:#1F1F1F}
 body.dark .rf-f{fill:#F2EDE4}
 body.dark .rf-ch{fill:#FF6B70}
+/* ===== Celebration al piano ===== */
+.cp-card{gap:10px}
+.cp-ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.cp-tempo{display:inline-flex;align-items:center;gap:8px;font:600 13px 'Inter',system-ui,sans-serif;color:#3A3A3A}
+.cp-now{display:flex;flex-direction:column;gap:2px}
+.cp-now b{font:400 32px/1.1 'Archivo Black','Inter',sans-serif;color:#E31B23}
+.cp-now span{font-size:13px;line-height:18px;color:#3A3A3A}
+.cp-kb{display:block;width:100%;max-width:640px;height:auto}
+.cp-w{fill:#FFFFFF;stroke:#8A8A8A;stroke-width:1}
+.cp-b{fill:#121212}
+.cp-w[data-on="true"]{fill:#E31B23}
+.cp-b[data-on="true"]{fill:#B3121A}
+.cp-c4{font:600 8px 'Inter',sans-serif;fill:#8A8A8A}
+.cp-bars{display:flex;flex-direction:column;gap:8px}
+.cp-bar small{font-size:12px;line-height:16px;color:#5A5A5A}
+.cp-lane{position:relative;height:42px;border-radius:8px;background:#F2F2F2;overflow:hidden}
+.cp-tick{position:absolute;top:0;bottom:0;width:1px;background:#DADADA}
+.cp-tick.cp-beat{width:2px;background:#9A9A9A}
+.cp-blk{position:absolute;top:5px;bottom:5px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;border:2px solid #FFFFFF;border-radius:6px;background:#121212;color:#FFFFFF;font:700 13px 'Inter',system-ui,sans-serif;white-space:nowrap;overflow:hidden}
+.cp-blk.cp-rest{background:transparent;color:#8A8A8A;font-weight:500;border-color:transparent}
+.cp-blk[data-on="true"]{background:#E31B23}
+.cp-head{display:none;position:absolute;top:0;bottom:0;width:3px;margin-left:-1px;background:#E31B23;box-shadow:0 0 0 2px rgba(227,27,35,0.25)}
+.cp-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.cp-mc{display:flex;flex-direction:column;gap:2px;padding:8px;border:2px solid transparent;border-radius:12px;background:#F7F7F7}
+.cp-mc b{font-size:15px;line-height:20px}
+.cp-mc small{font-size:12px;line-height:16px;color:#5A5A5A}
+.cp-mc[data-on="true"]{border-color:#E31B23;background:#FFE9E9}
+body.dark .cp-tempo,body.dark .cp-now span{color:#BDB6AA}
+body.dark .cp-lane{background:#272727}
+body.dark .cp-tick{background:#3A3A3A}
+body.dark .cp-tick.cp-beat{background:#6A6A6A}
+body.dark .cp-blk{background:#F2EDE4;color:#131209;border-color:#272727}
+body.dark .cp-blk.cp-rest{background:transparent;color:#8A8478}
+body.dark .cp-blk[data-on="true"]{background:#E31B23;color:#FFFFFF}
+body.dark .cp-mc{background:#272727}
+body.dark .cp-mc small,body.dark .cp-bar small{color:#BDB6AA}
+body.dark .cp-mc[data-on="true"]{background:#3A1E20}
+/* ===== fin Celebration al piano ===== */
 /* ===== Cuaderno de ejercicios (módulo 10) ===== */
 .ej-h{font-size:14px;line-height:20px;color:inherit}
 .ej-sub{font-size:13px;line-height:18px}
@@ -4004,6 +4042,143 @@ const SONG_SHEETS = [
   key: ['Mi mayor', 'E major'], bpm: '≈ 95 BPM', meter: '4/4', date: ['2007 · álbum «This Is the Life»', '2007 · album “This Is the Life”'],
   learn: ['Rasgueo de acompañamiento con acordes abiertos en la guitarra acústica, sobre una progresión que se repite toda la canción.', 'Strumming accompaniment with open chords on acoustic guitar, over a progression that repeats through the whole song.'] }
 ];
+// ===== Celebration al piano (cancionero, canción 5): progresión, ritmo y 3 posiciones =====
+// chords per bar: [chord or null (rest), start beat, length in beats]; taken from the teacher's lead sheet
+const CP_SECS = {
+  chorus: { reps: 2, bars: [[[null, 0, 0.5], ['Db', 0.5, 0.5], ['Db', 1, 0.5], ['Gb', 1.5, 0.5], ['Gb', 2, 1], ['Db', 3, 1]], [['Gb', 0, 0.75], ['Db', 0.75, 0.75], ['Ab', 1.5, 2.5]]] },
+  verse: { reps: 1, bars: [[['Gb', 0, 4]], [['Bbm', 0, 1.5], ['Ab', 1.5, 2.5]]] },
+  bridge: { reps: 1, bars: [[['Dbmaj7', 0, 4]], [['Cm7', 0, 4]], [['Fsus4', 0, 4]], [['F', 0, 4]], [['Bbm', 0, 4]], [['Db/Eb', 0, 4]]] }
+};
+// right-hand voicings (MIDI) for the three positions: starting with the root, the 3rd or the 5th of D♭ at the bottom,
+// every other chord picked as the closest move from the one before (voice leading)
+const CP_VOI = {"root": {"chorus": {"Db": [61, 65, 68], "Gb": [61, 66, 70], "Ab": [63, 68, 72]}, "verse": {"Gb": [61, 66, 70], "Bbm": [61, 65, 70], "Ab": [60, 63, 68]}, "bridge": {"Dbmaj7": [60, 61, 65, 68], "Cm7": [60, 63, 67, 70], "Fsus4": [60, 65, 70], "F": [60, 65, 69], "Bbm": [61, 65, 70], "Db/Eb": [61, 65, 68]}}, "third": {"chorus": {"Db": [65, 68, 73], "Gb": [66, 70, 73], "Ab": [68, 72, 75]}, "verse": {"Gb": [66, 70, 73], "Bbm": [65, 70, 73], "Ab": [63, 68, 72]}, "bridge": {"Dbmaj7": [65, 68, 72, 73], "Cm7": [63, 67, 70, 72], "Fsus4": [65, 70, 72], "F": [65, 69, 72], "Bbm": [65, 70, 73], "Db/Eb": [65, 68, 73]}}, "fifth": {"chorus": {"Db": [56, 61, 65], "Gb": [58, 61, 66], "Ab": [56, 60, 63]}, "verse": {"Gb": [58, 61, 66], "Bbm": [58, 61, 65], "Ab": [56, 60, 63]}, "bridge": {"Dbmaj7": [56, 60, 61, 65], "Cm7": [55, 58, 60, 63], "Fsus4": [53, 58, 60], "F": [53, 57, 60], "Bbm": [53, 58, 61], "Db/Eb": [53, 56, 61]}}};
+// left hand: the root (the bass of D♭/E♭ is E♭), two octaves down
+const CP_BASS = { Db: 37, Gb: 42, Ab: 44, Bbm: 46, Dbmaj7: 37, Cm7: 36, Fsus4: 41, F: 41, 'Db/Eb': 39 };
+const CP_NAMES = { es: ['Do', 'Re♭', 'Re', 'Mi♭', 'Mi', 'Fa', 'Sol♭', 'Sol', 'La♭', 'La', 'Si♭', 'Si'], en: ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'] };
+const cpChord = (c) => c.replace(/([A-G])b/g, '$1♭');
+function cpTone(ac, m, at, dur, vol) {
+  // a soft electric-piano-like tone: sine body plus a quieter octave, quick attack, gentle decay
+  const f = 440 * Math.pow(2, (m - 69) / 12), g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(vol, at + 0.008);
+  g.gain.exponentialRampToValueAtTime(vol * 0.35, at + Math.min(0.5, dur));
+  g.gain.exponentialRampToValueAtTime(0.0001, at + dur + 0.25);
+  g.connect(ac.destination);
+  [[1, 'sine', 1], [2, 'sine', 0.25], [1, 'triangle', 0.18]].forEach((p) => {
+    const o = ac.createOscillator(), og = ac.createGain();
+    o.type = p[1]; o.frequency.value = f * p[0]; og.gain.value = p[2];
+    o.connect(og); og.connect(g); o.start(at); o.stop(at + dur + 0.3);
+  });
+}
+function celebPiano(root, es) {
+  const L = es ? 'es' : 'en';
+  const T = es ? {
+    h: 'Piano · primer ejercicio', x: 'Acordes en la mano derecha y la tónica en la izquierda. Sigue el diagrama: cada bloque es un acorde y su largo es lo que dura. Las líneas finas marcan las semicorcheas y las gruesas, los pulsos.',
+    sec: 'Parte', secs: { chorus: 'Estribillo (×2)', verse: 'Estrofa', bridge: 'Puente' }, pos: 'Posición',
+    poss: { root: ['1 · desde la tónica', 'Re♭ abajo: Re♭–Fa–La♭'], third: ['2 · desde la 3ª', 'Fa abajo: Fa–La♭–Re♭'], fifth: ['3 · desde la 5ª', 'La♭ abajo: La♭–Re♭–Fa'] },
+    listen: 'Escuchar', stop: 'Parar', tempo: 'Tempo', slower: 'Más lento', faster: 'Más rápido', bar: 'Compás', rest: 'silencio',
+    lh: 'Mano izquierda', rh: 'Mano derecha', map: 'Los acordes de esta parte en la posición elegida',
+    note: 'Las tres posiciones salen de empezar el Re♭ con la tónica, la 3ª o la 5ª abajo; el resto de acordes se coloca lo más cerca posible del anterior (voice leading), así la mano casi no salta. Fíjate en el estribillo: el Sol♭ y el La♭ entran un poco antes del pulso (anticipación), eso es lo que hace bailar la canción. En la grabación, los compases 5 y 6 repiten este patrón con la frase de los vientos encima.',
+    kbAria: 'Teclado con el acorde que suena'
+  } : {
+    h: 'Piano · first exercise', x: 'Chords in the right hand and the root in the left. Follow the diagram: each block is a chord and its length is how long it lasts. Thin lines mark the sixteenths and thick ones, the beats.',
+    sec: 'Part', secs: { chorus: 'Chorus (×2)', verse: 'Verse', bridge: 'Bridge' }, pos: 'Position',
+    poss: { root: ['1 · from the root', 'D♭ at the bottom: D♭–F–A♭'], third: ['2 · from the 3rd', 'F at the bottom: F–A♭–D♭'], fifth: ['3 · from the 5th', 'A♭ at the bottom: A♭–D♭–F'] },
+    listen: 'Listen', stop: 'Stop', tempo: 'Tempo', slower: 'Slower', faster: 'Faster', bar: 'Bar', rest: 'rest',
+    lh: 'Left hand', rh: 'Right hand', map: 'This part’s chords in the chosen position',
+    note: 'The three positions come from starting D♭ with the root, the 3rd or the 5th at the bottom; every other chord sits as close as possible to the one before (voice leading), so your hand barely jumps. Check the chorus: G♭ and A♭ come in just before the beat (anticipation), and that’s what makes the song dance. On the record, bars 5 and 6 repeat this pattern with the horn line on top.',
+    kbAria: 'Keyboard showing the chord being played'
+  };
+  const st = root._cp = root._cp || { sec: 'chorus', pos: 'root', bpm: 100, playing: false };
+  const N = CP_NAMES[L];
+  const noteName = (m) => N[m % 12];
+  // keyboard C3–C6: white keys, black keys on top; keys of the chord light up
+  const kb = (notes, small) => {
+    const lo = 48, hi = 84, W = small ? 9 : 16, H = small ? 34 : 70;
+    const whites = []; for (let m = lo; m <= hi; m++) if ([1, 3, 6, 8, 10].indexOf(m % 12) < 0) whites.push(m);
+    let s = '<svg class="cp-kb' + (small ? ' cp-kbs' : '') + '" viewBox="0 0 ' + whites.length * W + ' ' + H + '" role="img" aria-label="' + T.kbAria + '">';
+    whites.forEach((m, i) => { s += '<rect class="cp-w" data-m="' + m + '" data-on="' + (notes.indexOf(m) >= 0) + '" x="' + i * W + '" y="0" width="' + W + '" height="' + H + '" rx="2"/>'; if (m === 60 && !small) s += '<text class="cp-c4" x="' + (i * W + W / 2) + '" y="' + (H - 6) + '" text-anchor="middle">C4</text>'; });
+    whites.forEach((m, i) => { if ([0, 2, 5, 7, 9].indexOf(m % 12) >= 0 && m + 1 <= hi) s += '<rect class="cp-b" data-m="' + (m + 1) + '" data-on="' + (notes.indexOf(m + 1) >= 0) + '" x="' + (i * W + W * 0.66) + '" y="0" width="' + W * 0.68 + '" height="' + H * 0.6 + '" rx="1.5"/>'; });
+    return s + '</svg>';
+  };
+  const chip = (attr, v, on, label, sub) => '<button type="button" class="ej-chip" ' + attr + '="' + v + '" aria-pressed="' + on + '">' + label + (sub ? '<small>' + sub + '</small>' : '') + '</button>';
+  const paint = () => {
+    const S = CP_SECS[st.sec], V = CP_VOI[st.pos][st.sec];
+    const chords = []; S.bars.forEach((b) => b.forEach((e) => { if (e[0] && chords.indexOf(e[0]) < 0) chords.push(e[0]); }));
+    let h = '<div class="pt-card cp-card"><h3 class="bt-h3" style="margin:0">' + T.h + '</h3><p class="pt-p">' + T.x + '</p>'
+      + '<b class="ej-h">' + T.sec + '</b><div class="ej-chips">' + Object.keys(CP_SECS).map((k) => chip('data-sec', k, k === st.sec, T.secs[k])).join('') + '</div>'
+      + '<b class="ej-h">' + T.pos + '</b><div class="ej-chips">' + Object.keys(CP_VOI).map((k) => chip('data-pos', k, k === st.pos, T.poss[k][0], T.poss[k][1])).join('') + '</div>'
+      + '<div class="cp-ctl"><button type="button" class="rt-play" data-a="play">' + (st.playing ? '■ ' + T.stop : '▶ ' + T.listen) + '</button><span class="cp-tempo">' + T.tempo + '<button type="button" class="bt-bpm" data-b="-5" aria-label="' + T.slower + '">−</button><b>' + st.bpm + ' BPM</b><button type="button" class="bt-bpm" data-b="5" aria-label="' + T.faster + '">+</button></span></div>'
+      + '<div class="cp-now"><b data-a="now">' + cpChord(chords[0]) + '</b><span data-a="hands">' + T.rh + ': ' + V[chords[0]].map(noteName).join(' · ') + ' — ' + T.lh + ': ' + noteName(CP_BASS[chords[0]]) + '</span></div>'
+      + '<div data-a="kb">' + kb(V[chords[0]], false) + '</div>'
+      + '<div class="cp-bars">';
+    S.bars.forEach((b, bi) => {
+      h += '<div class="cp-bar"><small>' + T.bar + ' ' + (bi + 1) + (S.reps > 1 && bi === S.bars.length - 1 ? ' · ×' + S.reps : '') + '</small><div class="cp-lane">';
+      for (let q = 1; q < 16; q++) h += '<i class="cp-tick' + (q % 4 === 0 ? ' cp-beat' : '') + '" style="left:' + (q / 16 * 100) + '%"></i>';
+      b.forEach((e, ei) => { h += '<span class="cp-blk' + (e[0] ? '' : ' cp-rest') + '" data-k="' + bi + '-' + ei + '" style="left:' + (e[1] / 4 * 100) + '%;width:' + (e[2] / 4 * 100) + '%"' + (e[0] ? '>' + cpChord(e[0]) : ' title="' + T.rest + '" aria-label="' + T.rest + '">—') + '</span>'; });
+      h += '<i class="cp-head" data-a="head"></i></div></div>';
+    });
+    h += '</div><b class="ej-h">' + T.map + '</b><div class="cp-map">' + chords.map((c) => '<div class="cp-mc" data-c="' + c + '"><b>' + cpChord(c) + '</b><small>' + V[c].map(noteName).join(' · ') + '</small>' + kb(V[c], true) + '</div>').join('') + '</div>'
+      + '<div class="pt-note"><p class="pt-p">' + T.note + '</p></div></div>';
+    root.innerHTML = h;
+  };
+  const show = (c) => {
+    const V = CP_VOI[st.pos][st.sec];
+    root.querySelector('[data-a="now"]').textContent = cpChord(c);
+    root.querySelector('[data-a="hands"]').textContent = T.rh + ': ' + V[c].map(noteName).join(' · ') + ' — ' + T.lh + ': ' + noteName(CP_BASS[c]);
+    root.querySelectorAll('[data-a="kb"] [data-m]').forEach((k) => k.setAttribute('data-on', String(V[c].indexOf(+k.getAttribute('data-m')) >= 0)));
+    root.querySelectorAll('.cp-mc').forEach((e) => e.setAttribute('data-on', String(e.getAttribute('data-c') === c)));
+  };
+  const stop = () => {
+    st.playing = false; clearInterval(root._cpT); (root._cpTm || []).forEach(clearTimeout); root._cpTm = [];
+    root.querySelectorAll('.cp-blk').forEach((e) => e.setAttribute('data-on', 'false'));
+    root.querySelectorAll('[data-a="head"]').forEach((e) => { e.style.display = 'none'; });
+    const b = root.querySelector('[data-a="play"]'); if (b) b.textContent = '▶ ' + T.listen;
+  };
+  const play = () => {
+    const ac = pAudio(); if (!ac) return;
+    try { pUnlock(); } catch (e) {}
+    stop(); st.playing = true;
+    root.querySelector('[data-a="play"]').textContent = '■ ' + T.stop;
+    const S = CP_SECS[st.sec], V = CP_VOI[st.pos][st.sec], spb = 60 / st.bpm, t0 = ac.currentTime + 0.15;
+    root._cpTm = [];
+    let total = 0;
+    for (let r = 0; r < S.reps; r++) S.bars.forEach((b, bi) => {
+      const barAt = t0 + (r * S.bars.length + bi) * 4 * spb;
+      b.forEach((e, ei) => {
+        if (!e[0]) return;
+        const at = barAt + e[1] * spb, dur = e[2] * spb * 0.95;
+        V[e[0]].forEach((m) => cpTone(ac, m, at, dur, 0.12));
+        cpTone(ac, CP_BASS[e[0]], at, dur, 0.16);
+        const ms = (at - ac.currentTime) * 1000;
+        root._cpTm.push(setTimeout(() => {
+          if (!root.isConnected) return stop();
+          root.querySelectorAll('.cp-blk').forEach((x) => x.setAttribute('data-on', String(x.getAttribute('data-k') === bi + '-' + ei)));
+          show(e[0]);
+        }, ms));
+      });
+      total = Math.max(total, (r * S.bars.length + bi + 1) * 4 * spb);
+    });
+    // a playhead runs through the bar that is sounding
+    const heads = root.querySelectorAll('[data-a="head"]');
+    root._cpT = setInterval(() => {
+      if (!root.isConnected) return stop();
+      const el = ac.currentTime - t0; if (el < 0) return;
+      if (el >= total) return stop();
+      const bt = el / spb, barN = Math.floor(bt / 4) % S.bars.length;
+      heads.forEach((hd, i) => { hd.style.display = i === barN ? 'block' : 'none'; if (i === barN) hd.style.left = ((bt % 4) / 4 * 100) + '%'; });
+    }, 30);
+  };
+  paint();
+  root.onclick = (e) => {
+    const b = e.target.closest && e.target.closest('button'); if (!b) return;
+    if (b.hasAttribute('data-sec')) { stop(); st.sec = b.getAttribute('data-sec'); paint(); }
+    else if (b.hasAttribute('data-pos')) { stop(); st.pos = b.getAttribute('data-pos'); paint(); }
+    else if (b.hasAttribute('data-b')) { st.bpm = Math.max(50, Math.min(130, st.bpm + +b.getAttribute('data-b'))); const was = st.playing; stop(); paint(); if (was) play(); }
+    else if (b.getAttribute('data-a') === 'play') { if (st.playing) stop(); else play(); }
+  };
+}
+// ===== fin Celebration al piano =====
 function songSheet(n) {
   return (DCLogic) => {
     class Component extends DCLogic {
@@ -4029,9 +4204,13 @@ function songSheet(n) {
         h += '<h3 class="bt-h3">' + (es ? 'Qué vas a aprender' : 'What you will learn') + '</h3><p class="pt-p">' + v(S.learn) + '</p>';
         if (S.link) h += '<a class="cf-link" href="#/' + S.link + '">' + (es ? 'Practicar el ritmo →' : 'Practice the rhythm →') + '</a>';
         if (S.check) h += '<div class="pt-note"><p class="pt-p">' + v(S.check) + '</p></div>';
+        // Celebration also has its piano exercise
+        if (S.n === 5) h += '<div id="cp-root" data-own-theme=""></div>';
         h += '<div class="cf-soon">' + (es ? 'Versión de referencia, acordes, mano derecha e improvisación: próximamente.' : 'Reference version, chords, picking hand and improvisation: coming soon.') + '</div>';
         h += '<p class="pt-foot">' + (es ? 'Tempo y tonalidad aproximados de la grabación original.' : 'Approximate tempo and key of the original recording.') + '</p>';
         root.innerHTML = h;
+        const cp = document.getElementById('cp-root');
+        if (cp) celebPiano(cp, es);
       }
       renderVals() {
         const lang = this.state.lang, es = lang === 'es', S = SONG_SHEETS.find((x) => x.n === n);
