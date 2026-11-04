@@ -3784,7 +3784,9 @@ if (id == null) return;
 const was = this._playing;
 this.halt();
 if (was === id) { this.paintBtns(); return; }
-try { const AC = window.AudioContext || window.webkitAudioContext; if (!this._ac) this._ac = new AC(); if (this._ac.state === 'suspended') this._ac.resume(); } catch (er) { return; }
+// clicks and guitar notes share one audio clock (the app's), so every note sounds at its own time instead of all at once at the start
+this._ac = pAudio(); if (!this._ac) return;
+try { pUnlock(); } catch (er) {}
 const r = id === 'song' ? this._cfg.entry.song : this._cfg.entry.rows[+id];
 const card = root.querySelector('[data-card="' + id + '"]');
 const ns = Array.prototype.slice.call(card.querySelectorAll('.ep-n'));
@@ -3793,17 +3795,13 @@ this._playing = id;
 const nb = r.slots.length, per = nb / 4, step = spb / per;
 for (let rep = 0; rep < 2; rep++) for (let s = 0; s < 2 * nb; s++) {
 const at = t0 + (rep * 2 * nb + s) * step, i = s % nb;
-if (i % per === 0) this.click(at, i === 0 ? 0.16 : 0.08, i === 0 ? 1500 : 1000);
+// soft and even: the same quiet click on every beat and the same guitar note, at the same volume, for every note
+if (i % per === 0) this.click(at, 0.04, 1000);
 if (r.slots[i] === 'n') {
 const accd = r.acc.indexOf(i) >= 0;
-if (id === 'song') {
-// La♭ and its octave on the accents; the other sixteenths are muted scratches
-if (accd) { (r.notes || []).forEach((m) => { try { const so = pluck(m, at); if (so) this._os.push(so); } catch (er) {} }); }
-else this.click(at, 0.05, 700);
-} else {
-if (typeof pluck === 'function') { try { const so = pluck(accd ? 57 : 45, at); if (so) this._os.push(so); } catch (er) {} }
-if (accd) this.click(at, 0.22, 2200);
-}
+// the song example sounds La♭ with its octave only on its accents; the exercises sound every note
+const ms2 = id === 'song' ? (accd ? r.notes || [] : []) : [45];
+ms2.forEach((m) => { try { const so = pluck(m, at, 0.22); if (so) this._os.push(so); } catch (er) {} });
 }
 const el = ns[s], ms = (at - this._ac.currentTime) * 1000;
 this._tm.push(setTimeout(() => el.classList.add('rt-on'), ms));
@@ -7545,7 +7543,9 @@ play(id, evs, beats, reps) {
 const was = this._playing;
 this.halt();
 if (was === id) { this.paintBtns(); return; }
-try { const AC = window.AudioContext || window.webkitAudioContext; if (!this._ac) this._ac = new AC(); if (this._ac.state === 'suspended') this._ac.resume(); } catch (e) { return; }
+// clicks and chord notes share one audio clock (the app's), so the chords sound in time instead of all together at the start
+this._ac = pAudio(); if (!this._ac) return;
+try { pUnlock(); } catch (e) {}
 const spb = 60 / this.state.bpm, t0 = this._ac.currentTime + 0.12;
 this._playing = id;
 for (let r = 0; r < reps; r++) {
@@ -18644,12 +18644,12 @@ function pluckBuf(ac, midi) {
   for (let i = 0; i < fade; i++) d[len - 1 - i] *= i / fade;
   return (pBuf[midi] = b);
 }
-function pluck(midi, when) {
+function pluck(midi, when, vol) {
   const ac = pAudio();
   if (!ac) return null;
   const s = ac.createBufferSource(), g = ac.createGain();
   s.buffer = pluckBuf(ac, midi);
-  g.gain.value = 0.55;
+  g.gain.value = vol == null ? 0.55 : vol;
   s.connect(g); g.connect(ac.destination);
   s.start(when || 0);
   return s;
