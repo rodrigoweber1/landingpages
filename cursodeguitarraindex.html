@@ -678,6 +678,47 @@ body.dark #sl-root .sl-now{box-shadow:inset 0 0 0 1px #3A362C}
 #sl-root .sl-cur .sl-mark{margin-left:52px}
 }
 @media (prefers-reduced-motion:reduce){#sl-root .sl-pop{animation:none}#sl-root .sl-fill,#sl-root .sl-chev,#sl-root .sl-row,#sl-root .sl-mark{transition:none}#sl-root .sl-mark:active,#sl-root .sl-row:active{transform:none}}
+/* ruta: escritorio = menú lateral + tarjeta del paso actual; móvil = la lista */
+#sl-root .sl-nowcard{position:relative;display:flex;flex-direction:column;gap:6px;margin-top:22px;padding:22px 20px 18px;border-radius:16px;background:var(--sl-dark);color:var(--sl-darkInk)}
+body.dark #sl-root .sl-nowcard{box-shadow:inset 0 0 0 1px #3A362C}
+#sl-root .sl-nc-note{font:400 22px/1 'Permanent Marker',cursive;color:var(--sl-red);transform:rotate(-4deg);width:fit-content}
+#sl-root .sl-nc-m{font-size:13px;line-height:18px;color:var(--sl-darkMute)}
+#sl-root .sl-nc-t{display:flex;align-items:baseline;gap:10px;font:400 30px/1.1 'Archivo Black',sans-serif!important;color:#FFFFFF!important;text-decoration:none}
+#sl-root .sl-nc-n{font:400 30px/1 'Archivo Black',sans-serif;color:transparent;-webkit-text-stroke:1.5px var(--sl-red)}
+#sl-root .sl-nc-b{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+#sl-root .sl-nc-open{display:inline-flex;align-items:center;height:36px;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,0.3);color:#FFFFFF;font-size:13px;font-weight:700;text-decoration:none}
+@media (hover:hover){#sl-root .sl-nc-open:hover{background:rgba(255,255,255,0.1)}}
+#sl-root .sl-nc-side{font-size:12px;line-height:16px;color:var(--sl-darkMute)}
+#sl-root .sl-nowcard a:focus-visible,#sl-root .sl-nowcard button:focus-visible{outline-color:#FFFFFF}
+@media (min-width:900px){#sl-root .sl-list{display:none}#sl-root .sl-foot{display:none}}
+@media (max-width:899px){#sl-root .sl-nowcard{display:none}}
+/* menú lateral de la Ruta con aire de setlist */
+#side.sd-sl .sd-nav details{border-top:1px dashed #DDD7CC}
+#side.sd-sl .sd-nav summary{gap:10px;padding:12px 8px}
+#side.sd-sl .sd-nav summary .n{width:auto;min-width:36px;height:auto;border-radius:0;background:none!important;color:transparent!important;-webkit-text-stroke:1.2px #131209;font:400 22px/1 'Archivo Black',sans-serif;letter-spacing:-0.03em;justify-content:flex-start}
+#side.sd-sl .sd-nav summary .t{font:400 13px/1.25 'Archivo Black',sans-serif;text-transform:uppercase;letter-spacing:0.01em;color:#131209}
+#side.sd-sl .sd-nav details.sd-mdone summary .n{color:#131209!important;-webkit-text-stroke:0}
+#side.sd-sl .sd-nav details.sd-mdone summary .t{color:#6B675E;text-decoration:line-through;text-decoration-color:#E31B23;text-decoration-thickness:3px}
+#side.sd-sl .sd-nav details.sd-mnow{margin:6px 0;border-top:0;border-radius:12px;background:#131209}
+#side.sd-sl .sd-nav details.sd-mnow + details{border-top:0}
+#side.sd-sl .sd-nav details.sd-mnow summary .n{-webkit-text-stroke:1.5px #E31B23}
+#side.sd-sl .sd-nav details.sd-mnow summary .t{color:#FFFFFF;text-decoration:none}
+#side.sd-sl .sd-nav details.sd-mnow .chev{stroke:#BDB6AA}
+#side.sd-sl .sd-nav details.sd-mnow a.it{color:#F2EDE4}
+#side.sd-sl .sd-nav details.sd-mnow a.it:hover{background:rgba(255,255,255,0.08)}
+#side.sd-sl .sd-nav details.sd-mnow a.it.on{background:rgba(227,27,35,0.24);color:#FFFFFF}
+#side.sd-sl .sd-nav details.sd-mnow a.it .sn{color:#FF6B70}
+#side.sd-sl .sd-nav details.sd-mnow a.it.dn{color:#BDB6AA}
+#side.sd-sl .sd-nav a.it.dn{color:#6B675E}
+#side.sd-sl .sd-nav a.it.dn::after{content:'✓';float:right;margin-left:6px;color:#E31B23;font-weight:700}
+body.dark #side.sd-sl .sd-nav details{border-top-color:#34312A}
+body.dark #side.sd-sl .sd-nav summary .n{-webkit-text-stroke-color:#F2EDE4}
+body.dark #side.sd-sl .sd-nav summary .t{color:#F2EDE4}
+body.dark #side.sd-sl .sd-nav details.sd-mdone summary .n{color:#F2EDE4!important}
+body.dark #side.sd-sl .sd-nav details.sd-mdone summary .t{color:#A39C8F}
+body.dark #side.sd-sl .sd-nav details.sd-mnow{background:#0B0A05;box-shadow:inset 0 0 0 1px #3A362C}
+body.dark #side.sd-sl .sd-nav details.sd-mnow summary .n{-webkit-text-stroke-color:#E31B23}
+body.dark #side.sd-sl .sd-nav a.it.dn{color:#A39C8F}
 /* ===== fin La Ruta como setlist ===== */
 /* ===== The Sky Is Crying: bajo y double stops ===== */
 .sk-card{gap:10px}
@@ -4563,7 +4604,8 @@ function rutaSetlist(root, lang) {
     hint: 'Marca «Hecho» al terminar cada pantalla. Se guarda en este dispositivo.',
     mod: 'Módulo', done: 'Terminado', of: ' de ', screens: (n) => n + (n === 1 ? ' pantalla' : ' pantallas'),
     now: '¡Ahora!', mark: 'Hecho ✓', tag: 'Hecho', markAria: (l) => 'Marcar como hecho: ' + l, unAria: (l) => 'Quitar el hecho: ' + l,
-    foot: '¡Y al final, a tocar con la banda!'
+    foot: '¡Y al final, a tocar con la banda!',
+    open: 'Abrir', side: 'Tienes todos los módulos en el menú de la izquierda.', fin: '¡Ruta completa!'
   } : {
     eye: 'Path for rockers', h1a: 'Your ', h1b: 'setlist',
     sub: (n) => n + ' modules, like the songs in a gig. Play them in order or jump to the one you need.',
@@ -4571,7 +4613,8 @@ function rutaSetlist(root, lang) {
     hint: 'Tap «Done» when you finish each screen. It’s saved on this device.',
     mod: 'Module', done: 'Done', of: ' of ', screens: (n) => n + (n === 1 ? ' screen' : ' screens'),
     now: 'Now!', mark: 'Done ✓', tag: 'Done', markAria: (l) => 'Mark as done: ' + l, unAria: (l) => 'Mark as not done: ' + l,
-    foot: 'And then, play it with the band!'
+    foot: 'And then, play it with the band!',
+    open: 'Open', side: 'All the modules are in the menu on the left.', fin: 'Path complete!'
   };
   const mods = (NAV[lang] || NAV.es).mods;
   const total = mods.reduce((a, m) => a + m.steps.length, 0);
@@ -4591,7 +4634,18 @@ function rutaSetlist(root, lang) {
     let h = '<div class="sl-head"><h1 class="sl-h1">' + T.h1a + '<em>' + T.h1b + '</em></h1><p class="sl-sub">' + T.sub(mods.length) + '</p></div>'
       + '<div class="sl-neck" role="progressbar" aria-label="' + T.progAria + '" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + d + '"><div class="sl-fill" style="width:' + (d / total * 100) + '%"></div>' + neck + '</div>'
       + '<div class="sl-meta"><span>' + T.prog(d, total) + '</span><span>' + Math.round(d / total * 100) + ' %</span></div>'
-      + '<p class="sl-hint">' + T.hint + '</p><ol class="sl-list">';
+      + '<p class="sl-hint">' + T.hint + '</p>';
+    // desktop: the modules live in the side menu, so here only the screen you're on
+    const [cm, cs] = firstTodo(done);
+    if (cm < 0) h += '<div class="sl-nowcard"><span class="sl-nc-note">' + T.fin + '</span></div>';
+    else {
+      const s0 = mods[cm].steps[cs];
+      h += '<div class="sl-nowcard"><span class="sl-nc-note" aria-hidden="true">' + T.now + '</span><span class="sl-nc-m">' + T.mod + ' ' + (cm + 1) + ' · ' + esc(mods[cm].title) + '</span>'
+        + '<a class="sl-nc-t" href="#/' + esc(s0.href) + '"><span class="sl-nc-n">' + (cm + 1) + '.' + (cs + 1) + '</span>' + esc(s0.label) + '</a>'
+        + '<div class="sl-nc-b"><a class="sl-nc-open" href="#/' + esc(s0.href) + '">' + T.open + '</a><button type="button" class="sl-mark" data-h="' + esc(s0.href) + '" aria-label="' + esc(T.markAria(s0.label)) + '">' + T.mark + '</button></div>'
+        + '<small class="sl-nc-side">' + T.side + '</small></div>';
+    }
+    h += '<ol class="sl-list">';
     mods.forEach((m, i) => {
       const n = m.steps.length, dn = m.steps.filter((s) => done.has(s.href)).length;
       const kind = dn === n ? 'done' : i === ci ? 'now' : 'todo', open = st.open === i;
@@ -4630,7 +4684,8 @@ function rutaSetlist(root, lang) {
         if (mods[mi].steps.every((s) => done.has(s.href))) { st.stamp = 'm' + mi; st.open = firstTodo(done)[0]; }
       }
       paint();
-      const f = root.querySelector('.sl-steps .sl-mark') || root.querySelector('[data-m="' + mi + '"]'); if (f && f.focus) f.focus({ preventScroll: true });
+      try { sideKey = null; renderSide(currentName, lang); } catch (e2) {}
+      const f = Array.from(root.querySelectorAll('.sl-mark')).find((x) => x.offsetParent) || root.querySelector('[data-m="' + mi + '"]'); if (f && f.focus) f.focus({ preventScroll: true });
     } else if (b.hasAttribute('data-m')) {
       const i = +b.getAttribute('data-m'); st.open = st.open === i ? -1 : i; paint();
       const r = root.querySelector('[data-m="' + i + '"]'); if (r) r.focus({ preventScroll: true });
@@ -18677,9 +18732,14 @@ function renderSide(name, lang) {
   let h = '<div class="sd-head"><div class="sd-logo"><img src="' + URIS[0] + '" alt=""><span aria-label="You Rock Academy" role="img">' + LOGO_SVG + '</span></div><a class="home" href="#/Inicio">' + navIcon('Inicio', 16) + esc(L.home) + '</a>'
     + '<div class="sd-tabs" role="group"><a href="#/Main" class="' + (menu === 'ruta' && name !== 'Herramientas' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Main', 18) + esc(L.ruta) + '</a><a href="#/Cancionero" class="' + (menu === 'musica' && name !== 'Herramientas' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Cancionero', 18) + esc(L.musica) + '</a><a href="#/Herramientas" class="' + (name === 'Herramientas' || (toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Herramientas', 18) + (lang === 'en' ? 'Tools' : 'Herramientas') + '</a></div>'
     + '</div><div class="sd-nav">';
+  // Ruta menu: screens marked «Hecho» and the module you're in (or the next one to play) for the setlist look
+  const dn = menu === 'ruta' ? slDoneGet() : null;
+  let nowMod = curMod;
+  if (dn && nowMod < 0) nowMod = nav.mods.findIndex((m) => m.steps.some((s) => !dn.has(s.href)));
   nav.mods.forEach((m, i) => {
-    h += '<details data-i="' + i + '"' + (opens.has(i) ? ' open' : '') + '><summary><span class="n">' + (i + 1) + '</span><span>' + esc(m.title) + '</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>';
-    m.steps.forEach((st, si) => { const on = base(st.href) === name || (st.href === 'ArmoniaAv' && AV_SUBS.indexOf(name) >= 0); h += '<a class="it' + (on ? ' on' : '') + '" href="#/' + st.href + '"' + (on ? ' aria-current="page"' : '') + '>' + (menu === 'ruta' ? '<b class="sn">' + (i + 1) + '.' + (si + 1) + '</b> ' : '') + esc(st.label) + '</a>'; });
+    const mCls = dn ? ((m.steps.every((s) => dn.has(s.href)) ? 'sd-mdone' : '') + (i === nowMod ? ' sd-mnow' : '')).trim() : '';
+    h += '<details data-i="' + i + '"' + (mCls ? ' class="' + mCls + '"' : '') + (opens.has(i) ? ' open' : '') + '><summary><span class="n">' + (dn ? String(i + 1).padStart(2, '0') : (i + 1)) + '</span><span class="t">' + esc(m.title) + '</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>';
+    m.steps.forEach((st, si) => { const on = base(st.href) === name || (st.href === 'ArmoniaAv' && AV_SUBS.indexOf(name) >= 0); h += '<a class="it' + (on ? ' on' : '') + (dn && dn.has(st.href) ? ' dn' : '') + '" href="#/' + st.href + '"' + (on ? ' aria-current="page"' : '') + '>' + (menu === 'ruta' ? '<b class="sn">' + (i + 1) + '.' + (si + 1) + '</b> ' : '') + esc(st.label) + '</a>'; });
     h += '</details>';
   });
   h += '</div><div class="sd-foot">'
@@ -18692,6 +18752,7 @@ function renderSide(name, lang) {
   const oldIt = oldNav && oldNav.querySelector('a.it[href="#/' + name + '"]');
   const keepY = oldIt ? oldIt.getBoundingClientRect().top : null;
   sideEl.innerHTML = h;
+  sideEl.classList.toggle('sd-sl', menu === 'ruta');
   sideEl.querySelectorAll('details').forEach((d) => d.addEventListener('toggle', () => { const i = +d.getAttribute('data-i'); if (d.open) opens.add(i); else opens.delete(i); }));
   const navEl = sideEl.querySelector('.sd-nav');
   if (navEl && keepTop != null) navEl.scrollTop = keepTop;
