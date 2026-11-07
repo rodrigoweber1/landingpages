@@ -41,7 +41,7 @@ body{margin:0;background:#FFFFFF;overscroll-behavior-y:none}
 #stage{display:block}
 #app{width:390px;margin:0 auto;zoom:var(--z,1);background:#FFFFFF;min-height:var(--mh,100vh);box-shadow:0 0 0 1px #E2E8F0}
 @media (min-width:900px){
-body{display:grid;grid-template-columns:320px minmax(0,1fr);align-items:start}
+body{display:grid;grid-template-columns:360px minmax(0,1fr);align-items:start}
 #side{display:flex;flex-direction:column;position:sticky;top:0;height:100vh;box-sizing:border-box;background:#FFFFFF;border-right:1px solid #E2E8F0;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
 #stage{display:flex;justify-content:center;align-items:flex-start;padding:24px 0;box-sizing:border-box;min-width:0}
 #app{width:var(--aw,900px);zoom:1;margin:0;border-radius:14px;overflow:hidden;overflow:clip;box-shadow:0 1px 3px rgba(26,20,16,.12),0 8px 28px rgba(26,20,16,.10)}
@@ -1057,8 +1057,8 @@ body.stage #side.sd-sl .sd-nav details.sd-mnow + details{border-top:1px dashed #
 body.stage #side.sd-sl .sd-nav{padding:0 14px 72px}
 body.stage #side.sd-sl .sd-nav details,body.stage #side.sd-sl .sd-nav details.sd-mnow,body.stage #side.sd-sl .sd-nav details.sd-mnow + details{border-top:0!important;border-bottom:1px dashed var(--st-rule)!important}
 body.stage #side.sd-sl .sd-nav summary{display:grid!important;grid-template-columns:52px minmax(0,1fr) 22px;align-items:center;gap:10px;box-sizing:border-box;min-height:72px;padding:12px 2px}
-body.stage #side.sd-sl .sd-nav summary .n{width:auto!important;min-width:0!important;height:auto!important;display:block!important;font:400 34px/1 'Archivo Black',sans-serif!important;letter-spacing:-0.03em}
-body.stage #side.sd-sl .sd-nav summary .t{min-width:0;font:400 17px/1.15 'Archivo Black',sans-serif!important;text-transform:uppercase;color:var(--st-ink)!important}
+body.stage #side.sd-sl .sd-nav summary .n{width:auto!important;min-width:0!important;height:auto!important;display:block!important;font:400 34px/1 'Inter',system-ui,sans-serif!important;letter-spacing:-0.03em}
+body.stage #side.sd-sl .sd-nav summary .t{min-width:0;font:400 17px/1.15 'Archivo Black',sans-serif!important;letter-spacing:0!important;text-transform:uppercase;color:var(--st-ink)!important}
 body.stage #side.sd-sl .sd-nav summary .t .sm{display:block;margin-top:2px;font:400 13px/18px 'Inter',system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--st-mute)}
 /* the arrow points right like on the phone and turns down when the module is open */
 body.stage #side.sd-sl .sd-nav summary .chev{width:22px;height:22px;stroke:var(--st-mute)!important;transform:rotate(-90deg)}
@@ -1312,19 +1312,19 @@ body.stage #app .rs ~ .stg-grid .stg-ruta .stg-go{background:transparent!importa
 /* ===== one list style across the app, taken from the Ruta list: wide heavy title in caps, grey second line, dashed rules, outline numbers ===== */
 body.stage #app .stg-home .stg-grid{border-top:2px solid var(--st-ink)}
 body.stage #app .stg-row{border-top:0!important;border-bottom:1px dashed var(--st-rule)!important;padding:14px 4px!important}
-body.stage #app .stg-row h2{font:400 17px/1.15 'Archivo Black',sans-serif!important;text-transform:uppercase}
+body.stage #app .stg-row h2{font:400 17px/1.15 'Archivo Black',sans-serif!important;letter-spacing:0!important;text-transform:uppercase}
 body.stage #app .stg-row p{font-size:13px!important;line-height:18px!important;color:var(--st-mute)!important}
 body.stage #app .stg-soon{border-top:0!important;border-bottom:1px dashed var(--st-rule)!important}
 body.stage #app .stg-soon h2{font:400 17px/1.15 'Archivo Black',sans-serif!important;text-transform:uppercase;color:var(--st-mute)!important}
 body.stage #app .yl-list{display:block!important;margin-top:4px;border-top:2px solid var(--st-ink)}
 body.stage #app .yl-row{display:grid!important;grid-template-columns:minmax(0,1fr) 22px;align-items:center;gap:10px;box-sizing:border-box;min-height:72px;padding:12px 2px!important;border:0!important;border-bottom:1px dashed var(--st-rule)!important;border-radius:0!important;background:transparent!important;color:var(--st-ink)!important}
 body.stage #app .yl-row>span:not(.yl-num){min-width:0}
-body.stage #app .yl-row .yl-t{font:400 17px/1.15 'Archivo Black',sans-serif!important;text-transform:uppercase;color:var(--st-ink)!important}
+body.stage #app .yl-row .yl-t{font:400 17px/1.15 'Archivo Black',sans-serif!important;letter-spacing:0!important;text-transform:uppercase;color:var(--st-ink)!important}
 body.stage #app .yl-row .yl-s{font-size:13px!important;line-height:18px!important;color:var(--st-mute)!important}
 body.stage #app .yl-row .yl-e{font-size:12px!important;line-height:16px!important;color:var(--st-redInk)!important}
 body.stage #app .yl-row svg{width:22px!important;height:22px!important;stroke:var(--st-mute)!important}
 body.stage #app .yl-song{grid-template-columns:52px minmax(0,1fr) 22px}
-body.stage #app .yl-num{width:auto!important;height:auto!important;border-radius:0!important;background:transparent!important;font:400 34px/1 'Archivo Black',sans-serif!important;letter-spacing:-0.03em;color:transparent!important;-webkit-text-stroke:1.5px var(--st-ink);text-align:left!important}
+body.stage #app .yl-num{width:auto!important;height:auto!important;border-radius:0!important;background:transparent!important;font:400 34px/1 'Inter',system-ui,sans-serif!important;letter-spacing:-0.03em;color:transparent!important;-webkit-text-stroke:1.5px var(--st-ink);text-align:left!important}
 @media (hover:hover) and (pointer:fine){body.stage #app .yl-row:hover{background:rgba(255,255,255,.03)!important}}
 body.stage #app .stg-quiz .stg-q{line-height:1!important}
 body.stage #app .stg-stats{color:var(--st-mute)!important}
@@ -3319,7 +3319,7 @@ leftText: (s) => 'Quedan ' + s + ' s', countText: (n) => n + (n === 1 ? ' cambio
 tapLabel: 'Cambio limpio: +1', tapHelp: 'Pulsa solo cuando cambies de acorde y suenen limpias todas las cuerdas, sin perder el pulso. Sé sincero.',
 result: (n, b) => n + (n === 1 ? ' cambio limpio' : ' cambios limpios') + ' en 1 minuto a ' + b + ' BPM.',
 best: (n, b) => 'Tu mejor marca con este par: ' + n + ' (a ' + b + ' BPM).',
-drillNote: 'Los cambios los cuentas tú, así que esto sirve para compararte contigo mismo, no con otras personas.', stageBtn: 'Modo palco', stageExit: 'Salir', stageAria: 'Modo palco: práctica a pantalla completa', stageNext: 'Luego', stageKeys: 'Espacio: iniciar o parar · ↑ ↓: tempo · Esc: salir', stMinus: 'Bajar 5 BPM', stPlus: 'Subir 5 BPM', tkTitle: 'Ensayo hecho', tkTime: 'En el escenario', tkTop: 'Tempo más alto', tkSet: 'Repertorio', tkMore: 'Seguir aquí', tkAgain: 'Otra vez',
+drillNote: 'Los cambios los cuentas tú, así que esto sirve para compararte contigo mismo, no con otras personas.', stageBtn: 'Modo escenario', stageExit: 'Salir', stageAria: 'Modo escenario: práctica a pantalla completa', stageNext: 'Luego', stageKeys: 'Espacio: iniciar o parar · ↑ ↓: tempo · Esc: salir', stMinus: 'Bajar 5 BPM', stPlus: 'Subir 5 BPM', tkTitle: 'Ensayo hecho', tkTime: 'En el escenario', tkTop: 'Tempo más alto', tkSet: 'Repertorio', tkMore: 'Seguir aquí', tkAgain: 'Otra vez',
 tipsTitle: 'Cómo practicar los cambios',
 gen: [
 'Prepara el siguiente acorde antes de que acabe el que suena: mira hacia delante, no a la mano.',
@@ -19251,7 +19251,7 @@ function fit() {
     document.documentElement.style.setProperty('--aw', Math.min(640, vw - 144) + 'px');
   } else if (vw >= DESK) {
     z = 1;
-    const sw = document.body.classList.contains('home') ? 0 : 320;
+    const sw = document.body.classList.contains('home') ? 0 : 360;
     const aw = Math.max(520, Math.min(920, vw - sw - 48));
     document.documentElement.style.setProperty('--aw', aw + 'px');
     mh = vh - 48;
@@ -20991,8 +20991,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '7 nov 2026 · 19:05';
-  var BUILD_ID = '2026-11-07T19:05';
+  var BUILD = '7 nov 2026 · 19:30';
+  var BUILD_ID = '2026-11-07T19:30';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
