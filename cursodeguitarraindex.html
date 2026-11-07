@@ -20911,6 +20911,22 @@ try { route(); } catch (e) { fail(e); }
     });
     bar.appendChild(g);
   }
+  // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
+  var BUILD = '7 nov 2026 · 16:20';
+  function stamp(onHome) {
+    var el = document.getElementById('yr-ver');
+    if (!onHome) { if (el) el.remove(); return; }
+    var root = document.querySelector('.stg-home');
+    if (!root) return;
+    if (!el || el.parentElement !== root) {
+      if (el) el.remove();
+      el = document.createElement('p');
+      el.id = 'yr-ver';
+      el.style.cssText = 'margin:4px 0 88px;font:400 12px/16px Inter,system-ui,sans-serif;text-align:center;opacity:.55';
+      root.appendChild(el);
+    }
+    el.textContent = (document.documentElement.lang === 'en' ? 'Version ' : 'Versión ') + BUILD;
+  }
   function update() {
     ticking = false;
     var p = realParts();
@@ -20919,6 +20935,7 @@ try { route(); } catch (e) { fail(e); }
       on = true;
       build(p);
     }
+    stamp(on);
     if (bar) { bar.setAttribute('data-on', on ? 'true' : 'false'); if (!on) bar.setAttribute('aria-hidden', 'true'); else bar.removeAttribute('aria-hidden'); }
   }
   function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
