@@ -20873,6 +20873,9 @@ try { route(); } catch (e) { fail(e); }
 #yr-mini .ym-lang button{min-width:44px;height:36px;border:0;border-radius:8px;background:transparent;color:#BDB6AA;font:700 13px 'Inter',system-ui,sans-serif;cursor:pointer}
 #yr-mini .ym-lang button[aria-pressed="true"]{background:#3A1E20;color:#F4EEE6;box-shadow:inset 0 -2px 0 #E31B23}
 #yr-mini{transition:none}
+#yr-upd{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 92px);z-index:95;display:flex;align-items:center;justify-content:space-between;gap:12px;box-sizing:border-box;padding:10px 10px 10px 16px;border-radius:14px;background:#E31B23;color:#FFFFFF;font:600 14px/20px 'Inter',system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45)}
+#yr-upd button{flex:none;min-height:44px;padding:0 18px;border:0;border-radius:10px;background:#FFFFFF;color:#B3121A;font:700 14px/20px 'Inter',system-ui,sans-serif;cursor:pointer}
+@media (min-width:900px){#yr-upd{left:auto;right:24px;bottom:24px;width:380px}}
 @media (max-width:899px){body.stage #app .stg-home{padding-top:calc(env(safe-area-inset-top) + 53px + 20px)!important}body.stage #app .stg-home>header>.thm-wrap,body.stage #app .stg-home>header>div:nth-child(2){display:none!important}}
 @media (min-width:900px){#yr-mini{display:none}}
 @media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
@@ -20912,7 +20915,22 @@ try { route(); } catch (e) { fail(e); }
     bar.appendChild(g);
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
-  var BUILD = '7 nov 2026 · 16:20';
+  // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
+  var BUILD = '7 nov 2026 · 16:45';
+  var BUILD_ID = '2026-11-07T16:45';
+  function checkNew() {
+    try {
+      fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+        if (!j || !j.build || j.build === BUILD_ID || document.getElementById('yr-upd')) return;
+        var es = document.documentElement.lang !== 'en';
+        var d = document.createElement('div');
+        d.id = 'yr-upd'; d.setAttribute('role', 'status');
+        d.innerHTML = '<span>' + (es ? 'Hay una versión nueva de la app.' : 'There’s a new version of the app.') + '</span><button type="button">' + (es ? 'Actualizar' : 'Update') + '</button>';
+        d.querySelector('button').addEventListener('click', function () { location.replace(location.pathname + '?v=' + encodeURIComponent(j.build) + (location.hash || '')); });
+        document.body.appendChild(d);
+      }).catch(function () {});
+    } catch (e) {}
+  }
   function stamp(onHome) {
     var el = document.getElementById('yr-ver');
     if (!onHome) { if (el) el.remove(); return; }
@@ -20945,6 +20963,8 @@ try { route(); } catch (e) { fail(e); }
   var appEl = document.getElementById('app');
   if (appEl && window.MutationObserver) new MutationObserver(req).observe(appEl, { childList: true });
   req(); setTimeout(req, 300); setTimeout(req, 1200);
+  checkNew();
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') checkNew(); });
 })();
 </script>
 </body>
