@@ -944,13 +944,17 @@ body.dark .ej-spd-menu button[aria-selected="true"]{background:#3A1E20;color:#FF
 .cs-meta{font-size:13px;line-height:18px;color:#475569}
 .cs-lbl{display:block;font-size:12px;line-height:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;margin-bottom:2px}
 .cs-tabwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-.cs-tab{display:flex;width:max-content;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
-.cs-tc{display:flex;flex-direction:column;align-items:stretch;min-width:28px;border-radius:4px;transition:background-color .1s}
+.cs-tab{display:flex;width:max-content;max-width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
+.cs-tc{display:flex;flex-direction:column;align-items:stretch;flex:0 1 30px;min-width:0;border-radius:4px;transition:background-color .1s}
+/* a tab never scrolls sideways: its columns share the width of the card (a long riff just gets tighter columns) */
+.cs-tc.cs-names{flex:0 0 auto}.cs-tc.cs-sep{flex:0 1 10px}
+.cs-tc .cs-s b{padding:0 1px;font-size:13px}
+@media(max-width:899px){.cs-tab{font-size:12px}.cs-tc .cs-s b{font-size:12px;padding:0}}
+.cs-tc .cs-top{display:flex;justify-content:center;overflow:visible}
 .cs-tc .cs-top{height:18px;font:700 12px/18px 'Inter',sans-serif;color:#B3121A;text-align:center;white-space:nowrap}
 .cs-tc .cs-s{height:20px;display:flex;align-items:center;justify-content:center;background:linear-gradient(#CBD5E1,#CBD5E1) center/100% 1px no-repeat}
 .cs-tc .cs-s b{background:#FFFFFF;padding:0 2px;line-height:1;font-weight:700;color:#0F172A}
 .cs-tc.cs-names .cs-s{background:none;color:#64748B;font-weight:700;min-width:16px}
-.cs-tc.cs-sep{min-width:10px}
 .cs-tc.cs-sep .cs-s{background:linear-gradient(#CBD5E1,#CBD5E1) center/1px 100% no-repeat}
 .cs-tc.cs-on,.cs-tc.cs-on .cs-s b{background:#FFE9E9}
 .cs-tc.cs-on .cs-s b{color:#B3121A}
@@ -16406,12 +16410,13 @@ const notes = [];
 HC_ARP.forEach((c, ci) => HC_PAT.forEach((q, k) => { const s = q === 'b' ? c[2] : q; notes.push({ ci, k, s, f: c[1][s], lab: k === 0 ? c[0] : '' }); }));
 const y = (s) => 26 + s * 14;
 let h = '';
-for (let r = 0; r < 4; r++) {
-const W = 44 + 17 * 26;
+const per = window.innerWidth < 900 ? 1 : 2; // a phone shows one bar per line, so the tab never scrolls sideways
+for (let r = 0; r < 8 / per; r++) {
+const W = 44 + (per === 2 ? 17 : 8) * 26 + (per === 2 ? 0 : -14);
 h += '<svg class="rf-tab" data-nk="" viewBox="0 0 ' + W + ' 116" style="max-width:' + Math.round(W * 1.3) + 'px" role="img" aria-label="Tab">';
 ['e', 'B', 'G', 'D', 'A', 'E'].forEach((n, s) => { h += '<line class="rf-line" x1="22" y1="' + y(s) + '" x2="' + (W - 4) + '" y2="' + y(s) + '"/><text class="rf-sn" x="10" y="' + (y(s) + 4) + '" text-anchor="middle">' + n + '</text>'; });
 h += '<line class="rf-line" x1="22" y1="' + y(0) + '" x2="22" y2="' + y(5) + '" stroke-width="2"/>';
-[r * 2, r * 2 + 1].forEach((bar, bi) => {
+(per === 2 ? [r * 2, r * 2 + 1] : [r]).forEach((bar, bi) => {
 const x0 = 40 + bi * 8 * 26 + bi * 14;
 h += '<rect class="hc-lp" data-bar="' + (bar + 1) + '" x="' + (x0 - 12) + '" y="1" width="' + (8 * 26 + 4) + '" height="104" rx="4" fill="#FFE08A" fill-opacity="0.45" opacity="0"/>';
 notes.filter((n) => n.ci === bar).forEach((n) => {
@@ -21143,8 +21148,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '7 nov 2026 · 22:50';
-  var BUILD_ID = '2026-11-07T22:50';
+  var BUILD = '7 nov 2026 · 23:10';
+  var BUILD_ID = '2026-11-07T23:10';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
