@@ -8034,6 +8034,9 @@ this.tPaint({ idx, cents: cents(tf[idx]), hz: fm, tgt: tf[idx] });
 
 tHalt() {
 if (this._ti) { clearInterval(this._ti); this._ti = 0; }
+try { if (this._an) this._an.disconnect(); } catch (e) {}
+try { if (this._mute) this._mute.disconnect(); } catch (e) {}
+this._mute = null;
 try { if (this._src) this._src.disconnect(); } catch (e) {}
 try { if (this._st) this._st.getTracks().forEach((x) => x.stop()); } catch (e) {}
 this._src = null; this._st = null; this._an = null; this._hist = [];
@@ -8051,19 +8054,29 @@ if (!md || !md.getUserMedia) { this.setState({ tErr: 'nosup' }); return; }
 try {
 const AC0 = window.AudioContext || window.webkitAudioContext;
 if (AC0 && !this._ac) this._ac = new AC0();
-if (this._ac && this._ac.state === 'suspended' && this._ac.resume) this._ac.resume();
+if (this._ac && this._ac.state !== 'running' && this._ac.resume) this._ac.resume();
 } catch (e) {}
-md.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } }).then((stream) => {
+const ask = (c) => md.getUserMedia(c);
+// Safari can refuse the fine-tuned constraints: if the failure is not about permission, retry with the plain request
+ask({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } }).catch((e) => {
+if (e && /^(OverconstrainedError|ConstraintNotSatisfiedError|TypeError|AbortError)$/.test(e.name)) return ask({ audio: true });
+throw e;
+}).then((stream) => {
 try {
 const AC = window.AudioContext || window.webkitAudioContext;
 if (!this._ac) this._ac = new AC();
 const ac = this._ac;
-if (ac.state === 'suspended' && ac.resume) ac.resume();
+if (ac.state !== 'running' && ac.resume) ac.resume();
 const src = ac.createMediaStreamSource(stream);
 const an = ac.createAnalyser();
 an.fftSize = 4096;
 an.smoothingTimeConstant = 0;
 src.connect(an);
+// Safari only pulls audio through a graph that reaches the output: a silent path keeps the analyser fed
+const mute = ac.createGain();
+mute.gain.value = 0;
+an.connect(mute); mute.connect(ac.destination);
+this._mute = mute;
 this._st = stream; this._src = src; this._an = an; this._buf = new Float32Array(an.fftSize); this._hist = [];
 this._ti = setInterval(() => this.tTick(), 70);
 this.setState({ tOn: true, tErr: '' });
@@ -8072,7 +8085,16 @@ try { stream.getTracks().forEach((x) => x.stop()); } catch (x) {}
 this.setState({ tErr: 'fail' });
 }
 }).catch((e) => {
-this.setState({ tErr: e && (e.name === 'NotAllowedError' || e.name === 'SecurityError' || e.name === 'PermissionDeniedError') ? 'denied' : 'fail' });
+const denied = e && (e.name === 'NotAllowedError' || e.name === 'SecurityError' || e.name === 'PermissionDeniedError');
+if (!denied) { this.setState({ tErr: 'fail' }); return; }
+// blocked in the settings ('denied') or the person tapped "Don't allow" on the prompt ('ask'): each one needs a different tip
+try {
+if (navigator.permissions && navigator.permissions.query) {
+navigator.permissions.query({ name: 'microphone' }).then((p) => this.setState({ tErr: p && p.state === 'prompt' ? 'ask' : 'denied' }), () => this.setState({ tErr: 'denied' }));
+return;
+}
+} catch (x) {}
+this.setState({ tErr: 'denied' });
 });
 }
 
@@ -8090,6 +8112,8 @@ const D = {
   "tnErrNosup": "Este navegador no deja usar el micrófono aquí. Abre la app desde una dirección https:// (por ejemplo, GitHub Pages) o con un navegador actualizado.",
   "tnErrDenied": "No hay permiso para el micrófono. Actívalo para este sitio en los ajustes del navegador y vuelve a pulsar el botón.",
   "tnErrFail": "No he podido acceder al micrófono. Comprueba que está conectado y que no lo está usando otra app.",
+  "tnErrDeniedIos": "El micrófono está bloqueado para este sitio. En el iPhone: toca «aA» en la barra de Safari, luego «Ajustes del sitio web» y pon Micrófono en «Permitir». Si no lo ves ahí, mira en Ajustes › Apps › Safari › Micrófono. Después vuelve aquí y pulsa el botón.",
+  "tnErrAsk": "No se ha activado el micrófono. Cuando el navegador te pregunte, pulsa «Permitir». Si no te sale la pregunta, recarga la página y prueba otra vez.",
   "tnStringWord": "cuerda",
   "vidTitle": "Vídeo: afinar con el método del traste 5", "vidSoon": "Aquí irá el vídeo de afinación", "vidAria": "Espacio reservado para el vídeo sobre cómo afinar",
   "tnQuiet": "No oigo nada. Acerca el micrófono a la guitarra, toca más fuerte y comprueba que el navegador usa el micrófono correcto (la barra de arriba tiene que moverse al tocar).",
@@ -8135,6 +8159,8 @@ const D = {
   "tnErrNosup": "This browser won’t let you use the microphone here. Open the app from an https:// address (for example, GitHub Pages) or in an up-to-date browser.",
   "tnErrDenied": "No microphone permission. Allow it for this site in the browser settings and press the button again.",
   "tnErrFail": "I couldn’t access the microphone. Check that it’s plugged in and that no other app is using it.",
+  "tnErrDeniedIos": "The microphone is blocked for this site. On iPhone: tap “aA” in Safari’s address bar, then “Website Settings” and set Microphone to “Allow”. If it’s not there, check Settings › Apps › Safari › Microphone. Then come back here and press the button.",
+  "tnErrAsk": "The microphone didn’t turn on. When the browser asks, tap “Allow”. If the question doesn’t show up, reload the page and try again.",
   "tnStringWord": "string",
   "vidTitle": "Video: tuning with the 5th-fret method", "vidSoon": "The tuning video will go here", "vidAria": "Space reserved for the video on how to tune",
   "tnQuiet": "I can’t hear anything. Bring the mic closer to the guitar, play louder and check that the browser is using the right microphone (the bar above should move when you play).",
@@ -8222,7 +8248,7 @@ const AFIN_VIDEO = '';
 const vidFile = /\.(mp4|webm|mov)(\?.*)?$/i.test(AFIN_VIDEO);
 const tErr = this.state.tErr;
 const tOn = this.state.tOn;
-const out = { vidEmpty: !AFIN_VIDEO, vidFile: !!AFIN_VIDEO && vidFile, vidEmbed: !!AFIN_VIDEO && !vidFile, vidSrc: AFIN_VIDEO, tuns, tunDesc, sChips, rows, pegs, mrows, methodNote, tChips, tOn, tBtn: tOn ? t.tnStop : t.tnStart, tBtnBg: tOn ? '#121212' : '#E31B23', tToggle: () => this.tToggle(), tHasErr: !!tErr, tErrTxt: tErr === 'nosup' ? t.tnErrNosup : (tErr === 'denied' ? t.tnErrDenied : t.tnErrFail) };
+const out = { vidEmpty: !AFIN_VIDEO, vidFile: !!AFIN_VIDEO && vidFile, vidEmbed: !!AFIN_VIDEO && !vidFile, vidSrc: AFIN_VIDEO, tuns, tunDesc, sChips, rows, pegs, mrows, methodNote, tChips, tOn, tBtn: tOn ? t.tnStop : t.tnStart, tBtnBg: tOn ? '#121212' : '#E31B23', tToggle: () => this.tToggle(), tHasErr: !!tErr, tErrTxt: tErr === 'nosup' ? t.tnErrNosup : (tErr === 'denied' ? (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ? t.tnErrDeniedIos : t.tnErrDenied) : (tErr === 'ask' ? t.tnErrAsk : t.tnErrFail)) };
 
 const langs = ['es', 'en'].map((l) => {
 const on = lang === l;
