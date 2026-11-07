@@ -20752,6 +20752,8 @@ try { route(); } catch (e) { fail(e); }
 #yr-mini .ym-lang{display:flex;gap:2px;padding:2px;border-radius:10px;background:#221B17}
 #yr-mini .ym-lang button{min-width:44px;height:36px;border:0;border-radius:8px;background:transparent;color:#BDB6AA;font:700 13px 'Inter',system-ui,sans-serif;cursor:pointer}
 #yr-mini .ym-lang button[aria-pressed="true"]{background:#3A1E20;color:#F4EEE6;box-shadow:inset 0 -2px 0 #E31B23}
+#yr-mini{transition:none}
+@media (max-width:899px){body.stage #app .stg-home{padding-top:calc(env(safe-area-inset-top) + 53px + 20px)!important}body.stage #app .stg-home>header>.thm-wrap,body.stage #app .stg-home>header>div:nth-child(2){display:none!important}}
 @media (min-width:900px){#yr-mini{display:none}}
 @media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
 </style>
@@ -20794,9 +20796,8 @@ try { route(); } catch (e) { fail(e); }
     var p = realParts();
     var on = false;
     if (p && /^#\/?Inicio\/?(\?.*)?$/.test(location.hash || '#/Inicio') || (p && !location.hash)) {
-      var r = p.h.getBoundingClientRect();
-      on = r.bottom < 40;
-      if (on) build(p);
+      on = true;
+      build(p);
     }
     if (bar) { bar.setAttribute('data-on', on ? 'true' : 'false'); if (!on) bar.setAttribute('aria-hidden', 'true'); else bar.removeAttribute('aria-hidden'); }
   }
@@ -20806,6 +20807,7 @@ try { route(); } catch (e) { fail(e); }
   window.addEventListener('hashchange', function () { setTimeout(update, 60); });
   var appEl = document.getElementById('app');
   if (appEl && window.MutationObserver) new MutationObserver(req).observe(appEl, { childList: true });
+  req(); setTimeout(req, 300); setTimeout(req, 1200);
 })();
 </script>
 </body>
