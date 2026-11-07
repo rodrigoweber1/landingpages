@@ -4576,16 +4576,21 @@ o.connect(g); g.connect(ac.destination); o.start(at); o.stop(at + 0.07);
 // nums: count the sixteenths 1–16 instead of «1 e y a»
 row(slots, acc, first, label, nums) {
 const n = slots.length, per = n / 4, six = n === 16;
-const g = 8, yT = 30, yA = yT + 2.5 * g, W = 660, x0 = first ? 92 : 58, barW = (W - x0 - 10) / 2, sw = barW / n;
+const stack = typeof window !== 'undefined' && window.innerWidth < 900; // narrow screens: one bar per line, so nothing has to scroll sideways
+const g = 8, yT = 30, yA = yT + 2.5 * g, W = stack ? 340 : 660, x0 = first ? 92 : 58, barW = stack ? (W - 92 - 10) : (W - x0 - 10) / 2, sw = barW / n;
 const hr = six ? 4.4 : 5.4, vr = six ? 3.3 : 3.9;
 const cnt8 = ['1', '&', '2', '&', '3', '&', '4', '&'];
 const sub16 = this._cfg && this._cfg.t.sub16 || ['e', '&', 'a'];
-let h = '<svg class="ep-svg" viewBox="0 0 ' + W + ' 150" role="img" aria-label="' + label + '">';
+let h = '<svg class="ep-svg" viewBox="0 0 ' + W + ' ' + (stack ? 300 : 150) + '" role="img" aria-label="' + label + '">';
+const system = (ts) => {
 for (let i = 0; i < 5; i++) h += '<line class="pt-line" x1="6" y1="' + (yT + i * g) + '" x2="' + (W - 6) + '" y2="' + (yT + i * g) + '" stroke="#8A8A8A" stroke-width="1"/>';
 h += '<path class="pt-ink" transform="translate(12 ' + (yT + 4 * g + 1.4) + ') scale(0.0497 -0.0497) translate(-120 0)" d="' + CR_CLEF + '"/>';
-if (first) h += '<text class="rt-ts" x="66" y="' + (yT + 14) + '" text-anchor="middle" style="font-size:17px">4</text><text class="rt-ts" x="66" y="' + (yT + 30) + '" text-anchor="middle" style="font-size:17px">4</text>';
+if (ts) h += '<text class="rt-ts" x="66" y="' + (yT + 14) + '" text-anchor="middle" style="font-size:17px">4</text><text class="rt-ts" x="66" y="' + (yT + 30) + '" text-anchor="middle" style="font-size:17px">4</text>';
+};
+system(first);
 for (let b = 0; b < 2; b++) {
-const bx = x0 + b * barW;
+if (stack && b === 1) { h += '<g transform="translate(0 150)">'; system(false); }
+const bx = stack ? (b === 0 ? x0 : 58 + 34) : x0 + b * barW;
 h += '<line class="pt-line" x1="' + (bx + barW) + '" y1="' + yT + '" x2="' + (bx + barW) + '" y2="' + (yT + 4 * g) + '" stroke="#8A8A8A" stroke-width="' + (b ? 2 : 1.2) + '"/>';
 // eighths are beamed by half bar, sixteenths by beat
 const grp = six ? per : 4;
@@ -4612,6 +4617,7 @@ h += '<rect class="rt-beam" x="' + stems[0] + '" y="' + (yA - 27) + '" width="' 
 if (six) h += '<rect class="rt-beam" x="' + stems[0] + '" y="' + (yA - 21) + '" width="' + bw + '" height="4"/>';
 }
 }
+if (stack && b === 1) h += '</g>';
 }
 return h + '</svg>';
 }
@@ -5162,7 +5168,9 @@ function minSvgText(scope) {
     });
     const need = 12 / (lo * a);
     if (need <= 1.0001) return;
-    if (need <= 1.35) { ts.forEach((x) => { if (+x.dataset.fs0 * a < 12) x.style.fontSize = (12 / a) + 'px'; }); return; }
+    // a score or a diagram that is only a little too small never gets a sideways scroll box (it would pan under the finger):
+    // its labels are enlarged instead. Fretboards keep the tighter limit because they are cropped to the chord instead.
+    if (need <= (neckInfo(svg) && !/^Tab/.test(svg.getAttribute('aria-label') || '') ? 1.35 : 1.55)) { ts.forEach((x) => { if (+x.dataset.fs0 * a < 12) x.style.fontSize = (12 / a) + 'px'; }); return; }
     // a fretboard never scrolls sideways: it is cut after the last fret that has a note, so only the chord moves
     const nkc = neckInfo(svg);
     if (nkc && cropNeck(svg, nkc)) {
@@ -21132,7 +21140,7 @@ try { route(); } catch (e) { fail(e); }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
   var BUILD = '7 nov 2026 · 21:45';
-  var BUILD_ID = '2026-11-07T21:45';
+  var BUILD_ID = '2026-11-07T22:30';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
