@@ -5159,6 +5159,9 @@ function mtMotion(name) {
 // ===== fin screen transitions =====
 // ===== La Ruta como setlist =====
 // finished screens are saved on this device as a list of hrefs ('guitar.done'); the student marks them with «Hecho»
+// HECHO_ON = false switches the whole «Hecho» marking off for now (buttons, stamps, progress bar, side-menu ticks);
+// set it back to true to bring it back. Nothing already saved is deleted.
+const HECHO_ON = false;
 function slDoneGet() { try { const v = JSON.parse(localStorage.getItem('guitar.done') || '[]'); return new Set(Array.isArray(v) ? v : []); } catch (e) { return new Set(); } }
 function slDoneSet(s) { try { localStorage.setItem('guitar.done', JSON.stringify(Array.from(s))); } catch (e) {} }
 const SL_PICK = (c, check) => '<svg class="sl-pick" viewBox="0 0 100 112" aria-hidden="true"><path d="M50 4C80 4 96 15 96 36C96 64 68 94 50 108C32 94 4 64 4 36C4 15 20 4 50 4Z" fill="' + c + '"/>' + (check ? '<path d="M30 52l14 14 26-30" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>' : '') + '</svg>';
@@ -5196,14 +5199,16 @@ function rutaSetlist(root, lang) {
   [3, 5, 7, 9, 15].forEach((f) => { neck += '<i class="sl-dot" style="left:' + (fpos(f - 1) + fpos(f)) / 2 + '%"></i>'; });
   const x12 = (fpos(11) + fpos(12)) / 2; neck += '<i class="sl-dot sl-d1" style="left:' + x12 + '%"></i><i class="sl-dot sl-d2" style="left:' + x12 + '%"></i>';
   const paint = () => {
-    const done = slDoneGet(), [ci] = firstTodo(done);
+    const done = HECHO_ON ? slDoneGet() : new Set(), [ci] = firstTodo(done);
     // every module starts closed; the student opens the one they want (finishing a module opens the next one)
     if (st.open === null) st.open = -1;
     const d = mods.reduce((a, m) => a + m.steps.filter((s) => done.has(s.href)).length, 0);
     let h = '<div class="sl-head"><h1 class="sl-h1">' + T.h1a + '<em>' + T.h1b + '</em></h1><p class="sl-sub">' + T.sub(mods.length) + '</p></div>'
-      + '<div class="sl-neck" role="progressbar" aria-label="' + T.progAria + '" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + d + '"><div class="sl-fill" style="width:' + (d / total * 100) + '%"></div>' + neck + '</div>'
-      + '<div class="sl-meta"><span>' + T.prog(d, total) + '</span><span>' + Math.round(d / total * 100) + ' %</span></div>'
-      + '<p class="sl-hint">' + T.hint + '</p>';
+      + (HECHO_ON
+        ? '<div class="sl-neck" role="progressbar" aria-label="' + T.progAria + '" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + d + '"><div class="sl-fill" style="width:' + (d / total * 100) + '%"></div>' + neck + '</div>'
+          + '<div class="sl-meta"><span>' + T.prog(d, total) + '</span><span>' + Math.round(d / total * 100) + ' %</span></div>'
+          + '<p class="sl-hint">' + T.hint + '</p>'
+        : '');
     h += '<ol class="sl-list">';
     mods.forEach((m, i) => {
       const n = m.steps.length, dn = m.steps.filter((s) => done.has(s.href)).length;
@@ -5216,7 +5221,7 @@ function rutaSetlist(root, lang) {
       if (open) {
         const ft = m.steps.findIndex((s) => !done.has(s.href));
         h += '<ol class="sl-steps">' + m.steps.map((s, j) => {
-          const ok = done.has(s.href), cur = i === ci && j === ft;
+          const ok = done.has(s.href), cur = HECHO_ON && i === ci && j === ft;
           const btn = cur ? '<button type="button" class="sl-mark" data-h="' + esc(s.href) + '" aria-label="' + esc(T.markAria(s.label)) + '">' + T.mark + '</button>'
             : ok ? '<button type="button" class="sl-tag' + (st.stamp === s.href ? ' sl-pop' : '') + '" data-h="' + esc(s.href) + '" aria-pressed="true" aria-label="' + esc(T.unAria(s.label)) + '">' + T.tag + '</button>' : '';
           return '<li class="sl-step' + (ok ? ' sl-ok' : '') + (cur ? ' sl-cur' : '') + '"><a href="#/' + esc(s.href) + '"><span class="sl-n">' + (i + 1) + '.' + (j + 1) + '</span><span class="sl-t">' + esc(s.label) + '</span></a>' + btn + '</li>';
@@ -19404,12 +19409,13 @@ function renderSide(name, lang) {
     + '<div class="sd-tabs" role="group"><a href="#/Main" class="' + (menu === 'ruta' && name !== 'Herramientas' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Main', 18) + esc(L.ruta) + '</a><a href="#/Cancionero" class="' + (menu === 'musica' && name !== 'Herramientas' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Cancionero', 18) + esc(L.musica) + '</a><a href="#/Herramientas" class="' + (name === 'Herramientas' || (toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Herramientas', 18) + (lang === 'en' ? 'Tools' : 'Herramientas') + '</a></div>'
     + '</div><div class="sd-nav">';
   // Ruta menu: screens marked «Hecho» and the module you're in (or the next one to play) for the setlist look
-  const dn = menu === 'ruta' ? slDoneGet() : null;
+  const isRuta = menu === 'ruta';
+  const dn = isRuta && HECHO_ON ? slDoneGet() : null;
   let nowMod = curMod;
   if (dn && nowMod < 0) nowMod = nav.mods.findIndex((m) => m.steps.some((s) => !dn.has(s.href)));
   nav.mods.forEach((m, i) => {
     const mCls = dn ? ((m.steps.every((s) => dn.has(s.href)) ? 'sd-mdone' : '') + (i === nowMod ? ' sd-mnow' : '')).trim() : '';
-    h += '<details data-i="' + i + '"' + (mCls ? ' class="' + mCls + '"' : '') + (opens.has(i) ? ' open' : '') + '><summary><span class="n">' + (dn ? String(i + 1).padStart(2, '0') : (i + 1)) + '</span><span class="t">' + esc(m.title) + (dn ? '<small class="sm">' + esc(slSideMeta(m, i, dn, en)) + '</small>' : '') + '</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>';
+    h += '<details data-i="' + i + '"' + (mCls ? ' class="' + mCls + '"' : '') + (opens.has(i) ? ' open' : '') + '><summary><span class="n">' + (isRuta ? String(i + 1).padStart(2, '0') : (i + 1)) + '</span><span class="t">' + esc(m.title) + (isRuta ? '<small class="sm">' + esc(slSideMeta(m, i, dn || new Set(), en)) + '</small>' : '') + '</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>';
     m.steps.forEach((st, si) => { const on = base(st.href) === name || (st.href === 'ArmoniaAv' && AV_SUBS.indexOf(name) >= 0); h += '<a class="it' + (on ? ' on' : '') + (dn && dn.has(st.href) ? ' dn' : '') + '" href="#/' + st.href + '"' + (on ? ' aria-current="page"' : '') + '>' + (menu === 'ruta' ? '<b class="sn">' + (i + 1) + '.' + (si + 1) + '</b> ' : '') + esc(st.label) + '</a>'; });
     h += '</details>';
   });
@@ -20968,8 +20974,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '7 nov 2026 · 18:15';
-  var BUILD_ID = '2026-11-07T18:15';
+  var BUILD = '7 nov 2026 · 18:40';
+  var BUILD_ID = '2026-11-07T18:40';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
