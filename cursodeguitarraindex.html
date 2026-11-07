@@ -8037,6 +8037,7 @@ if (this._ti) { clearInterval(this._ti); this._ti = 0; }
 try { if (this._an) this._an.disconnect(); } catch (e) {}
 try { if (this._mute) this._mute.disconnect(); } catch (e) {}
 this._mute = null;
+try { if (navigator.audioSession) navigator.audioSession.type = 'auto'; } catch (e) {}
 try { if (this._src) this._src.disconnect(); } catch (e) {}
 try { if (this._st) this._st.getTracks().forEach((x) => x.stop()); } catch (e) {}
 this._src = null; this._st = null; this._an = null; this._hist = [];
@@ -8051,15 +8052,25 @@ tToggle() {
 if (this.state.tOn) { this.tStop(); return; }
 const md = navigator.mediaDevices;
 if (!md || !md.getUserMedia) { this.setState({ tErr: 'nosup', tDbg: 'sin mediaDevices · seguro: ' + (window.isSecureContext ? 'sí' : 'no') }); return; }
+// iPhone: if the page already played sound (or an AudioContext is running), Safari keeps the audio session in
+// "playback" and refuses the microphone ("AudioSession category is not compatible with audio capture").
+// Ask for play-and-record before touching audio; it goes back to "auto" when the tuner stops.
+const setSession = (t) => { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) {} };
+setSession('play-and-record');
 try {
 const AC0 = window.AudioContext || window.webkitAudioContext;
 if (AC0 && !this._ac) this._ac = new AC0();
 if (this._ac && this._ac.state !== 'running' && this._ac.resume) this._ac.resume();
 } catch (e) {}
 const ask = (c) => md.getUserMedia(c);
-// Safari can refuse the fine-tuned constraints: if the failure is not about permission, retry with the plain request
+// Safari can refuse the fine-tuned constraints, or the session may still be in playback: retry once with the plain request
 ask({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } }).catch((e) => {
-if (e && /^(OverconstrainedError|ConstraintNotSatisfiedError|TypeError|AbortError)$/.test(e.name)) return ask({ audio: true });
+if (e && /^(OverconstrainedError|ConstraintNotSatisfiedError|TypeError|AbortError|InvalidStateError)$/.test(e.name)) {
+setSession('play-and-record');
+const ac0 = this._ac;
+const calm = ac0 && ac0.suspend && ac0.state === 'running' ? ac0.suspend().catch(() => {}) : Promise.resolve();
+return calm.then(() => ask({ audio: true }));
+}
 throw e;
 }).then((stream) => {
 try {
@@ -8085,6 +8096,7 @@ try { stream.getTracks().forEach((x) => x.stop()); } catch (x) {}
 this.setState({ tErr: 'fail' });
 }
 }).catch((e) => {
+setSession('auto');
 const denied = e && (e.name === 'NotAllowedError' || e.name === 'SecurityError' || e.name === 'PermissionDeniedError');
 const nm = (e && e.name) || 'error';
 if (!denied) { this.setState({ tErr: 'fail', tDbg: nm + (e && e.message ? ': ' + String(e.message).slice(0, 50) : '') }); return; }
