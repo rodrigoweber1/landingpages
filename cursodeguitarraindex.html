@@ -5091,6 +5091,27 @@ function skyBlues(root, es) {
 // keeps every diagram label at 12px or more on screen. SVGs scale with their box, so on a phone a label drawn at 12
 // can end up at 9. A small shortfall is fixed by enlarging the labels; a big one (dense scores and tabs) by giving the
 // diagram a minimum width and letting its box scroll sideways, so nothing overlaps.
+// shows only the part of a fretboard where the notes are: from the left labels to the last fret with a note (at least three frets)
+function cropNeck(svg, nk) {
+  const vb = svg.viewBox && svg.viewBox.baseVal; if (!vb || !vb.width) return false;
+  if (svg._cropped) return true;
+  let last = -1, notes = 0;
+  svg.querySelectorAll('circle').forEach((c) => {
+    if (!isNote(nk, c)) return;
+    notes++;
+    const cx = +c.getAttribute('cx');
+    if (cx < nk.xs[0] - 1) return;
+    const i = nk.xs.filter((x) => x < cx).length;
+    if (i > last) last = i;
+  });
+  if (last < 0 || last > 6 || notes > 20) return false; // a chord or a box fits in six frets; a map of the whole neck keeps its scroll box
+  const edge = nk.xs[Math.min(Math.max(3, last), nk.xs.length - 1)];
+  const right = edge + 6;
+  if (right >= vb.x + vb.width - 4) return true; // a chord that already needs the whole board: no cut, no scroll box
+  svg.setAttribute('viewBox', vb.x + ' ' + vb.y + ' ' + (right - vb.x) + ' ' + vb.height);
+  svg._cropped = true;
+  return true;
+}
 function minSvgText(scope) {
   (scope || document).querySelectorAll('svg').forEach((svg) => {
     const ts = svg.querySelectorAll('text'); if (!ts.length || !svg.getClientRects().length) return;
@@ -5107,6 +5128,15 @@ function minSvgText(scope) {
     const need = 12 / (lo * a);
     if (need <= 1.0001) return;
     if (need <= 1.35) { ts.forEach((x) => { if (+x.dataset.fs0 * a < 12) x.style.fontSize = (12 / a) + 'px'; }); return; }
+    // a fretboard never scrolls sideways: it is cut after the last fret that has a note, so only the chord moves
+    const nkc = neckInfo(svg);
+    if (nkc && cropNeck(svg, nkc)) {
+      const bc = svg.getBoundingClientRect(), vbc = svg.viewBox.baseVal;
+      const ac = Math.min(bc.width / vbc.width, bc.height / vbc.height);
+      // no scroll box for a chord board: the labels are enlarged to 12px instead
+      if (ac) ts.forEach((x) => { if (+x.dataset.fs0 * ac < 12) x.style.fontSize = (12 / ac) + 'px'; });
+      return;
+    }
     const vb = svg.viewBox && svg.viewBox.baseVal; if (!vb || !vb.width) return;
     svg._msW = Math.ceil(vb.width * 12 / lo);
     svg.style.minWidth = svg._msW + 'px';
@@ -20991,8 +21021,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '7 nov 2026 · 19:30';
-  var BUILD_ID = '2026-11-07T19:30';
+  var BUILD = '7 nov 2026 · 20:00';
+  var BUILD_ID = '2026-11-07T20:00';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
