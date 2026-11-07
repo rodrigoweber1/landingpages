@@ -713,7 +713,7 @@ body.dark #sl-root .sl-nowcard{box-shadow:inset 0 0 0 1px #3A362C}
 @media (hover:hover){#sl-root .sl-nc-open:hover{background:rgba(255,255,255,0.1)}}
 #sl-root .sl-nc-side{font-size:12px;line-height:16px;color:var(--sl-darkMute)}
 #sl-root .sl-nowcard a:focus-visible,#sl-root .sl-nowcard button:focus-visible{outline-color:#FFFFFF}
-@media (min-width:900px){#sl-root .sl-list,#sl-root .sl-foot,#sl-root .sl-hint{display:none}}
+/* the setlist (modules list, hint and footer) now shows on desktop too, same as on the phone */
 @media (max-width:899px){#sl-root .sl-nowcard{display:none}}
 /* menú lateral de la Ruta con aire de setlist */
 #side.sd-sl .sd-nav details{border-top:1px dashed #DDD7CC}
@@ -1026,6 +1026,11 @@ body.stage #fnav a.on{background:var(--st-floor3)!important;color:var(--st-ink)!
 body.stage #side{background:#100D0B!important;border-right-color:#2A221D!important;color:var(--st-ink)!important}
 body.stage #side .sd-nav a.it.on{background:#2A1416!important;color:var(--st-ink)!important}
 body.stage #side .sd-nav summary .n{background:transparent!important;color:var(--st-redInk)!important}
+/* Ruta side menu: numbers drawn like the setlist on the phone (outline, no red), the current module like the others */
+body.stage #side.sd-sl .sd-nav summary .n{color:transparent!important;-webkit-text-stroke:1.2px var(--st-ink)!important}
+body.stage #side.sd-sl .sd-nav details.sd-mdone summary .n{color:var(--st-ink)!important;-webkit-text-stroke:0!important}
+body.stage #side.sd-sl .sd-nav details.sd-mnow{margin:0!important;background:transparent!important;box-shadow:none!important;border-top:1px dashed #34312A!important}
+body.stage #side.sd-sl .sd-nav details.sd-mnow + details{border-top:1px dashed #34312A!important}
 body.stage #side .sd-foot a{background:var(--st-floor)!important;border-color:var(--st-rule)!important}
 
 /* ---------- INICIO ---------- */
@@ -20916,8 +20921,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '7 nov 2026 · 16:45';
-  var BUILD_ID = '2026-11-07T16:45';
+  var BUILD = '7 nov 2026 · 17:15';
+  var BUILD_ID = '2026-11-07T17:15';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
