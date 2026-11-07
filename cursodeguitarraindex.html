@@ -389,6 +389,8 @@ a.cta{height:auto !important;min-height:48px;padding:12px 20px !important;box-si
 .sp-row{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:4%}
 .sp .sp-pi{width:min(170px,38%);max-width:none;margin:0;height:auto;flex:none}
 .sp .sp-gt{width:min(280px,58%);max-width:none;margin:0;height:auto;flex:none}
+/* narrow screens: the piano and the little board stack, each wide enough to read, instead of two scroll boxes side by side */
+@media (max-width:560px){.sp-row{flex-direction:column;gap:14px}.sp .sp-pi{width:min(230px,100%)}.sp .sp-gt{width:min(296px,100%)}}
 .sp-k{stroke:#475569;stroke-width:1.2;transition:fill 200ms ease}
 .sp-w{fill:#FFFFFF}
 .sp-b{fill:#0F172A}
@@ -5137,6 +5139,11 @@ function minSvgText(scope) {
       if (ac) ts.forEach((x) => { if (+x.dataset.fs0 * ac < 12) x.style.fontSize = (12 / ac) + 'px'; });
       return;
     }
+    // a small board whose labels only need a moderate boost: enlarge them, no scroll box
+    if (nkc && need <= 1.8 && /^(M[áa]stil|Fretboard)/i.test(svg.getAttribute('aria-label') || '')) {
+      ts.forEach((x) => { if (+x.dataset.fs0 * a < 12) x.style.fontSize = (12 / a) + 'px'; });
+      return;
+    }
     const vb = svg.viewBox && svg.viewBox.baseVal; if (!vb || !vb.width) return;
     svg._msW = Math.ceil(vb.width * 12 / lo);
     svg.style.minWidth = svg._msW + 'px';
@@ -5155,11 +5162,55 @@ function minSvgText(scope) {
     }
   });
 }
+// The 12-fret board where a chord slides along (Barre, Shapes): on a narrow screen it shows one "page" of seven frets
+// (1-7, or 6-12 once the chord goes higher), so the board stays still and only the chord moves; no scroll box, no auto-scroll.
+// It runs the moment the board is drawn (before the first paint), so nothing flashes.
+function windowRoamNeck(svg) {
+  const vb = svg.viewBox && svg.viewBox.baseVal;
+  if (!vb || vb.width < 380 || svg._cropped) return;
+  if (svg.getBoundingClientRect().width > 480) return;
+  const act = Array.prototype.filter.call(svg.querySelectorAll('circle'), (c) => c.getAttribute('r') === '9.5');
+  const board = Array.prototype.find.call(svg.querySelectorAll('rect'), (r) => +r.getAttribute('x') === 34 && +r.getAttribute('width') > 300);
+  if (!act.length || !board) return;
+  const X0 = 34, FW = 26;
+  const hi = Math.max.apply(null, act.map((c) => { const cx = +c.getAttribute('cx'); return cx < X0 ? 0 : Math.floor((cx - X0) / FW) + 1; }));
+  const first = hi <= 7 ? 1 : 6, last = first + 6;
+  const xL = X0 + (first - 1) * FW, xR = X0 + last * FW + 6, boardR = X0 + 12 * FW;
+  const num = (e, a) => +e.getAttribute(a);
+  if (first > 1) {
+    [board].concat(Array.prototype.slice.call(svg.querySelectorAll('image.nk-grain'))).forEach((e) => { e.setAttribute('x', xL); e.setAttribute('width', boardR - xL); });
+    svg.querySelectorAll('line').forEach((l) => {
+      if (num(l, 'x1') === num(l, 'x2')) { if (num(l, 'x1') < xL - 0.5) l.style.display = 'none'; }
+      else if (num(l, 'x1') < xL) l.setAttribute('x1', xL);
+    });
+    svg.querySelectorAll('circle').forEach((c) => { if (c.getAttribute('r') === '3.2' && num(c, 'cx') < xL) c.style.display = 'none'; });
+    svg.querySelectorAll('text').forEach((t) => {
+      const x = num(t, 'x');
+      if (x === -8) t.setAttribute('x', xL - 8);
+      else if (/^\d+$/.test(t.textContent) && num(t, 'y') > 150 && x < xL) t.style.display = 'none';
+    });
+    svg.querySelectorAll('g').forEach((g) => { const c = g.querySelector('circle'); if (c && num(c, 'cx') < xL) g.style.display = 'none'; });
+    svg.querySelectorAll('polyline').forEach((p) => {
+      const pts = (p.getAttribute('points') || '').split(' ').filter((s) => s && +s.split(',')[0] >= xL);
+      p.setAttribute('points', pts.join(' '));
+    });
+  }
+  svg.setAttribute('viewBox', (xL - 44) + ' ' + vb.y + ' ' + (xR - (xL - 44)) + ' ' + vb.height);
+  svg._cropped = true;
+}
 (function () {
   let tm = 0;
   const run = () => { clearTimeout(tm); tm = setTimeout(() => { try { minSvgText(document.getElementById('app')); } catch (e) {} }, 120); };
   const start = () => {
     const app = document.getElementById('app'); if (!app) return setTimeout(start, 200);
+    // microtask pass: windows the roaming board as soon as it is added, before the browser paints it
+    new MutationObserver((ms) => {
+      ms.forEach((m) => m.addedNodes.forEach((n) => {
+        if (n.nodeType !== 1) return;
+        const list = n.tagName && n.tagName.toLowerCase() === 'svg' ? [n] : n.querySelectorAll ? n.querySelectorAll('svg') : [];
+        Array.prototype.forEach.call(list, (s) => { try { windowRoamNeck(s); } catch (e) {} });
+      }));
+    }).observe(app, { childList: true, subtree: true });
     new MutationObserver(run).observe(app, { childList: true, subtree: true });
     window.addEventListener('resize', run); run();
   };
@@ -21021,8 +21072,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '7 nov 2026 · 20:00';
-  var BUILD_ID = '2026-11-07T20:00';
+  var BUILD = '7 nov 2026 · 20:35';
+  var BUILD_ID = '2026-11-07T20:35';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
