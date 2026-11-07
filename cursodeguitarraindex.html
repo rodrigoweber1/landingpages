@@ -3,6 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+// every AudioContext the app creates is remembered, so the tuner can silence them all before asking for the microphone
+// (a context left running by another screen keeps the iPhone's audio session in "playback" and Safari refuses the capture)
+(function () {
+  try {
+    var Base = window.AudioContext || window.webkitAudioContext;
+    if (!Base || Base.__yr) return;
+    var list = [];
+    var Tracked = class extends Base { constructor() { super(...arguments); list.push(this); } };
+    Tracked.__yr = true;
+    window.__yrAC = list;
+    window.AudioContext = Tracked;
+    if (window.webkitAudioContext) window.webkitAudioContext = Tracked;
+  } catch (e) {}
+})();
+</script>
 <meta name="theme-color" content="#121212">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -8057,19 +8073,19 @@ if (!md || !md.getUserMedia) { this.setState({ tErr: 'nosup', tDbg: 'sin mediaDe
 // Ask for play-and-record before touching audio; it goes back to "auto" when the tuner stops.
 const setSession = (t) => { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) {} };
 setSession('play-and-record');
-try {
-const AC0 = window.AudioContext || window.webkitAudioContext;
-if (AC0 && !this._ac) this._ac = new AC0();
-if (this._ac && this._ac.state !== 'running' && this._ac.resume) this._ac.resume();
-} catch (e) {}
+// the microphone is requested first, with nothing playing: the AudioContext is only created once the stream exists
+// (older iOS has no audioSession control, and a running context alone makes Safari refuse the capture)
+const quiet = () => {
+const all = (window.__yrAC || []).concat(this._ac ? [this._ac] : []);
+const ps = all.filter((c) => c && c.state === 'running' && c.suspend).map((c) => { try { return c.suspend().catch(() => {}); } catch (e) { return Promise.resolve(); } });
+return ps.length ? Promise.race([Promise.all(ps), new Promise((r) => setTimeout(r, 600))]) : Promise.resolve();
+};
 const ask = (c) => md.getUserMedia(c);
-// Safari can refuse the fine-tuned constraints, or the session may still be in playback: retry once with the plain request
-ask({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } }).catch((e) => {
+// silence every context first; Safari can also refuse the fine-tuned constraints: retry once with the plain request
+quiet().then(() => ask({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } })).catch((e) => {
 if (e && /^(OverconstrainedError|ConstraintNotSatisfiedError|TypeError|AbortError|InvalidStateError)$/.test(e.name)) {
 setSession('play-and-record');
-const ac0 = this._ac;
-const calm = ac0 && ac0.suspend && ac0.state === 'running' ? ac0.suspend().catch(() => {}) : Promise.resolve();
-return calm.then(() => ask({ audio: true }));
+return quiet().then(() => ask({ audio: true }));
 }
 throw e;
 }).then((stream) => {
