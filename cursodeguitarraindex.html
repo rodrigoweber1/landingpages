@@ -67,6 +67,7 @@ body.home #side{display:none}
 html{scroll-padding-top:calc(env(safe-area-inset-top) + 130px)}
 #app>div>header{position:sticky;top:env(safe-area-inset-top);z-index:72;background:inherit}
 #app :is([style*="font-size: 11px"],[style*="font-size:11px"],[style*="font-size: 10px"],[style*="font-size:10px"]){font-size:12px!important}
+#app :is(a,button)[aria-label^="Volver"],#app :is(a,button)[aria-label^="Back"]{flex:none!important;min-width:44px}
 @media(max-width:480px){#app #sbar{position:static!important}#app>div>header .yr-logo{--yr:20px!important}#app>div>header img[style*="height: 60px"]{height:46px!important}}
 #sbar{position:sticky;top:calc(env(safe-area-inset-top) + var(--hdh,56px));z-index:71;background:inherit;margin:0;padding:10px 0 6px;font-family:'Inter',system-ui,sans-serif}
 #sbar::after{content:'';position:absolute;left:0;right:0;bottom:-8px;height:8px;background:linear-gradient(rgba(0,0,0,0.06),transparent);pointer-events:none}
