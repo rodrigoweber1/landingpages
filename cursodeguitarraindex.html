@@ -82,6 +82,27 @@ body.home #side{display:none}
 /* the top of every screen (back, title, language, search) stays in view while the page scrolls */
 html{scroll-padding-top:calc(env(safe-area-inset-top) + 130px)}
 #app>div>header{position:sticky;top:env(safe-area-inset-top);z-index:72;background:inherit}
+/* phone held sideways (short and wide): slim top bar, search scrolls away, bottom bar becomes a narrow icon rail in the left gutter */
+@media (max-width:899px) and (orientation:landscape) and (max-height:520px){
+#app{width:var(--aw,560px)!important;zoom:1!important;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)!important}
+#app>div:not(.stg-home)>header{height:44px!important}
+#app>div:not(.stg-home)>header img[style*="height: 40px"],#app>div:not(.stg-home)>header img[style*="height: 60px"],#app>div:not(.stg-home)>header img[style*="height: 46px"]{height:30px!important}
+#app>div:not(.stg-home)>header h1{font-size:14px!important;line-height:1.15!important}
+#app>div:not(.stg-home)>header [role="group"]{height:36px!important}
+#app>div:not(.stg-home)>header [role="group"] button{height:32px!important}
+#app>div:not(.stg-home)>header :is(a,button)[aria-label^="Volver"],#app>div:not(.stg-home)>header :is(a,button)[aria-label^="Back"]{width:40px!important;height:40px!important}
+#app #sbar{position:relative!important;top:auto!important;padding:6px 0 4px!important}
+#app #sbar .sb-f{height:38px!important}
+#app #sbar.has,#app #sbar:focus-within{position:sticky!important;top:calc(env(safe-area-inset-top) + 44px)!important}
+#fnav{left:calc(env(safe-area-inset-left) + 8px)!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;width:56px!important;flex-direction:column!important;padding:4px!important;gap:2px!important;border-radius:22px!important}
+#fnav a{height:46px!important;width:100%!important;font-size:0!important;line-height:0!important;border-radius:18px!important}
+#yr-mini{padding:calc(env(safe-area-inset-top) + 2px) 14px 2px 16px!important}
+#yr-mini .ym-logo img{height:24px!important}
+#yr-mini .ym-lang button{height:30px!important}
+body.stage #app .stg-home{padding-top:calc(env(safe-area-inset-top) + 40px + 12px)!important}
+html body.stage #app .stg-home .stg-h1{font-size:40px!important;line-height:.95!important;max-width:none!important}
+#yr-upd{left:auto!important;right:12px!important;bottom:12px!important;width:min(380px,calc(100% - 100px))!important}
+}
 #app :is([style*="font-size: 11px"],[style*="font-size:11px"],[style*="font-size: 10px"],[style*="font-size:10px"]){font-size:12px!important}
 #app>div>header[style*="grid-template-columns: 52px"]{grid-template-columns:auto minmax(0,1fr) auto!important;column-gap:4px}
 #app>div>header[style*="grid-template-columns: 52px"]>h1{padding:0 4px;font-size:15px!important;line-height:1.2!important}
@@ -1031,6 +1052,15 @@ body.stage #side.sd-sl .sd-nav summary .n{color:transparent!important;-webkit-te
 body.stage #side.sd-sl .sd-nav details.sd-mdone summary .n{color:var(--st-ink)!important;-webkit-text-stroke:0!important}
 body.stage #side.sd-sl .sd-nav details.sd-mnow{margin:0!important;background:transparent!important;box-shadow:none!important;border-top:1px dashed #34312A!important}
 body.stage #side.sd-sl .sd-nav details.sd-mnow + details{border-top:1px dashed #34312A!important}
+/* Ruta side menu rows drawn like the setlist rows on the phone: big outline number, uppercase title, small second line, dashed rule */
+body.stage #side.sd-sl .sd-nav{padding:0 14px 72px}
+body.stage #side.sd-sl .sd-nav details,body.stage #side.sd-sl .sd-nav details.sd-mnow,body.stage #side.sd-sl .sd-nav details.sd-mnow + details{border-top:0!important;border-bottom:1px dashed var(--st-rule)!important}
+body.stage #side.sd-sl .sd-nav summary{display:grid!important;grid-template-columns:50px minmax(0,1fr) 16px;align-items:center;gap:10px;box-sizing:border-box;min-height:64px;padding:8px 2px}
+body.stage #side.sd-sl .sd-nav summary .n{width:auto!important;min-width:0!important;height:auto!important;display:block!important;font:400 34px/1 'Archivo Black',sans-serif!important;letter-spacing:-0.03em}
+body.stage #side.sd-sl .sd-nav summary .t{min-width:0;font:400 16px/1.15 'Archivo Black',sans-serif!important;text-transform:uppercase;color:var(--st-ink)!important}
+body.stage #side.sd-sl .sd-nav summary .t .sm{display:block;margin-top:3px;font:400 12px/16px 'Inter',system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--st-mute)}
+body.stage #side.sd-sl .sd-nav details.sd-mdone summary .t{color:var(--st-mute)!important}
+body.stage #side.sd-sl .sd-nav details summary .chev{margin-left:0;justify-self:end}
 body.stage #side .sd-foot a{background:var(--st-floor)!important;border-color:var(--st-rule)!important}
 
 /* ---------- INICIO ---------- */
@@ -19188,7 +19218,12 @@ function fit() {
   const vw = document.documentElement.clientWidth || window.innerWidth || 390;
   const vh = window.innerHeight || 800;
   let z, mh;
-  if (vw >= DESK) {
+  // phone held sideways: the height is what is scarce, so no zoom-in and a wider column (the bars shrink in CSS)
+  if (vw < DESK && vw > vh && vh <= 520) {
+    z = 1;
+    mh = vh;
+    document.documentElement.style.setProperty('--aw', Math.min(640, vw - 144) + 'px');
+  } else if (vw >= DESK) {
     z = 1;
     const sw = document.body.classList.contains('home') ? 0 : 320;
     const aw = Math.max(520, Math.min(920, vw - sw - 48));
@@ -19337,6 +19372,14 @@ function nextOf(name) {
   if (i < 0) return undefined;
   return i < seq.length - 1 ? SEQS[menu][i + 1] : null;
 }
+// second line of a module in the Ruta side menu, same wording as the setlist on the phone
+function slSideMeta(m, i, dn, en) {
+  const n = m.steps.length, d = m.steps.filter((s) => dn.has(s.href)).length;
+  const scr = en ? n + (n === 1 ? ' screen' : ' screens') : n + (n === 1 ? ' pantalla' : ' pantallas');
+  const head = (en ? 'Module ' : 'Módulo ') + (i + 1) + ' · ';
+  if (d === n) return head + (en ? 'Done' : 'Terminado') + ' · ' + scr;
+  return head + (d ? d + (en ? ' of ' : ' de ') + scr : scr);
+}
 function renderSide(name, lang) {
   const key = name + '|' + lang + '|' + menu;
   if (key === sideKey) return;
@@ -19362,7 +19405,7 @@ function renderSide(name, lang) {
   if (dn && nowMod < 0) nowMod = nav.mods.findIndex((m) => m.steps.some((s) => !dn.has(s.href)));
   nav.mods.forEach((m, i) => {
     const mCls = dn ? ((m.steps.every((s) => dn.has(s.href)) ? 'sd-mdone' : '') + (i === nowMod ? ' sd-mnow' : '')).trim() : '';
-    h += '<details data-i="' + i + '"' + (mCls ? ' class="' + mCls + '"' : '') + (opens.has(i) ? ' open' : '') + '><summary><span class="n">' + (dn ? String(i + 1).padStart(2, '0') : (i + 1)) + '</span><span class="t">' + esc(m.title) + '</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>';
+    h += '<details data-i="' + i + '"' + (mCls ? ' class="' + mCls + '"' : '') + (opens.has(i) ? ' open' : '') + '><summary><span class="n">' + (dn ? String(i + 1).padStart(2, '0') : (i + 1)) + '</span><span class="t">' + esc(m.title) + (dn ? '<small class="sm">' + esc(slSideMeta(m, i, dn, en)) + '</small>' : '') + '</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>';
     m.steps.forEach((st, si) => { const on = base(st.href) === name || (st.href === 'ArmoniaAv' && AV_SUBS.indexOf(name) >= 0); h += '<a class="it' + (on ? ' on' : '') + (dn && dn.has(st.href) ? ' dn' : '') + '" href="#/' + st.href + '"' + (on ? ' aria-current="page"' : '') + '>' + (menu === 'ruta' ? '<b class="sn">' + (i + 1) + '.' + (si + 1) + '</b> ' : '') + esc(st.label) + '</a>'; });
     h += '</details>';
   });
@@ -20921,8 +20964,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '7 nov 2026 · 17:15';
-  var BUILD_ID = '2026-11-07T17:15';
+  var BUILD = '7 nov 2026 · 17:55';
+  var BUILD_ID = '2026-11-07T17:55';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
