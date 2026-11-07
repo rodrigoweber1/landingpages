@@ -734,7 +734,8 @@ body.dark #sl-root .sl-nowcard{box-shadow:inset 0 0 0 1px #3A362C}
 @media (hover:hover){#sl-root .sl-nc-open:hover{background:rgba(255,255,255,0.1)}}
 #sl-root .sl-nc-side{font-size:12px;line-height:16px;color:var(--sl-darkMute)}
 #sl-root .sl-nowcard a:focus-visible,#sl-root .sl-nowcard button:focus-visible{outline-color:#FFFFFF}
-/* the setlist (modules list, hint and footer) now shows on desktop too, same as on the phone */
+/* on desktop the modules live in the side menu only: the list, the hint and the footer are not repeated in the middle */
+@media (min-width:900px){#sl-root .sl-list,#sl-root .sl-foot,#sl-root .sl-hint{display:none}}
 @media (max-width:899px){#sl-root .sl-nowcard{display:none}}
 /* menú lateral de la Ruta con aire de setlist */
 #side.sd-sl .sd-nav details{border-top:1px dashed #DDD7CC}
@@ -1048,17 +1049,20 @@ body.stage #side{background:#100D0B!important;border-right-color:#2A221D!importa
 body.stage #side .sd-nav a.it.on{background:#2A1416!important;color:var(--st-ink)!important}
 body.stage #side .sd-nav summary .n{background:transparent!important;color:var(--st-redInk)!important}
 /* Ruta side menu: numbers drawn like the setlist on the phone (outline, no red), the current module like the others */
-body.stage #side.sd-sl .sd-nav summary .n{color:transparent!important;-webkit-text-stroke:1.2px var(--st-ink)!important}
+body.stage #side.sd-sl .sd-nav summary .n{color:transparent!important;-webkit-text-stroke:1.5px var(--st-ink)!important}
 body.stage #side.sd-sl .sd-nav details.sd-mdone summary .n{color:var(--st-ink)!important;-webkit-text-stroke:0!important}
 body.stage #side.sd-sl .sd-nav details.sd-mnow{margin:0!important;background:transparent!important;box-shadow:none!important;border-top:1px dashed #34312A!important}
 body.stage #side.sd-sl .sd-nav details.sd-mnow + details{border-top:1px dashed #34312A!important}
 /* Ruta side menu rows drawn like the setlist rows on the phone: big outline number, uppercase title, small second line, dashed rule */
 body.stage #side.sd-sl .sd-nav{padding:0 14px 72px}
 body.stage #side.sd-sl .sd-nav details,body.stage #side.sd-sl .sd-nav details.sd-mnow,body.stage #side.sd-sl .sd-nav details.sd-mnow + details{border-top:0!important;border-bottom:1px dashed var(--st-rule)!important}
-body.stage #side.sd-sl .sd-nav summary{display:grid!important;grid-template-columns:50px minmax(0,1fr) 16px;align-items:center;gap:10px;box-sizing:border-box;min-height:64px;padding:8px 2px}
+body.stage #side.sd-sl .sd-nav summary{display:grid!important;grid-template-columns:52px minmax(0,1fr) 22px;align-items:center;gap:10px;box-sizing:border-box;min-height:72px;padding:12px 2px}
 body.stage #side.sd-sl .sd-nav summary .n{width:auto!important;min-width:0!important;height:auto!important;display:block!important;font:400 34px/1 'Archivo Black',sans-serif!important;letter-spacing:-0.03em}
-body.stage #side.sd-sl .sd-nav summary .t{min-width:0;font:400 16px/1.15 'Archivo Black',sans-serif!important;text-transform:uppercase;color:var(--st-ink)!important}
-body.stage #side.sd-sl .sd-nav summary .t .sm{display:block;margin-top:3px;font:400 12px/16px 'Inter',system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--st-mute)}
+body.stage #side.sd-sl .sd-nav summary .t{min-width:0;font:400 17px/1.15 'Archivo Black',sans-serif!important;text-transform:uppercase;color:var(--st-ink)!important}
+body.stage #side.sd-sl .sd-nav summary .t .sm{display:block;margin-top:2px;font:400 13px/18px 'Inter',system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--st-mute)}
+/* the arrow points right like on the phone and turns down when the module is open */
+body.stage #side.sd-sl .sd-nav summary .chev{width:22px;height:22px;stroke:var(--st-mute)!important;transform:rotate(-90deg)}
+body.stage #side.sd-sl .sd-nav details[open] summary .chev{transform:rotate(0deg)}
 body.stage #side.sd-sl .sd-nav details.sd-mdone summary .t{color:var(--st-mute)!important}
 body.stage #side.sd-sl .sd-nav details summary .chev{margin-left:0;justify-self:end}
 body.stage #side .sd-foot a{background:var(--st-floor)!important;border-color:var(--st-rule)!important}
@@ -20964,8 +20968,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '7 nov 2026 · 17:55';
-  var BUILD_ID = '2026-11-07T17:55';
+  var BUILD = '7 nov 2026 · 18:15';
+  var BUILD_ID = '2026-11-07T18:15';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
