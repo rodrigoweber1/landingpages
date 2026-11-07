@@ -8050,7 +8050,7 @@ this.setState({ tOn: false });
 tToggle() {
 if (this.state.tOn) { this.tStop(); return; }
 const md = navigator.mediaDevices;
-if (!md || !md.getUserMedia) { this.setState({ tErr: 'nosup' }); return; }
+if (!md || !md.getUserMedia) { this.setState({ tErr: 'nosup', tDbg: 'sin mediaDevices · seguro: ' + (window.isSecureContext ? 'sí' : 'no') }); return; }
 try {
 const AC0 = window.AudioContext || window.webkitAudioContext;
 if (AC0 && !this._ac) this._ac = new AC0();
@@ -8086,15 +8086,16 @@ this.setState({ tErr: 'fail' });
 }
 }).catch((e) => {
 const denied = e && (e.name === 'NotAllowedError' || e.name === 'SecurityError' || e.name === 'PermissionDeniedError');
-if (!denied) { this.setState({ tErr: 'fail' }); return; }
+const nm = (e && e.name) || 'error';
+if (!denied) { this.setState({ tErr: 'fail', tDbg: nm + (e && e.message ? ': ' + String(e.message).slice(0, 50) : '') }); return; }
 // blocked in the settings ('denied') or the person tapped "Don't allow" on the prompt ('ask'): each one needs a different tip
 try {
 if (navigator.permissions && navigator.permissions.query) {
-navigator.permissions.query({ name: 'microphone' }).then((p) => this.setState({ tErr: p && p.state === 'prompt' ? 'ask' : 'denied' }), () => this.setState({ tErr: 'denied' }));
+navigator.permissions.query({ name: 'microphone' }).then((p) => this.setState({ tErr: p && p.state === 'prompt' ? 'ask' : 'denied', tDbg: nm + ' · ' + (p && p.state) }), () => this.setState({ tErr: 'denied', tDbg: nm }));
 return;
 }
 } catch (x) {}
-this.setState({ tErr: 'denied' });
+this.setState({ tErr: 'denied', tDbg: nm });
 });
 }
 
@@ -8248,7 +8249,7 @@ const AFIN_VIDEO = '';
 const vidFile = /\.(mp4|webm|mov)(\?.*)?$/i.test(AFIN_VIDEO);
 const tErr = this.state.tErr;
 const tOn = this.state.tOn;
-const out = { vidEmpty: !AFIN_VIDEO, vidFile: !!AFIN_VIDEO && vidFile, vidEmbed: !!AFIN_VIDEO && !vidFile, vidSrc: AFIN_VIDEO, tuns, tunDesc, sChips, rows, pegs, mrows, methodNote, tChips, tOn, tBtn: tOn ? t.tnStop : t.tnStart, tBtnBg: tOn ? '#121212' : '#E31B23', tToggle: () => this.tToggle(), tHasErr: !!tErr, tErrTxt: tErr === 'nosup' ? t.tnErrNosup : (tErr === 'denied' ? (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ? t.tnErrDeniedIos : t.tnErrDenied) : (tErr === 'ask' ? t.tnErrAsk : t.tnErrFail)) };
+const out = { vidEmpty: !AFIN_VIDEO, vidFile: !!AFIN_VIDEO && vidFile, vidEmbed: !!AFIN_VIDEO && !vidFile, vidSrc: AFIN_VIDEO, tuns, tunDesc, sChips, rows, pegs, mrows, methodNote, tChips, tOn, tBtn: tOn ? t.tnStop : t.tnStart, tBtnBg: tOn ? '#121212' : '#E31B23', tToggle: () => this.tToggle(), tHasErr: !!tErr, tErrTxt: tErr === 'nosup' ? t.tnErrNosup : (tErr === 'denied' ? (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ? t.tnErrDeniedIos : t.tnErrDenied) : (tErr === 'ask' ? t.tnErrAsk : t.tnErrFail)) + (tErr && this.state.tDbg ? ' [' + this.state.tDbg + ']' : '') };
 
 const langs = ['es', 'en'].map((l) => {
 const on = lang === l;
