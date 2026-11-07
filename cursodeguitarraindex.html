@@ -20742,5 +20742,71 @@ if (/^#\/?Main\/?$/.test(location.hash)) { try { history.replaceState(null, '', 
 try { route(); } catch (e) { fail(e); }
 })();
 </script>
+<!-- Barra compacta de la portada: aparece al rolar, cuando el hero ya salió de la pantalla -->
+<style>
+#yr-mini{position:fixed;left:0;right:0;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;padding:calc(env(safe-area-inset-top) + 6px) 14px 6px 16px;background:rgba(13,11,10,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #3A302A;transform:translateY(-110%);transition:transform .22s cubic-bezier(.23,1,.32,1);pointer-events:none;visibility:hidden}
+#yr-mini[data-on="true"]{transform:none;pointer-events:auto;visibility:visible}
+#yr-mini .ym-logo{display:flex;align-items:center;gap:6px;min-width:0;color:#F4EEE6}
+#yr-mini .ym-logo img{height:30px!important;width:auto!important;flex:none!important;filter:invert(1)}
+#yr-mini .yr-logo{--yr:16px!important;color:#F4EEE6!important}
+#yr-mini .ym-lang{display:flex;gap:2px;padding:2px;border-radius:10px;background:#221B17}
+#yr-mini .ym-lang button{min-width:44px;height:36px;border:0;border-radius:8px;background:transparent;color:#BDB6AA;font:700 13px 'Inter',system-ui,sans-serif;cursor:pointer}
+#yr-mini .ym-lang button[aria-pressed="true"]{background:#3A1E20;color:#F4EEE6;box-shadow:inset 0 -2px 0 #E31B23}
+@media (min-width:900px){#yr-mini{display:none}}
+@media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
+</style>
+<script>
+(function () {
+  'use strict';
+  var bar = null, shown = false, ticking = false, sig = '';
+  function realParts() {
+    var h = document.querySelector('.stg-home>header');
+    if (!h) return null;
+    var btns = [].filter.call(h.querySelectorAll('.thm-top button'), function (b) { return /^(ES|EN)$/.test((b.textContent || '').trim()); });
+    var logo = h.querySelector('[role="img"]');
+    return { h: h, btns: btns, logo: logo };
+  }
+  function build(p) {
+    var langs = [];
+    for (var i = 0; i < p.btns.length; i++) langs.push({ t: (p.btns[i].textContent || '').trim(), on: p.btns[i].getAttribute('aria-pressed') === 'true' || /E31B23|#B3121A|3A1E20|rgb\(58, 30, 32\)/i.test(p.btns[i].getAttribute('style') || '') });
+    var s = langs.map(function (l) { return l.t + (l.on ? '*' : ''); }).join('|');
+    if (bar && s === sig) return;
+    sig = s;
+    if (!bar) { bar = document.createElement('div'); bar.id = 'yr-mini'; document.body.appendChild(bar); }
+    bar.innerHTML = '';
+    var left = document.createElement('a');
+    left.className = 'ym-logo'; left.href = '#/Inicio';
+    left.setAttribute('aria-label', 'You Rock Academy');
+    if (p.logo) left.appendChild(p.logo.cloneNode(true));
+    bar.appendChild(left);
+    var g = document.createElement('div');
+    g.className = 'ym-lang'; g.setAttribute('role', 'group');
+    langs.forEach(function (l, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = l.t; b.setAttribute('aria-pressed', l.on ? 'true' : 'false');
+      b.addEventListener('click', function () { var real = realParts(); if (real && real.btns[i]) real.btns[i].click(); setTimeout(update, 120); });
+      g.appendChild(b);
+    });
+    bar.appendChild(g);
+  }
+  function update() {
+    ticking = false;
+    var p = realParts();
+    var on = false;
+    if (p && /^#\/?Inicio\/?(\?.*)?$/.test(location.hash || '#/Inicio') || (p && !location.hash)) {
+      var r = p.h.getBoundingClientRect();
+      on = r.bottom < 40;
+      if (on) build(p);
+    }
+    if (bar) { bar.setAttribute('data-on', on ? 'true' : 'false'); if (!on) bar.setAttribute('aria-hidden', 'true'); else bar.removeAttribute('aria-hidden'); }
+  }
+  function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+  window.addEventListener('scroll', req, { passive: true });
+  window.addEventListener('resize', req);
+  window.addEventListener('hashchange', function () { setTimeout(update, 60); });
+  var appEl = document.getElementById('app');
+  if (appEl && window.MutationObserver) new MutationObserver(req).observe(appEl, { childList: true });
+})();
+</script>
 </body>
 </html>
