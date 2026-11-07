@@ -87,7 +87,8 @@ html{scroll-padding-top:calc(env(safe-area-inset-top) + 130px)}
 #app>div>header[style*="grid-template-columns: 52px"]>h1{padding:0 4px;font-size:15px!important;line-height:1.2!important}
 #app li>a[style*="text-decoration: underline"]{display:inline-block;padding:8px 0}
 #app :is(a,button)[aria-label^="Volver"],#app :is(a,button)[aria-label^="Back"]{flex:none!important;min-width:44px}
-@media(max-width:480px){#app #sbar{position:static!important}#app>div>header .yr-logo{--yr:20px!important}#app>div>header img[style*="height: 60px"]{height:46px!important}}
+/* search bar: it scrolls away when idle, but stays under the header while you type or results are open (its result panel hangs from it) */
+@media(max-width:480px){#app #sbar{position:relative!important}#app #sbar.has,#app #sbar:focus-within{position:sticky!important}#app>div>header .yr-logo{--yr:20px!important}#app>div>header img[style*="height: 60px"]{height:46px!important}}
 #sbar{position:sticky;top:calc(env(safe-area-inset-top) + var(--hdh,56px));z-index:71;background:inherit;margin:0;padding:10px 0 6px;font-family:'Inter',system-ui,sans-serif}
 #sbar::after{content:'';position:absolute;left:0;right:0;bottom:-8px;height:8px;background:linear-gradient(rgba(0,0,0,0.06),transparent);pointer-events:none}
 body.dark #sbar::after{background:linear-gradient(rgba(0,0,0,0.35),transparent)}
@@ -1249,7 +1250,10 @@ body.stage #app .stg-root header .bk-r{display:none!important}
 body.stage #app .stg-root>header{grid-template-columns:52px minmax(0,1fr) auto!important}
 
 body.stage #app .stg-home>header{border-bottom:0!important;background:transparent!important;position:static!important}
-body.stage #app .stg-home #sbar{position:static!important}
+body.stage #app .stg-home #sbar{position:relative!important}
+body.stage #app .stg-home #sbar.has,body.stage #app .stg-home #sbar:focus-within{position:sticky!important;top:calc(env(safe-area-inset-top) + 54px)}
+/* the sticky header covers the whole width and the strip above it, so scrolling text never shows around it */
+#app>div>header{box-shadow:-24px 0 0 #0D0B0A,24px 0 0 #0D0B0A,0 -90px 0 #0D0B0A,-24px -90px 0 #0D0B0A,24px -90px 0 #0D0B0A}
 
 body.stage #app .rs-t{order:1}
 body.stage #app .rs-e{order:2;margin-top:2px}
@@ -5154,7 +5158,8 @@ function rutaSetlist(root, lang) {
   const x12 = (fpos(11) + fpos(12)) / 2; neck += '<i class="sl-dot sl-d1" style="left:' + x12 + '%"></i><i class="sl-dot sl-d2" style="left:' + x12 + '%"></i>';
   const paint = () => {
     const done = slDoneGet(), [ci] = firstTodo(done);
-    if (st.open === null) st.open = ci;
+    // every module starts closed; the student opens the one they want (finishing a module opens the next one)
+    if (st.open === null) st.open = -1;
     const d = mods.reduce((a, m) => a + m.steps.filter((s) => done.has(s.href)).length, 0);
     let h = '<div class="sl-head"><h1 class="sl-h1">' + T.h1a + '<em>' + T.h1b + '</em></h1><p class="sl-sub">' + T.sub(mods.length) + '</p></div>'
       + '<div class="sl-neck" role="progressbar" aria-label="' + T.progAria + '" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + d + '"><div class="sl-fill" style="width:' + (d / total * 100) + '%"></div>' + neck + '</div>'
@@ -5163,9 +5168,9 @@ function rutaSetlist(root, lang) {
     h += '<ol class="sl-list">';
     mods.forEach((m, i) => {
       const n = m.steps.length, dn = m.steps.filter((s) => done.has(s.href)).length;
-      const kind = dn === n ? 'done' : i === ci ? 'now' : 'todo', open = st.open === i;
+      const kind = dn === n ? 'done' : 'todo', open = st.open === i;
       const meta = T.mod + ' ' + (i + 1) + ' · ' + (kind === 'done' ? T.done + ' · ' + T.screens(n) : dn ? dn + T.of + T.screens(n) : T.screens(n));
-      h += '<li class="sl-song sl-' + kind + '">' + (kind === 'now' ? '<span class="sl-note" aria-hidden="true">' + T.now + '</span>' : '')
+      h += '<li class="sl-song sl-' + kind + '">'
         + '<button type="button" class="sl-row" data-m="' + i + '" aria-expanded="' + open + '"><span class="sl-num" aria-hidden="true">' + String(i + 1).padStart(2, '0') + '</span>'
         + '<span class="sl-ttl"><b>' + esc(m.title) + '</b><small>' + meta + '</small></span>'
         + '<span class="sl-end">' + (kind === 'done' ? '<span class="sl-stamp' + (st.stamp === 'm' + i ? ' sl-pop' : '') + '">' + SL_PICK('#E31B23', true) + '</span>' : '') + SL_CHEV + '</span></button>';
