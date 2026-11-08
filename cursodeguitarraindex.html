@@ -999,7 +999,7 @@ body.dark .cs-play.cs-on{background:#E31B23;color:#FFFFFF}
 body.stage{
   --st-ground:#0D0B0A;--st-floor:#17120F;--st-floor2:#221B17;--st-floor3:#2E2520;--st-rule:#3A302A;
   --st-ink:#F4EEE6;--st-ink2:#CFC5B8;--st-mute:#A3978A;
-  --st-red:#E31B23;--st-redHot:#FF3B42;--st-redInk:#FF6066;--st-ok:#4FD08A;--st-amber:#FFB547;
+  --st-red:#E31B23;--st-redHot:#FF3B42;--st-redInk:#FF6066;--st-ok:#4FD08A;--st-amber:#FFC400; /* one yellow in the app (same as the gold of the necks) */
   --st-ease:cubic-bezier(0.23,1,0.32,1);
   --st-d:'Stage Display','Archivo Black',Impact,sans-serif;--st-t:'Stage Text','Inter',system-ui,sans-serif;
   background:var(--st-ground)!important;color-scheme:dark
@@ -19978,9 +19978,10 @@ function darken(roots) {
   ctas.forEach((b) => { b.style.color = '#FFFFFF'; });
 }
 // "Palco azul" palette for light mode: slate neutrals and a cool blue highlight
-const L_BG = { 'FFF1CC': 'FFF4D6', 'FEF2DB': 'FFF4D6', 'F2F2F2': 'F1F5F9', 'F4F4F4': 'F8FAFC', 'EBEBEB': 'EEF2F7', 'E9E9E9': 'E9EEF5', 'E6E6E6': 'E2E8F0', 'FAFAFA': 'F8FAFC' };
-const L_FG = { '121212': '0F172A', '3A3A3A': '334155', '5A5A5A': '475569' };
-const L_BD = { 'E6E6E6': 'E2E8F0', 'D9D9D9': 'CBD5E1', 'FFF1CC': 'CBD5E1' };
+// warm greys, the same family as the night theme (they used to be blue-ish slate)
+const L_BG = { 'FFF1CC': 'FFF4D6', 'FEF2DB': 'FFF4D6', 'F2F2F2': 'F4EEE6', 'F4F4F4': 'F8F4EE', 'EBEBEB': 'EFE8DE', 'E9E9E9': 'EAE3D8', 'E6E6E6': 'E6DFD3', 'FAFAFA': 'FAF7F2' };
+const L_FG = { '121212': '1A1512', '3A3A3A': '3A302A', '5A5A5A': '5A4F47' };
+const L_BD = { 'E6E6E6': 'E6DFD3', 'D9D9D9': 'D9D3C8', 'FFF1CC': 'D9D3C8' };
 function palLight(roots) {
   const els = themeTargets(roots, '__lt');
   const rec = [];
@@ -20006,7 +20007,7 @@ function themeUI(lang) {
   document.body.classList.toggle('dark', dark);
   document.documentElement.classList.toggle('dk', dark);
   const tc = document.querySelector('meta[name="theme-color"]');
-  if (tc) tc.setAttribute('content', dark ? '#0D0B0A' : (CLEAN ? '#F8FAFC' : '#FFFFFF'));
+  if (tc) tc.setAttribute('content', dark ? '#0D0B0A' : (CLEAN ? '#F8F4EE' : '#FFFFFF'));
   const en = lang === 'en';
   const lb = dark ? (en ? 'Switch to white background' : 'Cambiar a fondo blanco') : (en ? 'Switch to dark background' : 'Cambiar a fondo oscuro');
   themeBtn.setAttribute('aria-label', lb); themeBtn.title = lb;
@@ -21180,8 +21181,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 11:00';
-  var BUILD_ID = '2026-11-08T11:00';
+  var BUILD = '8 nov 2026 · 11:40';
+  var BUILD_ID = '2026-11-08T11:40';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
