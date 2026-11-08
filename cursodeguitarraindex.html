@@ -4282,7 +4282,9 @@ setLang(l) {
 this.setState({ lang: l });
 try { localStorage.setItem('guitar.lang', l); } catch (e) {}
 }
-halt() { (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('.rt-on').forEach((e) => e.classList.remove('rt-on')); }
+// "Escuchar" turns into "Parar" while it sounds (keep = the caller is about to start something else)
+resetBtns() { document.querySelectorAll('#rt-root .rt-play[data-stp]').forEach((b) => { b.textContent = b._lab || b.textContent; b.removeAttribute('data-stp'); }); }
+halt(keep) { if (!keep) this.resetBtns(); (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('.rt-on').forEach((e) => e.classList.remove('rt-on')); }
 click(at, strong) {
 const ac = this._ac;
 const o = ac.createOscillator(), g = ac.createGain();
@@ -4293,7 +4295,7 @@ o.connect(g); g.connect(ac.destination); o.start(at); o.stop(at + 0.08);
 }
 // plays a list of events { at: beats from start, strong, el } twice and lights each element as it sounds
 play(evs, beats, bpm) {
-this.halt();
+this.halt(true);
 try {
 const AC = window.AudioContext || window.webkitAudioContext;
 if (!this._ac) this._ac = new AC();
@@ -4307,6 +4309,7 @@ const ms = (at - this._ac.currentTime) * 1000;
 this._tm.push(setTimeout(() => { if (ev.el) ev.el.classList.add('rt-on'); }, ms));
 this._tm.push(setTimeout(() => { if (ev.el) ev.el.classList.remove('rt-on'); }, ms + Math.max(160, spb * 1000 * 0.6)));
 });
+this._tm.push(setTimeout(() => this.resetBtns(), (2 * beats * spb + 0.35) * 1000));
 }
 // one bar of rhythm on a staff: notes = [{ k: 'w'|'h'|'q'|'e', beam: group id }], counts under each note
 bar(ts, notes, counts, accents) {
@@ -4376,6 +4379,9 @@ const BPM = 80;
 root.onclick = (e) => {
 const b = e.target.closest && e.target.closest('.rt-play');
 if (!b) return;
+if (b.hasAttribute('data-stp')) { this.halt(); return; }
+this.halt();
+b._lab = b.textContent; b.setAttribute('data-stp', '1'); b.textContent = '■ ' + (document.documentElement.lang === 'en' ? 'Stop' : 'Parar');
 const id = b.getAttribute('data-p');
 const cardEl = root.querySelector('[data-card="' + id + '"]');
 const els = (sel) => Array.prototype.slice.call(cardEl.querySelectorAll(sel));
@@ -5529,7 +5535,8 @@ setLang(l) {
 this.setState({ lang: l });
 try { localStorage.setItem('guitar.lang', l); } catch (e) {}
 }
-halt() { (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('#rf-root .rf-on').forEach((e) => e.classList.remove('rf-on')); }
+resetBtns() { document.querySelectorAll('#rf-root .rt-play[data-stp]').forEach((b) => { b.textContent = b._lab || b.textContent; b.removeAttribute('data-stp'); }); }
+halt() { this.resetBtns(); (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('#rf-root .rf-on').forEach((e) => e.classList.remove('rf-on')); }
 // six-line tab, strings e B G D A E from top to bottom
 tab(cols) {
 const W = 44 + cols.length * 30, y = (s) => 26 + s * 14;
@@ -5560,7 +5567,9 @@ const OPEN = [64, 59, 55, 50, 45, 40];
 root.onclick = (e) => {
 const b = e.target.closest && e.target.closest('.rt-play');
 if (!b) return;
+if (b.hasAttribute('data-stp')) { this.halt(); return; }
 this.halt();
+b._lab = b.textContent; b.setAttribute('data-stp', '1'); b.textContent = '■ ' + (this._cfg.es ? 'Parar' : 'Stop');
 const r = RIFFS[+b.getAttribute('data-p')];
 const card = root.querySelector('[data-r="' + b.getAttribute('data-p') + '"]');
 const ac = pAudio(); if (!ac) return;
@@ -5574,6 +5583,7 @@ this._tm.push(setTimeout(() => el && el.classList.add('rf-on'), ms));
 this._tm.push(setTimeout(() => el && el.classList.remove('rf-on'), ms + step * 900));
 at += step; k++;
 });
+this._tm.push(setTimeout(() => this.resetBtns(), (at - ac.currentTime + 0.3) * 1000));
 };
 }
 renderVals() {
@@ -10648,7 +10658,7 @@ const major = MAJ.map((s, i) => ({ d: i, acc: '', m: 48 + s, name: NM[i], deg: m
 const minor = MIN.map((s, i) => { const flat = s !== MAJ[i]; return { d: i, acc: flat ? '♭' : '', m: 48 + s, name: NM[i] + (flat ? (es ? '♭' : '♭') : ''), deg: minDeg[i], chord: minCh[i] }; });
 const p = (x) => '<p class="pt-p">' + x + '</p>';
 const steps = (arr) => '<div class="sc-steps">' + arr.map((x) => '<span class="' + (x === 'S' ? 'sc-half' : '') + '">' + (x === 'T' ? T.tone : T.semi) + '</span>').join('') + '</div>';
-root.innerHTML = '<div class="pt-card rt-card" data-staff="maj"><div class="rt-top"><b>' + T.majT + '</b><span class="ts-btns"><button type="button" class="rt-play" data-play="maj">▶ ' + T.listen + '</button><button type="button" class="rt-play" data-rec="1" aria-label="' + T.recAria + '" title="' + T.recAria + '">▶ ' + T.rec + '</button></span></div>' + scaleStaff(major, T.majT) + steps(['T', 'T', 'S', 'T', 'T', 'T', 'S']) + '</div>'
+root.innerHTML = '<div class="pt-card rt-card" data-staff="maj"><div class="rt-top"><b>' + T.majT + '</b><span class="ts-btns"><button type="button" class="rt-play" data-rec="1" aria-label="' + T.recAria + '" title="' + T.recAria + '">▶ ' + T.listen + '</button></span></div>' + scaleStaff(major, T.majT) + steps(['T', 'T', 'S', 'T', 'T', 'T', 'S']) + '</div>'
 + '<div class="sc-legend">' + p(T.rule) + '</div>'
 + '<p class="sc-lead">' + T.minIntro + '</p>'
 + '<div class="pt-card rt-card" data-staff="min"><div class="rt-top"><b>' + T.minT + '</b><button type="button" class="rt-play" data-play="min">▶ ' + T.listen + '</button></div>' + scaleStaff(minor, T.minT) + steps(['T', 'S', 'T', 'T', 'S', 'T', 'T']) + '</div>'
@@ -10658,11 +10668,12 @@ scaleTap(root);
 const rb = root.querySelector('[data-rec]');
 const ns = Array.prototype.slice.call(root.querySelectorAll('[data-staff="maj"] .sc-n'));
 const lit = (k) => ns.forEach((n, i) => n.classList.toggle('sc-on', i === k));
-const label = (on) => { rb.textContent = (on ? '■ ' : '▶ ') + T.rec; };
+const label = (on) => { rb.textContent = on ? '■ ' + (es ? 'Parar' : 'Stop') : '▶ ' + T.listen; };
 const stop = () => { const a = this._rec; if (a) { a.pause(); a.currentTime = 0; } cancelAnimationFrame(this._recRaf); lit(-1); label(false); };
 rb.onclick = (e) => {
 e.stopPropagation();
 if (this._rec && !this._rec.paused) { stop(); return; }
+if (root._scStop) root._scStop(); // the synth minor scale, if it is sounding
 if (!this._rec) { this._rec = new Audio(TEO_REC); this._rec.preload = 'auto'; }
 const a = this._rec;
 a.onended = stop;
@@ -20783,13 +20794,32 @@ function scaleStaff(notes, aria, hlFrom, hlTo) {
   return h + '</svg>';
 }
 function scaleTap(root) {
+  // "Escuchar" turns into "Parar" while a scale sounds; a second tap (or starting another one) stops it
+  const stopWord = () => (document.documentElement.lang === 'en' ? 'Stop' : 'Parar');
+  const halt = () => {
+    const sp = root._sp; if (!sp) return;
+    root._sp = null;
+    sp.tms.forEach(clearTimeout); sp.src.forEach((x) => { try { x.stop(); } catch (er) {} });
+    root.querySelectorAll('.sc-on').forEach((n) => n.classList.remove('sc-on'));
+    if (sp.btn.isConnected) sp.btn.textContent = sp.lab;
+  };
+  root._scStop = halt;
   root.onclick = (e) => {
     const b = e.target.closest && e.target.closest('[data-play]');
     if (b) {
+      if (root._sp && root._sp.btn === b) { halt(); return; }
+      halt();
+      if (root._recStop) { try { root._recStop(); } catch (er) {} }
       const ns = Array.prototype.slice.call(root.querySelectorAll('[data-staff="' + b.getAttribute('data-play') + '"] .sc-n'));
       const ac = pAudio(); if (!ac) return;
       const t0 = ac.currentTime + 0.05;
-      ns.forEach((n, i) => { pluck(+n.getAttribute('data-m'), t0 + i * 0.42); setTimeout(() => { n.classList.add('sc-on'); setTimeout(() => n.classList.remove('sc-on'), 380); }, i * 420); });
+      const sp = root._sp = { btn: b, lab: b.textContent, tms: [], src: [] };
+      b.textContent = '■ ' + stopWord();
+      ns.forEach((n, i) => {
+        try { const so = pluck(+n.getAttribute('data-m'), t0 + i * 0.42); if (so) sp.src.push(so); } catch (er) {}
+        sp.tms.push(setTimeout(() => { n.classList.add('sc-on'); sp.tms.push(setTimeout(() => n.classList.remove('sc-on'), 380)); }, i * 420));
+      });
+      sp.tms.push(setTimeout(() => { if (root._sp === sp) halt(); }, ns.length * 420 + 300));
       return;
     }
     const n = e.target.closest && e.target.closest('.sc-n');
@@ -21148,8 +21178,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '7 nov 2026 · 23:10';
-  var BUILD_ID = '2026-11-07T23:10';
+  var BUILD = '8 nov 2026 · 09:00';
+  var BUILD_ID = '2026-11-08T09:00';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
