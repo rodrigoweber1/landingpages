@@ -3769,6 +3769,7 @@ return v;
 }
 }
  return Component; };
+const EM_SOUND = false; // set to true to hear the chords again in "Entendiendo el mástil"
 C["EntMastil"] = (DCLogic) => {
 class Component extends DCLogic {
 constructor(props) {
@@ -3804,6 +3805,7 @@ this.setState({ cur: ((i % (this._n || 1)) + (this._n || 1)) % (this._n || 1) })
 this.strum();
 }
 strum() {
+if (!EM_SOUND) return; // this screen is silent: the animation only shows the chords
 try {
 const v = this._cur;
 if (!v || typeof pluck !== 'function') return;
@@ -21178,8 +21180,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 09:40';
-  var BUILD_ID = '2026-11-08T09:40';
+  var BUILD = '8 nov 2026 · 10:05';
+  var BUILD_ID = '2026-11-08T10:05';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
