@@ -1252,6 +1252,24 @@ body.stage #app .stg-em .em2-song span{display:block;margin-top:2px;font-size:13
 body.stage #app .stg-em .em2-song button{flex:0 0 auto;min-height:44px;padding:0 14px;background:var(--st-floor2)!important;border:1px solid var(--st-rule)!important;color:var(--st-ink)!important;border-radius:999px!important;font-weight:700!important;font-size:14px;cursor:pointer}
 body.stage #app .stg-em .em2-song button[aria-pressed="true"]{background:var(--st-floor2)!important;border-color:var(--st-amber)!important;color:var(--st-amber)!important}
 body.stage #app .stg-em .em2-foot{margin:18px 0 12px!important;font-size:12px!important;line-height:16px!important;color:var(--st-mute)!important}
+/* Look redondo y amarillo en toda la app (probado primero en «Entendiendo el mástil»):
+   segmentados = cápsula con la opción activa en rojo; fichas = cápsula con borde y letra amarillos al elegirlas */
+body.stage #app [role="group"][style*="display: flex"]:not(.stg-answers):not(.stg-plain){border-radius:999px!important}
+body.stage #app [role="group"][style*="display: flex"]:not(.stg-answers):not(.stg-plain) button{border-radius:999px!important}
+body.stage #app [role="group"][style*="display: flex"]:not(.stg-answers):not(.stg-plain) button[aria-pressed="true"]{background:var(--st-red)!important;color:#FFFFFF!important;box-shadow:0 4px 14px rgba(227,27,35,.30)!important}
+body.stage #app [role="group"][style*="display: flex"]:not(.stg-answers):not(.stg-plain) button[aria-pressed="true"] span{color:#FFFFFF!important}
+/* grupos en rejilla (tonalidades, notas…): las fichas sin clase propia */
+body.stage #app [role="group"]:not([style*="display: flex"]):not(.stg-answers):not(.stg-plain) button:not([class]){border-radius:26px!important}
+body.stage #app [role="group"]:not([style*="display: flex"]):not(.stg-answers):not(.stg-plain) button:not([class])[aria-pressed="true"]{background:var(--st-floor)!important;color:var(--st-amber)!important;box-shadow:inset 0 0 0 1.5px var(--st-amber)!important}
+body.stage #app [role="group"]:not([style*="display: flex"]):not(.stg-answers):not(.stg-plain) button:not([class])[aria-pressed="true"] span{color:var(--st-amber)!important}
+/* fichas y botones sueltos */
+body.stage #app main button:is(:not([class]),.ej-chip,.stg-chip):not([role="switch"])[style*="border-radius"]{border-radius:26px!important}
+body.stage #app main button[aria-pressed="true"]:is(:not([class]),.ej-chip,.stg-chip):not([role="switch"]){background:var(--st-floor)!important;border-color:var(--st-amber)!important;color:var(--st-amber)!important;box-shadow:none!important}
+body.stage #app main button[aria-pressed="true"]:is(:not([class]),.ej-chip,.stg-chip):not([role="switch"]) span{color:var(--st-amber)!important}
+/* selector de idioma de la portada */
+body.stage .thm{border-radius:999px!important}
+body.stage .thm button{border-radius:999px!important}
+body.stage .thm button[aria-pressed="true"]{background:var(--st-red)!important;color:#FFFFFF!important;box-shadow:0 4px 14px rgba(227,27,35,.30)!important}
 
 /* the stage-mode launcher: the one red, unmissable control */
 body.stage #app .stg-live-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:64px;padding:0 20px;border:0;border-radius:999px;background:var(--st-red)!important;color:#FFFFFF!important;font-family:var(--st-d)!important;font-weight:900!important;font-size:26px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;box-shadow:0 14px 28px -12px rgba(0,0,0,.85)}
@@ -21263,8 +21281,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 21:00';
-  var BUILD_ID = '2026-11-08T21:00';
+  var BUILD = '8 nov 2026 · 21:07';
+  var BUILD_ID = '2026-11-08T21:07';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
