@@ -1387,7 +1387,7 @@ body.stage #app .stg-chg .stg-chip[aria-pressed="true"]{background:var(--st-floo
 /* ===== Stage skin, whole app ===== */
 html{scrollbar-color:#3A302A #0D0B0A}
 body.stage{caret-color:var(--st-red)}
-body.stage #themeBtn{display:none!important}
+body.stage #themeBtn,body.no-light .thm,body.no-light #yr-mini .ym-thm{display:none!important}
 body.stage .thm-top{margin:8px 0 4px}
 body.stage #app :focus-visible{outline:2px solid var(--st-redHot)!important;outline-offset:3px}
 
@@ -1565,6 +1565,7 @@ class DCLogic {
 const C = {};
 // screens that wear the stage skin (test: home, note quiz, chord changes)
 const STAGE_SCREENS = ['Inicio', 'Quiz', 'CambioAcordes'];
+const LIGHT_ON = false; // the light theme and its switch are off for now; set true to bring them back
 const STAGE_ALL = true; // stage skin on every screen; set false to bring the old light/night themes back
 C["Inicio"] = (DCLogic) => { 
 class Component extends DCLogic {
@@ -19863,7 +19864,7 @@ const fnav = document.getElementById('fnav');
 let themeMode = 'dark';
 try { const v = localStorage.getItem('guitar.theme'); if (v === 'light' || v === 'dark' || v === 'auto') themeMode = v; } catch (e) {}
 const darkMQ = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-const isDark = () => themeMode === 'dark' || (themeMode === 'auto' && !!(darkMQ && darkMQ.matches));
+const isDark = () => !LIGHT_ON || themeMode === 'dark' || (themeMode === 'auto' && !!(darkMQ && darkMQ.matches));
 let dark = isDark();
 function setThemeMode(m) {
   themeMode = m;
@@ -20005,6 +20006,7 @@ function palLight(roots) {
 
 const themeBtn = document.getElementById('themeBtn');
 function themeUI(lang) {
+  document.body.classList.toggle('no-light', !LIGHT_ON);
   document.body.classList.toggle('dark', dark);
   document.documentElement.classList.toggle('dk', dark);
   const tc = document.querySelector('meta[name="theme-color"]');
@@ -20995,7 +20997,7 @@ function mount(name, q) {
     if (l) document.documentElement.lang = l;
     document.title = 'You Rock Academy';
     document.body.classList.toggle('home', name === 'Inicio');
-    const onStage = dark && (STAGE_ALL || STAGE_SCREENS.indexOf(name) >= 0); // the stage skin is the night look; the light theme is the clean light one
+    const onStage = (dark || !LIGHT_ON) && (STAGE_ALL || STAGE_SCREENS.indexOf(name) >= 0); // the stage skin is the night look; the light theme is the clean light one
     document.body.classList.toggle('stage', onStage);
     if (name !== 'CambioAcordes') { document.body.classList.remove('stg-live-on'); document.querySelectorAll('body > .stg-live, body > .stg-tk-wrap').forEach((n) => n.remove()); }
     fit();
@@ -21194,8 +21196,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 12:20';
-  var BUILD_ID = '2026-11-08T12:20';
+  var BUILD = '8 nov 2026 · 12:45';
+  var BUILD_ID = '2026-11-08T12:45';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
