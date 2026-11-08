@@ -1212,19 +1212,22 @@ body.stage #app .stg-chg .stg-drillnote{color:var(--st-mute)!important}
 /* Entendiendo el mástil (módulo 4): una progresión, tres formas de tocarla */
 body.stage #app .stg-em main{gap:0!important}
 body.stage #app .stg-em .em2{display:flex;flex-direction:column}
-body.stage #app .stg-em .em2-eye{font:500 12px/16px var(--st-t);color:var(--st-redInk)}
+body.stage #app .stg-em .em2-eye{font:700 12px/16px var(--st-t);letter-spacing:.14em;text-transform:uppercase;color:var(--st-amber)}
 body.stage #app .stg-em .em2-intro{margin:4px 0 0!important;font-size:15px!important;line-height:22px!important}
 body.stage #app .stg-em .em2-lab{display:block;margin:22px 0 8px;font:700 12px/16px var(--st-t);letter-spacing:.1em;text-transform:uppercase;color:var(--st-mute)}
 body.stage #app .stg-em .em2-row{display:flex;flex-wrap:wrap;gap:8px}
-body.stage #app .stg-em .em2-chip{min-height:44px;padding:9px 14px;background:var(--st-floor2)!important;border:1px solid var(--st-rule)!important;color:var(--st-ink2)!important;border-radius:12px!important;font-weight:600!important;font-size:14px;cursor:pointer}
-body.stage #app .stg-em .em2-chip[aria-pressed="true"]{background:var(--st-red)!important;border-color:var(--st-red)!important;color:#FFFFFF!important}
+body.stage #app .stg-em .em2-chip{min-height:44px;padding:9px 16px;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;color:var(--st-ink2)!important;border-radius:999px!important;font-weight:600!important;font-size:14px;cursor:pointer}
+body.stage #app .stg-em .em2-chip[aria-pressed="true"]{background:var(--st-floor)!important;border-color:var(--st-amber)!important;color:var(--st-amber)!important}
 body.stage #app .stg-em .em2-keys .em2-chip{min-width:48px;padding:9px 8px;text-align:center}
-body.stage #app .stg-em .em2-seg{display:flex;gap:2px;padding:2px}
+body.stage #app .stg-em .em2-seg{display:flex;gap:4px;padding:4px}
+body.stage #app .stg-em .em2-seg[role="group"]:not(.stg-answers):not(.stg-plain){background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important}
+body.stage #app .stg-em .em2-seg[role="group"]:not(.stg-answers):not(.stg-plain) button{border-radius:999px!important;min-height:44px}
+body.stage #app .stg-em .em2-seg[role="group"]:not(.stg-answers):not(.stg-plain) button[aria-pressed="true"]{background:var(--st-red)!important;color:#FFFFFF!important;box-shadow:0 4px 14px rgba(227,27,35,.35)!important}
 body.stage #app .stg-em .em2-seg button{flex:1;min-width:0;font-size:14px;cursor:pointer}
 body.stage #app .stg-em .em2-note{margin:8px 2px 0!important;font-size:14px!important;line-height:20px!important;color:var(--st-mute)!important}
 body.stage #app .stg-em .em2-warn{margin:8px 0 0!important;padding-left:10px;border-left:3px solid var(--st-amber);font-size:14px!important;line-height:20px!important;color:var(--st-amber)!important}
 body.stage #app .stg-em .em2-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:8px}
-body.stage #app .stg-em .em2-cc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 10px;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:16px!important;color:var(--st-ink)!important;cursor:pointer}
+body.stage #app .stg-em .em2-cc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 10px;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:20px!important;color:var(--st-ink)!important;cursor:pointer}
 body.stage #app .stg-em .em2-cc[aria-pressed="true"]{background:#2A1416!important;border-color:var(--st-red)!important;box-shadow:inset 0 0 0 1px var(--st-red)}
 body.stage #app .stg-em .em2-cc svg{width:78px;height:auto;display:block}
 body.stage #app .stg-em .em2-cc b{font-size:17px;font-family:var(--st-t)}
@@ -1242,12 +1245,12 @@ body.stage #app .stg-em .em2-notes{margin-top:2px;font-size:14px;color:var(--st-
 body.stage #app .stg-em .em2-how{margin:8px 0 0!important;font-size:15px!important;line-height:22px!important;color:var(--st-ink)!important}
 body.stage #app .stg-em .em2-playrow{display:flex;align-items:center;gap:12px;margin-top:14px}
 body.stage #app .stg-em .em2-playrow span{font-size:13px;color:var(--st-mute)}
-body.stage #app .stg-em .em2-play{min-height:48px;padding:0 22px;background:var(--st-red)!important;color:#FFFFFF!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
+body.stage #app .stg-em .em2-play{min-height:48px;padding:0 22px;background:var(--st-amber)!important;color:#1A1200!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
 body.stage #app .stg-em .em2-song{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px;padding:12px 14px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
 body.stage #app .stg-em .em2-song b{display:block;font-size:15px;color:var(--st-ink)}
 body.stage #app .stg-em .em2-song span{display:block;margin-top:2px;font-size:13px;color:var(--st-mute)}
 body.stage #app .stg-em .em2-song button{flex:0 0 auto;min-height:44px;padding:0 14px;background:var(--st-floor2)!important;border:1px solid var(--st-rule)!important;color:var(--st-ink)!important;border-radius:999px!important;font-weight:700!important;font-size:14px;cursor:pointer}
-body.stage #app .stg-em .em2-song button[aria-pressed="true"]{background:var(--st-red)!important;border-color:var(--st-red)!important;color:#FFFFFF!important}
+body.stage #app .stg-em .em2-song button[aria-pressed="true"]{background:var(--st-floor2)!important;border-color:var(--st-amber)!important;color:var(--st-amber)!important}
 body.stage #app .stg-em .em2-foot{margin:18px 0 12px!important;font-size:12px!important;line-height:16px!important;color:var(--st-mute)!important}
 
 /* the stage-mode launcher: the one red, unmissable control */
@@ -21260,8 +21263,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 20:57';
-  var BUILD_ID = '2026-11-08T20:57';
+  var BUILD = '8 nov 2026 · 21:00';
+  var BUILD_ID = '2026-11-08T21:00';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
