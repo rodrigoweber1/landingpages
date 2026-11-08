@@ -1441,6 +1441,8 @@ body.stage #sl-root [class*="num"],body.stage #sl-root [class*="-n"]{color:var(-
 body.stage #app :is(.ej-chip,.hc-lc){background:var(--st-floor2,#221B17)!important;border:1px solid var(--st-rule)!important;color:var(--st-ink)!important;border-radius:12px}
 body.stage #app :is(.ej-chip small,.hc-lc small){color:var(--st-ink2)!important;opacity:1}
 body.stage #app .ej-chip[aria-pressed="true"],body.stage #app .hc-lc[data-end="true"]{background:var(--st-red,#E31B23)!important;border-color:var(--st-red,#E31B23)!important;color:#fff!important}
+/* the selected chip is red: every text inside it is white (the beige of the secondary text only reached 2.8:1) */
+body.stage #app :is(.ej-chip[aria-pressed="true"],.hc-lc[data-end="true"]) :is(span,small,b,i){color:#fff!important}
 body.stage #app :is(.ej-chip[aria-pressed="true"] small){color:#fff!important}
 body.stage #app .cp-blk{background:#2E2520!important;color:var(--st-ink)!important;border-color:var(--st-ground,#0D0B0A)!important}
 body.stage #app .cp-blk.cp-rest{background:transparent!important;color:var(--st-mute)!important}
@@ -21178,8 +21180,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 10:15';
-  var BUILD_ID = '2026-11-08T10:15';
+  var BUILD = '8 nov 2026 · 11:00';
+  var BUILD_ID = '2026-11-08T11:00';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
