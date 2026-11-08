@@ -1277,6 +1277,8 @@ body.stage #app .eb{font-size:12px!important;line-height:16px!important;font-wei
 body.stage #app [data-card]{border-radius:16px!important}
 body.stage #app [data-card="panel"]{background:var(--st-floor)!important;border-color:var(--st-rule)!important}
 body.stage #app [data-card="note"]{background:#2A1416!important}
+/* acción principal: el «Siguiente» es siempre rojo (las pantallas que se pintan aparte, como Quiz o Cambio de acordes, lo traían oscuro) */
+body.stage #app a.cta{background:var(--st-red)!important;color:#FFFFFF!important}
 /* mosaicos = radio 20, pasos = círculo, fichas de color = cápsula */
 body.stage #app .stg-ans,body.stage #app .ej-bar{border-radius:20px!important}
 body.stage #app .bt-bpm,body.stage #app .hc-lc{border-radius:999px!important}
@@ -21322,8 +21324,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 21:27';
-  var BUILD_ID = '2026-11-08T21:27';
+  var BUILD = '8 nov 2026 · 21:32';
+  var BUILD_ID = '2026-11-08T21:32';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
