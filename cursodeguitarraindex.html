@@ -1219,24 +1219,22 @@ body.stage #app .stg-em .em2-row{display:flex;flex-wrap:wrap;gap:8px}
 body.stage #app .stg-em .em2-chip{min-height:44px;padding:9px 16px;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;color:var(--st-ink2)!important;border-radius:999px!important;font-weight:600!important;font-size:14px;cursor:pointer}
 body.stage #app .stg-em .em2-chip[aria-pressed="true"]{background:var(--st-floor)!important;border-color:var(--st-amber)!important;color:var(--st-amber)!important}
 body.stage #app .stg-em .em2-keys .em2-chip{min-width:48px;padding:9px 8px;text-align:center}
-body.stage #app .stg-em .em2-seg{display:flex;gap:4px;padding:4px}
-body.stage #app .stg-em .em2-seg[role="group"]:not(.stg-answers):not(.stg-plain){background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important}
-body.stage #app .stg-em .em2-seg[role="group"]:not(.stg-answers):not(.stg-plain) button{border-radius:999px!important;min-height:44px}
-body.stage #app .stg-em .em2-seg[role="group"]:not(.stg-answers):not(.stg-plain) button[aria-pressed="true"]{background:var(--st-red)!important;color:#FFFFFF!important;box-shadow:0 4px 14px rgba(227,27,35,.35)!important}
+body.stage #app .stg-em .em2-seg{gap:4px;padding:4px}
 body.stage #app .stg-em .em2-seg button{flex:1;min-width:0;font-size:14px;cursor:pointer}
 body.stage #app .stg-em .em2-note{margin:8px 2px 0!important;font-size:14px!important;line-height:20px!important;color:var(--st-mute)!important}
 body.stage #app .stg-em .em2-warn{margin:8px 0 0!important;padding-left:10px;border-left:3px solid var(--st-amber);font-size:14px!important;line-height:20px!important;color:var(--st-amber)!important}
-body.stage #app .stg-em .em2-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:8px}
+body.stage #app .stg-em .em2-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));max-width:480px;gap:8px}
 body.stage #app .stg-em .em2-cc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 10px;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:20px!important;color:var(--st-ink)!important;cursor:pointer}
-body.stage #app .stg-em .em2-cc[aria-pressed="true"]{background:#2A1416!important;border-color:var(--st-red)!important;box-shadow:inset 0 0 0 1px var(--st-red)}
+body.stage #app .stg-em .em2-cc[aria-pressed="true"]{background:var(--st-floor)!important;border-color:var(--st-amber)!important;box-shadow:inset 0 0 0 1px var(--st-amber)}
+body.stage #app .stg-em .em2-cc[aria-pressed="true"] b{color:var(--st-amber)}
 body.stage #app .stg-em .em2-cc svg{width:78px;height:auto;display:block}
 body.stage #app .stg-em .em2-cc b{font-size:17px;font-family:var(--st-t)}
 body.stage #app .stg-em .em2-cc small{font-size:12px;line-height:16px;color:var(--st-mute)}
 body.stage #app .stg-em .em2-cc small.fbt{color:var(--st-amber)}
-body.stage #app .stg-em .em2-bars{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+body.stage #app .stg-em .em2-bars{display:grid;grid-template-columns:repeat(4,minmax(0,110px));justify-content:start;gap:6px;margin-top:10px}
 body.stage #app .stg-em .em2-bar{min-height:50px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:12px!important;color:var(--st-ink)!important;font-size:15px;font-weight:700;cursor:pointer}
 body.stage #app .stg-em .em2-bar small{font-size:12px;line-height:14px;font-weight:600;color:var(--st-mute)}
-body.stage #app .stg-em .em2-bar[aria-pressed="true"]{background:#2A1416!important;border-color:var(--st-red)!important}
+body.stage #app .stg-em .em2-bar[aria-pressed="true"]{background:var(--st-floor)!important;border-color:var(--st-amber)!important;box-shadow:inset 0 0 0 1px var(--st-amber);color:var(--st-amber)!important}
 body.stage #app .stg-em .em2-leg{display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:13px;color:var(--st-mute)}
 body.stage #app .stg-em .em2-leg i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
 body.stage #app .stg-em .em2-card{margin-top:14px;padding:16px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
@@ -1245,7 +1243,7 @@ body.stage #app .stg-em .em2-notes{margin-top:2px;font-size:14px;color:var(--st-
 body.stage #app .stg-em .em2-how{margin:8px 0 0!important;font-size:15px!important;line-height:22px!important;color:var(--st-ink)!important}
 body.stage #app .stg-em .em2-playrow{display:flex;align-items:center;gap:12px;margin-top:14px}
 body.stage #app .stg-em .em2-playrow span{font-size:13px;color:var(--st-mute)}
-body.stage #app .stg-em .em2-play{min-height:48px;padding:0 22px;background:var(--st-amber)!important;color:#1A1200!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
+body.stage #app .stg-em .em2-play{min-height:48px;padding:0 22px;background:var(--st-red)!important;color:#FFFFFF!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
 body.stage #app .stg-em .em2-song{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px;padding:12px 14px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
 body.stage #app .stg-em .em2-song b{display:block;font-size:15px;color:var(--st-ink)}
 body.stage #app .stg-em .em2-song span{display:block;margin-top:2px;font-size:13px;color:var(--st-mute)}
@@ -4062,7 +4060,7 @@ set('em2-name', cur.long); set('em2-notes', t.notes + cur.notes); set('em2-how',
 html() {
 const t = this.T(), S = this.S, c = this.chords(), cur = c[Math.min(S.cur, c.length - 1)];
 const chip = (attr, label, on) => '<button type="button" class="em2-chip" ' + attr + ' aria-pressed="' + on + '">' + label + '</button>';
-const seg = (aria, items, attr, val) => '<div class="em2-seg" role="group" aria-label="' + aria + '">' + items.map((x) => '<button type="button" ' + attr + '="' + x[0] + '" aria-pressed="' + (val === x[0]) + '">' + x[1] + '</button>').join('') + '</div>';
+const seg = (aria, items, attr, val) => '<div class="em2-seg" role="group" style="display: flex" aria-label="' + aria + '">' + items.map((x) => '<button type="button" ' + attr + '="' + x[0] + '" aria-pressed="' + (val === x[0]) + '">' + x[1] + '</button>').join('') + '</div>';
 const uq = []; c.forEach((x, i) => { if (!uq.some((u) => u.x.key === x.key)) uq.push({ x, i }); });
 const fbN = uq.filter((u) => u.x.sh.fb).length;
 const isBars = c.length > 6, sg = EM_SONGS[S.mode][S.prog] || [];
@@ -4075,7 +4073,7 @@ h += '<span class="em2-lab">' + t.how + '</span>' + seg(t.how, [['open', t.m_ope
 h += '<p class="em2-note">' + t['h_' + S.how] + '</p>';
 if (S.how === 'open' && fbN > 0 && fbN * 2 >= uq.length) h += '<p class="em2-warn">' + t.warnOpen + '</p>';
 h += '<span class="em2-lab">' + t.chords + '</span><div class="em2-strip">' + uq.map((u) => '<button type="button" class="em2-cc" data-c="' + u.i + '" aria-pressed="' + (u.x.key === cur.key) + '">' + emSvg(u.x.sh, u.x.r.pc) + '<b>' + u.x.label + '</b><small' + (u.x.sh.fb ? ' class="fbt"' : '') + '>' + this.fretTxt(u.x.sh) + '</small></button>').join('') + '</div>';
-if (isBars) h += '<div class="em2-bars" role="group" aria-label="' + t.bars + '">' + c.map((x, i) => '<button type="button" class="em2-bar" data-c="' + i + '" aria-pressed="' + (i === S.cur) + '" aria-label="' + t.bar + (i + 1) + ' ' + x.label + '"><small>' + (i + 1) + '</small>' + x.label + '</button>').join('') + '</div>';
+if (isBars) h += '<div class="em2-bars stg-plain" role="group" aria-label="' + t.bars + '">' + c.map((x, i) => '<button type="button" class="em2-bar" data-c="' + i + '" aria-pressed="' + (i === S.cur) + '" aria-label="' + t.bar + (i + 1) + ' ' + x.label + '"><small>' + (i + 1) + '</small>' + x.label + '</button>').join('') + '</div>';
 h += '<div class="em2-leg"><span><i style="background:#e31b23"></i>' + t.root + '</span><span><i style="background:#f4ede6"></i>' + t.other + '</span></div>';
 h += '<div class="em2-card" aria-live="polite"><div class="em2-name" id="em2-name">' + cur.long + '</div><div class="em2-notes" id="em2-notes">' + t.notes + cur.notes + '</div><p class="em2-how" id="em2-how">' + this.how(cur.sh) + '</p>';
 h += '<div class="em2-playrow"><button type="button" class="em2-play" data-play>' + (S.run ? t.stop : t.play) + '</button><span>' + t.pnote + '</span></div></div>';
@@ -21281,8 +21279,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 21:07';
-  var BUILD_ID = '2026-11-08T21:07';
+  var BUILD = '8 nov 2026 · 21:11';
+  var BUILD_ID = '2026-11-08T21:11';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
