@@ -1277,6 +1277,11 @@ body.stage #app .eb{font-size:12px!important;line-height:16px!important;font-wei
 body.stage #app [data-card]{border-radius:16px!important}
 body.stage #app [data-card="panel"]{background:var(--st-floor)!important;border-color:var(--st-rule)!important}
 body.stage #app [data-card="note"]{background:#2A1416!important}
+/* segmentado por lo que ve el alumno: 2–4 opciones de una línea, en una sola fila (el script tagSegs marca el grupo, sea cual sea su código) */
+body.stage #app [data-seg][data-seg][data-seg]{display:flex!important;gap:4px!important;padding:4px!important;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important}
+body.stage #app [data-seg][data-seg][data-seg] button{flex:1 1 0;min-width:0;background:transparent!important;border:0!important;color:var(--st-mute)!important;border-radius:999px!important;box-shadow:none!important;font-weight:600!important}
+body.stage #app [data-seg][data-seg][data-seg] button[aria-pressed="true"]{background:var(--st-red)!important;border-color:transparent!important;color:#FFFFFF!important;box-shadow:0 4px 14px rgba(227,27,35,.30)!important}
+body.stage #app [data-seg][data-seg][data-seg] button span{color:inherit!important}
 /* acción principal: el «Siguiente» es siempre rojo (las pantallas que se pintan aparte, como Quiz o Cambio de acordes, lo traían oscuro) */
 body.stage #app a.cta{background:var(--st-red)!important;color:#FFFFFF!important}
 /* mosaicos = radio 20, pasos = círculo, fichas de color = cápsula */
@@ -20480,7 +20485,8 @@ function styleNeck(svg, nk) {
 }
 // the fretboard goes first: on screens where a neck sits below the options that change it (key, notes,
 // fingers…), the block holding the neck moves up, right above the first of those options
-const NECK_FIRST_SKIP = ['Hotel'];
+// Buscador: the diagrams appear after choosing a chord and must always stay below the options (moving them up only for the first chord made the page jump)
+const NECK_FIRST_SKIP = ['Hotel', 'Buscador'];
 function isNeckEl(e) {
   if (e.tagName.toLowerCase() === 'svg') { if (e.classList.contains('rf-tab')) return false; try { return !!neckInfo(e); } catch (er) { return false; } }
   // a fretboard drawn with HTML cells (a group labelled as the neck)
@@ -20534,6 +20540,26 @@ function tagCards(root) {
   });
   todo.forEach((t) => t[0].setAttribute('data-card', t[1]));
 }
+// a group of 2–4 one-line options on a single row is a segmented control, whatever markup the screen used:
+// it gets the segmented look (red active option). Reads first, writes after.
+function tagSegs(root) {
+  const r = root || app;
+  if (!r || r.nodeType !== 1) return;
+  // the parents of the pressable options, whether the screen marked them as a group or not
+  const parents = [];
+  Array.prototype.slice.call(r.querySelectorAll('button[aria-pressed]')).concat(r.matches && r.matches('button[aria-pressed]') ? [r] : []).forEach((b) => { const pe = b.parentElement; if (pe && parents.indexOf(pe) < 0) parents.push(pe); });
+  const list = parents;
+  const todo = [];
+  list.forEach((g) => {
+    if (g.hasAttribute('data-seg') || g.classList.contains('stg-answers') || !g.closest('main') || g.closest('header') || g.matches('[style*="display: flex"]')) return;
+    const kids = Array.prototype.slice.call(g.children);
+    if (kids.length < 2 || kids.length > 4 || !kids.every((k) => k.tagName === 'BUTTON' && k.hasAttribute('aria-pressed') && k.children.length < 2 && !k.className.match(/(^|\s)(hc-cell|sk-cell|rt-play|em2-)/))) return;
+    const rs = kids.map((k) => k.getBoundingClientRect());
+    if (rs.some((b) => b.width === 0 || b.height > 52 || Math.abs(b.top - rs[0].top) > 4)) return;
+    todo.push(g);
+  });
+  todo.forEach((g) => g.setAttribute('data-seg', ''));
+}
 function tagNecks(root) {
   const r = root || app;
   const list = r.tagName && r.tagName.toLowerCase() === 'svg' ? [r] : r.querySelectorAll('svg');
@@ -20561,7 +20587,7 @@ try {
     // blocks painted after the render (cards drawn by hand, delayed paints) get the theme colours too;
     // this runs before the browser paints, so they never flash in the other theme
     const live = added.filter((n) => n.isConnected);
-    if (live.length) { try { if (dark) darken(live); else palLight(live); } catch (e) {} try { live.forEach((n) => tagCards(n)); } catch (e) {} }
+    if (live.length) { try { if (dark) darken(live); else palLight(live); } catch (e) {} try { live.forEach((n) => { tagCards(n); tagSegs(n); }); } catch (e) {} }
     // a neck painted after the first render gets the tap tip too
     if (!app.querySelector('.nk-hint')) { try { attachHint(currentName, document.documentElement.lang); } catch (e) {} }
     try { stageVideos(document.documentElement.lang || 'es'); } catch (e) {}
@@ -21153,6 +21179,7 @@ function mount(name, q) {
     // diagram labels (12px minimum, necks cut to the chord) are fixed here too, not 120 ms later: that late pass made every diagram jump after each selection
     try { minSvgText(app); } catch (e) {}
     try { tagCards(app); } catch (e) {}
+    try { tagSegs(app); } catch (e) {}
     for (const k in keep) { const e = document.getElementById(k); if (e) e.scrollTop = keep[k]; }
     if (render.first) { render.first = false; } else { window.scrollTo(0, y); }
   };
@@ -21324,8 +21351,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 21:32';
-  var BUILD_ID = '2026-11-08T21:32';
+  var BUILD = '8 nov 2026 · 21:39';
+  var BUILD_ID = '2026-11-08T21:39';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
