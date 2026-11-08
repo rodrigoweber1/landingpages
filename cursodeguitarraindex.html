@@ -1268,6 +1268,18 @@ body.stage #app main button[aria-pressed="true"]:is(:not([class]),.ej-chip,.stg-
 body.stage .thm{border-radius:999px!important}
 body.stage .thm button{border-radius:999px!important}
 body.stage .thm button[aria-pressed="true"]{background:var(--st-red)!important;border-color:transparent!important;color:#FFFFFF!important;box-shadow:0 4px 14px rgba(227,27,35,.30)!important}
+/* ===== Regla de look & feel (ver LOOK-AND-FEEL.md) ===== */
+/* la página la maneja la app (scrollTo tras cada dibujo): el navegador no debe «anclar» el scroll por su cuenta */
+html,body,#app{overflow-anchor:none}
+/* etiqueta de sección / «Módulo · Paso»: amarillo, mayúsculas */
+body.stage #app .eb{font-size:12px!important;line-height:16px!important;font-weight:700!important;letter-spacing:.14em;text-transform:uppercase;color:var(--st-amber)!important}
+/* tarjeta = fondo floor, borde rule, radio 16; aviso = fondo rojo oscuro (el script tagCards marca cada caja) */
+body.stage #app [data-card]{border-radius:16px!important}
+body.stage #app [data-card="panel"]{background:var(--st-floor)!important;border-color:var(--st-rule)!important}
+body.stage #app [data-card="note"]{background:#2A1416!important}
+/* mosaicos = radio 20, pasos = círculo, fichas de color = cápsula */
+body.stage #app .stg-ans,body.stage #app .ej-bar{border-radius:20px!important}
+body.stage #app .bt-bpm,body.stage #app .hc-lc{border-radius:999px!important}
 
 /* the stage-mode launcher: the one red, unmissable control */
 body.stage #app .stg-live-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:64px;padding:0 20px;border:0;border-radius:999px;background:var(--st-red)!important;color:#FFFFFF!important;font-family:var(--st-d)!important;font-weight:900!important;font-size:26px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;box-shadow:0 14px 28px -12px rgba(0,0,0,.85)}
@@ -20501,6 +20513,25 @@ function neckFirst(name) {
   a.insertBefore(nB, oB);
   tail.forEach((s) => a.insertBefore(s, oB));
 }
+// marks the boxes of a screen so the CSS can give them one look: panel (card) or note (red-tinted callout).
+// All reads first, writes after, so it costs one layout, not one per box.
+function tagCards(root) {
+  const r = root || app;
+  const list = r.nodeType === 1 ? (/^(DIV|SECTION|UL)$/.test(r.tagName) ? [r] : []).concat(Array.prototype.slice.call(r.querySelectorAll('div,section,ul'))) : [];
+  const todo = [];
+  list.forEach((e) => {
+    if (e.hasAttribute('data-card') || e.getAttribute('role') === 'group' || !e.closest('main') || e.closest('svg') || e.closest('header')) return;
+    const x = getComputedStyle(e);
+    if (x.display === 'none' || x.backgroundImage !== 'none') return;
+    const bw = parseFloat(x.borderTopWidth) || 0, bg = x.backgroundColor, hasBg = bg !== 'rgba(0, 0, 0, 0)';
+    if ((!bw && !hasBg) || bw >= 2) return;
+    const w = e.offsetWidth, h = e.offsetHeight;
+    if (w < 150 || h < 50 || w * h < 15000) return;
+    const m = bg.match(/\d+/g) || [];
+    todo.push([e, hasBg && +m[0] - +m[1] >= 15 && +m[0] - +m[2] >= 15 ? 'note' : 'panel']);
+  });
+  todo.forEach((t) => t[0].setAttribute('data-card', t[1]));
+}
 function tagNecks(root) {
   const r = root || app;
   const list = r.tagName && r.tagName.toLowerCase() === 'svg' ? [r] : r.querySelectorAll('svg');
@@ -20528,7 +20559,7 @@ try {
     // blocks painted after the render (cards drawn by hand, delayed paints) get the theme colours too;
     // this runs before the browser paints, so they never flash in the other theme
     const live = added.filter((n) => n.isConnected);
-    if (live.length) { try { if (dark) darken(live); else palLight(live); } catch (e) {} }
+    if (live.length) { try { if (dark) darken(live); else palLight(live); } catch (e) {} try { live.forEach((n) => tagCards(n)); } catch (e) {} }
     // a neck painted after the first render gets the tap tip too
     if (!app.querySelector('.nk-hint')) { try { attachHint(currentName, document.documentElement.lang); } catch (e) {} }
     try { stageVideos(document.documentElement.lang || 'es'); } catch (e) {}
@@ -21024,7 +21055,7 @@ function fixEyebrow(name, lang) {
   const rx = /^((Módulo|Module) \d+ · )?(Paso|Step) [\d.]+ (de|of) [\d.]+$|^(Módulo|Module) \d+$|^(Teoría de mástil|Fretboard theory|Avanzado|Advanced|Improvisación|Improvisation|Mano izquierda|Left hand|Armonía|Harmony|Mano derecha|Right hand|Repertorio|Repertoire|Mano derecha e izquierda|Picking and fretting hands)$/;
   const root = document.querySelector('main') || document.body;
   root.querySelectorAll('span,p,div').forEach((e) => {
-    if (e.children.length === 0 && rx.test((e.textContent || '').trim())) e.textContent = txt;
+    if (e.children.length === 0 && rx.test((e.textContent || '').trim())) { e.textContent = txt; e.classList.add('eb'); }
   });
 }
 function attachSearch(name, lang) {
@@ -21064,7 +21095,15 @@ function mount(name, q) {
     const persist = {}; if (!render.first) app.querySelectorAll('[data-persist]').forEach((e) => { if (e.id && e.firstChild) persist[e.id] = e; });
     // already-decoded images are reused too, so they do not blink while re-decoding
     const oldImgs = {}; if (!render.first) app.querySelectorAll('img').forEach((e) => { if (e.closest('[data-persist]') || (SB.el && SB.el.contains(e))) return; (oldImgs[e.src] = oldImgs[e.src] || []).push(e); });
-    const vals = inst.renderVals();
+    // screens paint their necks and hosts with setTimeout(..., 0) from renderVals. Run in the next task, that paint
+    // comes AFTER the browser has drawn the new screen with those hosts empty: the page shrinks, the scroll jumps and
+    // everything comes back (the flicker on every selection). Collect those zero-delay timers and run them at the
+    // end of this same render, so the first frame the user sees already has everything in place.
+    const deferred = [];
+    const nativeST = window.setTimeout;
+    window.setTimeout = function (fn, ms) { if (!ms && typeof fn === 'function') { deferred.push(fn); return 0; } return nativeST.apply(window, arguments); };
+    let vals;
+    try { vals = inst.renderVals(); } finally { window.setTimeout = nativeST; }
     const frag = document.createDocumentFragment();
     const tpl = template(name);
     for (let c = tpl.firstChild; c; c = c.nextSibling) build(c, vals, frag);
@@ -21107,8 +21146,12 @@ function mount(name, q) {
     try { fixEyebrow(name, l || 'es'); } catch (e) {}
     try { labelBack(l || 'es'); } catch (e) {}
     try { stageVideos(l || 'es'); } catch (e) {}
-    for (const k in keep) { const e = document.getElementById(k); if (e) e.scrollTop = keep[k]; }
     for (const k in persist) { const e = document.getElementById(k); if (e && e !== persist[k]) e.replaceWith(persist[k]); }
+    deferred.forEach((f) => { try { f(); } catch (e) {} });
+    // diagram labels (12px minimum, necks cut to the chord) are fixed here too, not 120 ms later: that late pass made every diagram jump after each selection
+    try { minSvgText(app); } catch (e) {}
+    try { tagCards(app); } catch (e) {}
+    for (const k in keep) { const e = document.getElementById(k); if (e) e.scrollTop = keep[k]; }
     if (render.first) { render.first = false; } else { window.scrollTo(0, y); }
   };
   render.first = true;
@@ -21279,8 +21322,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '8 nov 2026 · 21:13';
-  var BUILD_ID = '2026-11-08T21:13';
+  var BUILD = '8 nov 2026 · 21:27';
+  var BUILD_ID = '2026-11-08T21:27';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
