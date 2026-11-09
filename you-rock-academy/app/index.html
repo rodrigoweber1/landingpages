@@ -1259,6 +1259,18 @@ body.stage #app .stg-em .em2-bpm b{font:400 22px/24px var(--st-d);color:var(--st
 body.stage #app .stg-em .em2-bpm small{font-size:12px;line-height:14px;font-weight:700;letter-spacing:.06em;color:var(--st-mute)}
 body.stage #app .stg-em .em2-ctl{margin-left:auto;display:flex;align-items:center;gap:8px}
 body.stage #app .stg-em .em2-play{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:0;padding:0;box-shadow:0 6px 20px rgba(227,27,35,.28);background:var(--st-red)!important;color:#FFFFFF!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
+/* play bar, quiet version: 44px touch targets kept, less weight */
+body.stage #app .stg-em .em2-dock{padding:6px 8px!important;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+body.stage #app .stg-em .em2-ctl{gap:4px}
+body.stage #app .stg-em .em2-play{width:44px;height:44px;box-shadow:none}
+body.stage #app .stg-em .em2-play svg{width:18px;height:18px}
+body.stage #app .stg-em .em2-dock .em2-mute{width:44px;height:44px;background:transparent!important;border-color:transparent!important;color:var(--st-mute)!important}
+body.stage #app .stg-em .em2-dock .em2-mute svg{width:20px;height:20px}
+body.stage #app .stg-em .em2-dock .em2-mute[aria-pressed="true"]{background:#2A1416!important;border-color:transparent!important;color:#FF6066!important}
+body.stage #app .stg-em .em2-tempo{padding:0!important;gap:0;background:transparent!important;border-color:transparent!important}
+body.stage #app .stg-em .em2-tempo button{width:36px;font-size:20px;color:var(--st-mute)!important}
+body.stage #app .stg-em .em2-bpm{min-width:36px}
+body.stage #app .stg-em .em2-bpm b{font-size:18px;line-height:20px}
 body.stage #app .stg-em .em2-song{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px;padding:12px 14px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
 body.stage #app .stg-em .em2-song b{display:block;font-size:15px;color:var(--st-ink)}
 body.stage #app .stg-em .em2-song span{display:block;margin-top:2px;font-size:13px;color:var(--st-mute)}
@@ -21590,8 +21602,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '9 nov 2026 · 18:41';
-  var BUILD_ID = '2026-11-09T18:41';
+  var BUILD = '9 nov 2026 · 18:44';
+  var BUILD_ID = '2026-11-09T18:44';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
