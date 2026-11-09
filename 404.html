@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Página não encontrada</title>
+<script>
+  // As páginas foram reorganizadas em pastas em 9/11/2026.
+  // Este mapa leva os endereços antigos para os novos, para que links já enviados continuem funcionando.
+  (function () {
+    var MAPA = {
+      "CAST Portfolio Scan Landing.html": "cast/portfolio-scan.html",
+      "Cast/CAST Portfolio Scan Landing.html": "cast/portfolio-scan.html",
+      "Cast/landing-diagnostic-ia.html": "cast/diagnostico-ia.html",
+      "arcadio-falcon-escuela-landing.html": "you-rock-academy/landing-escura.html",
+      "arcadio-falcon-escuela-landing-clara.html": "you-rock-academy/landing-clara.html",
+      "yourock/arcadio-falcon-escuela-clara.html": "you-rock-academy/landing-clara.html",
+      "arcadio-falcon-escuela.html": "you-rock-academy/versoes-antigas/2026-10-31-landing-original.html",
+      "arcadio-falcon-escuela-vermelha.html": "you-rock-academy/versoes-antigas/2026-10-31-landing-vermelha.html",
+      "arcadio-falcon-escuela-escura-vermelha.html": "you-rock-academy/versoes-antigas/2026-10-31-landing-escura-vermelha.html",
+      "simulador-house-flip.html": "flipping-fam/simulador.html"
+    };
+    var caminho = decodeURIComponent(location.pathname);
+    var base = caminho.indexOf("/landingpages/") === 0 ? "/landingpages/" : "/";
+    var resto = caminho.slice(base.length);
+    if (MAPA[resto]) {
+      location.replace(base + MAPA[resto] + location.search + location.hash);
+    } else {
+      window.__base = base;
+    }
+  })();
+</script>
+<style>
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f6f5f2; color: #1d1c1a; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 16px; text-align: center; }
+  @media (prefers-color-scheme: dark) { body { background: #141413; color: #f1efea; } a { color: #ff5a6e; } }
+  a { color: #c8102e; }
+</style>
+</head>
+<body>
+  <div>
+    <h1>Página não encontrada</h1>
+    <p>Este endereço não existe. <a id="inicio" href="/landingpages/">Ver todas as páginas</a></p>
+  </div>
+  <script>if (window.__base) document.getElementById("inicio").href = window.__base;</script>
+</body>
+</html>
