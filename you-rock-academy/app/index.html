@@ -1214,7 +1214,7 @@ body.stage #app .stg-em main{gap:0!important}
 body.stage #app .stg-em .em2{display:flex;flex-direction:column}
 body.stage #app .stg-em .em2-eye{font:700 12px/16px var(--st-t);letter-spacing:.14em;text-transform:uppercase;color:var(--st-amber)}
 body.stage #app .stg-em .em2-intro{margin:4px 0 0!important;font-size:15px!important;line-height:22px!important}
-body.stage #app .stg-em .em2-lab{display:block;margin:22px 0 8px;font:700 12px/16px var(--st-t);letter-spacing:.1em;text-transform:uppercase;color:var(--st-mute)}
+body.stage #app .stg-em .em2-lab{display:block;margin:22px 0 8px;font:700 12px/16px var(--st-t);letter-spacing:.14em;text-transform:uppercase;color:var(--st-amber)}
 body.stage #app .stg-em .em2-row{display:flex;flex-wrap:wrap;gap:8px}
 body.stage #app .stg-em .em2-chip{min-height:44px;padding:9px 16px;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;color:var(--st-ink2)!important;border-radius:999px!important;font-weight:600!important;font-size:14px;cursor:pointer}
 body.stage #app .stg-em .em2-chip[aria-pressed="true"]{background:var(--st-floor)!important;border-color:var(--st-amber)!important;color:var(--st-amber)!important}
@@ -1223,29 +1223,34 @@ body.stage #app .stg-em .em2-seg{gap:4px;padding:4px}
 body.stage #app .stg-em .em2-seg button{flex:1;min-width:0;font-size:14px;cursor:pointer}
 body.stage #app .stg-em .em2-note{margin:8px 2px 0!important;font-size:14px!important;line-height:20px!important;color:var(--st-mute)!important}
 body.stage #app .stg-em .em2-warn{margin:8px 0 0!important;padding-left:10px;border-left:3px solid var(--st-amber);font-size:14px!important;line-height:20px!important;color:var(--st-amber)!important}
-body.stage #app .stg-em .em2-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));max-width:480px;gap:8px}
-body.stage #app .stg-em .em2-cc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 10px;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:20px!important;color:var(--st-ink)!important;cursor:pointer}
-body.stage #app .stg-em .em2-cc[aria-pressed="true"]{background:var(--st-floor)!important;border-color:var(--st-amber)!important;box-shadow:inset 0 0 0 1px var(--st-amber)}
+body.stage #app .stg-em .em2-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:480px;gap:10px}
+body.stage #app .stg-em .em2-cc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 4px 12px;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:20px!important;color:var(--st-ink)!important;cursor:pointer;min-width:0}
+body.stage #app .stg-em .em2-cc[aria-pressed="true"]{background:var(--st-floor)!important;border-color:var(--st-amber)!important;box-shadow:inset 0 0 0 1px var(--st-amber),0 0 0 3px rgba(255,196,0,.12)}
 body.stage #app .stg-em .em2-cc[aria-pressed="true"] b{color:var(--st-amber)}
-body.stage #app .stg-em .em2-cc svg{width:78px;height:auto;display:block}
-body.stage #app .stg-em .em2-cc b{font-size:17px;font-family:var(--st-t)}
-body.stage #app .stg-em .em2-cc small{font-size:12px;line-height:16px;color:var(--st-mute)}
+body.stage #app .stg-em .em2-cc svg{width:96px;max-width:100%;height:auto;display:block;margin-bottom:8px}
+body.stage #app .stg-em .em2-cc b{font:400 26px/30px var(--st-d);letter-spacing:.01em}
+body.stage #app .stg-em .em2-strip.wide .em2-cc svg{width:124px}
+body.stage #app .stg-em .em2-cc small{font-size:13px;line-height:18px;color:var(--st-mute)}
 body.stage #app .stg-em .em2-cc small.fbt{color:var(--st-amber)}
 body.stage #app .stg-em .em2-bars{display:grid;grid-template-columns:repeat(4,minmax(0,110px));justify-content:start;gap:6px;margin-top:10px}
 body.stage #app .stg-em .em2-bar{min-height:50px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--st-floor)!important;border:1px solid var(--st-rule)!important;border-radius:12px!important;color:var(--st-ink)!important;font-size:15px;font-weight:700;cursor:pointer}
 body.stage #app .stg-em .em2-bar small{font-size:12px;line-height:14px;font-weight:600;color:var(--st-mute)}
 body.stage #app .stg-em .em2-bar[aria-pressed="true"]{background:var(--st-floor)!important;border-color:var(--st-amber)!important;box-shadow:inset 0 0 0 1px var(--st-amber);color:var(--st-amber)!important}
-body.stage #app .stg-em .em2-leg{display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:13px;color:var(--st-mute)}
+body.stage #app .stg-em .em2-leg{display:flex;gap:20px;justify-content:center;margin-top:14px;font-size:14px;font-weight:600;color:var(--st-ink2)}
 body.stage #app .stg-em .em2-leg i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
-body.stage #app .stg-em .em2-card{margin-top:14px;padding:16px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
-body.stage #app .stg-em .em2-name{font:900 24px/28px var(--st-d);color:var(--st-ink)}
-body.stage #app .stg-em .em2-notes{margin-top:2px;font-size:14px;color:var(--st-mute)}
-body.stage #app .stg-em .em2-how{margin:8px 0 0!important;font-size:15px!important;line-height:22px!important;color:var(--st-ink)!important}
-body.stage #app .stg-em .em2-playrow{display:flex;align-items:center;gap:12px;margin-top:14px}
-body.stage #app .stg-em .em2-playrow span{font-size:13px;color:var(--st-mute)}
+body.stage #app .stg-em .em2-card{margin-top:18px;padding:18px 20px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
+body.stage #app .stg-em .em2-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+body.stage #app .stg-em .em2-name{font:400 28px/32px var(--st-d);text-transform:uppercase;color:var(--st-ink)}
+body.stage #app .stg-em .em2-notes{flex:0 0 auto;padding:3px 10px;border:1px solid var(--st-amber);border-radius:999px;font-size:13px;line-height:18px;font-weight:700;color:var(--st-amber);background:rgba(255,196,0,.08)}
+body.stage #app .stg-em .em2-how{margin:10px 0 0!important;font-size:15px!important;line-height:22px!important;color:var(--st-ink)!important}
+body.stage #app .stg-em .em2-dock{position:sticky;bottom:0;z-index:6;display:flex;align-items:center;gap:12px;margin:16px -24px 0;padding:12px 24px calc(12px + env(safe-area-inset-bottom,0px));background:var(--st-ground);border-top:1px solid var(--st-rule)}
+@media (max-width:899px){body.stage #app .stg-em .em2-dock{bottom:84px;margin:16px -8px 0;padding:10px 10px 10px 16px;background:var(--st-floor2);border:1px solid var(--st-rule);border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.45)}}
+body.stage #app .stg-em .em2-now{flex:0 1 auto;min-width:0;display:flex;flex-direction:column}
+body.stage #app .stg-em .em2-now small{font-size:12px;line-height:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--st-mute)}
+body.stage #app .stg-em .em2-now b{font:400 22px/26px var(--st-d);color:var(--st-amber);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.stage #app .stg-em .em2-mute{flex:0 0 auto;width:48px;height:48px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:var(--st-floor2)!important;color:var(--st-ink2)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important;cursor:pointer;transition:background .16s var(--st-ease),color .16s var(--st-ease),border-color .16s var(--st-ease)}
 body.stage #app .stg-em .em2-mute[aria-pressed="true"]{background:#2A1416!important;color:#FF6066!important;border-color:var(--st-red)!important}
-body.stage #app .stg-em .em2-play{min-height:48px;padding:0 22px;background:var(--st-red)!important;color:#FFFFFF!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
+body.stage #app .stg-em .em2-play{flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;box-shadow:0 6px 20px rgba(227,27,35,.28);background:var(--st-red)!important;color:#FFFFFF!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
 body.stage #app .stg-em .em2-song{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px;padding:12px 14px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
 body.stage #app .stg-em .em2-song b{display:block;font-size:15px;color:var(--st-ink)}
 body.stage #app .stg-em .em2-song span{display:block;margin-top:2px;font-size:13px;color:var(--st-mute)}
@@ -3988,7 +3993,7 @@ const EM_TX = {
     k_power: (f, st) => 'Power chord con raíz en la ' + st + 'ª cuerda, ' + (f === 0 ? 'al aire' : 'traste ' + f) + '. Solo tónica y quinta, sin tercera.',
     shE: 'forma de Mi', shA: 'forma de La',
     warnOpen: 'En esta tonalidad casi no hay acordes abiertos, así que la mayoría se tocan con cejilla. Prueba con Do, Sol, Re, La o Mi.',
-    play: '▶ Reproducir', stop: '■ Parar', pnote: 'Toca un acorde para oírlo.', mute: 'Silenciar el sonido', unmute: 'Activar el sonido',
+    play: 'Reproducir', stop: 'Parar', nowOn: 'Sonando', nowOff: 'Acorde', pnote: 'Toca un acorde para oírlo.', mute: 'Silenciar el sonido', unmute: 'Activar el sonido',
     bars: 'Los 12 compases', bar: 'compás ', exTitle: 'Canciones de ejemplo', keyPre: 'Tono original: ', keyNone: 'Tono original sin confirmar', showIn: 'Ver en ', tuneDown: ' · guitarras afinadas medio tono abajo', songM: ' m',
     progs: {
       maj: [['I – IV – V', 'El I es el acorde de casa, el IV abre el sonido y el V crea una tensión que pide volver al I. Con estos tres acordes se tocan miles de canciones de rock y blues.'], ['I – V – vi – IV', 'Es un bucle de cuatro acordes que suena en miles de canciones de pop y rock. El vi es el acorde menor de la secuencia y le da un toque emotivo.'], ['vi – IV – I – V', 'Son los mismos cuatro acordes que la secuencia anterior, pero empezando por el vi. Al arrancar con el acorde menor, el ambiente se vuelve más melancólico.'], ['I – ♭VII – IV', 'El ♭VII es el acorde situado un tono (dos trastes) por debajo del I. No pertenece a la escala mayor, y ese sonido inesperado es el que da el carácter de rock clásico.'], ['Blues de 12 compases', 'Doce compases que se repiten con tres acordes: I, IV y V. Se leen en tres filas de cuatro compases: I I I I / IV IV I I / V IV I I. Aquí aparece con séptimas, que le dan el color típico del blues.', 'I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 I7']],
@@ -4013,7 +4018,7 @@ const EM_TX = {
     k_power: (f, st) => 'Power chord with the root on string ' + st + ', ' + (f === 0 ? 'open' : 'fret ' + f) + '. Just root and fifth, no third.',
     shE: 'E shape', shA: 'A shape',
     warnOpen: 'In this key there are almost no open chords, so most are played as barre chords. Try C, G, D, A or E.',
-    play: '▶ Play', stop: '■ Stop', pnote: 'Tap a chord to hear it.', mute: 'Mute the sound', unmute: 'Turn the sound on',
+    play: 'Play', stop: 'Stop', nowOn: 'Playing', nowOff: 'Chord', pnote: 'Tap a chord to hear it.', mute: 'Mute the sound', unmute: 'Turn the sound on',
     bars: 'The 12 bars', bar: 'bar ', exTitle: 'Example songs', keyPre: 'Original key: ', keyNone: 'Original key not confirmed', showIn: 'Show in ', tuneDown: ' · guitars tuned half a step down', songM: 'm',
     progs: {
       maj: [['I – IV – V', 'The I is home base, the IV opens the sound up and the V builds tension that pulls you back to the I. Thousands of rock and blues songs use just these three chords.'], ['I – V – vi – IV', 'A four-chord loop that runs through thousands of pop and rock songs. The vi is the minor chord in the sequence and adds an emotional touch.'], ['vi – IV – I – V', 'The same four chords as the sequence above, but starting on the vi. Opening on the minor chord gives it a more melancholic mood.'], ['I – ♭VII – IV', 'The ♭VII is the chord one whole step (two frets) below the I. It does not belong to the major scale, and that unexpected sound is what gives it the classic rock flavor.'], ['12-bar blues', 'Twelve bars that repeat with three chords: I, IV and V. They run in three rows of four bars: I I I I / IV IV I I / V IV I I. Here they appear with sevenths, which add the typical blues color.', 'I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 I7']],
@@ -4043,6 +4048,12 @@ const EM_OP = {
   'm': { 2: [-1, -1, 0, 2, 3, 1], 4: [0, 2, 2, 0, 0, 0], 9: [-1, 0, 2, 2, 1, 0] },
   '7': { 0: [-1, 3, 2, 3, 1, 0], 2: [-1, -1, 0, 2, 1, 2], 4: [0, 2, 0, 1, 0, 0], 7: [3, 2, 0, 0, 0, 1], 9: [-1, 0, 2, 0, 2, 0], 11: [-1, 2, 1, 2, 0, 2] }
 };
+// fingers (1 index … 4 little, 0 = none) for the open shapes above, same keys
+const EM_FG = {
+  '': { 0: [0, 3, 2, 0, 1, 0], 5: [0, 0, 3, 2, 1, 1], 2: [0, 0, 0, 1, 3, 2], 4: [0, 2, 3, 1, 0, 0], 7: [2, 1, 0, 0, 0, 3], 9: [0, 0, 1, 2, 3, 0] },
+  'm': { 2: [0, 0, 0, 2, 3, 1], 4: [0, 2, 3, 0, 0, 0], 9: [0, 0, 2, 3, 1, 0] },
+  '7': { 0: [0, 3, 2, 4, 1, 0], 2: [0, 0, 0, 2, 1, 3], 4: [0, 2, 0, 1, 0, 0], 7: [3, 2, 0, 0, 0, 1], 9: [0, 0, 2, 0, 3, 0], 11: [0, 2, 1, 3, 0, 4] }
+};
 const EM_DEG = { I: 0, II: 2, III: 4, IV: 5, V: 7, VI: 9, VII: 11 };
 function emRoman(tok, key) {
   let t = tok.trim(), flat = 0, sev = false;
@@ -4054,39 +4065,46 @@ function emRoman(tok, key) {
 function emShape(pc, q, how) {
   const f6 = (pc - 4 + 12) % 12, f5 = (pc - 9 + 12) % 12;
   if (how === 'power') {
-    return f6 <= f5 ? { f: [f6, f6 + 2, f6 + 2, -1, -1, -1], kind: 'power', fret: f6, str: 6 } : { f: [-1, f5, f5 + 2, f5 + 2, -1, -1], kind: 'power', fret: f5, str: 5 };
+    const pf = (f) => (f === 0 ? [0, 1, 2] : [1, 3, 4]);
+    return f6 <= f5 ? { f: [f6, f6 + 2, f6 + 2, -1, -1, -1], fg: pf(f6).concat([0, 0, 0]), kind: 'power', fret: f6, str: 6 } : { f: [-1, f5, f5 + 2, f5 + 2, -1, -1], fg: [0].concat(pf(f5), [0, 0]), kind: 'power', fret: f5, str: 5 };
   }
-  if (how === 'open' && EM_OP[q][pc]) return { f: EM_OP[q][pc], kind: 'open', easy: q === '' && pc === 5, mini: q === '' && pc === 5 };
+  if (how === 'open' && EM_OP[q][pc]) return { f: EM_OP[q][pc], fg: EM_FG[q][pc], kind: 'open', easy: q === '' && pc === 5, mini: q === '' && pc === 5 };
   const e = f6 || 12, a = f5 || 12, fb = how === 'open';
   if (e <= a) {
     const f = e;
-    return { f: q === 'm' ? [f, f + 2, f + 2, f, f, f] : (q === '7' ? [f, f + 2, f, f + 1, f, f] : [f, f + 2, f + 2, f + 1, f, f]), kind: 'barre', fb, fret: f, from: 0, sh: 'E' };
+    return { f: q === 'm' ? [f, f + 2, f + 2, f, f, f] : (q === '7' ? [f, f + 2, f, f + 1, f, f] : [f, f + 2, f + 2, f + 1, f, f]), fg: q === 'm' ? [1, 3, 4, 1, 1, 1] : (q === '7' ? [1, 3, 1, 2, 1, 1] : [1, 3, 4, 2, 1, 1]), kind: 'barre', fb, fret: f, from: 0, sh: 'E' };
   }
   const f = a;
-  return { f: q === 'm' ? [-1, f, f + 2, f + 2, f + 1, f] : (q === '7' ? [-1, f, f + 2, f, f + 2, f] : [-1, f, f + 2, f + 2, f + 2, f]), kind: 'barre', fb, fret: f, from: 1, sh: 'A' };
+  return { f: q === 'm' ? [-1, f, f + 2, f + 2, f + 1, f] : (q === '7' ? [-1, f, f + 2, f, f + 2, f] : [-1, f, f + 2, f + 2, f + 2, f]), fg: q === 'm' ? [0, 1, 3, 4, 2, 1] : (q === '7' ? [0, 1, 3, 1, 4, 1] : [0, 1, 2, 3, 4, 1]), kind: 'barre', fb, fret: f, from: 1, sh: 'A' };
 }
 // small chord picture (paths, not <line>, so the neck helpers of the app leave it alone)
 function emSvg(sh, root) {
   const fr = sh.f.filter((x) => x > 0), mx = fr.length ? Math.max.apply(null, fr) : 1, mn = fr.length ? Math.min.apply(null, fr) : 1;
-  const start = mx <= 4 ? 1 : mn, X0 = 22, SP = 16, Y0 = 26, FH = 24, ROWS = 5;
+  // drawn at 96px wide, so the finger numbers (13.4 units) come out at 12px, the app minimum
+  const start = mx <= 4 ? 1 : mn, X0 = 15, SP = 15, Y0 = 24, FH = 21, ROWS = 5;
   const X = (i) => X0 + i * SP, Y = (f) => Y0 + (f - start) * FH + FH / 2;
-  let s = '<svg viewBox="0 0 124 156" xmlns="http://www.w3.org/2000/svg" role="presentation" aria-hidden="true" focusable="false">';
-  s += '<rect x="' + (X0 - 8) + '" y="' + Y0 + '" width="' + (5 * SP + 16) + '" height="' + (ROWS * FH) + '" rx="4" fill="#26190f"/>';
+  const num = (x, y, n, col) => '<text x="' + x + '" y="' + (y + 4.7) + '" text-anchor="middle" font-size="13.4" font-weight="800" font-family="Inter,system-ui,sans-serif" fill="' + col + '">' + n + '</text>';
+  let s = '<svg viewBox="0 0 105 132" xmlns="http://www.w3.org/2000/svg" role="presentation" aria-hidden="true" focusable="false">';
+  s += '<rect x="' + (X0 - 8) + '" y="' + Y0 + '" width="' + (5 * SP + 16) + '" height="' + (ROWS * FH) + '" rx="3" fill="#26190f"/>';
   for (let r = 0; r <= ROWS; r++) {
     const nut = r === 0 && start === 1;
-    s += '<path d="M' + (X0 - 8) + ' ' + (Y0 + r * FH) + 'h' + (5 * SP + 16) + '" stroke="' + (nut ? '#f4ede6' : '#8c8379') + '" stroke-width="' + (nut ? 4 : 1.4) + '" fill="none"/>';
+    s += '<path d="M' + (X0 - 8) + ' ' + (Y0 + r * FH) + 'h' + (5 * SP + 16) + '" stroke="' + (nut ? '#f4ede6' : '#8c8379') + '" stroke-width="' + (nut ? 4 : 1.3) + '" fill="none"/>';
   }
-  for (let i = 0; i < 6; i++) s += '<path d="M' + X(i) + ' ' + Y0 + 'v' + (ROWS * FH) + '" stroke="#d8cfc3" stroke-width="' + (2.2 - i * 0.28).toFixed(2) + '" fill="none"/>';
+  for (let i = 0; i < 6; i++) s += '<path d="M' + X(i) + ' ' + Y0 + 'v' + (ROWS * FH) + '" stroke="#d8cfc3" stroke-width="' + (2 - i * 0.24).toFixed(2) + '" fill="none"/>';
   const bar = sh.kind === 'barre' ? { fret: sh.fret, from: sh.from } : (sh.mini ? { fret: 1, from: 4 } : null);
-  if (bar) s += '<rect x="' + (X(bar.from) - 7) + '" y="' + (Y(bar.fret) - 8) + '" width="' + ((5 - bar.from) * SP + 14) + '" height="16" rx="8" fill="#e31b23" stroke="#fff" stroke-opacity=".5"/>';
+  let onBar = 0;
+  if (bar) s += '<rect x="' + (X(bar.from) - 7.5) + '" y="' + (Y(bar.fret) - 7.5) + '" width="' + ((5 - bar.from) * SP + 15) + '" height="15" rx="7.5" fill="#e31b23" stroke="#fff" stroke-opacity=".5"/>';
   for (let i = 0; i < 6; i++) {
-    const f = sh.f[i];
-    if (f < 0) { s += '<path d="M' + (X(i) - 4.5) + ' 8l9 9m0 -9l-9 9" stroke="#e31b23" stroke-width="2.2" stroke-linecap="round" fill="none"/>'; continue; }
+    const f = sh.f[i], fg = sh.fg ? sh.fg[i] : 0;
+    if (f < 0) { s += '<path d="M' + (X(i) - 4) + ' 7l8 8m0 -8l-8 8" stroke="#e31b23" stroke-width="2.2" stroke-linecap="round" fill="none"/>'; continue; }
     const isRoot = (EM_OPEN[i] + f) % 12 === root;
-    if (f === 0) { s += '<circle cx="' + X(i) + '" cy="13" r="5" fill="none" stroke="' + (isRoot ? '#e31b23' : '#f4ede6') + '" stroke-width="2.2"/>'; continue; }
-    if (bar && f === bar.fret && i >= bar.from && !isRoot) continue;
-    s += '<circle cx="' + X(i) + '" cy="' + Y(f) + '" r="7.2" fill="' + (isRoot ? '#e31b23' : '#f4ede6') + '" stroke="' + (isRoot ? '#fff' : '#26190f') + '" stroke-width="1.4"/>';
+    if (f === 0) { s += '<circle cx="' + X(i) + '" cy="11" r="4.6" fill="none" stroke="' + (isRoot ? '#e31b23' : '#f4ede6') + '" stroke-width="2"/>'; continue; }
+    if (bar && f === bar.fret && i >= bar.from) { if (!isRoot) continue; onBar++; }
+    s += '<circle cx="' + X(i) + '" cy="' + Y(f) + '" r="7.5" fill="' + (isRoot ? '#e31b23' : '#f4ede6') + '" stroke="' + (isRoot ? '#fff' : '#26190f') + '" stroke-width="1.2"/>';
+    if (fg) s += num(X(i), Y(f), fg, isRoot ? '#fff' : '#17120f');
   }
+  // the barre's own "1" sits in the middle when no root dot already shows it
+  if (bar && !onBar) s += num((X(bar.from) + X(5)) / 2, Y(bar.fret), 1, '#fff');
   return s + '</svg>';
 }
 class Component extends DCLogic {
@@ -4119,7 +4137,7 @@ const label = S.how === 'power' ? nm + '5' : nm + (r.q === 'm' ? t.minor : (r.q 
 const long = S.how === 'power' ? nm + '5' : nm + (r.q === 'm' ? t.minorW : (r.q === '7' ? '7' : t.mayorW));
 const third = (r.pc + (r.q === 'm' ? 3 : 4)) % 12, fifth = (r.pc + 7) % 12;
 const nl = S.how === 'power' ? [r.pc, fifth] : (r.q === '7' ? [r.pc, third, fifth, (r.pc + 10) % 12] : [r.pc, third, fifth]);
-return { r, sh, label, long, notes: nl.map((p) => t.names[p]).join(' – '), key: r.pc + ':' + r.q };
+return { r, sh, label, long, notes: nl.map((p) => t.names[p]).join(' · '), key: r.pc + ':' + r.q };
 });
 }
 fretTxt(sh) {
@@ -4195,7 +4213,8 @@ const i = +b.dataset.c, on = b.classList.contains('em2-bar') ? i === S.cur : !!(
 b.setAttribute('aria-pressed', on ? 'true' : 'false');
 });
 const set = (id, v) => { const el = h.querySelector('#' + id); if (el) el.textContent = v; };
-set('em2-name', cur.long); set('em2-notes', t.notes + cur.notes); set('em2-how', this.how(cur.sh));
+set('em2-name', cur.long); set('em2-notes', cur.notes); set('em2-how', this.how(cur.sh)); set('em2-now', cur.long);
+const nt = h.querySelector('#em2-notes'); if (nt) nt.setAttribute('aria-label', t.notes + cur.notes);
 }
 html() {
 const t = this.T(), S = this.S, c = this.chords(), cur = c[Math.min(S.cur, c.length - 1)];
@@ -4212,11 +4231,10 @@ h += '<p class="em2-note">' + t.progs[S.mode][S.prog][1] + '</p>';
 h += '<span class="em2-lab">' + t.how + '</span>' + seg(t.how, [['open', t.m_open], ['barre', t.m_barre], ['power', t.m_power]], 'data-h', S.how);
 h += '<p class="em2-note">' + t['h_' + S.how] + '</p>';
 if (S.how === 'open' && fbN > 0 && fbN * 2 >= uq.length) h += '<p class="em2-warn">' + t.warnOpen + '</p>';
-h += '<span class="em2-lab">' + t.chords + '</span><div class="em2-strip">' + uq.map((u) => '<button type="button" class="em2-cc" data-c="' + u.i + '" aria-pressed="' + (u.x.key === cur.key) + '">' + emSvg(u.x.sh, u.x.r.pc) + '<b>' + u.x.label + '</b><small' + (u.x.sh.fb ? ' class="fbt"' : '') + '>' + this.fretTxt(u.x.sh) + '</small></button>').join('') + '</div>';
+h += '<span class="em2-lab">' + t.chords + '</span><div class="em2-strip' + (uq.length === 4 ? ' wide' : '') + '" style="grid-template-columns:repeat(' + (uq.length === 4 ? 2 : Math.min(uq.length, 3)) + ',minmax(0,1fr))">' + uq.map((u) => '<button type="button" class="em2-cc" data-c="' + u.i + '" aria-pressed="' + (u.x.key === cur.key) + '">' + emSvg(u.x.sh, u.x.r.pc) + '<b>' + u.x.label + '</b><small' + (u.x.sh.fb ? ' class="fbt"' : '') + '>' + this.fretTxt(u.x.sh) + '</small></button>').join('') + '</div>';
 if (isBars) h += '<div class="em2-bars stg-plain" role="group" aria-label="' + t.bars + '">' + c.map((x, i) => '<button type="button" class="em2-bar" data-c="' + i + '" aria-pressed="' + (i === S.cur) + '" aria-label="' + t.bar + (i + 1) + ' ' + x.label + '"><small>' + (i + 1) + '</small>' + x.label + '</button>').join('') + '</div>';
 h += '<div class="em2-leg"><span><i style="background:#e31b23"></i>' + t.root + '</span><span><i style="background:#f4ede6"></i>' + t.other + '</span></div>';
-h += '<div class="em2-card" aria-live="polite"><div class="em2-name" id="em2-name">' + cur.long + '</div><div class="em2-notes" id="em2-notes">' + t.notes + cur.notes + '</div><p class="em2-how" id="em2-how">' + this.how(cur.sh) + '</p>';
-h += '<div class="em2-playrow"><button type="button" class="em2-play" data-play>' + (S.run ? t.stop : t.play) + '</button><button type="button" class="em2-mute" data-mute aria-pressed="' + !!S.mute + '" aria-label="' + (S.mute ? t.unmute : t.mute) + '" title="' + (S.mute ? t.unmute : t.mute) + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button><span>' + t.pnote + '</span></div></div>';
+h += '<div class="em2-card" aria-live="polite"><div class="em2-head"><div class="em2-name" id="em2-name">' + cur.long + '</div><span class="em2-notes" id="em2-notes" aria-label="' + t.notes + cur.notes + '">' + cur.notes + '</span></div><p class="em2-how" id="em2-how">' + this.how(cur.sh) + '</p></div>';
 if (sg.length) {
 h += '<span class="em2-lab">' + t.exTitle + '</span>' + sg.map((x) => {
 const k = x[1], has = k != null, on = has && k === S.key, kn = has ? t.names[k] + (S.mode === 'min' ? t.songM : '') : '';
@@ -4224,7 +4242,13 @@ const extra = x[2] === 'tune' ? t.tuneDown : (this.state.lang === 'es' ? (x[2] |
 return '<div class="em2-song"><div><b>♪ ' + x[0] + '</b><span>' + (has ? t.keyPre + kn + extra : t.keyNone) + '</span></div>' + (has ? '<button type="button" data-sk="' + k + '" aria-pressed="' + on + '">' + (on ? kn : t.showIn + kn) + '</button>' : '') + '</div>';
 }).join('');
 }
-return h + '<p class="em2-foot">' + t.foot + '</p>';
+h += '<p class="em2-foot">' + t.foot + '</p>';
+// play bar that stays at the foot of the screen while the lesson scrolls
+const ic = S.run ? '<path d="M7 6h10v12H7z" fill="currentColor" stroke="none"/>' : '<path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="none"/>';
+h += '<div class="em2-dock"><div class="em2-now"><small>' + (S.run ? t.nowOn : t.nowOff) + '</small><b id="em2-now">' + cur.long + '</b></div>';
+h += '<button type="button" class="em2-play" data-play aria-pressed="' + !!S.run + '"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">' + ic + '</svg>' + (S.run ? t.stop : t.play) + '</button>';
+h += '<button type="button" class="em2-mute" data-mute aria-pressed="' + !!S.mute + '" aria-label="' + (S.mute ? t.unmute : t.mute) + '" title="' + (S.mute ? t.unmute : t.mute) + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button></div>';
+return h;
 }
 paint() {
 const host = document.getElementById('em2'); if (!host) return;
@@ -21508,8 +21532,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '9 nov 2026 · 17:38';
-  var BUILD_ID = '2026-11-09T17:38';
+  var BUILD = '9 nov 2026 · 18:05';
+  var BUILD_ID = '2026-11-09T18:05';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
