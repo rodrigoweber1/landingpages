@@ -21182,6 +21182,8 @@ function mount(name, q) {
     for (const k in persist) { const e = document.getElementById(k); if (e && e !== persist[k]) e.replaceWith(persist[k]); }
     deferred.forEach((f) => { try { f(); } catch (e) {} });
     // diagram labels (12px minimum, necks cut to the chord) are fixed here too, not 120 ms later: that late pass made every diagram jump after each selection
+    // the roaming boards are windowed before minSvgText measures them (otherwise they get a sideways scroll box)
+    try { Array.prototype.forEach.call(app.querySelectorAll('svg'), (sv) => windowRoamNeck(sv)); } catch (e) {}
     try { minSvgText(app); } catch (e) {}
     try { tagCards(app); } catch (e) {}
     try { tagSegs(app); } catch (e) {}
@@ -21356,8 +21358,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '9 nov 2026 · 10:41';
-  var BUILD_ID = '2026-11-09T10:41';
+  var BUILD = '9 nov 2026 · 10:44';
+  var BUILD_ID = '2026-11-09T10:44';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
