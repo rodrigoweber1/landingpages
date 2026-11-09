@@ -1241,17 +1241,17 @@ body.stage #app .stg-em .em2-leg i{display:inline-block;width:12px;height:12px;b
 body.stage #app .stg-em .em2-card{margin-top:18px;padding:18px 20px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
 body.stage #app .stg-em .em2-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 body.stage #app .stg-em .em2-name{font:400 28px/32px var(--st-d);text-transform:uppercase;color:var(--st-ink)}
-body.stage #app .stg-em .em2-notes{flex:0 0 auto;padding:3px 10px;border:1px solid var(--st-amber);border-radius:999px;font-size:13px;line-height:18px;font-weight:700;color:var(--st-amber);background:rgba(255,196,0,.08)}
+body.stage #app .stg-em .em2-notes{flex:0 0 auto;font-size:15px;line-height:20px;font-weight:700;letter-spacing:.02em;color:var(--st-ink2)}
 body.stage #app .stg-em .em2-how{margin:10px 0 0!important;font-size:15px!important;line-height:22px!important;color:var(--st-ink)!important}
-body.stage #app .stg-em .em2-dock{position:sticky;bottom:0;z-index:6;display:flex;align-items:center;gap:12px;margin:16px -24px 0;padding:12px 24px calc(12px + env(safe-area-inset-bottom,0px));background:var(--st-ground);border-top:1px solid var(--st-rule)}
-@media (max-width:899px){body.stage #app .stg-em .em2-dock{bottom:84px;margin:16px -8px 0;padding:10px 10px 10px 16px;background:var(--st-floor2);border:1px solid var(--st-rule);border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.45)}}
+body.stage #app .stg-em .em2-dock{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:6;display:flex;align-items:center;gap:12px;margin:16px 0 0!important;padding:8px!important;background:var(--st-floor2)!important;border:1px solid var(--st-rule)!important;border-radius:16px!important;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+@media (max-width:899px){body.stage #app .stg-em .em2-dock{bottom:84px}}
 body.stage #app .stg-em .em2-now{flex:0 1 auto;min-width:0;display:flex;flex-direction:column}
 body.stage #app .stg-em .em2-now small{font-size:12px;line-height:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--st-mute)}
 body.stage #app .stg-em .em2-now b{font:400 22px/26px var(--st-d);color:var(--st-amber);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.stage #app .stg-em .em2-mute{flex:0 0 auto;width:48px;height:48px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:var(--st-floor2)!important;color:var(--st-ink2)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important;cursor:pointer;transition:background .16s var(--st-ease),color .16s var(--st-ease),border-color .16s var(--st-ease)}
 body.stage #app .stg-em .em2-met[aria-pressed="true"]{background:#2A1416!important;color:#FF6066!important;border-color:var(--st-red)!important}
 body.stage #app .stg-em .em2-mute[aria-pressed="true"]{background:#2A1416!important;color:#FF6066!important;border-color:var(--st-red)!important}
-body.stage #app .stg-em .em2-tempo{flex:0 0 auto;display:flex;align-items:center;gap:2px;padding:4px;background:var(--st-floor3);border:1px solid var(--st-rule);border-radius:999px}
+body.stage #app .stg-em .em2-tempo{flex:0 0 auto;display:flex;align-items:center;gap:2px;padding:4px;background:var(--st-floor3)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important}
 body.stage #app .stg-em .em2-tempo button{flex:0 0 auto;width:40px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:transparent!important;color:var(--st-ink)!important;border:0!important;border-radius:999px!important;font-size:24px;line-height:1;font-weight:700;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 body.stage #app .stg-em .em2-tempo button:active{background:var(--st-floor2)!important}
 body.stage #app .stg-em .em2-bpm{display:flex;flex-direction:column;align-items:center;min-width:40px}
@@ -1264,7 +1264,7 @@ body.stage #app .stg-em .em2-song b{display:block;font-size:15px;color:var(--st-
 body.stage #app .stg-em .em2-song span{display:block;margin-top:2px;font-size:13px;color:var(--st-mute)}
 body.stage #app .stg-em .em2-song button{flex:0 0 auto;min-height:44px;padding:0 14px;background:var(--st-floor2)!important;border:1px solid var(--st-rule)!important;color:var(--st-ink)!important;border-radius:999px!important;font-weight:700!important;font-size:14px;cursor:pointer}
 body.stage #app .stg-em .em2-song button[aria-pressed="true"]{background:var(--st-floor2)!important;border-color:var(--st-amber)!important;color:var(--st-amber)!important}
-body.stage #app .stg-em .em2-foot{margin:18px 0 12px!important;font-size:12px!important;line-height:16px!important;color:var(--st-mute)!important}
+body.stage #app .stg-em .em2-foot{max-width:none!important;margin:18px 0 12px!important;font-size:12px!important;line-height:16px!important;color:var(--st-mute)!important}
 /* Los primeros acordes: práctica con canciones (acordes abiertos) */
 body.stage #app .ab-prac{margin-top:20px;display:flex;flex-direction:column;gap:8px}
 body.stage #app .ab-eye{font-size:12px;line-height:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--st-amber)}
@@ -4285,7 +4285,7 @@ h += '<p class="em2-foot">' + t.foot + '</p>';
 // play bar that stays at the foot of the screen while the lesson scrolls
 const ic = S.run ? '<path d="M7 6h10v12H7z" fill="currentColor" stroke="none"/>' : '<path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="none"/>';
 const bpm = S.bpm || 80;
-h += '<div class="em2-dock"><div class="em2-tempo" role="group" aria-label="' + t.tempo + '"><button type="button" data-bpm="-1" aria-label="' + t.slower + '" title="' + t.slower + '">−</button><span class="em2-bpm" aria-live="polite"><b id="em2-bpm">' + bpm + '</b><small>BPM</small></span><button type="button" data-bpm="1" aria-label="' + t.faster + '" title="' + t.faster + '">+</button></div>';
+h += '<div class="em2-dock"><div class="em2-tempo stg-plain" role="group" aria-label="' + t.tempo + '"><button type="button" data-bpm="-1" aria-label="' + t.slower + '" title="' + t.slower + '">−</button><span class="em2-bpm" aria-live="polite"><b id="em2-bpm">' + bpm + '</b><small>BPM</small></span><button type="button" data-bpm="1" aria-label="' + t.faster + '" title="' + t.faster + '">+</button></div>';
 h += '<div class="em2-ctl"><button type="button" class="em2-play" data-play aria-pressed="' + !!S.run + '" aria-label="' + (S.run ? t.stop : t.play) + '" title="' + (S.run ? t.stop : t.play) + '"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">' + ic + '</svg></button>';
 h += '<button type="button" class="em2-mute em2-met" data-metro aria-pressed="' + !!S.metro + '" aria-label="' + t.metro + '" title="' + t.metro + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6l4 18H5z"/><path d="M7 16h10"/><path d="M12 16l5-10"/></svg></button>';
 h += '<button type="button" class="em2-mute" data-mute aria-pressed="' + !!S.mute + '" aria-label="' + (S.mute ? t.unmute : t.mute) + '" title="' + (S.mute ? t.unmute : t.mute) + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button></div>';
@@ -21590,8 +21590,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '9 nov 2026 · 18:24';
-  var BUILD_ID = '2026-11-09T18:24';
+  var BUILD = '9 nov 2026 · 18:41';
+  var BUILD_ID = '2026-11-09T18:41';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
