@@ -5251,6 +5251,8 @@ function skyBlues(root, es) {
 function cropNeck(svg, nk) {
   const vb = svg.viewBox && svg.viewBox.baseVal; if (!vb || !vb.width) return false;
   if (svg._cropped) return true;
+  // the pentatonic boxes keep one size on every box and every root: never cut to the notes
+  if (/^(Diagrama de la caja|Diagram of box)/.test(svg.getAttribute('aria-label') || '')) { svg._cropped = true; return true; }
   let last = -1, notes = 0;
   svg.querySelectorAll('circle').forEach((c) => {
     if (!isNote(nk, c)) return;
@@ -21349,8 +21351,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '9 nov 2026 · 10:38';
-  var BUILD_ID = '2026-11-09T10:38';
+  var BUILD = '9 nov 2026 · 10:41';
+  var BUILD_ID = '2026-11-09T10:41';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
