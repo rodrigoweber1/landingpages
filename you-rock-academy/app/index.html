@@ -1249,8 +1249,10 @@ body.stage #app .stg-em .em2-now{flex:0 1 auto;min-width:0;display:flex;flex-dir
 body.stage #app .stg-em .em2-now small{font-size:12px;line-height:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--st-mute)}
 body.stage #app .stg-em .em2-now b{font:400 22px/26px var(--st-d);color:var(--st-amber);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.stage #app .stg-em .em2-mute{flex:0 0 auto;width:48px;height:48px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:var(--st-floor2)!important;color:var(--st-ink2)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important;cursor:pointer;transition:background .16s var(--st-ease),color .16s var(--st-ease),border-color .16s var(--st-ease)}
+body.stage #app .stg-em .em2-met[aria-pressed="true"]{background:#2A1416!important;color:#FF6066!important;border-color:var(--st-red)!important}
 body.stage #app .stg-em .em2-mute[aria-pressed="true"]{background:#2A1416!important;color:#FF6066!important;border-color:var(--st-red)!important}
-body.stage #app .stg-em .em2-play{flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;box-shadow:0 6px 20px rgba(227,27,35,.28);background:var(--st-red)!important;color:#FFFFFF!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
+body.stage #app .stg-em .em2-ctl{margin-left:auto;display:flex;align-items:center;gap:10px}
+body.stage #app .stg-em .em2-play{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:0;padding:0;box-shadow:0 6px 20px rgba(227,27,35,.28);background:var(--st-red)!important;color:#FFFFFF!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
 body.stage #app .stg-em .em2-song{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px;padding:12px 14px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
 body.stage #app .stg-em .em2-song b{display:block;font-size:15px;color:var(--st-ink)}
 body.stage #app .stg-em .em2-song span{display:block;margin-top:2px;font-size:13px;color:var(--st-mute)}
@@ -3993,7 +3995,7 @@ const EM_TX = {
     k_power: (f, st) => 'Power chord con raíz en la ' + st + 'ª cuerda, ' + (f === 0 ? 'al aire' : 'traste ' + f) + '. Solo tónica y quinta, sin tercera.',
     shE: 'forma de Mi', shA: 'forma de La',
     warnOpen: 'En esta tonalidad casi no hay acordes abiertos, así que la mayoría se tocan con cejilla. Prueba con Do, Sol, Re, La o Mi.',
-    play: 'Reproducir', stop: 'Parar', nowOn: 'Sonando', nowOff: 'Acorde', pnote: 'Toca un acorde para oírlo.', mute: 'Silenciar el sonido', unmute: 'Activar el sonido',
+    play: 'Reproducir', stop: 'Parar', metro: 'Metrónomo', nowOn: 'Sonando', nowOff: 'Acorde', pnote: 'Toca un acorde para oírlo.', mute: 'Silenciar el sonido', unmute: 'Activar el sonido',
     bars: 'Los 12 compases', bar: 'compás ', exTitle: 'Canciones de ejemplo', keyPre: 'Tono original: ', keyNone: 'Tono original sin confirmar', showIn: 'Ver en ', tuneDown: ' · guitarras afinadas medio tono abajo', songM: ' m',
     progs: {
       maj: [['I – IV – V', 'El I es el acorde de casa, el IV abre el sonido y el V crea una tensión que pide volver al I. Con estos tres acordes se tocan miles de canciones de rock y blues.'], ['I – V – vi – IV', 'Es un bucle de cuatro acordes que suena en miles de canciones de pop y rock. El vi es el acorde menor de la secuencia y le da un toque emotivo.'], ['vi – IV – I – V', 'Son los mismos cuatro acordes que la secuencia anterior, pero empezando por el vi. Al arrancar con el acorde menor, el ambiente se vuelve más melancólico.'], ['I – ♭VII – IV', 'El ♭VII es el acorde situado un tono (dos trastes) por debajo del I. No pertenece a la escala mayor, y ese sonido inesperado es el que da el carácter de rock clásico.'], ['Blues de 12 compases', 'Doce compases que se repiten con tres acordes: I, IV y V. Se leen en tres filas de cuatro compases: I I I I / IV IV I I / V IV I I. Aquí aparece con séptimas, que le dan el color típico del blues.', 'I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 I7']],
@@ -4018,7 +4020,7 @@ const EM_TX = {
     k_power: (f, st) => 'Power chord with the root on string ' + st + ', ' + (f === 0 ? 'open' : 'fret ' + f) + '. Just root and fifth, no third.',
     shE: 'E shape', shA: 'A shape',
     warnOpen: 'In this key there are almost no open chords, so most are played as barre chords. Try C, G, D, A or E.',
-    play: 'Play', stop: 'Stop', nowOn: 'Playing', nowOff: 'Chord', pnote: 'Tap a chord to hear it.', mute: 'Mute the sound', unmute: 'Turn the sound on',
+    play: 'Play', stop: 'Stop', metro: 'Metronome', nowOn: 'Playing', nowOff: 'Chord', pnote: 'Tap a chord to hear it.', mute: 'Mute the sound', unmute: 'Turn the sound on',
     bars: 'The 12 bars', bar: 'bar ', exTitle: 'Example songs', keyPre: 'Original key: ', keyNone: 'Original key not confirmed', showIn: 'Show in ', tuneDown: ' · guitars tuned half a step down', songM: 'm',
     progs: {
       maj: [['I – IV – V', 'The I is home base, the IV opens the sound up and the V builds tension that pulls you back to the I. Thousands of rock and blues songs use just these three chords.'], ['I – V – vi – IV', 'A four-chord loop that runs through thousands of pop and rock songs. The vi is the minor chord in the sequence and adds an emotional touch.'], ['vi – IV – I – V', 'The same four chords as the sequence above, but starting on the vi. Opening on the minor chord gives it a more melancholic mood.'], ['I – ♭VII – IV', 'The ♭VII is the chord one whole step (two frets) below the I. It does not belong to the major scale, and that unexpected sound is what gives it the classic rock flavor.'], ['12-bar blues', 'Twelve bars that repeat with three chords: I, IV and V. They run in three rows of four bars: I I I I / IV IV I I / V IV I I. Here they appear with sevenths, which add the typical blues color.', 'I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 I7']],
@@ -4114,7 +4116,7 @@ let lang = 'es';
 try { const v = localStorage.getItem('guitar.lang'); if (v === 'en' || v === 'es') lang = v; } catch (e) {}
 this.state = { lang };
 this.S = window.__emLast || (window.__emLast = { key: 0, mode: 'maj', prog: 0, how: 'open', cur: 0, run: false });
-this.S.run = false;
+this.S.run = false; this.S.metro = false;
 }
 componentDidMount() {
 try {
@@ -4123,7 +4125,7 @@ if (e.key === 'guitar.lang' && (e.newValue === 'es' || e.newValue === 'en')) thi
 });
 } catch (e) {}
 }
-componentWillUnmount() { this.stop(true); }
+componentWillUnmount() { this.S.metro = false; this.stop(true); }
 setLang(l) {
 this.setState({ lang: l });
 try { localStorage.setItem('guitar.lang', l); } catch (e) {}
@@ -4165,27 +4167,56 @@ let k = 0;
 for (let i = 0; i < 6; i++) { if (sh.f[i] < 0) continue; pluck(EM_BASE[i] + sh.f[i], t0 + k * 0.028, (vol || 0.5) * (1 - i * 0.04)); k++; }
 } catch (e) {}
 }
-// playback on the audio clock: strums are scheduled ahead, the screen only follows
+// playback on the audio clock: strums and metronome clicks are scheduled ahead, the screen only follows.
+// The clock runs while the progression plays or the metronome is on; both share the same pulse.
+click(at, strong) {
+try {
+if (this.S.mute) return;
+const ac = pAudio(); if (!ac) return;
+const o = ac.createOscillator(), g = ac.createGain();
+o.type = 'square'; o.frequency.value = strong ? 1500 : 1000;
+g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(strong ? 0.3 : 0.18, at + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.06);
+o.connect(g); g.connect(ac.destination); o.start(at); o.stop(at + 0.08);
+} catch (e) {}
+}
 sched() {
-const ac = pAudio(); if (!ac || !this.S.run) return;
+const ac = pAudio(), S = this.S; if (!ac || !(S.run || S.metro)) return;
 const spb = 60 / 80;
 while (this._next < ac.currentTime + 0.15) {
-const c = this.chords(), ci = Math.floor(this._beat / 4) % c.length, bt = this._beat % 4, at = this._next;
+const bt = this._beat % 4, at = this._next;
+if (S.metro) this.click(at, bt === 0);
+if (S.run) {
+const c = this.chords(), ci = Math.floor(this._beat / 4) % c.length;
 this.strum(c[ci].sh, at, bt === 0 ? 0.5 : 0.34);
 setTimeout(() => { if (this.S.run && this.S.cur !== ci) { this.S.cur = ci; this.sync(); } }, Math.max(0, (at - ac.currentTime) * 1000));
+}
 this._next += spb; this._beat++;
 }
 }
+// starts the shared pulse if it is not running yet
+clock() {
+const ac = pAudio(); if (!ac) return false;
+if (!this._tm) { this._next = ac.currentTime + 0.08; this._beat = 0; this._tm = setInterval(() => this.sched(), 40); }
+return true;
+}
 toggle() {
 if (this.S.run) { this.stop(); return; }
-const ac = pAudio(); if (!ac) return;
-this.S.run = true; this._beat = this.S.cur * 4; this._next = ac.currentTime + 0.08;
-this._tm = setInterval(() => this.sched(), 40);
+if (!this.clock()) return;
+this.S.run = true;
+// the progression starts on the next beat of the pulse, from the chord that is picked
+this._beat = this.S.cur * 4;
 this.sched(); this.paint();
 }
+metro() {
+const S = this.S;
+S.metro = !S.metro;
+if (S.metro) { if (this.clock()) this.sched(); }
+else if (!S.run && this._tm) { clearInterval(this._tm); this._tm = 0; }
+this.paint();
+}
 stop(quiet) {
-if (this._tm) { clearInterval(this._tm); this._tm = 0; }
 this.S.run = false;
+if (this._tm && !this.S.metro) { clearInterval(this._tm); this._tm = 0; }
 if (!quiet) this.paint();
 }
 onClick(e) {
@@ -4202,6 +4233,7 @@ else this.strum(this.chords()[S.cur].sh, null, 0.55);
 }
 else if (d.sk !== undefined) { this.stop(true); S.key = +d.sk; S.cur = 0; this.paint(); this.strum(this.chords()[0].sh, null, 0.5); }
 else if (d.play !== undefined) this.toggle();
+else if (d.metro !== undefined) this.metro();
 else if (d.mute !== undefined) { S.mute = !S.mute; this.paint(); }
 }
 // only what moves while the progression plays: which chord is lit and its text
@@ -4246,8 +4278,9 @@ h += '<p class="em2-foot">' + t.foot + '</p>';
 // play bar that stays at the foot of the screen while the lesson scrolls
 const ic = S.run ? '<path d="M7 6h10v12H7z" fill="currentColor" stroke="none"/>' : '<path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="none"/>';
 h += '<div class="em2-dock"><div class="em2-now"><small>' + (S.run ? t.nowOn : t.nowOff) + '</small><b id="em2-now">' + cur.long + '</b></div>';
-h += '<button type="button" class="em2-play" data-play aria-pressed="' + !!S.run + '"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">' + ic + '</svg>' + (S.run ? t.stop : t.play) + '</button>';
-h += '<button type="button" class="em2-mute" data-mute aria-pressed="' + !!S.mute + '" aria-label="' + (S.mute ? t.unmute : t.mute) + '" title="' + (S.mute ? t.unmute : t.mute) + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button></div>';
+h += '<div class="em2-ctl"><button type="button" class="em2-play" data-play aria-pressed="' + !!S.run + '" aria-label="' + (S.run ? t.stop : t.play) + '" title="' + (S.run ? t.stop : t.play) + '"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">' + ic + '</svg></button>';
+h += '<button type="button" class="em2-mute em2-met" data-metro aria-pressed="' + !!S.metro + '" aria-label="' + t.metro + '" title="' + t.metro + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6l4 18H5z"/><path d="M7 16h10"/><path d="M12 16l5-10"/></svg></button>';
+h += '<button type="button" class="em2-mute" data-mute aria-pressed="' + !!S.mute + '" aria-label="' + (S.mute ? t.unmute : t.mute) + '" title="' + (S.mute ? t.unmute : t.mute) + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button></div></div>';
 return h;
 }
 paint() {
@@ -21532,8 +21565,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '9 nov 2026 · 18:05';
-  var BUILD_ID = '2026-11-09T18:05';
+  var BUILD = '9 nov 2026 · 18:19';
+  var BUILD_ID = '2026-11-09T18:19';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
