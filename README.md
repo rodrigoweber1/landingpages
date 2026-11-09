@@ -6,11 +6,12 @@ Páginas publicadas pelo GitHub Pages. A página inicial (`index.html`) tem link
 
 ```
 index.html                  Página inicial com links para tudo
-cursodeguitarraindex.html   App dos alunos do You Rock Academy (não mover: o endereço já está com os alunos)
-version.json                Usado pelo app para avisar quando há uma versão nova (deve ficar ao lado do app)
 404.html                    Redireciona os endereços antigos para os novos
 
 you-rock-academy/
+  app/
+    index.html              App dos alunos (antigo cursodeguitarraindex.html)
+    version.json            Avisa o app quando há uma versão nova (deve ficar ao lado do index.html)
   landing-escura.html       Landing page da escola, tema escuro
   landing-clara.html        Landing page da escola, tema claro
   media/                    Fotos e vídeos usados pelas duas landing pages
