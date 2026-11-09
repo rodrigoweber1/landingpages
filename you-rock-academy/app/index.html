@@ -1243,6 +1243,8 @@ body.stage #app .stg-em .em2-notes{margin-top:2px;font-size:14px;color:var(--st-
 body.stage #app .stg-em .em2-how{margin:8px 0 0!important;font-size:15px!important;line-height:22px!important;color:var(--st-ink)!important}
 body.stage #app .stg-em .em2-playrow{display:flex;align-items:center;gap:12px;margin-top:14px}
 body.stage #app .stg-em .em2-playrow span{font-size:13px;color:var(--st-mute)}
+body.stage #app .stg-em .em2-mute{flex:0 0 auto;width:48px;height:48px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:var(--st-floor2)!important;color:var(--st-ink2)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important;cursor:pointer;transition:background .16s var(--st-ease),color .16s var(--st-ease),border-color .16s var(--st-ease)}
+body.stage #app .stg-em .em2-mute[aria-pressed="true"]{background:#2A1416!important;color:#FF6066!important;border-color:var(--st-red)!important}
 body.stage #app .stg-em .em2-play{min-height:48px;padding:0 22px;background:var(--st-red)!important;color:#FFFFFF!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
 body.stage #app .stg-em .em2-song{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px;padding:12px 14px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
 body.stage #app .stg-em .em2-song b{display:block;font-size:15px;color:var(--st-ink)}
@@ -3869,7 +3871,7 @@ const EM_TX = {
     k_power: (f, st) => 'Power chord con raíz en la ' + st + 'ª cuerda, ' + (f === 0 ? 'al aire' : 'traste ' + f) + '. Solo tónica y quinta, sin tercera.',
     shE: 'forma de Mi', shA: 'forma de La',
     warnOpen: 'En esta tonalidad casi no hay acordes abiertos, así que la mayoría se tocan con cejilla. Prueba con Do, Sol, Re, La o Mi.',
-    play: '▶ Reproducir', stop: '■ Parar', pnote: 'Toca un acorde para oírlo.',
+    play: '▶ Reproducir', stop: '■ Parar', pnote: 'Toca un acorde para oírlo.', mute: 'Silenciar el sonido', unmute: 'Activar el sonido',
     bars: 'Los 12 compases', bar: 'compás ', exTitle: 'Canciones de ejemplo', keyPre: 'Tono original: ', keyNone: 'Tono original sin confirmar', showIn: 'Ver en ', tuneDown: ' · guitarras afinadas medio tono abajo', songM: ' m',
     progs: {
       maj: [['I – IV – V', 'Los tres acordes básicos del rock and roll y del blues.'], ['I – V – vi – IV', 'Se oye muchísimo en pop y rock.'], ['vi – IV – I – V', 'La misma de antes, pero empezando por el acorde menor.'], ['I – ♭VII – IV', 'Sonido de rock clásico: el ♭VII es el que le da el carácter.'], ['Blues de 12 compases', 'Doce compases con I, IV y V: la estructura base del blues y del rock and roll. Aquí con séptimas.', 'I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 I7']],
@@ -3894,7 +3896,7 @@ const EM_TX = {
     k_power: (f, st) => 'Power chord with the root on string ' + st + ', ' + (f === 0 ? 'open' : 'fret ' + f) + '. Just root and fifth, no third.',
     shE: 'E shape', shA: 'A shape',
     warnOpen: 'In this key there are almost no open chords, so most are played as barre chords. Try C, G, D, A or E.',
-    play: '▶ Play', stop: '■ Stop', pnote: 'Tap a chord to hear it.',
+    play: '▶ Play', stop: '■ Stop', pnote: 'Tap a chord to hear it.', mute: 'Mute the sound', unmute: 'Turn the sound on',
     bars: 'The 12 bars', bar: 'bar ', exTitle: 'Example songs', keyPre: 'Original key: ', keyNone: 'Original key not confirmed', showIn: 'Show in ', tuneDown: ' · guitars tuned half a step down', songM: 'm',
     progs: {
       maj: [['I – IV – V', 'The three basic chords of rock and roll and blues.'], ['I – V – vi – IV', 'You hear it a lot in pop and rock.'], ['vi – IV – I – V', 'Same as the one above, but starting on the minor chord.'], ['I – ♭VII – IV', 'Classic rock sound: the ♭VII is what gives it its character.'], ['12-bar blues', 'Twelve bars with I, IV and V: the basic structure of blues and rock and roll. Shown here with sevenths.', 'I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 I7']],
@@ -4020,6 +4022,7 @@ return sh.fb ? t.k_fb(sh.fret, s) : t.k_barre(sh.fret, s);
 }
 strum(sh, when, vol) {
 try {
+if (this.S.mute) return;
 const ac = pAudio();
 if (!ac || typeof pluck !== 'function') return;
 const t0 = when == null ? ac.currentTime + 0.02 : when;
@@ -4064,6 +4067,7 @@ else this.strum(this.chords()[S.cur].sh, null, 0.55);
 }
 else if (d.sk !== undefined) { this.stop(true); S.key = +d.sk; S.cur = 0; this.paint(); this.strum(this.chords()[0].sh, null, 0.5); }
 else if (d.play !== undefined) this.toggle();
+else if (d.mute !== undefined) { S.mute = !S.mute; this.paint(); }
 }
 // only what moves while the progression plays: which chord is lit and its text
 sync() {
@@ -4095,7 +4099,7 @@ h += '<span class="em2-lab">' + t.chords + '</span><div class="em2-strip">' + uq
 if (isBars) h += '<div class="em2-bars stg-plain" role="group" aria-label="' + t.bars + '">' + c.map((x, i) => '<button type="button" class="em2-bar" data-c="' + i + '" aria-pressed="' + (i === S.cur) + '" aria-label="' + t.bar + (i + 1) + ' ' + x.label + '"><small>' + (i + 1) + '</small>' + x.label + '</button>').join('') + '</div>';
 h += '<div class="em2-leg"><span><i style="background:#e31b23"></i>' + t.root + '</span><span><i style="background:#f4ede6"></i>' + t.other + '</span></div>';
 h += '<div class="em2-card" aria-live="polite"><div class="em2-name" id="em2-name">' + cur.long + '</div><div class="em2-notes" id="em2-notes">' + t.notes + cur.notes + '</div><p class="em2-how" id="em2-how">' + this.how(cur.sh) + '</p>';
-h += '<div class="em2-playrow"><button type="button" class="em2-play" data-play>' + (S.run ? t.stop : t.play) + '</button><span>' + t.pnote + '</span></div></div>';
+h += '<div class="em2-playrow"><button type="button" class="em2-play" data-play>' + (S.run ? t.stop : t.play) + '</button><button type="button" class="em2-mute" data-mute aria-pressed="' + !!S.mute + '" aria-label="' + (S.mute ? t.unmute : t.mute) + '" title="' + (S.mute ? t.unmute : t.mute) + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button><span>' + t.pnote + '</span></div></div>';
 if (sg.length) {
 h += '<span class="em2-lab">' + t.exTitle + '</span>' + sg.map((x) => {
 const k = x[1], has = k != null, on = has && k === S.key, kn = has ? t.names[k] + (S.mode === 'min' ? t.songM : '') : '';
@@ -21362,8 +21366,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '9 nov 2026 · 10:44';
-  var BUILD_ID = '2026-11-09T10:44';
+  var BUILD = '9 nov 2026 · 13:10';
+  var BUILD_ID = '2026-11-09T13:10';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
