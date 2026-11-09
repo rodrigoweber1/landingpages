@@ -5384,7 +5384,9 @@ function windowRoamNeck(svg) {
 }
 (function () {
   let tm = 0;
-  const run = () => { clearTimeout(tm); tm = setTimeout(() => { try { minSvgText(document.getElementById('app')); } catch (e) {} }, 120); };
+  // minSvgText resets and re-measures the diagrams, which can shrink the page for an instant and make the browser clamp the scroll:
+  // the page jumped up when the student reached the bottom (iPhone's bars collapse there and fire a resize). The scroll is put back.
+  const run = () => { clearTimeout(tm); tm = setTimeout(() => { const y = window.scrollY; try { minSvgText(document.getElementById('app')); } catch (e) {} if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y); }, 120); };
   const start = () => {
     const app = document.getElementById('app'); if (!app) return setTimeout(start, 200);
     // microtask pass: windows the roaming board as soon as it is added, before the browser paints it
@@ -5396,7 +5398,9 @@ function windowRoamNeck(svg) {
       }));
     }).observe(app, { childList: true, subtree: true });
     new MutationObserver(run).observe(app, { childList: true, subtree: true });
-    window.addEventListener('resize', run); run();
+    let lastW = window.innerWidth;
+    window.addEventListener('resize', () => { if (window.innerWidth !== lastW) { lastW = window.innerWidth; run(); } });
+    run();
   };
   start();
 })();
