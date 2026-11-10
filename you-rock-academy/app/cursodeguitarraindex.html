@@ -22092,8 +22092,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 21:30';
-  var BUILD_ID = '2026-11-10T21:30';
+  var BUILD = '10 nov 2026 · 17:23';
+  var BUILD_ID = '2026-11-10T17:23';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
