@@ -4023,7 +4023,7 @@ const EM_TX = {
     k_power: (f, st) => 'Power chord con raíz en la ' + st + 'ª cuerda, ' + (f === 0 ? 'al aire' : 'traste ' + f) + '. Solo tónica y quinta, sin tercera.',
     shE: 'forma de Mi', shA: 'forma de La',
     warnOpen: 'En esta tonalidad casi no hay acordes abiertos, así que la mayoría se tocan con cejilla. Prueba con Do, Sol, Re, La o Mi.',
-    play: 'Reproducir', stop: 'Parar', metro: 'Metrónomo', metroVol: 'Volumen del metrónomo', tempo: 'Velocidad', slower: 'Más lento', faster: 'Más rápido', nowOn: 'Sonando', nowOff: 'Acorde', pnote: 'Toca un acorde para oírlo.', mute: 'Silenciar el sonido', unmute: 'Activar el sonido',
+    play: 'Reproducir', stop: 'Parar', metro: 'Metrónomo', metroVol: 'Volumen del metrónomo', chordVol: 'Volumen de los acordes', tempo: 'Velocidad', slower: 'Más lento', faster: 'Más rápido', nowOn: 'Sonando', nowOff: 'Acorde', pnote: 'Toca un acorde para oírlo.', mute: 'Silenciar el sonido', unmute: 'Activar el sonido',
     bars: 'Los 12 compases', bar: 'compás ', exTitle: 'Canciones de ejemplo', keyPre: 'Tono original: ', keyNone: 'Tono original sin confirmar', showIn: 'Ver en ', tuneDown: ' · guitarras afinadas medio tono abajo', songM: ' m',
     progs: {
       maj: [['I – IV – V', 'El I es el acorde de casa, el IV abre el sonido y el V crea una tensión que pide volver al I. Con estos tres acordes se tocan miles de canciones de rock y blues.'], ['I – V – vi – IV', 'Es un bucle de cuatro acordes que suena en miles de canciones de pop y rock. El vi es el acorde menor de la secuencia y le da un toque emotivo.'], ['vi – IV – I – V', 'Son los mismos cuatro acordes que la secuencia anterior, pero empezando por el vi. Al arrancar con el acorde menor, el ambiente se vuelve más melancólico.'], ['I – ♭VII – IV', 'El ♭VII es el acorde situado un tono (dos trastes) por debajo del I. No pertenece a la escala mayor, y ese sonido inesperado es el que da el carácter de rock clásico.'], ['Blues de 12 compases', 'Doce compases que se repiten con tres acordes: I, IV y V. Se leen en tres filas de cuatro compases: I I I I / IV IV I I / V IV I I. Aquí aparece con séptimas, que le dan el color típico del blues.', 'I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 I7']],
@@ -4048,7 +4048,7 @@ const EM_TX = {
     k_power: (f, st) => 'Power chord with the root on string ' + st + ', ' + (f === 0 ? 'open' : 'fret ' + f) + '. Just root and fifth, no third.',
     shE: 'E shape', shA: 'A shape',
     warnOpen: 'In this key there are almost no open chords, so most are played as barre chords. Try C, G, D, A or E.',
-    play: 'Play', stop: 'Stop', metro: 'Metronome', metroVol: 'Metronome volume', tempo: 'Speed', slower: 'Slower', faster: 'Faster', nowOn: 'Playing', nowOff: 'Chord', pnote: 'Tap a chord to hear it.', mute: 'Mute the sound', unmute: 'Turn the sound on',
+    play: 'Play', stop: 'Stop', metro: 'Metronome', metroVol: 'Metronome volume', chordVol: 'Chord volume', tempo: 'Speed', slower: 'Slower', faster: 'Faster', nowOn: 'Playing', nowOff: 'Chord', pnote: 'Tap a chord to hear it.', mute: 'Mute the sound', unmute: 'Turn the sound on',
     bars: 'The 12 bars', bar: 'bar ', exTitle: 'Example songs', keyPre: 'Original key: ', keyNone: 'Original key not confirmed', showIn: 'Show in ', tuneDown: ' · guitars tuned half a step down', songM: 'm',
     progs: {
       maj: [['I – IV – V', 'The I is home base, the IV opens the sound up and the V builds tension that pulls you back to the I. Thousands of rock and blues songs use just these three chords.'], ['I – V – vi – IV', 'A four-chord loop that runs through thousands of pop and rock songs. The vi is the minor chord in the sequence and adds an emotional touch.'], ['vi – IV – I – V', 'The same four chords as the sequence above, but starting on the vi. Opening on the minor chord gives it a more melancholic mood.'], ['I – ♭VII – IV', 'The ♭VII is the chord one whole step (two frets) below the I. It does not belong to the major scale, and that unexpected sound is what gives it the classic rock flavor.'], ['12-bar blues', 'Twelve bars that repeat with three chords: I, IV and V. They run in three rows of four bars: I I I I / IV IV I I / V IV I I. Here they appear with sevenths, which add the typical blues color.', 'I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 I7']],
@@ -4194,7 +4194,7 @@ const ac = pAudio();
 if (!ac || typeof pluck !== 'function') return;
 const t0 = when == null ? ac.currentTime + 0.02 : when;
 let k = 0;
-for (let i = 0; i < 6; i++) { if (sh.f[i] < 0) continue; pluck(EM_BASE[i] + sh.f[i], t0 + k * 0.028, (vol || 0.5) * (1 - i * 0.04)); k++; }
+for (let i = 0; i < 6; i++) { if (sh.f[i] < 0) continue; pluck(EM_BASE[i] + sh.f[i], t0 + k * 0.028, (vol || 0.5) * cvGet() * 2 * (1 - i * 0.04)); k++; }
 } catch (e) {}
 }
 // playback on the audio clock: strums and metronome clicks are scheduled ahead, the screen only follows.
@@ -4315,7 +4315,8 @@ h += '<div class="em2-ctl"><button type="button" class="em2-play" data-play aria
 h += '<button type="button" class="em2-mute" data-mute aria-pressed="' + !!S.mute + '" aria-label="' + (S.mute ? t.unmute : t.mute) + '" title="' + (S.mute ? t.unmute : t.mute) + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button>';
 h += '<button type="button" class="em2-mute em2-met" data-metro aria-pressed="' + !!S.metro + '" aria-label="' + t.metro + '" title="' + t.metro + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6l4 18H5z"/><path d="M7 16h10"/><path d="M12 16l5-10"/></svg></button></div>';
 h += '<div class="em2-tempo stg-plain" role="group" aria-label="' + t.tempo + '"><button type="button" data-bpm="-1" aria-label="' + t.slower + '" title="' + t.slower + '">−</button><span class="em2-bpm" aria-live="polite"><b id="em2-bpm">' + bpm + '</b><small>BPM</small></span><button type="button" data-bpm="1" aria-label="' + t.faster + '" title="' + t.faster + '">+</button></div>';
-if (S.metro) h += mvRow(t.metroVol, 'color: var(--st-mute); flex-basis: 100%');
+h += mvRow(t.chordVol, 'color: var(--st-mute)', 'c');
+if (S.metro) h += mvRow(t.metroVol, 'color: var(--st-mute)', 'm');
 h += '</div>';
 return h;
 }
@@ -7401,6 +7402,7 @@ const CF_D = {
   "seqIntro": "Monta tu propia progresión: elige la nota y el tipo de cada acorde, toca el diagrama para cambiar de posición y pulsa play. Cada acorde dura 4 tiempos.",
   "seqAdd": "Añadir acorde",
   "metroVol": "Volumen del metrónomo",
+  "chordVol": "Volumen de los acordes",
   "seqToast": "En la secuencia: {n} · ver",
   "seqDrag": "Arrastra para cambiar el orden",
   "seqEmpty": "Todavía no hay acordes. Busca uno arriba y pulsa «A la secuencia» en la posición que quieras. Después podrás arrastrarlos para cambiar el orden.",
@@ -7467,6 +7469,7 @@ const CF_D = {
   "seqIntro": "Build your own progression: pick the note and type of each chord, tap the diagram to change position and hit play. Each chord lasts 4 beats.",
   "seqAdd": "Add chord",
   "metroVol": "Metronome volume",
+  "chordVol": "Chord volume",
   "seqToast": "In the sequence: {n} · view",
   "seqDrag": "Drag to change the order",
   "seqEmpty": "No chords yet. Look one up above and tap “Add to sequence” on the shape you want. Then you can drag them to change the order.",
@@ -7754,7 +7757,7 @@ h += '<div style="display: flex; align-items: center; gap: 4px">';
 h += '<button type="button" data-sq="play" aria-pressed="' + !!S.run + '" aria-label="' + CF_ESC(S.run ? t.stop : t.play) + '" title="' + CF_ESC(S.run ? t.stop : t.play) + '" style="' + rb + ' background: #E31B23; color: #FFFFFF"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">' + ic + '</svg></button>';
 h += '<button type="button" data-sq="mute" aria-pressed="' + !!S.mute + '" aria-label="' + CF_ESC(S.mute ? t.unmute : t.mute) + '" title="' + CF_ESC(S.mute ? t.unmute : t.mute) + '" style="' + tog(S.mute) + '"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button>';
 h += '<button type="button" data-sq="metro" aria-pressed="' + !!S.metro + '" aria-label="' + CF_ESC(t.metro) + '" title="' + CF_ESC(t.metro) + '" style="' + tog(S.metro) + '"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6l4 18H5z"/><path d="M7 16h10"/><path d="M12 16l5-10"/></svg></button></div>';
-h += '<div role="group" aria-label="' + CF_ESC(t.tempo) + '" style="display: flex; align-items: center"><button type="button" data-bpm="-1" aria-label="' + CF_ESC(t.slower) + '" title="' + CF_ESC(t.slower) + '" style="' + tb + '">\u2212</button><span aria-live="polite" style="display: flex; flex-direction: column; align-items: center; min-width: 40px"><b id="cfsBpm" style="font-size: 18px; line-height: 20px; font-weight: 700; color: #121212">' + (S.bpm || 80) + '</b><small style="font-size: 12px; line-height: 14px; font-weight: 700; letter-spacing: .06em; color: #5A5A5A">BPM</small></span><button type="button" data-bpm="1" aria-label="' + CF_ESC(t.faster) + '" title="' + CF_ESC(t.faster) + '" style="' + tb + '">+</button></div>' + (S.metro ? mvRow(CF_ESC(t.metroVol), 'color: #5A5A5A') : '') + '</div>';
+h += '<div role="group" aria-label="' + CF_ESC(t.tempo) + '" style="display: flex; align-items: center"><button type="button" data-bpm="-1" aria-label="' + CF_ESC(t.slower) + '" title="' + CF_ESC(t.slower) + '" style="' + tb + '">\u2212</button><span aria-live="polite" style="display: flex; flex-direction: column; align-items: center; min-width: 40px"><b id="cfsBpm" style="font-size: 18px; line-height: 20px; font-weight: 700; color: #121212">' + (S.bpm || 80) + '</b><small style="font-size: 12px; line-height: 14px; font-weight: 700; letter-spacing: .06em; color: #5A5A5A">BPM</small></span><button type="button" data-bpm="1" aria-label="' + CF_ESC(t.faster) + '" title="' + CF_ESC(t.faster) + '" style="' + tb + '">+</button></div>' + mvRow(CF_ESC(t.chordVol), 'color: #5A5A5A', 'c') + (S.metro ? mvRow(CF_ESC(t.metroVol), 'color: #5A5A5A', 'm') : '') + '</div>';
 return h;
 }
 paintSeq() {
@@ -7848,7 +7851,7 @@ const ac = pAudio(); const v = this.sqV(i);
 if (!ac || !v || typeof pluck !== 'function') return;
 const t0 = when == null ? ac.currentTime + 0.02 : when;
 let k = 0;
-for (let s = 0; s < 6; s++) { if (v.f[s] < 0) continue; pluck(CF_OPEN[s] + v.f[s], t0 + k * 0.028, (vol || 0.5) * (1 - s * 0.04)); k++; }
+for (let s = 0; s < 6; s++) { if (v.f[s] < 0) continue; pluck(CF_OPEN[s] + v.f[s], t0 + k * 0.028, (vol || 0.5) * cvGet() * 2 * (1 - s * 0.04)); k++; }
 } catch (e) {}
 }
 sqTick(at, strong) {
@@ -21113,13 +21116,21 @@ function mvGet() {
   return v;
 }
 function mvSet(v) { try { localStorage.setItem('guitar.metvol', String(v)); } catch (e) {} }
-function mvRow(label, style) {
-  const v = Math.round(mvGet() * 100);
-  return '<label class="mv-row" style="flex: 1 0 100%; display: flex; align-items: center; gap: 10px; padding: 2px 8px 4px; box-sizing: border-box; font-size: 12px; line-height: 16px; font-weight: 600; ' + (style || '') + '"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6l4 18H5z"/><path d="M12 16l5-10"/></svg><span style="flex: 0 0 auto">' + label + '</span><input type="range" class="mv-vol" min="0" max="100" step="5" value="' + v + '" aria-label="' + label + '" style="flex: 1 1 auto; min-width: 0; height: 32px; margin: 0; accent-color: #E31B23; touch-action: pan-y"></label>';
+// chord (guitar) volume, separate from the metronome
+function cvGet() {
+  let v = 0.5;
+  try { const x = parseFloat(localStorage.getItem('guitar.chordvol')); if (x >= 0 && x <= 1) v = x; } catch (e) {}
+  return v;
+}
+function cvSet(v) { try { localStorage.setItem('guitar.chordvol', String(v)); } catch (e) {} }
+function mvRow(label, style, kind) {
+  const ch = kind === 'c', v = Math.round((ch ? cvGet() : mvGet()) * 100);
+  const ico = ch ? '<path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>' : '<path d="M9 3h6l4 18H5z"/><path d="M12 16l5-10"/>';
+  return '<label class="mv-row" style="flex: 1 0 100%; display: flex; align-items: center; gap: 10px; padding: 2px 8px 4px; box-sizing: border-box; font-size: 12px; line-height: 16px; font-weight: 600; ' + (style || '') + '"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + ico + '</svg><span style="flex: 0 0 auto">' + label + '</span><input type="range" class="mv-vol" data-k="' + (ch ? 'c' : 'm') + '" min="0" max="100" step="5" value="' + v + '" aria-label="' + label + '" style="flex: 1 1 auto; min-width: 0; height: 32px; margin: 0; accent-color: #E31B23; touch-action: pan-y"></label>';
 }
 function mvBind(host) {
   if (host.__mv) return; host.__mv = true;
-  host.addEventListener('input', (e) => { const el = e.target; if (el && el.classList && el.classList.contains('mv-vol')) mvSet(el.value / 100); });
+  host.addEventListener('input', (e) => { const el = e.target; if (el && el.classList && el.classList.contains('mv-vol')) { if (el.getAttribute('data-k') === 'c') cvSet(el.value / 100); else mvSet(el.value / 100); } });
 }
 function pAudio() {
   if (!pAC) {
@@ -22419,8 +22430,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 19:29';
-  var BUILD_ID = '2026-11-10T19:29';
+  var BUILD = '10 nov 2026 · 19:30';
+  var BUILD_ID = '2026-11-10T19:30';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
