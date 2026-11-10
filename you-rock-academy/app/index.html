@@ -1299,6 +1299,11 @@ body.stage #app .ab-bars{display:grid;gap:8px;max-width:480px;margin-top:6px}
 body.stage #app .ab-bar{display:flex;gap:4px;padding:4px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
 body.stage #app .ab-step{min-width:0;min-height:44px;padding:0 4px;background:var(--st-floor2)!important;border:1px solid transparent!important;border-radius:999px!important;color:var(--st-ink)!important;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 body.stage #app .ab-step[aria-pressed="true"]{border-color:var(--st-amber)!important;color:var(--st-amber)!important}
+.bt-slot.acc b{color:#E31B23}
+.bt-slot.rest b{opacity:.35}
+.bt-slot.rt-on b{color:#FFFFFF}
+.bt-slot small.lab{font-size:12px;line-height:14px;font-weight:600}
+.bt-progs{display:flex;flex-direction:column;gap:8px}
 body.stage #app .bt-prac{display:flex;flex-direction:column;gap:2px;padding:14px 16px;background:var(--st-floor);border:1px solid var(--st-rule);border-radius:16px}
 body.stage #app .bt-prac b{font-size:15px;color:var(--st-ink)}
 body.stage #app .bt-prac span{font-size:13px;color:var(--st-mute)}
@@ -9393,7 +9398,7 @@ constructor(props) {
 super(props);
 let lang = 'es';
 try { const v = localStorage.getItem('guitar.lang'); if (v === 'en' || v === 'es') lang = v; } catch (e) {}
-this.state = { lang, entry: 0, alt: false, bpm: 100 };
+this.state = { lang, entry: 0, alt: false, bpm: 70 };
 }
 componentDidMount() {
 try {
@@ -9426,10 +9431,10 @@ try { pUnlock(); } catch (e) {}
 const spb = 60 / this.state.bpm, t0 = this._ac.currentTime + 0.12;
 this._playing = id;
 for (let r = 0; r < reps; r++) {
-for (let b = 0; b < beats; b++) this.click(t0 + (r * beats + b) * spb, b === 0);
+for (let b = 0; b < beats; b++) this.click(t0 + (r * beats + b) * spb, b === 0 || (beats === 6 && b === 3));
 evs.forEach((ev) => {
 const at = t0 + (r * beats + ev.at) * spb;
-if (ev.chord && typeof pluck === 'function') ev.chord.forEach((m) => { try { const s = pluck(m, at); if (s) this._os.push(s); } catch (e) {} });
+if (ev.chord && typeof pluck === 'function') ev.chord.forEach((m, mi) => { try { const s = pluck(m, at + mi * 0.012, ev.vol); if (s) this._os.push(s); } catch (e) {} });
 const ms = (at - this._ac.currentTime) * 1000;
 const els = [].concat(ev.el || []);
 this._tm.push(setTimeout(() => els.forEach((el) => el.classList.add('rt-on')), ms));
@@ -9462,6 +9467,50 @@ if (n.k === 'e') (groups[n.beam] = groups[n.beam] || []).push(x + 5.6);
 Object.keys(groups).forEach((k) => { const b = groups[k]; h += '<rect class="rt-beam" x="' + b[0] + '" y="' + (yM - 31) + '" width="' + (b[b.length - 1] - b[0] + 1.6) + '" height="4.5"/>'; });
 return h + '</svg>';
 }
+// generic bar: notes [{ s: start slot, k: 'q'|'e'|'s'|'r', beam, sb, acc }]; one slot = 1/sub of a click
+bar2(E) {
+const g = 9, yT = 36, yM = yT + 2 * g, x0 = 78, W = 360, N = E.clicks * E.spc;
+const step = (W - x0 - 18) / N, X = (s) => x0 + step * (s + 0.5);
+const accAt = {}; E.strokes.forEach((st) => { if (st.a) accAt[st.s] = 1; });
+const noteAt = {}; E.notes.forEach((n) => { noteAt[n.s] = 1; });
+const num = E.meter.split('/');
+let h = '<svg class="rt-svg" viewBox="0 0 ' + W + ' 122" role="img" aria-label="' + E.meter + '">';
+for (let i = 0; i < 5; i++) h += '<line class="pt-line" x1="6" y1="' + (yT + i * g) + '" x2="' + (W - 6) + '" y2="' + (yT + i * g) + '" stroke="#8A8A8A" stroke-width="1"/>';
+h += '<line class="pt-line" x1="' + (W - 6) + '" y1="' + yT + '" x2="' + (W - 6) + '" y2="' + (yT + 4 * g) + '" stroke="#8A8A8A" stroke-width="2"/>';
+h += '<text class="rt-ts" x="44" y="' + (yT + 16) + '" text-anchor="middle">' + num[0] + '</text><text class="rt-ts" x="44" y="' + (yT + 34) + '" text-anchor="middle">' + num[1] + '</text>';
+const groups = {}, cnt = (s) => '<text class="rt-cnt' + (accAt[s] ? ' rt-acc' : '') + '" x="' + X(s) + '" y="' + (yT + 4 * g + 24) + '" text-anchor="middle">' + (E.counts[s] || '') + '</text>';
+E.notes.forEach((n) => {
+const x = X(n.s);
+if (n.k === 'r') {
+h += '<circle class="rt-head" cx="' + (x - 2) + '" cy="' + (yM - 6) + '" r="2.1"/><path class="rt-flag" d="M' + (x - 2) + ' ' + (yM - 4.5) + ' Q' + (x + 1.5) + ' ' + (yM - 3.5) + ' ' + (x + 3.5) + ' ' + (yM - 8) + ' L' + (x - 0.5) + ' ' + (yM + 8) + '"/>';
+h += cnt(n.s); return;
+}
+h += '<g class="rt-n" data-s="' + n.s + '"><ellipse class="rt-head" cx="' + x + '" cy="' + yM + '" rx="6.2" ry="4.4" transform="rotate(-20 ' + x + ' ' + yM + ')"/>';
+h += '<line class="rt-stem" x1="' + (x + 5.6) + '" y1="' + (yM - 1) + '" x2="' + (x + 5.6) + '" y2="' + (yM - 30) + '"/>';
+if (n.k !== 'q' && n.beam === undefined) h += '<path class="rt-flag" d="M' + (x + 5.6) + ' ' + (yM - 30) + ' C' + (x + 6.6) + ' ' + (yM - 22) + ' ' + (x + 15) + ' ' + (yM - 20) + ' ' + (x + 13) + ' ' + (yM - 10) + '"/>';
+h += cnt(n.s) + '</g>';
+if (n.acc) h += '<path class="rt-flag" d="M' + (x - 4.5) + ' 6 L' + (x + 4.5) + ' 10.5 L' + (x - 4.5) + ' 15"/>';
+if (n.beam !== undefined) (groups[n.beam] = groups[n.beam] || []).push({ x: x + 5.6, sb: n.sb });
+});
+for (let s = 0; s < N; s++) if (!noteAt[s]) h += cnt(s);
+Object.keys(groups).forEach((k) => {
+const q = groups[k];
+h += '<rect class="rt-beam" x="' + q[0].x + '" y="' + (yM - 31) + '" width="' + (q[q.length - 1].x - q[0].x + 1.6) + '" height="4.5"/>';
+q.forEach((m, i) => { if (m.sb && q[i + 1]) h += '<rect class="rt-beam" x="' + m.x + '" y="' + (yM - 22) + '" width="' + (q[i + 1].x - m.x + 1.6) + '" height="3.4"/>'; });
+});
+return h + '</svg>';
+}
+// the pick row for generic entries: one box per slot, arrow or silence
+slots2(E) {
+const N = E.clicks * E.spc, at = {}; E.strokes.forEach((st) => { at[st.s] = st; });
+let h = '<div class="bt-slots" style="grid-template-columns:repeat(' + N + ',minmax(0,1fr));gap:' + (N > 8 ? 2 : 4) + 'px">';
+for (let s = 0; s < N; s++) {
+const st = at[s];
+h += st ? '<span class="bt-slot' + (st.a ? ' acc' : '') + '" data-s="' + s + '"><b>' + (st.d === 'D' ? '↓' : '↑') + '</b><small>' + (E.counts[s] || '') + '</small>' + (st.lab ? '<small class="lab">' + st.lab + '</small>' : '') + '</span>'
+: '<span class="bt-slot rest"><b>·</b><small>' + (E.counts[s] || '') + '</small></span>';
+}
+return h + '</div>';
+}
 build(c) {
 const T = c.t, E = c.entry;
 const h2 = (x) => '<h2 class="cr-h">' + x + '</h2>';
@@ -9474,6 +9523,8 @@ const arrows = counts.map((cn, i) => '<span class="bt-slot" data-i="' + i + '"><
 let h = '<div class="bt-entries" role="group" aria-label="' + T.entriesAria + '">' + c.entries.map((x, i) => '<button type="button" class="bt-entry' + (i === c.idx ? ' on' : '') + '" data-e="' + i + '"><small>' + (i + 1) + '</small>' + x + '</button>').join('') + '<span class="bt-soon">' + T.soon + '</span></div>';
 h += '<article class="bt-art">';
 h += '<div class="bt-head"><span class="pz-e">' + T.entryWord + ' ' + (c.idx + 1) + '</span><h2 class="cr-h" style="margin:0">' + E.name + '</h2>' + p(E.sub) + '</div>';
+h += '<div class="rt-video"><b>' + T.vidT + '</b><div class="rt-vbox" role="img" aria-label="' + T.vidT + '"><span class="rt-vplay">▶</span><span>' + T.vidSoon + '</span></div></div>';
+if (E.strokes) return h + this.buildNew(c, E, T, btn, h3, p) + '</article>';
 h += '<div class="pt-card rt-card" data-card="score"><div class="rt-top"><b>' + E.scoreT + '</b>' + btn('score') + '</div>' + this.bar(eighths, counts, E.chord, true) + p(E.scoreX) + '</div>';
 h += '<div class="pt-card rt-card" data-card="pick"><div class="rt-top"><b>' + E.pickT + '</b>' + btn('pick') + '</div>'
 + '<div class="bt-modes" role="group" aria-label="' + E.pickT + '">' + E.modes.map((x, i) => '<button type="button" class="bt-mode' + ((i === 1) === c.alt ? ' on' : '') + '" data-alt="' + i + '">' + x + '</button>').join('') + '</div>'
@@ -9486,7 +9537,19 @@ h += '<div class="bt-ref">' + h3(E.refT) + p(E.refX) + '<div class="bt-chords">'
 h += h3(E.songsT) + '<ul class="bt-songs">' + E.songs.map((x) => '<li>♪ ' + x + '</li>').join('') + '</ul>';
 if (E.prac) h += h3(E.prac.t) + '<div class="bt-prac"><b>♪ ' + E.prac.song + '</b><span>' + E.prac.meta + '</span>' + p(E.prac.x) + '</div>';
 h += '<div class="pt-note">' + p('<b>' + T.tipT + '</b> ' + T.tipX) + '</div>';
+h += '<div class="pt-note">' + p('<b>' + T.practT + '</b> ' + T.practX) + '</div>';
 return h + '</article>';
+}
+buildNew(c, E, T, btn, h3, p) {
+let h = '<div class="pt-card rt-card" data-card="score"><div class="rt-top"><b>' + E.scoreT + '</b>' + btn('score') + '</div>' + this.bar2(E) + p(E.scoreX) + '</div>';
+h += '<div class="pt-card rt-card" data-card="pick"><div class="rt-top"><b>' + E.pickT + '</b>' + btn('pick') + '</div>' + this.slots2(E) + p(E.pickX) + '</div>';
+h += '<div class="bt-tempo"><span>' + T.bpmT + '</span><button type="button" class="bt-bpm" data-b="-5" aria-label="' + T.slower + '">−</button><b>' + c.bpm + ' BPM</b><button type="button" class="bt-bpm" data-b="5" aria-label="' + T.faster + '">+</button></div>';
+if (E.metroX) h += p(E.metroX);
+if (E.progs) h += h3(T.progT) + p(T.progX) + '<div class="bt-progs">' + E.progs.map((pr) => '<div class="bt-chords">' + pr.map((x) => '<span>' + x + '</span>').join('') + '</div>').join('') + '</div>';
+h += h3(T.songsNewT) + '<ul class="bt-songs">' + E.songs.map((x) => '<li>♪ ' + x + '</li>').join('') + '</ul>';
+h += '<div class="pt-note">' + p('<b>' + (E.tipT || T.tipT) + '</b> ' + (E.tipX || T.tipX)) + '</div>';
+h += '<div class="pt-note">' + p('<b>' + T.practT + '</b> ' + T.practX) + '</div>';
+return h;
 }
 paint() {
 if (!this.__render || !this._cfg) return;
@@ -9505,6 +9568,14 @@ const id = el.getAttribute('data-p');
 if (!id) return;
 const card = root.querySelector('[data-card="' + id + '"]');
 const q = (s) => Array.prototype.slice.call(card.querySelectorAll(s));
+const GE = this._cfg.entry;
+if (GE.strokes) {
+const N = GE.clicks * GE.spc, bySlot = {};
+q(id === 'score' ? '.rt-n' : '.bt-slot[data-s]').forEach((x) => { bySlot[x.getAttribute('data-s')] = x; });
+const evs = GE.strokes.map((st, i) => { const nx = GE.strokes[i + 1]; return { at: st.s / GE.spc, el: bySlot[st.s], chord: st.d === 'U' ? GE.up : (st.ch === 'b' ? GE.bass : (st.ch === 'f' ? GE.fing : GE.full)), vol: st.a ? 0.75 : (st.d === 'U' ? 0.4 : 0.55), len: ((nx ? nx.s : N) - st.s) / GE.spc }; });
+this.play(id, evs, GE.clicks, 2);
+return;
+}
 if (id === 'score') { const n = q('.rt-n'); this.play(id, n.map((x, i) => ({ at: i / 2, el: x, chord: E5, len: 0.5 })), 4, 2); }
 else if (id === 'pick') { const s = q('.bt-slot'); this.play(id, s.map((x, i) => ({ at: i / 2, el: x, chord: E5, len: 0.5 })), 4, 2); }
 else if (id === 'contrast') {
@@ -9519,20 +9590,113 @@ renderVals() {
 const st = this.state, lang = st.lang, es = lang === 'es';
 const T = es ? {
 langAria: 'Idioma', backAria: 'Volver a la ruta', title: 'Ritmos de acompañamiento', eyebrow: 'Módulo 5',
-intro: 'Cada entrada es un ritmo distinto. Te cuento cómo se escribe en la partitura, cómo se mueve la púa (↓ abajo, ↑ arriba) y dos canciones donde lo vas a oír. Arrancamos con el más rockero.',
+intro: 'Cada entrada es un ritmo distinto. Te cuento cómo se escribe en la partitura, cómo se mueve la púa (↓ abajo, ↑ arriba) y en qué canciones lo vas a oír. El acento (en rojo) es el golpe más fuerte: ahí cae el peso de la música.',
+vidT: 'Vídeo del profesor', vidSoon: 'Aquí irá el vídeo explicativo del ritmo', progT: 'Progresiones para practicar', progX: 'Cada acorde dura un compás. Toca el ritmo sobre estas progresiones clásicas.', songsNewT: 'Canciones que se pueden tocar con este ritmo',
+practT: 'Cómo practicarlo.', practX: 'Despacio, siempre despacio. Busca una velocidad en la que te salga cómodo, sin ir forzado, y empieza hacia los 70 BPM. Repite el ritmo con el metrónomo durante varios minutos, hasta sentir que lo dominas; entonces sube 5 BPM y repite el proceso.',
 entriesAria: 'Ritmos', soon: 'Más ritmos, próximamente', entryWord: 'Ritmo', listen: 'Escuchar', stop: 'Parar', and: 'y',
 bpmT: 'Tempo', slower: 'Más lento', faster: 'Más rápido',
 tipT: 'La mano no para.', tipX: 'Aunque un golpe no suene, la mano sigue moviéndose al ritmo de las corcheas. Así el pulso no se te escapa.',
 cta: 'Siguiente'
 } : {
 langAria: 'Language', backAria: 'Back to the path', title: 'Accompaniment rhythms', eyebrow: 'Module 5',
-intro: 'Each entry is a different rhythm. I’ll show you how it’s written on the staff, how the pick moves (↓ down, ↑ up) and two songs where you’ll hear it. We’re kicking off with the most rock one.',
+intro: 'Each entry is a different rhythm. I’ll show you how it’s written on the staff, how the pick moves (↓ down, ↑ up) and which songs you’ll hear it in. The accent (in red) is the strongest stroke: that’s where the weight of the music falls.',
+vidT: 'Teacher’s video', vidSoon: 'The video explaining this rhythm will go here', progT: 'Progressions to practice with', progX: 'Each chord lasts one bar. Play the rhythm over these classic progressions.', songsNewT: 'Songs you can play with this rhythm',
+practT: 'How to practice it.', practX: 'Slowly, always slowly. Find a speed where it feels comfortable, no strain, and start around 70 BPM. Repeat the rhythm with the metronome for several minutes, until you feel you’ve got it; then raise it by 5 BPM and repeat.',
 entriesAria: 'Rhythms', soon: 'More rhythms coming soon', entryWord: 'Rhythm', listen: 'Listen', stop: 'Stop', and: '&',
 bpmT: 'Tempo', slower: 'Slower', faster: 'Faster',
 tipT: 'The hand never stops.', tipX: 'Even when a stroke doesn’t sound, your hand keeps moving with the eighth notes. That way the pulse never gets away from you.',
 cta: 'Next'
 };
-const ENTRIES = es ? [{
+
+const CM = [48, 52, 55, 60, 64], CT = [55, 60, 64];
+const NEW_ES = [{
+name: 'Básico', sub: 'El ritmo de acompañamiento más usado en el pop y el folk. En cuatro tiempos la mano no para de moverse, pero hay golpes que se quedan «en el aire».',
+meter: '4/4', clicks: 4, spc: 2, full: CM, up: CT,
+counts: ['1', 'y', '2', 'y', '3', 'y', '4', 'y'],
+strokes: [{ s: 0, d: 'D', a: 1 }, { s: 2, d: 'D' }, { s: 3, d: 'U' }, { s: 5, d: 'U' }, { s: 6, d: 'D' }, { s: 7, d: 'U' }],
+notes: [{ s: 0, k: 'q', acc: 1 }, { s: 2, k: 'e', beam: 'a' }, { s: 3, k: 'e', beam: 'a' }, { s: 4, k: 'r' }, { s: 5, k: 'e' }, { s: 6, k: 'e', beam: 'b' }, { s: 7, k: 'e', beam: 'b' }],
+scoreT: 'En la partitura', scoreX: 'Un compás de 4/4: una negra, dos corcheas, un silencio de corchea y una corchea, y otras dos corcheas. Se cuenta «1 y 2 y 3 y 4 y» y no suenan ni el «y» del 1 ni el 3.',
+pickT: 'La púa', pickX: 'Abajo en el 1 (con acento), abajo en el 2, arriba en el «y» del 2, arriba en el «y» del 3, abajo en el 4 y arriba en el «y» del 4. La mano sube en el «y» del 1 y baja en el 3 sin tocar las cuerdas: no se detiene nunca.',
+progs: [['Sol', 'Mi m', 'Do', 'Re'], ['Do', 'La m', 'Fa', 'Sol'], ['Do', 'Fa', 'Do', 'Sol'], ['La', 'Si m', 'Re', 'Re m'], ['La', 'Si m', 'Re', 'Mi'], ['Re', 'Fa♯ m', 'Sol', 'La']],
+songs: ["Knockin' on Heaven's Door · Bob Dylan", 'Take Me Home, Country Roads · John Denver', 'Wonderwall · Oasis']
+}, {
+name: 'Acento desplazado', sub: 'Ocho corcheas por compás, igual que en las corcheas rock, pero con el acento en la 1.ª, la 4.ª y la 7.ª. El peso del pulso cambia de sitio y el ritmo gana nervio.',
+meter: '4/4', clicks: 4, spc: 2, full: CM, up: CT,
+counts: ['1', 'y', '2', 'y', '3', 'y', '4', 'y'],
+strokes: [{ s: 0, d: 'D', a: 1 }, { s: 1, d: 'D' }, { s: 2, d: 'D' }, { s: 3, d: 'D', a: 1 }, { s: 4, d: 'D' }, { s: 5, d: 'D' }, { s: 6, d: 'D', a: 1 }, { s: 7, d: 'D' }],
+notes: [{ s: 0, k: 'e', beam: 'a', acc: 1 }, { s: 1, k: 'e', beam: 'a' }, { s: 2, k: 'e', beam: 'a' }, { s: 3, k: 'e', beam: 'b', acc: 1 }, { s: 4, k: 'e', beam: 'b' }, { s: 5, k: 'e', beam: 'b' }, { s: 6, k: 'e', beam: 'c', acc: 1 }, { s: 7, k: 'e', beam: 'c' }],
+scoreT: 'En la partitura', scoreX: 'Ocho corcheas agrupadas de 3 en 3 en 2 (3 + 3 + 2). Los acentos (>) caen en la corchea 1, 4 y 7, no en los números del pulso: fíjate en que el segundo acento cae en el «y» del 2.',
+pickT: 'La púa', pickX: 'Todas las corcheas van hacia abajo. Los golpes en rojo son más fuertes: el 1, el «y» del 2 y el 4. Cuenta «1 y 2 y 3 y 4 y» y marca solo esos tres.',
+progs: [['Sol', 'Mi m', 'Do', 'Re'], ['Do', 'La m', 'Fa', 'Sol'], ['Do', 'Fa', 'Do', 'Sol'], ['La', 'Si m', 'Re', 'Re m'], ['La', 'Si m', 'Re', 'Mi'], ['Re', 'Fa♯ m', 'Sol', 'La']],
+songs: ['Nada de esto fue un error · Coti', 'Shape of You · Ed Sheeran', 'Despacito · Luis Fonsi']
+}, {
+name: 'Country-rock', sub: 'El «ritmo del tren»: boom-chicka-boom. Es el patrón de la música country de Johnny Cash y se parece al traqueteo de las ruedas de un tren.',
+meter: '4/4', clicks: 4, spc: 2, full: CM, up: CT,
+counts: ['1', 'y', '2', 'y', '3', 'y', '4', 'y'],
+strokes: [{ s: 0, d: 'D', a: 1 }, { s: 2, d: 'D' }, { s: 3, d: 'U' }, { s: 4, d: 'D', a: 1 }, { s: 6, d: 'D' }, { s: 7, d: 'U' }],
+notes: [{ s: 0, k: 'q', acc: 1 }, { s: 2, k: 'e', beam: 'a' }, { s: 3, k: 'e', beam: 'a' }, { s: 4, k: 'q', acc: 1 }, { s: 6, k: 'e', beam: 'b' }, { s: 7, k: 'e', beam: 'b' }],
+scoreT: 'En la partitura', scoreX: 'Un compás de 4/4: negra, dos corcheas, negra y dos corcheas. Se cuenta «1 · 2 y · 3 · 4 y». Los tiempos 1 y 3 llevan el acento (el «boom») y los dos golpes siguientes son el «chicka».',
+pickT: 'La púa', pickX: 'Abajo con acento en el 1 y en el 3. En el 2 y en el 4, abajo y arriba seguidos (el «chicka»). Entre un golpe y otro la mano sigue moviéndose para mantener el pulso.',
+progs: [['Sol', 'Mi m', 'Do', 'Re'], ['Do', 'La m', 'Fa', 'Sol'], ['Do', 'Fa', 'Do', 'Sol'], ['La', 'Si m', 'Re', 'Re m'], ['La', 'Si m', 'Re', 'Mi'], ['Re', 'Fa♯ m', 'Sol', 'La']],
+songs: ['Folsom Prison Blues · Johnny Cash', 'I Walk the Line · Johnny Cash', 'Jackson · Johnny Cash y June Carter']
+}, {
+name: 'Ritmo de 6/8', sub: 'Un compás de 6/8 tiene seis corcheas, agrupadas de tres en tres, con el peso en el 1 y en el 4. Es el balanceo de muchas baladas clásicas.',
+meter: '6/8', clicks: 6, spc: 2, full: CM, up: CT,
+counts: ['1', '', '2', 'y', '3', 'y', '4', '', '5', 'y', '6', 'y'],
+strokes: [{ s: 0, d: 'D', a: 1 }, { s: 2, d: 'D' }, { s: 3, d: 'U' }, { s: 4, d: 'D' }, { s: 5, d: 'U' }, { s: 6, d: 'D', a: 1 }, { s: 8, d: 'D' }, { s: 9, d: 'U' }, { s: 10, d: 'D' }, { s: 11, d: 'U' }],
+notes: [{ s: 0, k: 'e', beam: 'a', acc: 1 }, { s: 2, k: 's', beam: 'a', sb: 1 }, { s: 3, k: 's', beam: 'a' }, { s: 4, k: 's', beam: 'a', sb: 1 }, { s: 5, k: 's', beam: 'a' }, { s: 6, k: 'e', beam: 'b', acc: 1 }, { s: 8, k: 's', beam: 'b', sb: 1 }, { s: 9, k: 's', beam: 'b' }, { s: 10, k: 's', beam: 'b', sb: 1 }, { s: 11, k: 's', beam: 'b' }],
+scoreT: 'En la partitura', scoreX: 'Seis corcheas por compás en dos grupos de tres (1 2 3 · 4 5 6). La corchea 1 y la 4 van enteras; las demás se parten en dos semicorcheas (el «y»). Acento en el 1 y en el 4.',
+pickT: 'La púa', pickX: 'Abajo con acento en el 1 y en el 4. En el 2, el 3, el 5 y el 6, abajo y arriba seguidos. Pon el metrónomo a 6 pulsos: uno por cada corchea.',
+songs: ['Piano Man · Billy Joel', 'House of the Rising Sun · The Animals', 'Unchained Melody · The Righteous Brothers']
+}, {
+name: 'Vals', sub: 'El acompañamiento clásico del vals, como en El Danubio Azul: tres tiempos por compás, con el bajo en el 1 y el acorde en el 2 y el 3. Suele tocarse con los dedos, no con púa.',
+meter: '3/4', clicks: 3, spc: 1, full: CM, up: CT, bass: [48], fing: CT,
+counts: ['1', '2', '3'],
+strokes: [{ s: 0, d: 'D', a: 1, ch: 'b', lab: 'Pulgar' }, { s: 1, d: 'D', ch: 'f', lab: 'Dedos' }, { s: 2, d: 'D', ch: 'f', lab: 'Dedos' }],
+notes: [{ s: 0, k: 'q', acc: 1 }, { s: 1, k: 'q' }, { s: 2, k: 'q' }],
+scoreT: 'En la partitura', scoreX: 'Un compás de 3/4 con tres negras: «1 2 3». El 1 lleva el acento: es el bajo. En el 2 y en el 3 suena el acorde.',
+pickT: 'Pulgar y dedos', pickX: 'El pulgar toca una cuerda grave (la raíz del acorde) en el 1. Los dedos (índice, corazón y anular) tocan juntos las tres cuerdas agudas en el 2 y en el 3. Cuenta «1-2-3, 1-2-3» y pon el metrónomo a 3 pulsos.',
+tipT: 'El bajo manda.', tipX: 'El pulgar marca el acorde que suena: en cada compás toca la cuerda grave de ese acorde, y los dedos repiten siempre el mismo golpe.',
+songs: ['El Danubio Azul · Johann Strauss II', 'Moon River · Audrey Hepburn', 'Edelweiss · The Sound of Music']
+}];
+
+const NEW_EN = [Object.assign({}, NEW_ES[0], {
+name: 'Basic', sub: 'The most widely used accompaniment rhythm in pop and folk. In four beats your hand never stops moving, but some strokes stay “in the air”.',
+counts: ['1', '&', '2', '&', '3', '&', '4', '&'],
+scoreX: 'One 4/4 bar: a quarter note, two eighth notes, an eighth rest and an eighth note, and two more eighth notes. You count “1 & 2 & 3 & 4 &” and neither the “&” of 1 nor the 3 sounds.',
+pickT: 'The pick', pickX: 'Down on 1 (accented), down on 2, up on the “&” of 2, up on the “&” of 3, down on 4 and up on the “&” of 4. Your hand goes up on the “&” of 1 and down on 3 without touching the strings: it never stops.',
+progs: [['G', 'Em', 'C', 'D'], ['C', 'Am', 'F', 'G'], ['C', 'F', 'C', 'G'], ['A', 'Bm', 'D', 'Dm'], ['A', 'Bm', 'D', 'E'], ['D', 'F♯m', 'G', 'A']],
+songs: ["Knockin' on Heaven's Door · Bob Dylan", 'Take Me Home, Country Roads · John Denver', 'Wonderwall · Oasis']
+}), Object.assign({}, NEW_ES[1], {
+name: 'Displaced accent', sub: 'Eight eighth notes per bar, just like rock eighths, but with the accent on the 1st, 4th and 7th. The weight of the pulse moves and the rhythm gets more edge.',
+counts: ['1', '&', '2', '&', '3', '&', '4', '&'],
+scoreX: 'Eight eighth notes grouped 3 + 3 + 2. The accents (>) fall on eighth notes 1, 4 and 7, not on the beat numbers: notice that the second accent lands on the “&” of 2.',
+pickT: 'The pick', pickX: 'Every eighth note goes down. The red strokes are stronger: the 1, the “&” of 2 and the 4. Count “1 & 2 & 3 & 4 &” and accent only those three.',
+progs: [['G', 'Em', 'C', 'D'], ['C', 'Am', 'F', 'G'], ['C', 'F', 'C', 'G'], ['A', 'Bm', 'D', 'Dm'], ['A', 'Bm', 'D', 'E'], ['D', 'F♯m', 'G', 'A']],
+songs: ['Nada de esto fue un error · Coti', 'Shape of You · Ed Sheeran', 'Despacito · Luis Fonsi']
+}), Object.assign({}, NEW_ES[2], {
+name: 'Country-rock', sub: 'The “train rhythm”: boom-chicka-boom. It is the Johnny Cash country pattern and sounds like the clatter of train wheels.',
+counts: ['1', '&', '2', '&', '3', '&', '4', '&'],
+scoreX: 'One 4/4 bar: quarter note, two eighth notes, quarter note and two eighth notes. You count “1 · 2 & · 3 · 4 &”. Beats 1 and 3 carry the accent (the “boom”) and the next two strokes are the “chicka”.',
+pickT: 'The pick', pickX: 'Down with an accent on 1 and on 3. On 2 and on 4, down and up one after the other (the “chicka”). Between strokes your hand keeps moving to hold the pulse.',
+progs: [['G', 'Em', 'C', 'D'], ['C', 'Am', 'F', 'G'], ['C', 'F', 'C', 'G'], ['A', 'Bm', 'D', 'Dm'], ['A', 'Bm', 'D', 'E'], ['D', 'F♯m', 'G', 'A']],
+songs: ['Folsom Prison Blues · Johnny Cash', 'I Walk the Line · Johnny Cash', 'Jackson · Johnny Cash & June Carter']
+}), Object.assign({}, NEW_ES[3], {
+name: '6/8 rhythm', sub: 'A 6/8 bar has six eighth notes, grouped in threes, with the weight on 1 and 4. It is the sway of many classic ballads.',
+counts: ['1', '', '2', '&', '3', '&', '4', '', '5', '&', '6', '&'],
+scoreX: 'Six eighth notes per bar in two groups of three (1 2 3 · 4 5 6). Eighth notes 1 and 4 stay whole; the others are split into two sixteenth notes (the “&”). Accent on 1 and 4.',
+pickT: 'The pick', pickX: 'Down with an accent on 1 and 4. On 2, 3, 5 and 6, down and up one after the other. Set the metronome to 6 beats: one per eighth note.',
+songs: ['Piano Man · Billy Joel', 'House of the Rising Sun · The Animals', 'Unchained Melody · The Righteous Brothers']
+}), Object.assign({}, NEW_ES[4], {
+name: 'Waltz', sub: 'The classic waltz accompaniment, as in The Blue Danube: three beats per bar, with the bass on 1 and the chord on 2 and 3. It is usually played with the fingers, not a pick.',
+counts: ['1', '2', '3'],
+strokes: [{ s: 0, d: 'D', a: 1, ch: 'b', lab: 'Thumb' }, { s: 1, d: 'D', ch: 'f', lab: 'Fingers' }, { s: 2, d: 'D', ch: 'f', lab: 'Fingers' }],
+scoreX: 'One 3/4 bar with three quarter notes: “1 2 3”. The 1 carries the accent: it is the bass. On 2 and 3 the chord sounds.',
+pickT: 'Thumb and fingers', pickX: 'Your thumb plays a low string (the root of the chord) on 1. Your fingers (index, middle and ring) play the three high strings together on 2 and 3. Count “1-2-3, 1-2-3” and set the metronome to 3 beats.',
+tipT: 'The bass leads.', tipX: 'The thumb names the chord that is sounding: in each bar it plays that chord’s low string, and the fingers always repeat the same stroke.',
+songs: ['The Blue Danube · Johann Strauss II', 'Moon River · Audrey Hepburn', 'Edelweiss · The Sound of Music']
+})];
+const OLDS = es ? [{
 name: 'Corcheas rock', sub: 'Ocho corcheas por compás, con la púa siempre hacia abajo. Es el motor de un montón de canciones de rock.',
 chord: 'Mi m', chord2: 'Mi m',
 scoreT: 'En la partitura', scoreX: 'Un compás de 4/4 con ocho corcheas: dos por pulso. Se cuenta «1 y 2 y 3 y 4 y», y los números (en rojo) caen justo en el pulso.',
@@ -9557,6 +9721,8 @@ chords: ['Em', 'D', 'C', 'G'],
 songsT: 'Two songs with this rhythm', songs: ['Paranoid · Black Sabbath', 'Blitzkrieg Bop · Ramones'],
 prac: { t: 'To practice', song: 'The Trooper · Iron Maiden', meta: 'Key: E minor · Verse only', x: 'This is an example of a song you can play with this pattern: downstroke eighth notes on Em. Practice just the verse.' }
 }];
+const NW = es ? NEW_ES : NEW_EN;
+const ENTRIES = [NW[0], OLDS[0], NW[1], NW[2], NW[3], NW[4]];
 const idx = Math.min(st.entry, ENTRIES.length - 1);
 this._cfg = { t: T, entry: ENTRIES[idx], idx, entries: ENTRIES.map((x) => x.name), alt: st.alt, bpm: st.bpm };
 setTimeout(() => this.paint(), 0);
@@ -21628,8 +21794,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 12:37';
-  var BUILD_ID = '2026-11-10T12:37';
+  var BUILD = '10 nov 2026 · 12:52';
+  var BUILD_ID = '2026-11-10T12:52';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
