@@ -1244,7 +1244,9 @@ body.stage #app .stg-em .em2-name{font:400 28px/32px var(--st-d);text-transform:
 body.stage #app .stg-em .em2-notes{flex:0 0 auto;font-size:15px;line-height:20px;font-weight:700;letter-spacing:.02em;color:var(--st-ink2)}
 body.stage #app .stg-em .em2-how{margin:10px 0 0!important;font-size:15px!important;line-height:22px!important;color:var(--st-ink)!important}
 body.stage #app .stg-em .em2-dock{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:6;display:flex;align-items:center;gap:12px;margin:16px 0 32px!important;padding:8px!important;background:var(--st-floor2)!important;border:1px solid var(--st-rule)!important;border-radius:16px!important;box-shadow:0 10px 30px rgba(0,0,0,.45)}
-@media (max-width:899px){body.stage #app .stg-em .em2-dock{bottom:84px;transition:opacity .2s,transform .2s}body.stage #app .stg-em .em2-dock.off{opacity:0;transform:translateY(12px);pointer-events:none;visibility:hidden}}
+body.stage #app .stg-em .em2-dock{transition:opacity .2s,transform .2s}
+body.stage #app .stg-em .em2-dock.off{opacity:0;transform:translateY(12px);pointer-events:none;visibility:hidden}
+@media (max-width:899px){body.stage #app .stg-em .em2-dock{bottom:84px}}
 body.stage #app .stg-em .em2-now{flex:0 1 auto;min-width:0;display:flex;flex-direction:column}
 body.stage #app .stg-em .em2-now small{font-size:12px;line-height:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--st-mute)}
 body.stage #app .stg-em .em2-now b{font:400 22px/26px var(--st-d);color:var(--st-amber);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -4354,7 +4356,7 @@ host.__rep = setTimeout(go, 420);
 ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => host.addEventListener(ev, stopRep)); }
 host.__em2inst = this;
 host.innerHTML = this.html();
-// phone: the play bar shows from the moment the chord diagrams appear
+// play bar shows from the moment the chord diagrams appear
 if (host.__em2io) host.__em2io.disconnect();
 const dk = host.querySelector('.em2-dock'), sp = host.querySelector('.em2-strip');
 if (dk) dk.classList.toggle('off', !host.__em2vis);
@@ -21800,8 +21802,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 15:05';
-  var BUILD_ID = '2026-11-10T15:05';
+  var BUILD = '10 nov 2026 · 15:25';
+  var BUILD_ID = '2026-11-10T15:25';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
