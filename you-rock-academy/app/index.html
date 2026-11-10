@@ -7505,7 +7505,17 @@ try { const v = localStorage.getItem('guitar.lang'); if (v === 'en' || v === 'es
 this.state = { lang };
 this._q = '';
 this._tm = null;
-this.SQ = window.__cfSeq || (window.__cfSeq = { sl: [], bpm: 80, cur: 0 });
+if (!window.__cfSeq) {
+let sv = null;
+try { sv = JSON.parse(localStorage.getItem('guitar.cfseq') || 'null'); } catch (e) {}
+window.__cfSeq = { sl: [], bpm: 80, cur: 0 };
+if (sv && Array.isArray(sv.sl)) {
+window.__cfSeq.sl = sv.sl.filter((x) => x && x.r >= 0 && x.r < 12 && CF_Q[x.q]).slice(0, 8).map((x) => ({ r: x.r | 0, q: x.q, v: Math.max(0, x.v | 0) }));
+if (sv.bpm >= 40 && sv.bpm <= 200) window.__cfSeq.bpm = sv.bpm | 0;
+window.__cfSeq.mute = !!sv.mute;
+}
+}
+this.SQ = window.__cfSeq;
 this.SQ.run = false; this.SQ.metro = false;
 }
 componentDidMount() {
@@ -7694,6 +7704,9 @@ this.pluck(vs[+b.getAttribute('data-i')]);
 };
 }
 // ---------- practice sequence ----------
+sqSave() {
+try { const S = this.SQ; localStorage.setItem('guitar.cfseq', JSON.stringify({ sl: S.sl.map((x) => ({ r: x.r, q: x.q, v: x.v })), bpm: S.bpm || 80, mute: !!S.mute })); } catch (e) {}
+}
 sqRoots() { return [[0, 0], [0, 1], [1, 0], [2, -1], [2, 0], [3, 0], [3, 1], [4, 0], [5, -1], [5, 0], [6, -1], [6, 0]]; }
 sqP(i) { const sl = this.SQ.sl[i], r = this.sqRoots()[sl.r]; return { rootL: r[0], rootA: r[1], q: sl.q }; }
 sqV(i) {
@@ -7737,6 +7750,7 @@ return h;
 }
 paintSeq() {
 if (this._dead || (typeof current !== 'undefined' && current !== this)) return;
+this.sqSave();
 const host = document.getElementById('cfSeq'); if (!host) return;
 const t = CF_D[this.state.lang], S = this.SQ;
 let h = '<div style="height: 1px; background: #E6E6E6; margin: 6px 0 2px"></div><h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 700; color: #121212">' + CF_ESC(t.seqT) + '</h2><p style="margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A">' + CF_ESC(t.seqIntro) + '</p>';
@@ -7802,7 +7816,7 @@ clearTimeout(this._toastT);
 this._toastT = setTimeout(() => { const x = document.getElementById('cfToast'); if (x) x.remove(); }, 4500);
 }
 sqBpm(v) {
-const S = this.SQ; S.bpm = Math.max(40, Math.min(200, Math.round(v)));
+const S = this.SQ; S.bpm = Math.max(40, Math.min(200, Math.round(v))); this.sqSave();
 const o = document.getElementById('cfsBpm'); if (o) o.textContent = S.bpm;
 }
 sqRefresh(i) {
@@ -7839,6 +7853,7 @@ o.connect(g); g.connect(ac.destination); o.start(at); o.stop(at + 0.08);
 }
 sqSched() {
 const ac = pAudio(), S = this.SQ; if (!ac || !(S.run || S.metro)) return;
+if (this._hq && this._hq.length) { let ch = false; while (this._hq.length && this._hq[0].at <= ac.currentTime + 0.03) { const x = this._hq.shift(); if (S.run && x.ci < S.sl.length && S.cur !== x.ci) { S.cur = x.ci; ch = true; } } if (ch) this.sqHl(); }
 const spb = 60 / (S.bpm || 80);
 while (this._nx < ac.currentTime + 0.15) {
 const bt = this._bt % 4, at = this._nx;
@@ -7847,7 +7862,7 @@ if (S.run) {
 if (!S.sl.length) break;
 const ci = Math.floor(this._bt / 4) % S.sl.length;
 if (bt === 0 || true) this.sqStrum(ci, at, bt === 0 ? 0.5 : 0.34);
-if (bt === 0) setTimeout(() => { if (this.SQ.run && this.SQ.cur !== ci) { this.SQ.cur = ci; this.sqHl(); } }, Math.max(0, (at - ac.currentTime) * 1000));
+if (bt === 0) (this._hq || (this._hq = [])).push({ at, ci });
 }
 this._nx += spb; this._bt++;
 }
@@ -7867,7 +7882,7 @@ const el = e.target; if (!el || !el.getAttribute) return;
 const a = el.getAttribute('data-sq'); if (a !== 'r' && a !== 'q') return;
 const i = +el.getAttribute('data-i'), sl = this.SQ.sl[i];
 if (a === 'r') sl.r = +el.value; else sl.q = el.value;
-sl.v = 0;
+sl.v = 0; this.sqSave();
 this.sqRefresh(i);
 if (!this.SQ.run) this.sqStrum(i, null, 0.55);
 }
@@ -7876,12 +7891,12 @@ const b = e.target.closest && e.target.closest('[data-sq]'); if (!b) return;
 const S = this.SQ, a = b.getAttribute('data-sq'), host = document.getElementById('cfSeq'), ac = pAudio();
 if (a === 'r' || a === 'q') return;
 const i = +b.getAttribute('data-i');
-if (a === 'cyc') { const sl = S.sl[i]; sl.v++; this.sqRefresh(i); if (!S.run) this.sqStrum(i, null, 0.55); }
+if (a === 'cyc') { const sl = S.sl[i]; sl.v++; this.sqSave(); this.sqRefresh(i); if (!S.run) this.sqStrum(i, null, 0.55); }
 else if (a === 'rem') { S.sl.splice(i, 1); if (S.cur >= S.sl.length) S.cur = 0; if (!S.sl.length) this.sqStop(true); this.paintSeq(); }
 else if (a === 'play') {
 if (S.run) { this.sqStop(); return; }
 if (!S.sl.length || !this.sqClock()) return;
-S.run = true; this._bt = S.cur * 4; this.sqSched(); this.paintSeq();
+S.run = true; this._hq = []; this._bt = S.cur * 4; this.sqSched(); this.paintSeq();
 }
 else if (a === 'metro') {
 S.metro = !S.metro;
@@ -22372,8 +22387,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 19:09';
-  var BUILD_ID = '2026-11-10T19:09';
+  var BUILD = '10 nov 2026 · 19:14';
+  var BUILD_ID = '2026-11-10T19:14';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
