@@ -7527,38 +7527,35 @@ o.stop(n + 1.7);
 } catch (e) {}
 }
 neck(v, root) {
-// upright chord box: strings run top to bottom (6th on the left), frets are rows; the fret lines are paths so the page's neck-tap logic ignores this diagram
-const X0 = 36, SP = 22, Y0 = 28, RH = 28, NR = 5;
-const w0 = v.hi <= 5 ? 1 : v.lo;
-const X = (s) => X0 + s * SP;
-const lab = ['E', 'A', 'D', 'G', 'B', 'e'];
-const W = X0 + 5 * SP + 14, H = Y0 + NR * RH + 22;
-// fingers: a barre is finger 1; the other fretted notes take the next fingers going up the neck (and, on the same fret, from the low string to the high one)
-const fg = [0, 0, 0, 0, 0, 0], bb0 = v.barre;
-const rest = [];
-for (let s = 0; s < 6; s++) { const f = v.f[s]; if (f > 0) { if (bb0 && f === bb0.fret && s >= bb0.from && s <= bb0.to) fg[s] = 1; else rest.push([f, s]); } }
+// same chord picture as "Entendiendo el mástil" (drawn at 96px wide so the finger numbers come out at 12px); fret lines are paths so the neck-tap logic of the app ignores it
+const start = v.hi <= 5 ? 1 : v.lo, X0 = 15, SP = 15, Y0 = 24, FH = 21, ROWS = 5;
+const X = (k) => X0 + k * SP, Y = (f) => Y0 + (f - start) * FH + FH / 2;
+const num = (x, y, n, col) => '<text x="' + x + '" y="' + (y + 4.7) + '" text-anchor="middle" font-size="13.4" font-weight="800" font-family="Inter,system-ui,sans-serif" fill="' + col + '">' + n + '</text>';
+// fingers: a barre is finger 1; the other fretted notes take the next fingers going up the neck (on the same fret, from the low string to the high one)
+const fg = [0, 0, 0, 0, 0, 0], bar = v.barre || null, rest = [];
+for (let s = 0; s < 6; s++) { const f = v.f[s]; if (f > 0) { if (bar && f === bar.fret && s >= bar.from && s <= bar.to) fg[s] = 1; else rest.push([f, s]); } }
 rest.sort((x, y) => x[0] - y[0] || x[1] - y[1]);
-let nf = bb0 ? 2 : 1;
+let nf = bar ? 2 : 1;
 rest.forEach((x) => { fg[x[1]] = Math.min(nf, 4); nf++; });
-let h = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="' + CF_ESC(this._aria(v)) + '" style="display:block;max-width:140px;margin:0 auto">';
-for (let k = 0; k <= NR; k++) h += '<path d="M' + X(0) + ' ' + (Y0 + k * RH) + 'H' + X(5) + '" stroke="' + (k === 0 && w0 === 1 ? '#121212' : '#BDBDBD') + '" stroke-width="' + (k === 0 && w0 === 1 ? 4 : 1.2) + '" fill="none"/>';
-for (let s = 0; s < 6; s++) {
-h += '<line x1="' + X(s) + '" y1="' + Y0 + '" x2="' + X(s) + '" y2="' + (Y0 + NR * RH) + '" stroke="#8A8A8A" stroke-width="' + (1 + s * 0.0 + (5 - s) * 0.25) + '"/>';
-h += '<text x="' + X(s) + '" y="' + (H - 5) + '" text-anchor="middle" font-size="13" fill="#5A5A5A">' + lab[s] + '</text>';
+let h = '<svg viewBox="0 0 105 132" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + CF_ESC(this._aria(v)) + '" style="display:block;width:96px;max-width:100%;height:auto;margin:0 auto">';
+h += '<rect x="' + (X0 - 8) + '" y="' + Y0 + '" width="' + (5 * SP + 16) + '" height="' + (ROWS * FH) + '" rx="3" fill="#26190f"/>';
+for (let r = 0; r <= ROWS; r++) {
+const nut = r === 0 && start === 1;
+h += '<path d="M' + (X0 - 8) + ' ' + (Y0 + r * FH) + 'h' + (5 * SP + 16) + '" stroke="' + (nut ? '#f4ede6' : '#8c8379') + '" stroke-width="' + (nut ? 4 : 1.3) + '" fill="none"/>';
 }
-for (let k = 0; k < NR; k++) h += '<text x="' + (X0 - 9) + '" y="' + (Y0 + k * RH + RH / 2 + 4) + '" text-anchor="end" font-size="13" fill="#5A5A5A">' + (w0 + k) + '</text>';
-if (v.barre) {
-const bb = v.barre; const cy = Y0 + (bb.fret - w0) * RH + RH / 2;
-h += '<rect x="' + (X(bb.from) - 9) + '" y="' + (cy - 9) + '" width="' + (X(bb.to) - X(bb.from) + 18) + '" height="18" rx="9" fill="#B8B8B8"/>';
-}
+for (let k = 0; k < 6; k++) h += '<path d="M' + X(k) + ' ' + Y0 + 'v' + (ROWS * FH) + '" stroke="#d8cfc3" stroke-width="' + (2 - k * 0.24).toFixed(2) + '" fill="none"/>';
+if (bar) h += '<rect x="' + (X(bar.from) - 7.5) + '" y="' + (Y(bar.fret) - 7.5) + '" width="' + ((bar.to - bar.from) * SP + 15) + '" height="15" rx="7.5" fill="#e31b23" stroke="#fff" stroke-opacity=".5"/>';
+let onBar = 0;
 for (let s = 0; s < 6; s++) {
 const f = v.f[s];
-if (f < 0) { h += '<text x="' + X(s) + '" y="' + (Y0 - 8) + '" text-anchor="middle" font-size="15" fill="#5A5A5A">\u00d7</text>'; continue; }
+if (f < 0) { h += '<path d="M' + (X(s) - 4) + ' 7l8 8m0 -8l-8 8" stroke="#e31b23" stroke-width="2.2" stroke-linecap="round" fill="none"/>'; continue; }
 const isR = (CF_OPEN[s] + f) % 12 === root;
-if (f === 0) { h += '<circle cx="' + X(s) + '" cy="' + (Y0 - 11) + '" r="4.5" fill="#FFFFFF" stroke="' + (isR ? '#E31B23' : '#121212') + '" stroke-width="' + (isR ? 2.5 : 1.8) + '"/>'; continue; }
-h += '<circle cx="' + X(s) + '" cy="' + (Y0 + (f - w0) * RH + RH / 2) + '" r="9.5" fill="' + (isR ? '#E31B23' : '#121212') + '"/>';
-if (fg[s] && !(v.barre && fg[s] === 1 && s !== v.barre.from && s !== v.barre.to)) h += '<text x="' + X(s) + '" y="' + (Y0 + (f - w0) * RH + RH / 2 + 4.5) + '" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">' + fg[s] + '</text>';
+if (f === 0) { h += '<circle cx="' + X(s) + '" cy="11" r="4.6" fill="none" stroke="' + (isR ? '#e31b23' : '#f4ede6') + '" stroke-width="2"/>'; continue; }
+if (bar && f === bar.fret && s >= bar.from && s <= bar.to) { if (!isR) continue; onBar++; }
+h += '<circle cx="' + X(s) + '" cy="' + Y(f) + '" r="7.5" fill="' + (isR ? '#e31b23' : '#f4ede6') + '" stroke="' + (isR ? '#fff' : '#26190f') + '" stroke-width="1.2"/>';
+if (fg[s]) h += num(X(s), Y(f), fg[s], isR ? '#fff' : '#17120f');
 }
+if (bar && !onBar) h += num((X(bar.from) + X(bar.to)) / 2, Y(bar.fret), 1, '#fff');
 return h + '</svg>';
 }
 _aria(v) {
@@ -7619,14 +7616,12 @@ h += '<div style="display: flex; flex-direction: column; gap: 8px; padding: 12px
 }
 if (p.slash) h += '<p style="margin: 0; font-size: 12px; line-height: 16px; color: #5A5A5A">' + CF_ESC(t.slash.replace('{a}', nm.sym)) + '</p>';
 if (!R.voicings.length) h += '<p style="margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A">' + CF_ESC(t.none) + '</p>';
-if (R.voicings.length) h += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px">';
+if (R.voicings.length) h += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; max-width: 480px">';
 R.voicings.forEach((v, i) => {
-const fl = v.f.map((f) => (f < 0 ? 'x' : f)).join(' ');
 const sub = v.barre ? t.barreAt + ' ' + v.barre.fret : (v.lo <= 4 && v.f.some((f) => f === 0) ? t.openPos : t.fret + ' ' + v.lo);
-h += '<section style="display: flex; flex-direction: column; gap: 4px; padding: 10px 8px 8px; border-radius: 14px; background: #FFFFFF; min-width: 0">' +
-'<div style="display: flex; flex-direction: column; padding: 0 2px"><span style="font-size: 14px; line-height: 18px; font-weight: 700; color: #121212">' + CF_ESC(t.pos) + ' ' + (i + 1) + '</span><span style="font-size: 12px; line-height: 16px; color: #5A5A5A">' + CF_ESC(sub) + '</span></div>' +
+h += '<button type="button" data-a="play" data-i="' + i + '" aria-label="' + CF_ESC(t.listenAria + ' ' + (i + 1) + ' \u00b7 ' + sub) + '" style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 4px 12px; border: 1px solid #D9D9D9; border-radius: 20px; background: #FFFFFF; color: #121212; font-family: inherit; cursor: pointer; min-width: 0">' +
 this.neck(v, rootPc) +
-'<div style="display: flex; justify-content: space-between; align-items: center; gap: 4px; padding: 0 2px"><span style="font-size: 12px; line-height: 16px; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; color: #3A3A3A">' + CF_ESC(fl) + '</span><button type="button" data-a="play" data-i="' + i + '" aria-label="' + CF_ESC(t.listenAria + ' ' + (i + 1)) + '" style="width: 40px; height: 40px; padding: 0; border: 0; border-radius: 12px; font-family: inherit; font-size: 14px; cursor: pointer; background: #E9E9E9; color: #121212">\u25b6</button></div></section>';
+'<span style="margin-top: 8px; font-size: 16px; line-height: 20px; font-weight: 700">' + CF_ESC(t.pos) + ' ' + (i + 1) + '</span><span style="font-size: 13px; line-height: 18px; color: #5A5A5A">' + CF_ESC(sub) + '</span><span style="font-size: 13px; line-height: 18px; color: #5A5A5A">\u25b6 ' + CF_ESC(t.listen) + '</span></button>';
 });
 if (R.voicings.length) h += '</div>';
 h += '<p style="margin: 0; font-size: 12px; line-height: 16px; color: #5A5A5A">' + CF_ESC(t.legend) + '</p>';
@@ -22104,8 +22099,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 18:35';
-  var BUILD_ID = '2026-11-10T18:35';
+  var BUILD = '10 nov 2026 · 18:55';
+  var BUILD_ID = '2026-11-10T18:55';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
