@@ -4205,7 +4205,7 @@ if (this.S.mute) return;
 const ac = pAudio(); if (!ac) return;
 const o = ac.createOscillator(), g = ac.createGain();
 o.type = 'square'; o.frequency.value = strong ? 1500 : 1000;
-const mv = mvGet() * 2; if (mv <= 0) return;
+const mv = 1;
 g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime((strong ? 0.3 : 0.18) * mv, at + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.06);
 o.connect(g); g.connect(ac.destination); o.start(at); o.stop(at + 0.08);
 } catch (e) {}
@@ -4316,7 +4316,6 @@ h += '<button type="button" class="em2-mute" data-mute aria-pressed="' + !!S.mut
 h += '<button type="button" class="em2-mute em2-met" data-metro aria-pressed="' + !!S.metro + '" aria-label="' + t.metro + '" title="' + t.metro + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6l4 18H5z"/><path d="M7 16h10"/><path d="M12 16l5-10"/></svg></button></div>';
 h += '<div class="em2-tempo stg-plain" role="group" aria-label="' + t.tempo + '"><button type="button" data-bpm="-1" aria-label="' + t.slower + '" title="' + t.slower + '">−</button><span class="em2-bpm" aria-live="polite"><b id="em2-bpm">' + bpm + '</b><small>BPM</small></span><button type="button" data-bpm="1" aria-label="' + t.faster + '" title="' + t.faster + '">+</button></div>';
 h += mvRow(t.chordVol, 'color: var(--st-mute)', 'c');
-if (S.metro) h += mvRow(t.metroVol, 'color: var(--st-mute)', 'm');
 h += '</div>';
 return h;
 }
@@ -7757,7 +7756,7 @@ h += '<div style="display: flex; align-items: center; gap: 4px">';
 h += '<button type="button" data-sq="play" aria-pressed="' + !!S.run + '" aria-label="' + CF_ESC(S.run ? t.stop : t.play) + '" title="' + CF_ESC(S.run ? t.stop : t.play) + '" style="' + rb + ' background: #E31B23; color: #FFFFFF"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">' + ic + '</svg></button>';
 h += '<button type="button" data-sq="mute" aria-pressed="' + !!S.mute + '" aria-label="' + CF_ESC(S.mute ? t.unmute : t.mute) + '" title="' + CF_ESC(S.mute ? t.unmute : t.mute) + '" style="' + tog(S.mute) + '"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button>';
 h += '<button type="button" data-sq="metro" aria-pressed="' + !!S.metro + '" aria-label="' + CF_ESC(t.metro) + '" title="' + CF_ESC(t.metro) + '" style="' + tog(S.metro) + '"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6l4 18H5z"/><path d="M7 16h10"/><path d="M12 16l5-10"/></svg></button></div>';
-h += '<div role="group" aria-label="' + CF_ESC(t.tempo) + '" style="display: flex; align-items: center"><button type="button" data-bpm="-1" aria-label="' + CF_ESC(t.slower) + '" title="' + CF_ESC(t.slower) + '" style="' + tb + '">\u2212</button><span aria-live="polite" style="display: flex; flex-direction: column; align-items: center; min-width: 40px"><b id="cfsBpm" style="font-size: 18px; line-height: 20px; font-weight: 700; color: #121212">' + (S.bpm || 80) + '</b><small style="font-size: 12px; line-height: 14px; font-weight: 700; letter-spacing: .06em; color: #5A5A5A">BPM</small></span><button type="button" data-bpm="1" aria-label="' + CF_ESC(t.faster) + '" title="' + CF_ESC(t.faster) + '" style="' + tb + '">+</button></div>' + mvRow(CF_ESC(t.chordVol), 'color: #5A5A5A', 'c') + (S.metro ? mvRow(CF_ESC(t.metroVol), 'color: #5A5A5A', 'm') : '') + '</div>';
+h += '<div role="group" aria-label="' + CF_ESC(t.tempo) + '" style="display: flex; align-items: center"><button type="button" data-bpm="-1" aria-label="' + CF_ESC(t.slower) + '" title="' + CF_ESC(t.slower) + '" style="' + tb + '">\u2212</button><span aria-live="polite" style="display: flex; flex-direction: column; align-items: center; min-width: 40px"><b id="cfsBpm" style="font-size: 18px; line-height: 20px; font-weight: 700; color: #121212">' + (S.bpm || 80) + '</b><small style="font-size: 12px; line-height: 14px; font-weight: 700; letter-spacing: .06em; color: #5A5A5A">BPM</small></span><button type="button" data-bpm="1" aria-label="' + CF_ESC(t.faster) + '" title="' + CF_ESC(t.faster) + '" style="' + tb + '">+</button></div>' + mvRow(CF_ESC(t.chordVol), 'color: #5A5A5A', 'c') + '</div>';
 return h;
 }
 paintSeq() {
@@ -7860,7 +7859,7 @@ if (this.SQ.mute) return;
 const ac = pAudio(); if (!ac) return;
 const o = ac.createOscillator(), g = ac.createGain();
 o.type = 'square'; o.frequency.value = strong ? 1500 : 1000;
-const mv = mvGet() * 2; if (mv <= 0) return;
+const mv = 1;
 g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime((strong ? 0.3 : 0.18) * mv, at + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.06);
 o.connect(g); g.connect(ac.destination); o.start(at); o.stop(at + 0.08);
 } catch (e) {}
@@ -22430,8 +22429,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 19:30';
-  var BUILD_ID = '2026-11-10T19:30';
+  var BUILD = '10 nov 2026 · 19:33';
+  var BUILD_ID = '2026-11-10T19:33';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
