@@ -7395,6 +7395,7 @@ const CF_D = {
   "seqT": "Secuencia de práctica",
   "seqIntro": "Monta tu propia progresión: elige la nota y el tipo de cada acorde, toca el diagrama para cambiar de posición y pulsa play. Cada acorde dura 4 tiempos.",
   "seqAdd": "Añadir acorde",
+  "seqAddV": "A la secuencia", "seqDone": "Añadido", "seqFull": "Secuencia llena (8)",
   "seqRem": "Quitar este acorde",
   "seqRoot": "Nota",
   "seqType": "Tipo",
@@ -7456,6 +7457,7 @@ const CF_D = {
   "seqT": "Practice sequence",
   "seqIntro": "Build your own progression: pick the note and type of each chord, tap the diagram to change position and hit play. Each chord lasts 4 beats.",
   "seqAdd": "Add chord",
+  "seqAddV": "Add to sequence", "seqDone": "Added", "seqFull": "Sequence full (8)",
   "seqRem": "Remove this chord",
   "seqRoot": "Note",
   "seqType": "Type",
@@ -7640,9 +7642,9 @@ if (!R.voicings.length) h += '<p style="margin: 0; font-size: 14px; line-height:
 if (R.voicings.length) h += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; max-width: 480px">';
 R.voicings.forEach((v, i) => {
 const sub = v.barre ? t.barreAt + ' ' + v.barre.fret : (v.lo <= 4 && v.f.some((f) => f === 0) ? t.openPos : t.fret + ' ' + v.lo);
-h += '<button type="button" data-a="play" data-i="' + i + '" aria-label="' + CF_ESC(t.listenAria + ' ' + (i + 1) + ' \u00b7 ' + sub) + '" style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 4px 12px; border: 1px solid #D9D9D9; border-radius: 20px; background: #FFFFFF; color: #121212; font-family: inherit; cursor: pointer; min-width: 0">' +
+h += '<div style="display: flex; flex-direction: column; gap: 6px; min-width: 0"><button type="button" data-a="play" data-i="' + i + '" aria-label="' + CF_ESC(t.listenAria + ' ' + (i + 1) + ' \u00b7 ' + sub) + '" style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 4px 12px; border: 1px solid #D9D9D9; border-radius: 20px; background: #FFFFFF; color: #121212; font-family: inherit; cursor: pointer; min-width: 0">' +
 this.neck(v, rootPc) +
-'<span style="margin-top: 8px; font-size: 16px; line-height: 20px; font-weight: 700">' + CF_ESC(t.pos) + ' ' + (i + 1) + '</span><span style="font-size: 13px; line-height: 18px; color: #5A5A5A">' + CF_ESC(sub) + '</span><span style="font-size: 13px; line-height: 18px; color: #5A5A5A">\u25b6 ' + CF_ESC(t.listen) + '</span></button>';
+'<span style="margin-top: 8px; font-size: 16px; line-height: 20px; font-weight: 700">' + CF_ESC(t.pos) + ' ' + (i + 1) + '</span><span style="font-size: 13px; line-height: 18px; color: #5A5A5A">' + CF_ESC(sub) + '</span><span style="font-size: 13px; line-height: 18px; color: #5A5A5A">\u25b6 ' + CF_ESC(t.listen) + '</span></button><button type="button" data-a="addseq" data-i="' + i + '" style="height: 40px; padding: 0 6px; border: 0; border-radius: 12px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; background: #E31B23; color: #FFFFFF">+ ' + CF_ESC(t.seqAddV) + '</button></div>';
 });
 if (R.voicings.length) h += '</div>';
 h += '<p style="margin: 0; font-size: 12px; line-height: 16px; color: #5A5A5A">' + CF_ESC(t.legend) + '</p>';
@@ -7669,6 +7671,15 @@ if (inp) inp.value = this._q;
 this.paint();
 } else if (a === 'alt') {
 this.setChord({ rootL: base.rootL, rootA: base.rootA, q: 'd7' });
+} else if (a === 'addseq' && vs && p.ok) {
+const S = this.SQ, v = +b.getAttribute('data-i'), pc = (CF_LET[p.rootL] + p.rootA + 12) % 12;
+if (S.sl.length >= 8) { b.textContent = CF_D[this.state.lang].seqFull; return; }
+let r = this.sqRoots().findIndex((x) => x[0] === p.rootL && x[1] === p.rootA);
+if (r < 0) r = this.sqRoots().findIndex((x) => (CF_LET[x[0]] + x[1] + 12) % 12 === pc);
+S.sl.push({ r, q: p.q, v });
+this.paintSeq();
+b.textContent = '✓ ' + CF_D[this.state.lang].seqDone;
+setTimeout(() => { if (b.isConnected) b.textContent = '+ ' + CF_D[this.state.lang].seqAddV; }, 1400);
 } else if (a === 'play' && vs) {
 this.pluck(vs[+b.getAttribute('data-i')]);
 }
@@ -7697,7 +7708,7 @@ let h = '<div class="cfs" data-i="' + i + '" style="display: flex; flex-directio
 h += '<div style="display: flex; align-items: center; justify-content: space-between; width: 100%"><span style="padding-left: 6px; font-size: 13px; line-height: 18px; font-weight: 700; color: #5A5A5A">' + (i + 1) + '</span>' + (this.SQ.sl.length > 2 ? '<button type="button" data-sq="rem" data-i="' + i + '" aria-label="' + CF_ESC(t.seqRem) + '" style="width: 32px; height: 32px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: #5A5A5A; font-size: 20px; line-height: 1; cursor: pointer">\u00d7</button>' : '') + '</div>';
 h += '<div style="display: flex; gap: 4px; width: 100%">';
 h += '<select data-sq="r" data-i="' + i + '" aria-label="' + CF_ESC(t.seqRoot) + '" style="' + sel + '">' + this.sqRoots().map((r, k) => '<option value="' + k + '"' + (k === sl.r ? ' selected' : '') + '>' + CF_ESC(cfNoteName({ li: r[0], acc: r[1] }, lang)) + '</option>').join('') + '</select>';
-h += '<select data-sq="q" data-i="' + i + '" aria-label="' + CF_ESC(t.seqType) + '" style="' + sel + '">' + Object.keys(t.qs).map((k) => '<option value="' + k + '"' + (k === sl.q ? ' selected' : '') + '>' + CF_ESC(t.qs[k]) + '</option>').join('') + '</select>';
+h += '<select data-sq="q" data-i="' + i + '" aria-label="' + CF_ESC(t.seqType) + '" style="' + sel + '">' + Object.keys(CF_Q).map((k) => '<option value="' + k + '"' + (k === sl.q ? ' selected' : '') + '>' + CF_ESC(t.qs[k] || CF_TYPED[k][lang === 'en' ? 1 : 0]) + '</option>').join('') + '</select>';
 h += '</div>';
 h += '<div class="cfs-d" style="width: 100%; display: flex; flex-direction: column; align-items: center">' + this.sqDiagram(i) + '</div></div>';
 return h;
@@ -22314,8 +22325,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 18:53';
-  var BUILD_ID = '2026-11-10T18:53';
+  var BUILD = '10 nov 2026 · 18:56';
+  var BUILD_ID = '2026-11-10T18:56';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
