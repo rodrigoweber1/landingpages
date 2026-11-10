@@ -7395,6 +7395,7 @@ const CF_D = {
   "seqT": "Secuencia de práctica",
   "seqIntro": "Monta tu propia progresión: elige la nota y el tipo de cada acorde, toca el diagrama para cambiar de posición y pulsa play. Cada acorde dura 4 tiempos.",
   "seqAdd": "Añadir acorde",
+  "seqToast": "En la secuencia: {n} · ver",
   "seqDrag": "Arrastra para cambiar el orden",
   "seqEmpty": "Todavía no hay acordes. Busca uno arriba y pulsa «A la secuencia» en la posición que quieras. Después podrás arrastrarlos para cambiar el orden.",
   "seqAddV": "A la secuencia", "seqDone": "Añadido", "seqFull": "Secuencia llena (8)",
@@ -7459,6 +7460,7 @@ const CF_D = {
   "seqT": "Practice sequence",
   "seqIntro": "Build your own progression: pick the note and type of each chord, tap the diagram to change position and hit play. Each chord lasts 4 beats.",
   "seqAdd": "Add chord",
+  "seqToast": "In the sequence: {n} · view",
   "seqDrag": "Drag to change the order",
   "seqEmpty": "No chords yet. Look one up above and tap “Add to sequence” on the shape you want. Then you can drag them to change the order.",
   "seqAddV": "Add to sequence", "seqDone": "Added", "seqFull": "Sequence full (8)",
@@ -7515,6 +7517,7 @@ if (e.key === 'guitar.lang' && (e.newValue === 'es' || e.newValue === 'en')) thi
 }
 componentWillUnmount() {
 if (this._tm) clearTimeout(this._tm);
+const tz = document.getElementById('cfToast'); if (tz) tz.remove();
 this.SQ.metro = false; this.sqStop(true);
 this._dead = true;
 }
@@ -7682,6 +7685,7 @@ let r = this.sqRoots().findIndex((x) => x[0] === p.rootL && x[1] === p.rootA);
 if (r < 0) r = this.sqRoots().findIndex((x) => (CF_LET[x[0]] + x[1] + 12) % 12 === pc);
 S.sl.push({ r, q: p.q, v });
 this.paintSeq();
+this.sqToast();
 b.textContent = '✓ ' + CF_D[this.state.lang].seqDone;
 setTimeout(() => { if (b.isConnected) b.textContent = '+ ' + CF_D[this.state.lang].seqAddV; }, 1400);
 } else if (a === 'play' && vs) {
@@ -7783,6 +7787,19 @@ if (S.cur === from) S.cur = to; else if (from < S.cur && to >= S.cur) S.cur--; e
 this.paintSeq();
 };
 document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+}
+sqToast() {
+const t = CF_D[this.state.lang], n = this.SQ.sl.length;
+let el = document.getElementById('cfToast');
+if (!el) {
+el = document.createElement('button'); el.id = 'cfToast'; el.type = 'button';
+el.style.cssText = 'position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 60; max-width: calc(100% - 32px); height: 48px; padding: 0 20px; border: 0; border-radius: 999px; background: #121212; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.35); cursor: pointer';
+el.addEventListener('click', () => { const h = document.getElementById('cfSeq'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.remove(); });
+document.body.appendChild(el);
+}
+el.textContent = '✓ ' + t.seqToast.replace('{n}', n) + ' ↓';
+clearTimeout(this._toastT);
+this._toastT = setTimeout(() => { const x = document.getElementById('cfToast'); if (x) x.remove(); }, 4500);
 }
 sqBpm(v) {
 const S = this.SQ; S.bpm = Math.max(40, Math.min(200, Math.round(v)));
@@ -22355,8 +22372,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 19:02';
-  var BUILD_ID = '2026-11-10T19:02';
+  var BUILD = '10 nov 2026 · 19:05';
+  var BUILD_ID = '2026-11-10T19:05';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
