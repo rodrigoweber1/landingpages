@@ -7603,7 +7603,7 @@ if (inp) inp.value = this._q;
 this.paint();
 }
 paint() {
-if (this._dead) return;
+if (this._dead || (typeof current !== 'undefined' && current !== this)) return;
 const out = document.getElementById('cfOut');
 if (!out) return;
 const lang = this.state.lang;
@@ -22372,8 +22372,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 19:05';
-  var BUILD_ID = '2026-11-10T19:05';
+  var BUILD = '10 nov 2026 · 19:09';
+  var BUILD_ID = '2026-11-10T19:09';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
