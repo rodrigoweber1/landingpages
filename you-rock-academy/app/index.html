@@ -4354,11 +4354,11 @@ host.__rep = setTimeout(go, 420);
 ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => host.addEventListener(ev, stopRep)); }
 host.__em2inst = this;
 host.innerHTML = this.html();
-// phone: the play bar only shows while the progression chords are on screen
+// phone: the play bar shows from the moment the chord diagrams appear
 if (host.__em2io) host.__em2io.disconnect();
 const dk = host.querySelector('.em2-dock'), sp = host.querySelector('.em2-strip');
 if (dk) dk.classList.toggle('off', !host.__em2vis);
-if (dk && sp && 'IntersectionObserver' in window) { host.__em2io = new IntersectionObserver((en) => { host.__em2vis = en[en.length - 1].isIntersecting; dk.classList.toggle('off', !host.__em2vis); }); host.__em2io.observe(sp); }
+if (dk && sp && 'IntersectionObserver' in window) { host.__em2io = new IntersectionObserver((en) => { const q = en[en.length - 1]; host.__em2vis = q.isIntersecting || q.boundingClientRect.top < 0; dk.classList.toggle('off', !host.__em2vis); }); host.__em2io.observe(sp); }
 }
 renderVals() {
 const lang = this.state.lang, t = this.T();
@@ -21800,8 +21800,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 14:40';
-  var BUILD_ID = '2026-11-10T14:40';
+  var BUILD = '10 nov 2026 · 15:05';
+  var BUILD_ID = '2026-11-10T15:05';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
