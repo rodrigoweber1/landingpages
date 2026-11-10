@@ -8564,7 +8564,7 @@ o.stop(n + d + 0.05);
 }
 
 playStr(m, i) {
-this.beep(440 * Math.pow(2, (m - 69) / 12), 1.6, 0.35, 'triangle');
+if (!pNoteHz(440 * Math.pow(2, (m - 69) / 12))) this.beep(440 * Math.pow(2, (m - 69) / 12), 1.6, 0.35, 'triangle');
 this.setState({ pl: i });
 if (this._tm) clearTimeout(this._tm);
 this._tm = setTimeout(() => this.setState({ pl: -1 }), 1200);
@@ -12758,8 +12758,8 @@ if (init) Object.assign(this.state, patch); else this.setState(patch);
 }
 play() {
 const s = this.state;
-this.beep(s.base, 0.7, 0.25, 'triangle');
-setTimeout(() => this.beep(s.base * Math.pow(2, s.q / 12), 0.9, 0.25, 'triangle'), 750);
+if (!pNoteHz(s.base)) this.beep(s.base, 0.7, 0.25, 'triangle');
+setTimeout(() => { if (!pNoteHz(s.base * Math.pow(2, s.q / 12))) this.beep(s.base * Math.pow(2, s.q / 12), 0.9, 0.25, 'triangle'); }, 750);
 }
 pick(i) {
 const s = this.state;
@@ -15985,8 +15985,8 @@ const out = {
 strs, frs, ams, btips: t.btips,
 result: t.resFmt.replace('%s', t.strNames[si]).replace('%f', fr).replace('%a', N[m1 % 12]).replace('%b', N[m2 % 12]).replace('%m', t.amShort[am - 1]),
 freqs: t.frFmt.replace('%a', f1.toFixed(1)).replace('%b', f2.toFixed(1)),
-playStart: () => this.beep(f1, 0.9, 0.3, 'triangle'),
-playTarget: () => this.beep(f2, 0.9, 0.3, 'triangle'),
+playStart: () => { if (!pNoteHz(f1)) this.beep(f1, 0.9, 0.3, 'triangle'); },
+playTarget: () => { if (!pNoteHz(f2)) this.beep(f2, 0.9, 0.3, 'triangle'); },
 playBend: () => this.bendSound(f1, f2)
 };
 
@@ -18148,7 +18148,7 @@ this.beep(first ? 1000 : 640, 0.05, first ? 0.5 : 0.28, 'square');
 }
 if (this.state.tone) {
 const ABS = [0, 5, 10, 15, 19, 24];
-this.beep(82.41 * Math.pow(2, (ABS[q.s] + q.fret) / 12), 0.14, 0.18, 'triangle');
+{ const fq = 82.41 * Math.pow(2, (ABS[q.s] + q.fret) / 12); if (!pNoteHz(fq, 0.5)) this.beep(fq, 0.14, 0.18, 'triangle'); }
 }
 this._t = setTimeout(() => this.step(), 60000 / this.state.bpm / sub);
 }
@@ -20857,7 +20857,7 @@ function pUnlock() {
   const ac = pAudio(); if (!ac) return;
   try { const s = ac.createBufferSource(); s.buffer = ac.createBuffer(1, 1, 22050); s.connect(ac.destination); s.start(0); } catch (e) {}
 }
-['touchend', 'pointerup', 'click'].forEach((t) => document.addEventListener(t, () => { if (!pAC || pAC.state !== 'running') pUnlock(); }, true));
+['touchend', 'pointerup', 'click'].forEach((t) => document.addEventListener(t, () => { if (!pAC || pAC.state !== 'running') pUnlock(); try { sampLoad(); } catch (e) {} }, true));
 // Karplus-Strong plucked string, rendered once per pitch and cached
 function pluckBuf(ac, midi) {
   if (pBuf[midi]) return pBuf[midi];
@@ -20873,11 +20873,52 @@ function pluckBuf(ac, midi) {
   for (let i = 0; i < fade; i++) d[len - 1 - i] *= i / fade;
   return (pBuf[midi] = b);
 }
+// ---------- recorded notes: drop files in sonidos/ and run actualizar_sonidos.bat (it writes sonidos/manifest.json) ----------
+// every note that has a file plays the recording; a missing note borrows the nearest recorded one (up to 2 semitones, pitch-shifted);
+// anything else keeps the synthesised string, so the app works with 0, a few or all of the notes recorded
+const pSamp = {};
+let pSampState = 0;
+function sampLoad() {
+  if (pSampState) return;
+  const ac = pAudio(); if (!ac) return;
+  pSampState = 1;
+  try {
+    fetch('sonidos/manifest.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).then((m) => {
+      if (!m || !m.notes) return;
+      Object.keys(m.notes).forEach((k) => {
+        fetch('sonidos/' + m.notes[k]).then((r) => (r.ok ? r.arrayBuffer() : null)).then((ab) => {
+          if (!ab) return;
+          const ok = (buf) => { pSamp[+k] = buf; }, bad = () => {};
+          try { const pr = ac.decodeAudioData(ab, ok, bad); if (pr && pr.then) pr.then(ok, bad); } catch (e) {}
+        }).catch(() => {});
+      });
+    }).catch(() => {});
+  } catch (e) {}
+}
+// nearest recorded note to this midi (null if none within 2 semitones)
+function sampFor(midi) {
+  if (pSamp[midi]) return { buf: pSamp[midi], rate: 1 };
+  for (let d = 1; d <= 2; d++) {
+    if (pSamp[midi - d]) return { buf: pSamp[midi - d], rate: Math.pow(2, d / 12) };
+    if (pSamp[midi + d]) return { buf: pSamp[midi + d], rate: Math.pow(2, -d / 12) };
+  }
+  return null;
+}
+// for the screens that used a plain tone: play the recorded note when there is one; false = nothing played, use the tone
+function pNoteHz(f, len) {
+  const x = 69 + 12 * Math.log2(f / 440), m = Math.round(x);
+  if (Math.abs(x - m) > 0.15 || !pSamp[m]) return false;
+  const s = pluck(m, 0, 0.7);
+  if (s && len) { try { s.stop(pAC.currentTime + len); } catch (e) {} }
+  return true;
+}
 function pluck(midi, when, vol) {
   const ac = pAudio();
   if (!ac) return null;
+  sampLoad();
   const s = ac.createBufferSource(), g = ac.createGain();
-  s.buffer = pluckBuf(ac, midi);
+  const sm = sampFor(midi);
+  if (sm) { s.buffer = sm.buf; if (sm.rate !== 1) s.playbackRate.value = sm.rate; } else s.buffer = pluckBuf(ac, midi);
   g.gain.value = vol == null ? 0.55 : vol;
   s.connect(g); g.connect(ac.destination);
   s.start(when || 0);
@@ -22051,8 +22092,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 20:40';
-  var BUILD_ID = '2026-11-10T20:40';
+  var BUILD = '10 nov 2026 · 21:30';
+  var BUILD_ID = '2026-11-10T21:30';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
