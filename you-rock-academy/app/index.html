@@ -7395,6 +7395,8 @@ const CF_D = {
   "seqT": "Secuencia de práctica",
   "seqIntro": "Monta tu propia progresión: elige la nota y el tipo de cada acorde, toca el diagrama para cambiar de posición y pulsa play. Cada acorde dura 4 tiempos.",
   "seqAdd": "Añadir acorde",
+  "seqDrag": "Arrastra para cambiar el orden",
+  "seqEmpty": "Todavía no hay acordes. Busca uno arriba y pulsa «A la secuencia» en la posición que quieras. Después podrás arrastrarlos para cambiar el orden.",
   "seqAddV": "A la secuencia", "seqDone": "Añadido", "seqFull": "Secuencia llena (8)",
   "seqRem": "Quitar este acorde",
   "seqRoot": "Nota",
@@ -7457,6 +7459,8 @@ const CF_D = {
   "seqT": "Practice sequence",
   "seqIntro": "Build your own progression: pick the note and type of each chord, tap the diagram to change position and hit play. Each chord lasts 4 beats.",
   "seqAdd": "Add chord",
+  "seqDrag": "Drag to change the order",
+  "seqEmpty": "No chords yet. Look one up above and tap “Add to sequence” on the shape you want. Then you can drag them to change the order.",
   "seqAddV": "Add to sequence", "seqDone": "Added", "seqFull": "Sequence full (8)",
   "seqRem": "Remove this chord",
   "seqRoot": "Note",
@@ -7499,7 +7503,7 @@ try { const v = localStorage.getItem('guitar.lang'); if (v === 'en' || v === 'es
 this.state = { lang };
 this._q = '';
 this._tm = null;
-this.SQ = window.__cfSeq || (window.__cfSeq = { sl: [{ r: 0, q: 'maj', v: 0 }, { r: 9, q: 'min', v: 0 }, { r: 5, q: 'maj', v: 0 }, { r: 7, q: 'maj', v: 0 }], bpm: 80, cur: 0 });
+this.SQ = window.__cfSeq || (window.__cfSeq = { sl: [], bpm: 80, cur: 0 });
 this.SQ.run = false; this.SQ.metro = false;
 }
 componentDidMount() {
@@ -7705,7 +7709,7 @@ sqSlot(i) {
 const sl = this.SQ.sl[i], lang = this.state.lang, t = CF_D[lang], on = this.SQ.cur === i;
 const sel = 'flex: 1 1 0; min-width: 0; height: 40px; box-sizing: border-box; padding: 0 4px; border: 1px solid #D9D9D9; border-radius: 10px; background: #FFFFFF; font-family: inherit; font-size: 15px; color: #121212';
 let h = '<div class="cfs" data-i="' + i + '" style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 6px 10px; box-sizing: border-box; min-width: 0; border-radius: 20px; background: #FFFFFF; border: ' + (on ? '2px solid #E31B23' : '1px solid #D9D9D9') + (on ? '; padding: 7px 5px 9px' : '') + '">';
-h += '<div style="display: flex; align-items: center; justify-content: space-between; width: 100%"><span style="padding-left: 6px; font-size: 13px; line-height: 18px; font-weight: 700; color: #5A5A5A">' + (i + 1) + '</span>' + (this.SQ.sl.length > 2 ? '<button type="button" data-sq="rem" data-i="' + i + '" aria-label="' + CF_ESC(t.seqRem) + '" style="width: 32px; height: 32px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: #5A5A5A; font-size: 20px; line-height: 1; cursor: pointer">\u00d7</button>' : '') + '</div>';
+h += '<div style="display: flex; align-items: center; justify-content: space-between; width: 100%"><span data-drag="' + i + '" role="button" aria-label="' + CF_ESC(t.seqDrag) + '" title="' + CF_ESC(t.seqDrag) + '" style="display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 8px; border-radius: 999px; background: #F2F2F2; touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; font-size: 13px; line-height: 18px; font-weight: 700; color: #3A3A3A"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/><circle cx="9" cy="12" r="1.8"/><circle cx="15" cy="12" r="1.8"/><circle cx="9" cy="18" r="1.8"/><circle cx="15" cy="18" r="1.8"/></svg>' + (i + 1) + '</span>' + (true ? '<button type="button" data-sq="rem" data-i="' + i + '" aria-label="' + CF_ESC(t.seqRem) + '" style="width: 32px; height: 32px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: #5A5A5A; font-size: 20px; line-height: 1; cursor: pointer">\u00d7</button>' : '') + '</div>';
 h += '<div style="display: flex; gap: 4px; width: 100%">';
 h += '<select data-sq="r" data-i="' + i + '" aria-label="' + CF_ESC(t.seqRoot) + '" style="' + sel + '">' + this.sqRoots().map((r, k) => '<option value="' + k + '"' + (k === sl.r ? ' selected' : '') + '>' + CF_ESC(cfNoteName({ li: r[0], acc: r[1] }, lang)) + '</option>').join('') + '</select>';
 h += '<select data-sq="q" data-i="' + i + '" aria-label="' + CF_ESC(t.seqType) + '" style="' + sel + '">' + Object.keys(CF_Q).map((k) => '<option value="' + k + '"' + (k === sl.q ? ' selected' : '') + '>' + CF_ESC(t.qs[k] || CF_TYPED[k][lang === 'en' ? 1 : 0]) + '</option>').join('') + '</select>';
@@ -7732,11 +7736,13 @@ if (this._dead || (typeof current !== 'undefined' && current !== this)) return;
 const host = document.getElementById('cfSeq'); if (!host) return;
 const t = CF_D[this.state.lang], S = this.SQ;
 let h = '<div style="height: 1px; background: #E6E6E6; margin: 6px 0 2px"></div><h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 700; color: #121212">' + CF_ESC(t.seqT) + '</h2><p style="margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A">' + CF_ESC(t.seqIntro) + '</p>';
+if (!S.sl.length) h += '<p style="margin: 0; padding: 18px 16px; border: 1px dashed #BDBDBD; border-radius: 16px; font-size: 14px; line-height: 20px; color: #3A3A3A; text-align: center">' + CF_ESC(t.seqEmpty) + '</p>';
+else {
 h += '<div class="cfs-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-width: 520px">';
 S.sl.forEach((x, i) => { h += this.sqSlot(i); });
 h += '</div>';
-if (S.sl.length < 8) h += '<button type="button" data-sq="add" style="align-self: flex-start; height: 44px; padding: 0 18px; border: 0; border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 500; cursor: pointer; background: #E9E9E9; color: #121212">+ ' + CF_ESC(t.seqAdd) + '</button>';
 h += this.sqDock();
+}
 host.innerHTML = h;
 if (!host.__sq) {
 host.__sq = true;
@@ -7751,8 +7757,32 @@ const go = () => { n++; me.sqBpm((me.SQ.bpm || 80) + step * (n > 12 ? 5 : 1)); h
 host.__rep = setTimeout(go, 420);
 });
 ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => host.addEventListener(ev, stopRep));
+host.addEventListener('pointerdown', (e) => {
+const g = e.target.closest && e.target.closest('[data-drag]'); if (!g || !host.__inst) return;
+e.preventDefault(); host.__inst.sqDrag(host, g, e);
+});
 }
 host.__inst = this;
+}
+sqDrag(host, g, e0) {
+const S = this.SQ, from = +g.getAttribute('data-drag'), cards = [...host.querySelectorAll('.cfs')], el = cards[from]; if (!el) return;
+let to = from;
+const mark = () => cards.forEach((c, k) => { c.style.opacity = k === from ? '.45' : '1'; c.style.outline = (k === to && k !== from) ? '3px solid #FFC400' : 'none'; });
+mark();
+const mv = (e) => {
+const o = document.elementFromPoint(e.clientX, e.clientY), c = o && o.closest ? o.closest('.cfs') : null;
+if (c && host.contains(c)) { const k = cards.indexOf(c); if (k >= 0 && k !== to) { to = k; mark(); } }
+const m = 60; if (e.clientY < m) window.scrollBy(0, -12); else if (e.clientY > innerHeight - m) window.scrollBy(0, 12);
+};
+const up = () => {
+document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+if (to !== from) {
+const x = S.sl.splice(from, 1)[0]; S.sl.splice(to, 0, x);
+if (S.cur === from) S.cur = to; else if (from < S.cur && to >= S.cur) S.cur--; else if (from > S.cur && to <= S.cur) S.cur++;
+}
+this.paintSeq();
+};
+document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
 }
 sqBpm(v) {
 const S = this.SQ; S.bpm = Math.max(40, Math.min(200, Math.round(v)));
@@ -7797,6 +7827,7 @@ while (this._nx < ac.currentTime + 0.15) {
 const bt = this._bt % 4, at = this._nx;
 if (S.metro) this.sqTick(at, bt === 0);
 if (S.run) {
+if (!S.sl.length) break;
 const ci = Math.floor(this._bt / 4) % S.sl.length;
 if (bt === 0 || true) this.sqStrum(ci, at, bt === 0 ? 0.5 : 0.34);
 if (bt === 0) setTimeout(() => { if (this.SQ.run && this.SQ.cur !== ci) { this.SQ.cur = ci; this.sqHl(); } }, Math.max(0, (at - ac.currentTime) * 1000));
@@ -7829,11 +7860,10 @@ const S = this.SQ, a = b.getAttribute('data-sq'), host = document.getElementById
 if (a === 'r' || a === 'q') return;
 const i = +b.getAttribute('data-i');
 if (a === 'cyc') { const sl = S.sl[i]; sl.v++; this.sqRefresh(i); if (!S.run) this.sqStrum(i, null, 0.55); }
-else if (a === 'rem') { if (S.sl.length > 2) { S.sl.splice(i, 1); if (S.cur >= S.sl.length) S.cur = 0; this.paintSeq(); } }
-else if (a === 'add') { const l = S.sl[S.sl.length - 1]; S.sl.push({ r: l.r, q: l.q, v: 0 }); this.paintSeq(); }
+else if (a === 'rem') { S.sl.splice(i, 1); if (S.cur >= S.sl.length) S.cur = 0; if (!S.sl.length) this.sqStop(true); this.paintSeq(); }
 else if (a === 'play') {
 if (S.run) { this.sqStop(); return; }
-if (!this.sqClock()) return;
+if (!S.sl.length || !this.sqClock()) return;
 S.run = true; this._bt = S.cur * 4; this.sqSched(); this.paintSeq();
 }
 else if (a === 'metro') {
@@ -22325,8 +22355,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 18:56';
-  var BUILD_ID = '2026-11-10T18:56';
+  var BUILD = '10 nov 2026 · 19:02';
+  var BUILD_ID = '2026-11-10T19:02';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
