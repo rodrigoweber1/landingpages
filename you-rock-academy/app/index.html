@@ -7515,8 +7515,10 @@ if (sv.bpm >= 40 && sv.bpm <= 200) window.__cfSeq.bpm = sv.bpm | 0;
 window.__cfSeq.mute = !!sv.mute;
 }
 }
-this.SQ = window.__cfSeq;
-this.SQ.run = false; this.SQ.metro = false;
+// the data (chords, bpm, mute) is shared and saved; "playing" and "metronome on" belong to THIS instance only
+// (the search index builds and tears down hidden copies of the screen, which must not stop the real one)
+this._rn = { run: false, metro: false };
+this.SQ = new Proxy(window.__cfSeq, { get: (t, k) => ((k === 'run' || k === 'metro') ? this._rn[k] : t[k]), set: (t, k, v) => { if (k === 'run' || k === 'metro') this._rn[k] = v; else t[k] = v; return true; } });
 }
 componentDidMount() {
 try {
@@ -7527,7 +7529,7 @@ if (e.key === 'guitar.lang' && (e.newValue === 'es' || e.newValue === 'en')) thi
 }
 componentWillUnmount() {
 if (this._tm) clearTimeout(this._tm);
-const tz = document.getElementById('cfToast'); if (tz) tz.remove();
+if (this._toastT) { const tz = document.getElementById('cfToast'); if (tz) tz.remove(); }
 this.SQ.metro = false; this.sqStop(true);
 this._dead = true;
 }
@@ -22387,8 +22389,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 19:14';
-  var BUILD_ID = '2026-11-10T19:14';
+  var BUILD = '10 nov 2026 · 19:18';
+  var BUILD_ID = '2026-11-10T19:18';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
