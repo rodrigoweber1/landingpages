@@ -22104,8 +22104,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 18:20';
-  var BUILD_ID = '2026-11-10T18:20';
+  var BUILD = '10 nov 2026 · 18:35';
+  var BUILD_ID = '2026-11-10T18:35';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
@@ -22154,6 +22154,10 @@ try { route(); } catch (e) { fail(e); }
   req(); setTimeout(req, 300); setTimeout(req, 1200);
   checkNew();
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') checkNew(); });
+  // phones keep the app open for a long time (and Safari restores it from memory): also look every 45 s while it is visible, and when the page comes back or the network returns
+  setInterval(function () { if (document.visibilityState === 'visible') checkNew(); }, 45000);
+  window.addEventListener('pageshow', checkNew);
+  window.addEventListener('online', checkNew);
 })();
 </script>
 </body>
