@@ -4215,7 +4215,9 @@ o.connect(g); g.connect(ac.destination); o.start(at); o.stop(at + 0.08);
 sched() {
 const ac = pAudio(), S = this.S; if (!ac || !(S.run || S.metro)) return;
 const spb = 60 / (S.bpm || 80);
-while (this._next < ac.currentTime + 0.15) {
+// a longer look-ahead keeps the beat steady when the phone is busy (building a chord takes a moment); if the clock fell far behind it restarts on the grid instead of firing a burst
+if (this._next < ac.currentTime - 0.1) this._next = ac.currentTime + 0.05;
+while (this._next < ac.currentTime + 0.4) {
 const bt = this._beat % 4, at = this._next;
 if (S.metro) this.click(at, bt === 0);
 if (S.run) {
@@ -7870,7 +7872,8 @@ sqSched() {
 const ac = pAudio(), S = this.SQ; if (!ac || !(S.run || S.metro)) return;
 this.sqFlush();
 const spb = 60 / (S.bpm || 80);
-while (this._nx < ac.currentTime + 0.15) {
+if (this._nx < ac.currentTime - 0.1) this._nx = ac.currentTime + 0.05;
+while (this._nx < ac.currentTime + 0.4) {
 const bt = this._bt % 4, at = this._nx;
 if (S.metro) this.sqTick(at, bt === 0);
 if (S.run) {
@@ -22432,8 +22435,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '10 nov 2026 · 19:41';
-  var BUILD_ID = '2026-11-10T19:41';
+  var BUILD = '10 nov 2026 · 19:46';
+  var BUILD_ID = '2026-11-10T19:46';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
