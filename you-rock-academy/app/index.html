@@ -1363,6 +1363,35 @@ body.stage #app #ab-prac .em2-tempo button{width:36px;font-size:20px;color:var(-
 body.stage #app #ab-prac .em2-bpm{min-width:36px}
 body.stage #app #ab-prac .em2-bpm b{font-size:18px;line-height:20px}
 body.stage #app #ab-prac .em2-dock{margin:12px 0 8px!important}
+body.stage #app #bp-prac .em2-dock{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:6;display:flex;align-items:center;gap:12px;margin:16px 0 32px!important;padding:8px!important;background:var(--st-floor2)!important;border:1px solid var(--st-rule)!important;border-radius:16px!important;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+body.stage #app #bp-prac .em2-dock{transition:opacity .2s,transform .2s}
+body.stage #app #bp-prac .em2-dock .em2-mute{width:40px}
+body.stage #app #bp-prac .em2-dock .em2-tempo button{width:34px}
+body.stage #app #bp-prac .em2-dock.off{opacity:0;transform:translateY(12px);pointer-events:none;visibility:hidden}
+@media (max-width:899px){body.stage #app #bp-prac .em2-dock{bottom:84px}}
+body.stage #app #bp-prac .em2-mute{flex:0 0 auto;width:48px;height:48px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:var(--st-floor2)!important;color:var(--st-ink2)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important;cursor:pointer;transition:background .16s var(--st-ease),color .16s var(--st-ease),border-color .16s var(--st-ease)}
+body.stage #app #bp-prac .em2-met[aria-pressed="true"]{background:#2A1416!important;color:#FF6066!important;border-color:var(--st-red)!important}
+body.stage #app #bp-prac .em2-mute[aria-pressed="true"]{background:#2A1416!important;color:#FF6066!important;border-color:var(--st-red)!important}
+body.stage #app #bp-prac .em2-tempo{margin-left:auto;flex:0 0 auto;display:flex;align-items:center;gap:2px;padding:4px;background:var(--st-floor3)!important;border:1px solid var(--st-rule)!important;border-radius:999px!important}
+body.stage #app #bp-prac .em2-tempo button{flex:0 0 auto;width:40px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:transparent!important;color:var(--st-ink)!important;border:0!important;border-radius:999px!important;font-size:24px;line-height:1;font-weight:700;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+body.stage #app #bp-prac .em2-tempo button:active{background:var(--st-floor2)!important}
+body.stage #app #bp-prac .em2-bpm{display:flex;flex-direction:column;align-items:center;min-width:40px}
+body.stage #app #bp-prac .em2-bpm b{font:400 22px/24px var(--st-d);color:var(--st-ink)}
+body.stage #app #bp-prac .em2-bpm small{font-size:12px;line-height:14px;font-weight:700;letter-spacing:.06em;color:var(--st-mute)}
+body.stage #app #bp-prac .em2-ctl{display:flex;align-items:center;gap:8px}
+body.stage #app #bp-prac .em2-play{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:0;padding:0;box-shadow:0 6px 20px rgba(227,27,35,.28);background:var(--st-red)!important;color:#FFFFFF!important;border:0!important;border-radius:999px!important;font-weight:800!important;font-size:15px;cursor:pointer}
+body.stage #app #bp-prac .em2-dock{padding:6px 8px!important;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+body.stage #app #bp-prac .em2-ctl{gap:4px}
+body.stage #app #bp-prac .em2-play{width:44px;height:44px;box-shadow:none}
+body.stage #app #bp-prac .em2-play svg{width:18px;height:18px}
+body.stage #app #bp-prac .em2-dock .em2-mute{width:44px;height:44px;background:transparent!important;border-color:transparent!important;color:var(--st-mute)!important}
+body.stage #app #bp-prac .em2-dock .em2-mute svg{width:20px;height:20px}
+body.stage #app #bp-prac .em2-dock .em2-mute[aria-pressed="true"]{background:#2A1416!important;border-color:transparent!important;color:#FF6066!important}
+body.stage #app #bp-prac .em2-tempo{padding:0!important;gap:0;background:transparent!important;border-color:transparent!important}
+body.stage #app #bp-prac .em2-tempo button{width:36px;font-size:20px;color:var(--st-mute)!important}
+body.stage #app #bp-prac .em2-bpm{min-width:36px}
+body.stage #app #bp-prac .em2-bpm b{font-size:18px;line-height:20px}
+body.stage #app #bp-prac .em2-dock{margin:12px 0 8px!important}
 /* Look redondo y amarillo en toda la app (probado primero en «Entendiendo el mástil»):
    segmentados = cápsula con la opción activa en rojo; fichas = cápsula con borde y letra amarillos al elegirlas */
 body.stage #app [role="group"][style*="display: flex"]:not(.stg-answers):not(.stg-plain){border-radius:999px!important}
@@ -6846,7 +6875,7 @@ if (this.state.nkRun) { this.nkStop(); return; }
 this.setState({ nkRun: true });
 this._nkT = setInterval(() => { this.setState({ nkStep: (this.state.nkStep + 1) % (this._nkN || 7) }); }, 1500);
 }
-componentWillUnmount() { try { clearInterval(this._nkT); } catch (e) {} try { bpStop(true); } catch (e) {} }
+componentWillUnmount() { try { clearInterval(this._nkT); } catch (e) {} try { bpStop('end'); } catch (e) {} }
 renderVals() {
 const st = this.state;
 setTimeout(() => bpEnsure('BarreDos', this.state.lang), 0);
@@ -8465,7 +8494,7 @@ if (this.state.nkRun) { this.nkStop(); return; }
 this.setState({ nkRun: true });
 this._nkT = setInterval(() => { this.setState({ nkStep: (this.state.nkStep + 1) % (this._nkN || 7) }); }, 1500);
 }
-componentWillUnmount() { try { clearInterval(this._nkT); } catch (e) {} try { bpStop(true); } catch (e) {} }
+componentWillUnmount() { try { clearInterval(this._nkT); } catch (e) {} try { bpStop('end'); } catch (e) {} }
 renderVals() {
 const st = this.state;
 setTimeout(() => bpEnsure('Barre', this.state.lang), 0);
@@ -21779,7 +21808,7 @@ const BP_TX = {
     eye: 'Practica con canciones', shape: 'Posición de cejilla', song: 'Canción', pick: 'Elegir canción', shapeAria: 'Elegir la posición de cejilla', bars: 'Compases',
     intro: { Barre: 'Ahora toca las cuatro canciones del módulo con cejillas. Cada acorde sale de la cejilla de E o de la de A: elige una posición y una canción, y mira en qué traste va cada acorde. Con Reproducir oyes la progresión para tocar encima.',
       BarreDos: 'Ahora toca las mismas cuatro canciones con las cejillas de D y de C. Elige una posición y una canción, y mira en qué traste va cada acorde. Con Reproducir oyes la progresión para tocar encima.' },
-    beats: (n) => n + (n === 1 ? ' tiempo' : ' tiempos'), play: '▶ Reproducir', stop: '■ Parar', mute: 'Silenciar el sonido', unmute: 'Activar el sonido', hint: 'Toca un acorde para oírlo.', root: 'Tónica', other: 'Otras notas',
+    beats: (n) => n + (n === 1 ? ' tiempo' : ' tiempos'), play: '▶ Reproducir', stop: '■ Parar', mute: 'Silenciar los acordes', unmute: 'Activar los acordes', metro: 'Metrónomo', bpb: 'Compás de {n} tiempos (pulsa para cambiar)', tempo: 'Velocidad', slower: 'Más lento', faster: 'Más rápido', hint: 'Toca un acorde para oírlo.', root: 'Tónica', other: 'Otras notas',
     barre: 'Cejilla · traste ', fret: 'Traste ', open: 'Abierto',
     openTip: 'Cuando pone «Abierto», el acorde cae en el traste 0: no hace falta cejilla.',
     fb: 'La cejilla de C no tiene versión menor: el La m se toca con la cejilla de D menor.'
@@ -21788,7 +21817,7 @@ const BP_TX = {
     eye: 'Practice with songs', shape: 'Barre position', song: 'Song', pick: 'Choose a song', shapeAria: 'Choose the barre position', bars: 'Bars',
     intro: { Barre: 'Now play the four songs of the module with barre chords. Every chord comes from the E barre or the A barre: pick a position and a song, and see on which fret each chord goes. Play lets you hear the progression so you can play along.',
       BarreDos: 'Now play the same four songs with the D and C barres. Pick a position and a song, and see on which fret each chord goes. Play lets you hear the progression so you can play along.' },
-    beats: (n) => n + (n === 1 ? ' beat' : ' beats'), play: '▶ Play', stop: '■ Stop', mute: 'Mute the sound', unmute: 'Turn the sound on', hint: 'Tap a chord to hear it.', root: 'Root', other: 'Other notes',
+    beats: (n) => n + (n === 1 ? ' beat' : ' beats'), play: '▶ Play', stop: '■ Stop', mute: 'Mute the chords', unmute: 'Turn the chords on', metro: 'Metronome', bpb: '{n} beats per bar (tap to change)', tempo: 'Tempo', slower: 'Slower', faster: 'Faster', hint: 'Tap a chord to hear it.', root: 'Root', other: 'Other notes',
     barre: 'Barre · fret ', fret: 'Fret ', open: 'Open',
     openTip: 'When it says “Open”, the chord falls on fret 0: no barre needed.',
     fb: 'The C barre has no minor version: Am is played with the D minor barre.'
@@ -21843,30 +21872,62 @@ function bpStrum(fr, when, vol) {
     for (let i = 0; i < 6; i++) { if (fr[i] < 0) continue; pluck(BP_BASE[i] + fr[i], t0 + k * 0.028, (vol || 0.5) * (1 - i * 0.04)); k++; }
   } catch (e) {}
 }
+function bpTick(at, strong) {
+  try {
+    const ac = pAudio(); if (!ac) return;
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'square'; o.frequency.value = strong ? 1500 : 1000;
+    g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(strong ? 0.3 : 0.18, at + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.06);
+    o.connect(g); g.connect(ac.destination); o.start(at); o.stop(at + 0.08);
+  } catch (e) {}
+}
 function bpSched() {
-  const ac = pAudio(); if (!ac || !BPS.run) return;
-  const S = bpState(BPS.gn), spb = 60 / 76, st = bpSteps(BP_SONGS[S.song]), tot = st[st.length - 1].at + st[st.length - 1].len;
-  while (BPS.next < ac.currentTime + 0.15) {
-    const bt = BPS.beat % tot, at = BPS.next;
-    let si = 0; while (si < st.length - 1 && bt >= st[si + 1].at) si++;
-    bpStrum(bpChord(BPS.gn, S.shape, st[si].c).fr, at, bt === st[si].at ? 0.5 : 0.34);
-    setTimeout(() => { if (BPS.run && S.cur !== si) { S.cur = si; bpSync(); } }, Math.max(0, (at - ac.currentTime) * 1000));
+  const ac = pAudio(); if (!ac) return;
+  const S = bpState(BPS.gn); if (!(BPS.run || S.metro)) return;
+  const spb = 60 / (S.bpm || 80), st = bpSteps(BP_SONGS[S.song]), tot = st[st.length - 1].at + st[st.length - 1].len;
+  if (BPS.next < ac.currentTime - 0.1) BPS.next = ac.currentTime + 0.05;
+  while (BPS.next < ac.currentTime + 0.4) {
+    const nb = S.beats === 2 ? 2 : 4, at = BPS.next;
+    if (S.metro) bpTick(at, BPS.beat % nb === 0);
+    if (BPS.run) {
+      const bt = BPS.beat % tot;
+      let si = 0; while (si < st.length - 1 && bt >= st[si + 1].at) si++;
+      bpStrum(bpChord(BPS.gn, S.shape, st[si].c).fr, at, bt === st[si].at ? 0.5 : 0.34);
+      setTimeout(() => { if (BPS.run && S.cur !== si) { S.cur = si; bpSync(); } }, Math.max(0, (at - ac.currentTime) * 1000));
+    }
     BPS.next += spb; BPS.beat++;
   }
 }
+// starts the shared pulse if it is not running yet
+function bpClock(gn) {
+  const ac = pAudio(); if (!ac) return false;
+  if (!BPS.tm) { BPS.next = ac.currentTime + 0.08; BPS.beat = 0; BPS.tm = setInterval(bpSched, 40); }
+  BPS.gn = gn;
+  return true;
+}
 function bpToggle(gn) {
   if (BPS.run && BPS.gn === gn) { bpStop(); return; }
-  const ac = pAudio(); if (!ac) return;
-  bpStop(true);
+  if (!bpClock(gn)) return;
   const S = bpState(gn);
-  BPS.gn = gn; BPS.run = true; S.cur = 0; BPS.beat = 0; BPS.next = ac.currentTime + 0.08;
-  BPS.tm = setInterval(bpSched, 40);
+  BPS.run = true; S.cur = 0; BPS.beat = 0;
   bpSched(); bpPaint();
 }
+function bpMetro(gn) {
+  const S = bpState(gn); S.metro = !S.metro;
+  if (S.metro) { if (bpClock(gn)) bpSched(); }
+  else if (!BPS.run && BPS.tm) { clearInterval(BPS.tm); BPS.tm = 0; }
+  bpPaint();
+}
+function bpBpm(gn, v) {
+  const S = bpState(gn); S.bpm = Math.max(40, Math.min(200, Math.round(v)));
+  const o = document.getElementById('bp-bpm'); if (o) o.textContent = S.bpm;
+}
 function bpStop(quiet) {
-  if (BPS.tm) { clearInterval(BPS.tm); BPS.tm = 0; }
+  const S = bpState(BPS.gn);
+  if (quiet === 'end') S.metro = false;
+  if (BPS.tm && !S.metro) { clearInterval(BPS.tm); BPS.tm = 0; }
   BPS.run = false;
-  if (!quiet) bpPaint();
+  if (quiet !== true && quiet !== 'end') bpPaint();
 }
 // lights the step that sounds and the diagram of its chord
 function bpSync() {
@@ -21888,6 +21949,9 @@ function bpClick(e) {
   else if (d.ch !== undefined) { BPS.gn = gn; bpStrum(bpChord(gn, S.shape, d.ch).fr, null, 0.55); }
   else if (d.play !== undefined) bpToggle(gn);
   else if (d.mute !== undefined) { S.mute = !S.mute; bpPaint(); }
+  else if (d.metro !== undefined) bpMetro(gn);
+  else if (d.beats !== undefined) { S.beats = S.beats === 2 ? 4 : 2; bpPaint(); }
+  else if (d.bpm !== undefined) { if (b.__held) { b.__held = false; return; } bpBpm(gn, (S.bpm || 80) + +d.bpm); }
 }
 function bpHtml(gn, lang) {
   const t = BP_TX[lang], S = bpState(gn), G = BP_GROUPS[gn], sg = BP_SONGS[Math.min(S.song, BP_SONGS.length - 1)], nm = BP_NAME[lang], li = lang === 'es' ? 0 : 1;
@@ -21910,7 +21974,15 @@ function bpHtml(gn, lang) {
   h += '<p class="ab-how">' + sg.note[li] + '</p>';
   if (anyBorrow) h += '<p class="ab-how">' + t.fb + '</p>';
   if (anyOpen) h += '<p class="ab-how">' + t.openTip + '</p>';
-  h += '<div class="ab-playrow"><button type="button" class="ab-play" data-play>' + (on ? t.stop : t.play) + '</button><button type="button" class="ab-mute" data-mute aria-pressed="' + !!S.mute + '" aria-label="' + (S.mute ? t.unmute : t.mute) + '" title="' + (S.mute ? t.unmute : t.mute) + '"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>') + '</svg></button><span>' + t.hint + '</span></div>';
+  const ic = on ? '<path d="M7 6h10v12H7z" fill="currentColor" stroke="none"/>' : '<path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="none"/>';
+  const bpm = S.bpm || 80, nb = S.beats === 2 ? 2 : 4, plain = t.play.replace(/^[^\wÀ-ÿ]+/, ''), stopT = t.stop.replace(/^[^\wÀ-ÿ]+/, '');
+  const sv = (p, w) => '<svg viewBox="0 0 24 24" width="' + (w || 22) + '" height="' + (w || 22) + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + p + '</svg>';
+  h += '<div class="em2-dock" style="flex-wrap: wrap"><div class="em2-ctl">';
+  h += '<button type="button" class="em2-play" data-play aria-pressed="' + on + '" aria-label="' + (on ? stopT : plain) + '" title="' + (on ? stopT : plain) + '"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">' + ic + '</svg></button>';
+  h += '<button type="button" class="em2-mute" data-mute aria-pressed="' + !!S.mute + '" aria-label="' + (S.mute ? t.unmute : t.mute) + '" title="' + (S.mute ? t.unmute : t.mute) + '">' + sv('<path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>')) + '</button>';
+  h += '<button type="button" class="em2-mute em2-met" data-metro aria-pressed="' + !!S.metro + '" aria-label="' + t.metro + '" title="' + t.metro + '">' + sv('<path d="M9 3h6l4 18H5z"/><path d="M7 16h10"/><path d="M12 16l5-10"/>') + '</button>';
+  h += '<button type="button" class="em2-mute em2-met" data-beats aria-label="' + t.bpb.replace('{n}', nb) + '" title="' + t.bpb.replace('{n}', nb) + '" style="font-size: 18px; font-weight: 700; line-height: 1">' + nb + '</button></div>';
+  h += '<div class="em2-tempo stg-plain" role="group" aria-label="' + t.tempo + '"><button type="button" data-bpm="-1" aria-label="' + t.slower + '" title="' + t.slower + '">−</button><span class="em2-bpm" aria-live="polite"><b id="bp-bpm">' + bpm + '</b><small>BPM</small></span><button type="button" data-bpm="1" aria-label="' + t.faster + '" title="' + t.faster + '">+</button></div></div>';
   return h;
 }
 function bpPaint(gn, lang) {
@@ -21918,11 +21990,23 @@ function bpPaint(gn, lang) {
   if (gn) host.__gn = gn;
   if (lang) host.__lang = lang;
   if (!host.__gn) return;
-  if (!host.__bp) { host.__bp = true; host.addEventListener('click', bpClick); }
+  if (!host.__bp) {
+    host.__bp = true; host.addEventListener('click', bpClick);
+    const stopRep = () => { clearTimeout(host.__rep); host.__rep = 0; };
+    host.addEventListener('pointerdown', (e) => {
+      const bt = e.target.closest && e.target.closest('[data-bpm]'); if (!bt || !host.__gn) return;
+      const step = +bt.dataset.bpm, gn = host.__gn; let n = 0;
+      stopRep();
+      const go = () => { n++; bt.__held = true; bpBpm(gn, (bpState(gn).bpm || 80) + step * (n > 12 ? 5 : 1)); host.__rep = setTimeout(go, 90); };
+      host.__rep = setTimeout(go, 420);
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => host.addEventListener(ev, stopRep));
+  }
   host.innerHTML = bpHtml(host.__gn, host.__lang || 'es');
 }
 // the screen re-renders on every tap of its own controls: only paint when the host is empty or the language changed
 function bpEnsure(gn, lang) {
+  if (typeof currentName !== 'undefined' && currentName !== gn) return;
   const host = document.getElementById('bp-prac'); if (!host) return;
   if (host.__gn === gn && host.__lang === lang && host.firstChild) return;
   bpPaint(gn, lang);
@@ -22594,8 +22678,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '11 nov 2026 · 21:25';
-  var BUILD_ID = '2026-11-11T21:25';
+  var BUILD = '11 nov 2026 · 21:35';
+  var BUILD_ID = '2026-11-11T21:35';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
