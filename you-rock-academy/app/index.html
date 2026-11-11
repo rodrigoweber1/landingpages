@@ -22621,9 +22621,9 @@ try { route(); } catch (e) { fail(e); }
 #yr-mini .yr-logo{--yr:16px!important;color:#F4EEE6!important}
 #yr-mini .ym-right{display:flex;align-items:center;gap:8px}
 #yr-mini .ym-thm{width:40px;height:36px;border:0;border-radius:10px;background:#221B17;color:#FFC400;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#yr-mini .ym-lang{display:flex;gap:2px;padding:2px;border-radius:10px;background:#221B17}
-#yr-mini .ym-lang button{min-width:44px;height:36px;border:0;border-radius:8px;background:transparent;color:#BDB6AA;font:700 13px 'Inter',system-ui,sans-serif;cursor:pointer}
-#yr-mini .ym-lang button[aria-pressed="true"]{background:#3A1E20;color:#F4EEE6;box-shadow:inset 0 -2px 0 #E31B23}
+#yr-mini .ym-lang{display:flex;gap:2px;padding:2px;border-radius:999px;background:#221B17}
+#yr-mini .ym-lang button{min-width:44px;height:36px;border:0;border-radius:999px;background:transparent;color:#A3978A;font:500 14px 'Inter',system-ui,sans-serif;cursor:pointer}
+#yr-mini .ym-lang button[aria-pressed="true"]{background:#E31B23;color:#FFFFFF;box-shadow:none}
 #yr-mini{transition:none}
 #yr-upd{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 92px);z-index:95;display:flex;align-items:center;justify-content:space-between;gap:12px;box-sizing:border-box;padding:10px 10px 10px 16px;border-radius:14px;background:#E31B23;color:#FFFFFF;font:600 14px/20px 'Inter',system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45)}
 #yr-upd button{flex:none;min-height:44px;padding:0 18px;border:0;border-radius:10px;background:#FFFFFF;color:#B3121A;font:700 14px/20px 'Inter',system-ui,sans-serif;cursor:pointer}
@@ -22678,8 +22678,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '11 nov 2026 · 21:35';
-  var BUILD_ID = '2026-11-11T21:35';
+  var BUILD = '11 nov 2026 · 22:03';
+  var BUILD_ID = '2026-11-11T22:03';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
