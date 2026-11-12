@@ -1817,7 +1817,7 @@ const D = {
   "h1": "Aprende guitarra desde cero",
   "intro": "De las notas del mástil a tu primer riff de rock. Son nueve módulos: síguelos en orden o salta al que te haga falta.",
   "rutaEye": "Aprende a tu ritmo",
-  "rutaT": "Ruta para rockeros",
+  "rutaT": "Guitarra principiante",
   "rutaX": "El camino completo, paso a paso: desde afinar la guitarra hasta tocar tus primeros riffs de rock.",
   "rutaMeta": "9 módulos · 45 pantallas",
   "cursoEye": "Con profesor",
@@ -1850,7 +1850,7 @@ const D = {
   "h1": "Learn guitar from scratch",
   "intro": "From the notes on the fretboard to your first rock riff. Nine modules: go through them in order or jump to the one you need.",
   "rutaEye": "Learn at your own pace",
-  "rutaT": "Path for rockers",
+  "rutaT": "Beginner guitar",
   "rutaX": "The full path, step by step: from tuning your guitar to playing your first rock riffs.",
   "rutaMeta": "9 modules · 45 screens",
   "cursoEye": "With a teacher",
@@ -2130,7 +2130,7 @@ setTimeout(() => { const r = document.getElementById('sl-root'); if (r && (!r.fi
 const D = {
   "es": {
     "langAria": "Idioma",
-    "eyebrow": "Ruta para rockeros",
+    "eyebrow": "Guitarra principiante",
     "h1": "Aprende guitarra desde cero",
     "intro": "De las notas del mástil a tu primer riff de rock. Son nueve módulos: síguelos en orden o salta al que te haga falta.",
     "stepsWord": [
@@ -2299,7 +2299,7 @@ const D = {
   },
   "en": {
     "langAria": "Language",
-    "eyebrow": "Path for rockers",
+    "eyebrow": "Beginner guitar",
     "h1": "Learn guitar from scratch",
     "intro": "From the notes on the fretboard to your first rock riff. Nine modules: go through them in order or jump to the one you need.",
     "stepsWord": [
@@ -5850,7 +5850,7 @@ const SL_CHEV = '<svg class="sl-chev" viewBox="0 0 24 24" fill="none" stroke="cu
 function rutaSetlist(root, lang) {
   const es = lang !== 'en';
   const T = es ? {
-    eye: 'Ruta para rockeros', h1a: 'Tu ', h1b: 'setlist',
+    eye: 'Guitarra principiante', h1a: 'Tu ', h1b: 'setlist',
     sub: (n) => n + ' módulos, como los temas de un concierto. Tócalos en orden o salta al que te haga falta.',
     prog: (d, n) => 'Llevas <b>' + d + '</b> de ' + n + ' pantallas', progAria: 'Tu progreso en la ruta',
     hint: 'Marca «Hecho» al terminar cada pantalla. Se guarda en este dispositivo.',
@@ -5859,7 +5859,7 @@ function rutaSetlist(root, lang) {
     foot: '¡Y al final, a tocar con la banda!',
     open: 'Abrir', side: 'Tienes todos los módulos en el menú de la izquierda.', fin: '¡Ruta completa!'
   } : {
-    eye: 'Path for rockers', h1a: 'Your ', h1b: 'setlist',
+    eye: 'Beginner guitar', h1a: 'Your ', h1b: 'setlist',
     sub: (n) => n + ' modules, like the songs in a gig. Play them in order or jump to the one you need.',
     prog: (d, n) => 'You’ve done <b>' + d + '</b> of ' + n + ' screens', progAria: 'Your progress on the path',
     hint: 'Tap «Done» when you finish each screen. It’s saved on this device.',
@@ -20666,7 +20666,7 @@ function renderSide(name, lang) {
   const prev = seqIdx > 0 ? seq[seqIdx - 1] : null;
   const next = seqIdx >= 0 && seqIdx < seq.length - 1 ? seq[seqIdx + 1] : (seqIdx < 0 ? seq[0] : null);
   const en = lang === 'en';
-  const L = en ? { home: 'Home', musica: 'Music', ruta: 'Path', curso: 'Course', prev: 'Previous', next: 'Next', key: 'Tip: use the ← → keys', aria: 'Navigation', idx: menu === 'curso' ? 'Course: all sessions' : (menu === 'musica' ? 'Songbook: all songs' : 'Path: all modules') } : { home: 'Inicio', musica: 'Música', ruta: 'Ruta', curso: 'Curso', prev: 'Anterior', next: 'Siguiente', key: 'Consejo: usa las teclas ← →', aria: 'Navegación', idx: menu === 'curso' ? 'Curso: todas las sesiones' : (menu === 'musica' ? 'Cancionero: todas las canciones' : 'Ruta: todos los módulos') };
+  const L = en ? { home: 'Home', musica: 'Music', ruta: 'Beginner', curso: 'Course', prev: 'Previous', next: 'Next', key: 'Tip: use the ← → keys', aria: 'Navigation', idx: menu === 'curso' ? 'Course: all sessions' : (menu === 'musica' ? 'Songbook: all songs' : 'Beginner: all modules') } : { home: 'Inicio', musica: 'Música', ruta: 'Principiante', curso: 'Curso', prev: 'Anterior', next: 'Siguiente', key: 'Consejo: usa las teclas ← →', aria: 'Navegación', idx: menu === 'curso' ? 'Curso: todas las sesiones' : (menu === 'musica' ? 'Cancionero: todas las canciones' : 'Principiante: todos los módulos') };
   sideEl.setAttribute('aria-label', L.aria);
   let h = '<div class="sd-head"><div class="sd-logo"><img src="' + URIS[0] + '" alt=""><span aria-label="You Rock Academy" role="img">' + LOGO_SVG + '</span></div><a class="home" href="#/Inicio">' + navIcon('Inicio', 16) + esc(L.home) + '</a>'
     + '<div class="sd-tabs" role="group"><a href="#/Main" class="' + (menu === 'ruta' && name !== 'Herramientas' && name !== 'Avanzada' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Main', 18) + esc(L.ruta) + '</a><a href="#/Cancionero" class="' + (menu === 'musica' && name !== 'Herramientas' && name !== 'Avanzada' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Cancionero', 18) + esc(L.musica) + '</a><a href="#/Herramientas" class="' + ((name === 'Herramientas' || (toolsMode && ADV.indexOf(name) < 0 && TOOLS.indexOf(name) >= 0)) ? 'on' : '') + '">' + navIcon('Herramientas', 18) + (lang === 'en' ? 'Tools' : 'Herramientas') + '</a><a href="#/Avanzada" class="' + ((name === 'Avanzada' || (toolsMode && ADV.indexOf(name) >= 0)) ? 'on' : '') + '">' + navIcon('Avanzada', 18) + (lang === 'en' ? 'Advanced' : 'Avanzada') + '</a></div>'
@@ -20933,7 +20933,7 @@ function cleanify(name, lang) {
   // floating bottom navigation
   const en = lang === 'en';
   const cur = (name === 'Avanzada' || (toolsMode && ADV.indexOf(name) >= 0)) ? 'Avanzada' : name === 'Inicio' ? 'Inicio' : (name === 'Herramientas' || (toolsMode && TOOLS.indexOf(name) >= 0)) ? 'Herramientas' : (menu === 'curso' ? 'Curso' : (menu === 'musica' ? 'Cancionero' : 'Main'));
-  const lab = en ? { Inicio: 'Home', Main: 'Path', Curso: 'Course', Cancionero: 'Music', Herramientas: 'Tools', Avanzada: 'Advanced' } : { Inicio: 'Inicio', Main: 'Ruta', Curso: 'Curso', Cancionero: 'Música', Herramientas: 'Herramientas', Avanzada: 'Avanzada' };
+  const lab = en ? { Inicio: 'Home', Main: 'Beginner', Curso: 'Course', Cancionero: 'Music', Herramientas: 'Tools', Avanzada: 'Advanced' } : { Inicio: 'Inicio', Main: 'Principiante', Curso: 'Curso', Cancionero: 'Música', Herramientas: 'Herramientas', Avanzada: 'Avanzada' };
   fnav.innerHTML = ['Inicio', 'Main', 'Cancionero', 'Herramientas', 'Avanzada'].map((k) => '<a href="#/' + k + '" class="' + (k === cur ? 'on' : '') + '">' + navIcon(k, 22) + lab[k] + '</a>').join('');
 }
 const fnav = document.getElementById('fnav');
@@ -21271,7 +21271,7 @@ function attachResume(name, lang) {
   const seq = SEQS[last.m].map(base);
   const i = seq.indexOf(last.n) + 1, n = seq.length;
   const en = lang === 'en';
-  const where = { ruta: en ? 'Path' : 'Ruta', curso: en ? 'Course' : 'Curso', musica: en ? 'Songbook' : 'Cancionero' }[last.m];
+  const where = { ruta: en ? 'Beginner' : 'Principiante', curso: en ? 'Course' : 'Curso', musica: en ? 'Songbook' : 'Cancionero' }[last.m];
   const a = document.createElement('a');
   a.className = 'rs';
   a.href = '#/' + last.n + (last.q ? '?' + last.q : '');
@@ -22734,8 +22734,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '12 nov 2026 · 13:41';
-  var BUILD_ID = '2026-11-12T13:41';
+  var BUILD = '12 nov 2026 · 13:57';
+  var BUILD_ID = '2026-11-12T13:57';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
