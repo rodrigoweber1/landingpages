@@ -70,7 +70,7 @@ body{display:grid;grid-template-columns:360px minmax(0,1fr);align-items:start}
 @media (min-width:900px){
 body.home{grid-template-columns:minmax(0,1fr)}
 body.home #side{display:none}
-.sd-tabs{display:grid;grid-template-columns:repeat(3,auto);gap:2px;padding:2px;border-radius:8px;background:#E9EEF5;margin-top:4px}
+.sd-tabs{display:grid;grid-template-columns:repeat(4,auto);gap:2px;padding:2px;border-radius:8px;background:#E9EEF5;margin-top:4px}
 .sd-tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;padding:8px 8px 7px;border-radius:6px;font-size:12px;line-height:16px;font-weight:700;color:#334155}
 .sd-tabs a.on{background:#FFFFFF;color:#B3121A;box-shadow:0 1px 2px rgba(26,20,16,.12)}
 #app main{padding-left:48px!important;padding-right:48px!important}
@@ -20614,7 +20614,8 @@ const NAV_IC = {
   Main: '<path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/>',
   Curso: '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/>',
   Cancionero: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
-  Herramientas: '<path d="M7 10h3V7L6.5 3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1-3 3l-6-6a6 6 0 0 1-8-8z"/>'
+  Herramientas: '<path d="M7 10h3V7L6.5 3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1-3 3l-6-6a6 6 0 0 1-8-8z"/>',
+  Avanzada: '<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/>'
 };
 const navIcon = (k, s) => '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + NAV_IC[k] + '</svg>';
 const openMods = { ruta: new Set(), curso: new Set(), musica: new Set() };
@@ -20668,7 +20669,7 @@ function renderSide(name, lang) {
   const L = en ? { home: 'Home', musica: 'Music', ruta: 'Path', curso: 'Course', prev: 'Previous', next: 'Next', key: 'Tip: use the ← → keys', aria: 'Navigation', idx: menu === 'curso' ? 'Course: all sessions' : (menu === 'musica' ? 'Songbook: all songs' : 'Path: all modules') } : { home: 'Inicio', musica: 'Música', ruta: 'Ruta', curso: 'Curso', prev: 'Anterior', next: 'Siguiente', key: 'Consejo: usa las teclas ← →', aria: 'Navegación', idx: menu === 'curso' ? 'Curso: todas las sesiones' : (menu === 'musica' ? 'Cancionero: todas las canciones' : 'Ruta: todos los módulos') };
   sideEl.setAttribute('aria-label', L.aria);
   let h = '<div class="sd-head"><div class="sd-logo"><img src="' + URIS[0] + '" alt=""><span aria-label="You Rock Academy" role="img">' + LOGO_SVG + '</span></div><a class="home" href="#/Inicio">' + navIcon('Inicio', 16) + esc(L.home) + '</a>'
-    + '<div class="sd-tabs" role="group"><a href="#/Main" class="' + (menu === 'ruta' && name !== 'Herramientas' && name !== 'Avanzada' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Main', 18) + esc(L.ruta) + '</a><a href="#/Cancionero" class="' + (menu === 'musica' && name !== 'Herramientas' && name !== 'Avanzada' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Cancionero', 18) + esc(L.musica) + '</a><a href="#/Herramientas" class="' + ((name === 'Herramientas' || (toolsMode && ADV.indexOf(name) < 0 && TOOLS.indexOf(name) >= 0)) ? 'on' : '') + '">' + navIcon('Herramientas', 18) + (lang === 'en' ? 'Tools' : 'Herramientas') + '</a></div>'
+    + '<div class="sd-tabs" role="group"><a href="#/Main" class="' + (menu === 'ruta' && name !== 'Herramientas' && name !== 'Avanzada' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Main', 18) + esc(L.ruta) + '</a><a href="#/Cancionero" class="' + (menu === 'musica' && name !== 'Herramientas' && name !== 'Avanzada' && !(toolsMode && TOOLS.indexOf(name) >= 0) ? 'on' : '') + '">' + navIcon('Cancionero', 18) + esc(L.musica) + '</a><a href="#/Herramientas" class="' + ((name === 'Herramientas' || (toolsMode && ADV.indexOf(name) < 0 && TOOLS.indexOf(name) >= 0)) ? 'on' : '') + '">' + navIcon('Herramientas', 18) + (lang === 'en' ? 'Tools' : 'Herramientas') + '</a><a href="#/Avanzada" class="' + ((name === 'Avanzada' || (toolsMode && ADV.indexOf(name) >= 0)) ? 'on' : '') + '">' + navIcon('Avanzada', 18) + (lang === 'en' ? 'Advanced' : 'Avanzada') + '</a></div>'
     + '</div><div class="sd-nav">';
   // Ruta menu: screens marked «Hecho» and the module you're in (or the next one to play) for the setlist look
   const isRuta = menu === 'ruta';
@@ -20931,9 +20932,9 @@ function cleanify(name, lang) {
   if (hd) { hd.style.borderBottomColor = 'transparent'; }
   // floating bottom navigation
   const en = lang === 'en';
-  const cur = (name === 'Inicio' || name === 'Avanzada' || (toolsMode && ADV.indexOf(name) >= 0)) ? 'Inicio' : (name === 'Herramientas' || (toolsMode && TOOLS.indexOf(name) >= 0)) ? 'Herramientas' : (menu === 'curso' ? 'Curso' : (menu === 'musica' ? 'Cancionero' : 'Main'));
-  const lab = en ? { Inicio: 'Home', Main: 'Path', Curso: 'Course', Cancionero: 'Music', Herramientas: 'Tools' } : { Inicio: 'Inicio', Main: 'Ruta', Curso: 'Curso', Cancionero: 'Música', Herramientas: 'Herramientas' };
-  fnav.innerHTML = ['Inicio', 'Main', 'Cancionero', 'Herramientas'].map((k) => '<a href="#/' + k + '" class="' + (k === cur ? 'on' : '') + '">' + navIcon(k, 22) + lab[k] + '</a>').join('');
+  const cur = (name === 'Avanzada' || (toolsMode && ADV.indexOf(name) >= 0)) ? 'Avanzada' : name === 'Inicio' ? 'Inicio' : (name === 'Herramientas' || (toolsMode && TOOLS.indexOf(name) >= 0)) ? 'Herramientas' : (menu === 'curso' ? 'Curso' : (menu === 'musica' ? 'Cancionero' : 'Main'));
+  const lab = en ? { Inicio: 'Home', Main: 'Path', Curso: 'Course', Cancionero: 'Music', Herramientas: 'Tools', Avanzada: 'Advanced' } : { Inicio: 'Inicio', Main: 'Ruta', Curso: 'Curso', Cancionero: 'Música', Herramientas: 'Herramientas', Avanzada: 'Avanzada' };
+  fnav.innerHTML = ['Inicio', 'Main', 'Cancionero', 'Herramientas', 'Avanzada'].map((k) => '<a href="#/' + k + '" class="' + (k === cur ? 'on' : '') + '">' + navIcon(k, 22) + lab[k] + '</a>').join('');
 }
 const fnav = document.getElementById('fnav');
 
@@ -22733,8 +22734,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '12 nov 2026 · 10:15';
-  var BUILD_ID = '2026-11-12T10:15';
+  var BUILD = '12 nov 2026 · 10:40';
+  var BUILD_ID = '2026-11-12T10:40';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
