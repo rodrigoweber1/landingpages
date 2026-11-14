@@ -23319,6 +23319,11 @@ body.stage .mu-head{--sl-ink:#F4EEE6;--sl-ink2:#CFC6BA}
 .mu-head .sl-h1{margin:0!important;font:400 clamp(36px,8vw,72px)/0.95 'Archivo Black','Inter',sans-serif!important;letter-spacing:0!important;text-transform:uppercase;color:var(--sl-ink)!important}
 .mu-head .sl-h1 em{font-style:normal;color:var(--sl-red)}
 .mu-head .sl-sub{margin:0!important;max-width:52ch;font-size:15px!important;line-height:22px!important;color:var(--sl-ink2)!important}
+/* Música / Herramientas: same title size, red and numbers as Guitarra principiante */
+body.stage #app .mu-head .sl-h1{font-size:clamp(36px,8vw,72px)!important;line-height:.95!important}
+body.stage #app .mu-head .sl-h1 em{color:#E31B23!important}
+body.stage #app .yl-song .yl-num{color:var(--st-ink2,#CFC6BA)!important}
+body.stage #app .yl-song .yl-s{color:#A39A8E!important}
 @media (min-width:900px){#yr-mini{display:none}}
 @media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
 </style>
@@ -23373,8 +23378,8 @@ body.stage .mu-head{--sl-ink:#F4EEE6;--sl-ink2:#CFC6BA}
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 12:07';
-  var BUILD_ID = '2026-11-14T12:07';
+  var BUILD = '14 nov 2026 · 12:14';
+  var BUILD_ID = '2026-11-14T12:14';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
