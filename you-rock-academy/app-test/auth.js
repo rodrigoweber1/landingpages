@@ -9,10 +9,14 @@
   var TX = {
     es: { title: 'Entrar', sub: 'Versión de pruebas con cuenta.', mail: 'Correo', pass: 'Contraseña', in: 'Entrar', up: 'Crear cuenta', magic: 'Enviarme un enlace por correo', toUp: '¿Primera vez? Crea tu cuenta', toIn: 'Ya tengo cuenta',
       checkMail: 'Revisa tu correo para continuar.', created: 'Cuenta creada. Si te pide confirmar, revisa tu correo.', bad: 'Correo o contraseña incorrectos.', need: 'Escribe tu correo y tu contraseña.', needMail: 'Escribe tu correo.',
-      err: 'No se pudo completar. Inténtalo de nuevo.', acct: 'Cuenta', role: 'Rol', out: 'Salir', close: 'Cerrar', admin: 'Administración', users: 'Usuarios y accesos', loading: 'Cargando…', none: 'Sin usuarios.', saved: 'Guardado', roleAdmin: 'admin', roleTeste: 'prueba' },
+      err: 'No se pudo completar. Inténtalo de nuevo.', acct: 'Cuenta', role: 'Rol', out: 'Salir', close: 'Cerrar', admin: 'Administración', users: 'Usuarios y accesos', loading: 'Cargando…', none: 'Sin usuarios.', saved: 'Guardado', roleAdmin: 'admin', roleTeste: 'prueba',
+      openAdmin: 'Abrir página Admin', lessons: 'Lecciones', protectedL: 'Lecciones protegidas (prueba)', locked: 'Bloqueada · requiere el módulo', open: 'Abrir', newL: 'Nueva lección', edit: 'Editar', del: 'Borrar', save: 'Guardar',
+      module: 'Módulo', titleEs: 'Título (ES)', titleEn: 'Title (EN)', bodyEs: 'Texto (ES)', bodyEn: 'Text (EN)', confirmDel: '¿Borrar esta lección?', noLessons: 'Aún no hay lecciones.', adminTitle: 'Admin', usersTab: 'Usuarios y accesos' },
     en: { title: 'Sign in', sub: 'Test version with an account.', mail: 'Email', pass: 'Password', in: 'Sign in', up: 'Create account', magic: 'Email me a link', toUp: 'First time? Create your account', toIn: 'I already have an account',
       checkMail: 'Check your email to continue.', created: 'Account created. If asked to confirm, check your email.', bad: 'Wrong email or password.', need: 'Enter your email and password.', needMail: 'Enter your email.',
-      err: 'Could not complete. Try again.', acct: 'Account', role: 'Role', out: 'Sign out', close: 'Close', admin: 'Administration', users: 'Users and access', loading: 'Loading…', none: 'No users.', saved: 'Saved', roleAdmin: 'admin', roleTeste: 'test' }
+      err: 'Could not complete. Try again.', acct: 'Account', role: 'Role', out: 'Sign out', close: 'Close', admin: 'Administration', users: 'Users and access', loading: 'Loading…', none: 'No users.', saved: 'Saved', roleAdmin: 'admin', roleTeste: 'test',
+      openAdmin: 'Open Admin page', lessons: 'Lessons', protectedL: 'Protected lessons (test)', locked: 'Locked · requires module', open: 'Open', newL: 'New lesson', edit: 'Edit', del: 'Delete', save: 'Save',
+      module: 'Module', titleEs: 'Title (ES)', titleEn: 'Title (EN)', bodyEs: 'Text (ES)', bodyEn: 'Text (EN)', confirmDel: 'Delete this lesson?', noLessons: 'No lessons yet.', adminTitle: 'Admin', usersTab: 'Users and access' }
   };
   function t(k) { return TX[lang()][k]; }
   function el(tag, attrs, html) { var e = document.createElement(tag); if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]); if (html != null) e.innerHTML = html; return e; }
@@ -50,7 +54,32 @@
     '#yr-acct .chips{display:flex;gap:6px;flex-wrap:wrap}',
     '#yr-acct .chip{min-height:36px;padding:0 12px;border:1px solid #3A302A;border-radius:999px;background:#221B17;color:#CFC6BA;font:600 13px Inter,system-ui,sans-serif;cursor:pointer}',
     '#yr-acct .chip[aria-pressed="true"]{border-color:#FFC400;color:#FFC400}',
-    '#yr-acct .note{font-size:13px;color:#BDB6AA}'
+    '#yr-acct .note{font-size:13px;color:#BDB6AA}',
+    '#yr-acct .les{padding:12px;border:1px solid #3A302A;border-radius:14px;display:flex;flex-direction:column;gap:8px}',
+    '#yr-acct .les b{font-size:15px}',
+    '#yr-acct .les .txt{white-space:pre-wrap;font-size:15px;line-height:22px;color:#F4EEE6}',
+    '#yr-acct .lock{font-size:13px;color:#FFC400}',
+    '#yr-admin{position:fixed;inset:0;z-index:10002;display:flex;flex-direction:column;background:#0D0B0A;color:#F4EEE6;font-family:Inter,system-ui,sans-serif}',
+    '#yr-admin[hidden]{display:none}',
+    '#yr-admin header{display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;border-bottom:1px solid #3A302A}',
+    '#yr-admin header h1{flex:1;margin:0;font:400 20px/1.2 "Archivo Black",Inter,sans-serif;text-transform:uppercase}',
+    '#yr-admin .main{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px;max-width:720px;width:100%;box-sizing:border-box;margin:0 auto}',
+    '#yr-admin .seg{display:flex;gap:4px;padding:4px;border:1px solid #3A302A;border-radius:999px}',
+    '#yr-admin .seg button{flex:1;min-height:44px;border:0;border-radius:999px;background:transparent;color:#CFC6BA;font:700 14px Inter,system-ui,sans-serif;cursor:pointer}',
+    '#yr-admin .seg button[aria-pressed="true"]{background:#E31B23;color:#fff}',
+    '#yr-admin button.b{min-height:44px;padding:0 18px;border:0;border-radius:999px;background:#E31B23;color:#fff;font:700 14px Inter,system-ui,sans-serif;cursor:pointer}',
+    '#yr-admin button.g{background:#2A211C;color:#F4EEE6}',
+    '#yr-admin .row{display:flex;gap:10px;flex-wrap:wrap}',
+    '#yr-admin .u,#yr-admin .les{padding:12px;border:1px solid #3A302A;border-radius:14px;display:flex;flex-direction:column;gap:8px}',
+    '#yr-admin .u .em,#yr-admin .les b{font-weight:700;font-size:14px;word-break:break-all}',
+    '#yr-admin .u .rl,#yr-admin .note{font-size:13px;color:#BDB6AA}',
+    '#yr-admin .chips{display:flex;gap:6px;flex-wrap:wrap}',
+    '#yr-admin .chip{min-height:36px;padding:0 12px;border:1px solid #3A302A;border-radius:999px;background:#221B17;color:#CFC6BA;font:600 13px Inter,system-ui,sans-serif;cursor:pointer}',
+    '#yr-admin .chip[aria-pressed="true"]{border-color:#FFC400;color:#FFC400}',
+    '#yr-admin label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#CFC6BA}',
+    '#yr-admin input,#yr-admin textarea,#yr-admin select{box-sizing:border-box;width:100%;padding:10px 14px;border:1px solid #3A302A;border-radius:14px;background:#17120F;color:#F4EEE6;font:500 16px Inter,system-ui,sans-serif;outline:none}',
+    '#yr-admin textarea{min-height:110px;resize:vertical}',
+    '#yr-admin input:focus,#yr-admin textarea:focus,#yr-admin select:focus{border-color:#E31B23}'
   ].join('\n'));
   document.head.appendChild(css);
 
@@ -100,17 +129,89 @@
     panel.innerHTML = '<div class="sheet"><h2>' + t('acct') + '</h2>'
       + '<div class="kv"><span>' + t('mail') + '</span><b>' + esc(profile ? profile.email : session.user.email) + '</b></div>'
       + '<div class="kv"><span>' + t('role') + '</span><b>' + esc(profile ? profile.role : '…') + '</b></div>'
-      + '<div class="row"><button class="b" id="yr-out" type="button">' + t('out') + '</button><button class="b g" id="yr-cl" type="button">' + t('close') + '</button></div>'
-      + (admin ? '<h3>' + t('admin') + ' · ' + t('users') + '</h3><div id="yr-users" class="note">' + t('loading') + '</div>' : '') + '</div>';
+      + '<div class="row">' + (admin ? '<button class="b" id="yr-adm" type="button">' + t('openAdmin') + '</button>' : '') + '<button class="b g" id="yr-out" type="button">' + t('out') + '</button><button class="b g" id="yr-cl" type="button">' + t('close') + '</button></div>'
+      + '<h3>' + t('protectedL') + '</h3><div id="yr-less" class="note">' + t('loading') + '</div></div>';
     panel.querySelector('#yr-cl').addEventListener('click', function () { panel.hidden = true; });
     panel.querySelector('#yr-out').addEventListener('click', function () { panel.hidden = true; SB.auth.signOut(); });
-    if (admin) loadUsers();
+    var ab = panel.querySelector('#yr-adm'); if (ab) ab.addEventListener('click', function () { panel.hidden = true; openAdmin(); });
+    loadLessons(panel.querySelector('#yr-less'));
+  }
+
+  // ───────── lecciones protegidas: lo que ve cada usuario según sus derechos ─────────
+  function loadLessons(box) {
+    Promise.all([SB.rpc('lesson_catalog'), SB.from('modules').select('id,title_es,title_en')]).then(function (rs) {
+      if (rs[0].error) { box.textContent = t('err'); return; }
+      var cat = rs[0].data || [], mods = {}; (rs[1].data || []).forEach(function (m) { mods[m.id] = lang() === 'en' ? m.title_en : m.title_es; });
+      if (!cat.length) { box.textContent = t('noLessons'); return; }
+      box.className = ''; box.innerHTML = '';
+      cat.forEach(function (c) {
+        var title = (lang() === 'en' && c.title_en) ? c.title_en : c.title_es;
+        var d = el('div', { class: 'les' }, '<b>' + esc(title) + '</b>');
+        if (!c.unlocked) { d.appendChild(el('div', { class: 'lock' }, '🔒 ' + t('locked') + ' «' + esc(mods[c.module_id] || c.module_id) + '»')); box.appendChild(d); return; }
+        var b = el('button', { type: 'button', class: 'b' }, t('open'));
+        b.addEventListener('click', function () {
+          SB.from('lessons').select('body_es,body_en').eq('id', c.id).maybeSingle().then(function (r) {
+            if (r.error || !r.data) { b.textContent = t('err'); return; }
+            var tx = el('div', { class: 'txt' }); tx.textContent = (lang() === 'en' && r.data.body_en) ? r.data.body_en : r.data.body_es;
+            d.appendChild(tx); b.remove();
+          });
+        });
+        d.appendChild(b); box.appendChild(d);
+      });
+    });
+  }
+
+  // ───────── página Admin (solo rol admin) ─────────
+  var adminPage = el('div', { id: 'yr-admin', hidden: '' });
+  var adminTab = 'users';
+  function openAdmin() { adminTab = 'users'; drawAdmin(); adminPage.hidden = false; }
+  function drawAdmin() {
+    adminPage.innerHTML = '<header><h1>' + t('adminTitle') + '</h1><button class="b g" id="yr-ad-x" type="button">' + t('close') + '</button></header>'
+      + '<div class="main"><div class="seg"><button type="button" data-tab="users" aria-pressed="' + (adminTab === 'users') + '">' + t('usersTab') + '</button><button type="button" data-tab="lessons" aria-pressed="' + (adminTab === 'lessons') + '">' + t('lessons') + '</button></div><div id="yr-ad-body" class="note">' + t('loading') + '</div></div>';
+    adminPage.querySelector('#yr-ad-x').addEventListener('click', function () { adminPage.hidden = true; });
+    Array.prototype.forEach.call(adminPage.querySelectorAll('.seg button'), function (b) { b.addEventListener('click', function () { adminTab = b.getAttribute('data-tab'); drawAdmin(); }); });
+    var body = adminPage.querySelector('#yr-ad-body');
+    if (adminTab === 'users') loadUsers(body); else loadAdminLessons(body);
+  }
+  function loadAdminLessons(box) {
+    Promise.all([SB.from('lessons').select('*').order('sort').order('created_at'), SB.from('modules').select('id,title_es,title_en,sort').order('sort')]).then(function (rs) {
+      if (rs[0].error || rs[1].error) { box.textContent = t('err'); return; }
+      var ls = rs[0].data || [], mods = rs[1].data || [];
+      box.className = ''; box.innerHTML = '';
+      var nb = el('button', { type: 'button', class: 'b' }, '+ ' + t('newL')); nb.addEventListener('click', function () { form(null); }); box.appendChild(nb);
+      if (!ls.length) box.appendChild(el('div', { class: 'note' }, t('noLessons')));
+      ls.forEach(function (l) {
+        var mt = ''; mods.forEach(function (m) { if (m.id === l.module_id) mt = lang() === 'en' ? m.title_en : m.title_es; });
+        var d = el('div', { class: 'les' }, '<b>' + esc(l.title_es) + '</b><div class="note">' + esc(mt || l.module_id) + '</div>');
+        var r = el('div', { class: 'row' }), eb = el('button', { type: 'button', class: 'b g' }, t('edit')), db = el('button', { type: 'button', class: 'b g' }, t('del'));
+        eb.addEventListener('click', function () { form(l); });
+        db.addEventListener('click', function () { if (confirm(t('confirmDel'))) SB.from('lessons').delete().eq('id', l.id).then(function () { drawAdmin(); }); });
+        r.appendChild(eb); r.appendChild(db); d.appendChild(r); box.appendChild(d);
+      });
+      function form(l) {
+        box.innerHTML = '';
+        var opts = mods.map(function (m) { return '<option value="' + esc(m.id) + '"' + (l && l.module_id === m.id ? ' selected' : '') + '>' + esc(lang() === 'en' ? m.title_en : m.title_es) + '</option>'; }).join('');
+        var f = el('div', { class: 'les' }, '<label>' + t('module') + '<select id="f-mod">' + opts + '</select></label>'
+          + '<label>' + t('titleEs') + '<input id="f-te" type="text"></label><label>' + t('titleEn') + '<input id="f-tn" type="text"></label>'
+          + '<label>' + t('bodyEs') + '<textarea id="f-be"></textarea></label><label>' + t('bodyEn') + '<textarea id="f-bn"></textarea></label>'
+          + '<div class="note" id="f-msg"></div><div class="row"><button class="b" id="f-save" type="button">' + t('save') + '</button><button class="b g" id="f-cancel" type="button">' + t('close') + '</button></div>');
+        box.appendChild(f);
+        f.querySelector('#f-te').value = l ? l.title_es : ''; f.querySelector('#f-tn').value = l ? l.title_en : '';
+        f.querySelector('#f-be').value = l ? l.body_es : ''; f.querySelector('#f-bn').value = l ? l.body_en : '';
+        f.querySelector('#f-cancel').addEventListener('click', drawAdmin);
+        f.querySelector('#f-save').addEventListener('click', function () {
+          var row = { module_id: f.querySelector('#f-mod').value, title_es: f.querySelector('#f-te').value.trim(), title_en: f.querySelector('#f-tn').value.trim(), body_es: f.querySelector('#f-be').value, body_en: f.querySelector('#f-bn').value };
+          if (!row.title_es) { f.querySelector('#f-msg').textContent = '…'; return; }
+          if (l) row.id = l.id;
+          SB.from('lessons').upsert(row).then(function (r) { if (r.error) f.querySelector('#f-msg').textContent = t('err'); else drawAdmin(); });
+        });
+      }
+    });
   }
   panel.addEventListener('click', function (e) { if (e.target === panel) panel.hidden = true; });
   btn.addEventListener('click', openPanel);
 
-  function loadUsers() {
-    var box = panel.querySelector('#yr-users');
+  function loadUsers(box) {
     Promise.all([
       SB.from('profiles').select('id,email,role,created_at').order('created_at'),
       SB.from('modules').select('id,title_es,title_en,sort').order('sort'),
@@ -143,7 +244,7 @@
   // ───────── arranque ─────────
   function show(sess) {
     session = sess;
-    if (!sess) { document.documentElement.classList.remove('yr-ok'); profile = null; btn.hidden = true; panel.hidden = true; drawGate(); gate.hidden = false; return; }
+    if (!sess) { document.documentElement.classList.remove('yr-ok'); profile = null; btn.hidden = true; panel.hidden = true; adminPage.hidden = true; drawGate(); gate.hidden = false; return; }
     document.documentElement.classList.add('yr-ok');
     gate.hidden = true; btn.hidden = false; btn.textContent = (sess.user.email || '?').charAt(0).toUpperCase();
     SB.from('profiles').select('id,email,role').eq('id', sess.user.id).maybeSingle().then(function (r) {
@@ -152,7 +253,7 @@
     });
   }
   function start() {
-    document.body.appendChild(gate); document.body.appendChild(btn); document.body.appendChild(panel);
+    document.body.appendChild(gate); document.body.appendChild(btn); document.body.appendChild(panel); document.body.appendChild(adminPage);
     gate.innerHTML = '<div class="box"><p>…</p></div>';
     if (!CFG.supabaseUrl || !window.supabase) { gate.innerHTML = '<div class="box"><p>' + t('err') + '</p></div>'; return; }
     SB = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
