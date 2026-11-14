@@ -23680,12 +23680,20 @@ body.stage #app #sk-root .ej-chips .ej-chip[aria-pressed="true"]{background:var(
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 16:00';
-  var BUILD_ID = '2026-11-14T16:00';
+  var BUILD = '14 nov 2026 · 16:01';
+  var BUILD_ID = '2026-11-14T16:01';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
         if (!j || !j.build || j.build === BUILD_ID || document.getElementById('yr-upd')) return;
+        // just opened with an old cached copy: reload straight away with a fresh URL (once per build), no banner needed
+        try {
+          if (performance.now() < 20000 && sessionStorage.getItem('yr-auto') !== j.build) {
+            sessionStorage.setItem('yr-auto', j.build);
+            location.replace(location.pathname + '?v=' + encodeURIComponent(j.build) + (location.hash || ''));
+            return;
+          }
+        } catch (e2) {}
         var es = document.documentElement.lang !== 'en';
         var d = document.createElement('div');
         d.id = 'yr-upd'; d.setAttribute('role', 'status');
