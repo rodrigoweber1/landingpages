@@ -2228,7 +2228,7 @@ renderVals() {
 const lang = this.state.lang;
 const D = {
  "es": {
-  "langAria": "Idioma", "backAria": "Volver al inicio", "title": "Guitarra avanzada", "eyebrow": "Guitarra avanzada", "h1a": "Para ir ", "h1b": "más lejos", "homeLink": "← Inicio",
+  "langAria": "Idioma", "backAria": "Volver al inicio", "title": "Guitarra avanzada", "eyebrow": "Para ir más lejos", "h1a": "Guitarra ", "h1b": "avanzada", "homeLink": "← Inicio",
   "intro": "Teoría, ritmo, escalas, modos e improvisación para cuando ya dominas lo básico. Toca una para abrirla.",
   "iTeoT": "Teoría esencial",
   "iTeoX": "Cómo se forman los acordes: tríadas, séptimas y novenas.",
@@ -2253,7 +2253,7 @@ const D = {
  "x": ""
  },
  "en": {
-  "langAria": "Language", "backAria": "Back to home", "title": "Advanced guitar", "eyebrow": "Advanced guitar", "h1a": "To go ", "h1b": "further", "homeLink": "← Home",
+  "langAria": "Language", "backAria": "Back to home", "title": "Advanced guitar", "eyebrow": "To go further", "h1a": "Advanced ", "h1b": "guitar", "homeLink": "← Home",
   "intro": "Theory, rhythm, scales, modes and improvisation for when you have the basics down. Tap one to open it.",
   "iTeoT": "Essential theory",
   "iTeoX": "How chords are built: triads, sevenths and ninths.",
@@ -2342,7 +2342,7 @@ setTimeout(() => { const r = document.getElementById('sl-root'); if (r && (!r.fi
 const D = {
   "es": {
     "langAria": "Idioma",
-    "eyebrow": "Guitarra principiante",
+    "eyebrow": "Aprende a tu ritmo",
     "h1": "Aprende guitarra desde cero",
     "intro": "De las notas del mástil a tu primer riff de rock. Son nueve módulos: síguelos en orden o salta al que te haga falta.",
     "stepsWord": [
@@ -2509,7 +2509,7 @@ const D = {
   },
   "en": {
     "langAria": "Language",
-    "eyebrow": "Beginner guitar",
+    "eyebrow": "Learn at your pace",
     "h1": "Learn guitar from scratch",
     "intro": "From the notes on the fretboard to your first rock riff. Nine modules: go through them in order or jump to the one you need.",
     "stepsWord": [
@@ -6498,7 +6498,7 @@ const SL_CHEV = '<svg class="sl-chev" viewBox="0 0 24 24" fill="none" stroke="cu
 function rutaSetlist(root, lang) {
   const es = lang !== 'en';
   const T = es ? {
-    eye: 'Guitarra principiante', h1a: 'Tu ', h1b: 'setlist',
+    eye: 'Aprende a tu ritmo', h1a: 'Guitarra ', h1b: 'principiante',
     sub: (n) => n + ' módulos, como los temas de un concierto. Tócalos en orden o salta al que te haga falta.',
     prog: (d, n) => 'Llevas <b>' + d + '</b> de ' + n + ' pantallas', progAria: 'Tu progreso en la ruta',
     hint: 'Marca «Hecho» al terminar cada pantalla. Se guarda en este dispositivo.',
@@ -6507,7 +6507,7 @@ function rutaSetlist(root, lang) {
     foot: '¡Y al final, a tocar con la banda!',
     open: 'Abrir', side: 'Tienes todos los módulos en el menú de la izquierda.', fin: '¡Ruta completa!'
   } : {
-    eye: 'Beginner guitar', h1a: 'Your ', h1b: 'setlist',
+    eye: 'Learn at your pace', h1a: 'Beginner ', h1b: 'guitar',
     sub: (n) => n + ' modules, like the songs in a gig. Play them in order or jump to the one you need.',
     prog: (d, n) => 'You’ve done <b>' + d + '</b> of ' + n + ' screens', progAria: 'Your progress on the path',
     hint: 'Tap «Done» when you finish each screen. It’s saved on this device.',
@@ -23373,8 +23373,8 @@ body.stage .mu-head{--sl-ink:#F4EEE6;--sl-ink2:#CFC6BA}
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 11:58';
-  var BUILD_ID = '2026-11-14T11:58';
+  var BUILD = '14 nov 2026 · 12:02';
+  var BUILD_ID = '2026-11-14T12:02';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
