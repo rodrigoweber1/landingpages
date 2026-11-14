@@ -6224,7 +6224,10 @@ var SONG_YT = {
     var es = lang() === 'es';
     ytMsg.hidden = false;
     ytMsg.innerHTML = '';
-    var p = document.createElement('p'); p.textContent = es ? 'Este v\u00eddeo no se puede reproducir aqu\u00ed.' : 'This video cannot be played here.';
+    var local = location.protocol === 'file:';
+    var p = document.createElement('p'); p.textContent = local
+      ? (es ? 'YouTube no reproduce v\u00eddeos en una app abierta como archivo del ordenador. Abre la app desde su direcci\u00f3n web.' : 'YouTube does not play videos in an app opened as a file on the computer. Open the app from its web address.')
+      : (es ? 'Este v\u00eddeo no se puede reproducir aqu\u00ed.' : 'This video cannot be played here.');
     var a = document.createElement('a'); a.href = 'https://www.youtube.com/watch?v=' + id; a.target = '_blank'; a.rel = 'noopener'; a.textContent = es ? 'Verlo en YouTube' : 'Watch on YouTube';
     ytMsg.appendChild(p); ytMsg.appendChild(a);
   }
@@ -6232,7 +6235,7 @@ var SONG_YT = {
     ytBox.innerHTML = ''; var el = document.createElement('div'); ytBox.appendChild(el);
     yt = new window.YT.Player(el, {
       width: '100%', height: '100%', videoId: id,
-      playerVars: { playsinline: 1, rel: 0, modestbranding: 1, autoplay: 1 },
+      playerVars: { playsinline: 1, rel: 0, modestbranding: 1, autoplay: 1, origin: location.origin, widget_referrer: location.href.split('#')[0] },
       events: {
         onReady: function (e) { try { e.target.setPlaybackRate(rate); e.target.playVideo(); } catch (err) {} },
         onStateChange: function (e) { try { setPlaying(e.data === 1); if (e.data === 1 && e.target.getPlaybackRate() !== rate) e.target.setPlaybackRate(rate); } catch (err) {} },
@@ -6242,6 +6245,8 @@ var SONG_YT = {
   }
   function playYt(id) {
     mode('yt'); ytMsg.hidden = true; ytPending = id;
+    // opened as a local file YouTube answers "error 153" (no web address to check): explain it instead of showing a broken player
+    if (location.protocol === 'file:') { ytFail(id); return; }
     try { if (spCtrl && spCtrl.pause) spCtrl.pause(); } catch (e) {}
     if (yt && yt.loadVideoById) { try { yt.loadVideoById(id); yt.setPlaybackRate(rate); return; } catch (e) {} }
     if (window.YT && window.YT.Player) { ytMake(id); return; }
@@ -23661,8 +23666,8 @@ body.stage #app #sk-root .ej-chips .ej-chip[aria-pressed="true"]{background:var(
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 15:46';
-  var BUILD_ID = '2026-11-14T15:46';
+  var BUILD = '14 nov 2026 · 15:48';
+  var BUILD_ID = '2026-11-14T15:48';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
