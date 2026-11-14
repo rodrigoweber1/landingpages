@@ -6150,15 +6150,15 @@ C["Biblioteca"] = (DCLogic) => {
 // Plays the YouTube video when SONG_YT has one (full song, no login, speed control); otherwise the Spotify embed (30 s preview).
 // SONG_YT: Spotify track id -> YouTube video id. Fill the ids here as the links arrive (the 11 characters after v= in the link).
 var SONG_YT = {
-  '5F1PDuoQ9ajtBnKAPVOqT4': '', // 1 The Sky Is Crying - Albert King
-  '2iXcvnD3d1gfLBum0cE5Eg': '', // 2 Tutti Frutti - Little Richard
-  '7FXj7Qg3YorUxdrzvrcY25': '', // 3 Fly Me to the Moon - Frank Sinatra
-  '4Y3WqmBWmG23thvU9xEhMv': '', // 4 Easy - Commodores
-  '3K7Q9PHUWPTaknlbFPThn2': '', // 5 Celebration - Kool & the Gang
-  '5PklEat9V4riVvqfQmXrGs': '', // 6 Paint It Black - The Rolling Stones
-  '7vggqxNKwd6xdRoYS0pQtM': '', // 7 Three Little Birds - Bob Marley & The Wailers
-  '2z71jdeVcC782NgsYZ6N8q': '', // 8 Paranoid - Black Sabbath
-  '2T3jgoAMbBXiMMD8pSc6QL': ''  // 9 This Is the Life - Amy Macdonald
+  '5F1PDuoQ9ajtBnKAPVOqT4': '4l5IdDb2Xxs', // 1 The Sky Is Crying - Albert King
+  '2iXcvnD3d1gfLBum0cE5Eg': 'F13JNjpNW6c', // 2 Tutti Frutti - Little Richard
+  '7FXj7Qg3YorUxdrzvrcY25': 'JYuyWrkwpok', // 3 Fly Me to the Moon - Frank Sinatra
+  '4Y3WqmBWmG23thvU9xEhMv': '9nBSd1U18vM', // 4 Easy - Commodores
+  '3K7Q9PHUWPTaknlbFPThn2': '3GwjfUFyY6M', // 5 Celebration - Kool & the Gang
+  '5PklEat9V4riVvqfQmXrGs': 'O4irXQhgMqg', // 6 Paint It Black - The Rolling Stones
+  '7vggqxNKwd6xdRoYS0pQtM': 'LanCLS_hIo4', // 7 Three Little Birds - Bob Marley & The Wailers
+  '2z71jdeVcC782NgsYZ6N8q': '0qanF-91aJo', // 8 Paranoid - Black Sabbath
+  '2T3jgoAMbBXiMMD8pSc6QL': 'iRYvuS9OxdA'  // 9 This Is the Life - Amy Macdonald
 };
 (function () {
   var dock = null, ytBox = null, ytMsg = null, spBox = null, rateRow = null;
@@ -23590,8 +23590,8 @@ body.stage .sp-open{color:var(--st-mute)!important}
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 14:21';
-  var BUILD_ID = '2026-11-14T14:21';
+  var BUILD = '14 nov 2026 · 15:00';
+  var BUILD_ID = '2026-11-14T15:00';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
