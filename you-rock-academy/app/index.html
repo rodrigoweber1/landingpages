@@ -23352,6 +23352,15 @@ body.stage #side.sd-sl .sd-nav a.sd-mod.on{background:#2A1416}
 @media (hover:hover) and (pointer:fine){body.stage #side.sd-sl .sd-nav a.sd-mod:hover{background:rgba(255,255,255,.03)}}
 /* on a wide screen the list lives in the side menu, like Principiante: the page keeps the title and the intro */
 @media (min-width:900px){#av-root .sl-list,body.stage #app .mu-head ~ .yl-list,body.stage #app .mu-head ~ nav.yl-list{display:none!important}}
+/* Principiante on the phone: the open module lists its screens like the desktop side menu (flat rows, white text, red numbers, no red ring after a tap) */
+body.stage #sl-root .sl-steps{gap:0;padding:0 0 12px}
+body.stage #sl-root .sl-step{background:transparent!important;border-radius:6px}
+body.stage #sl-root .sl-step a{min-height:44px;padding:8px 8px 8px 4px;gap:8px;color:var(--st-ink)!important;font-size:15px}
+body.stage #sl-root .sl-n{min-width:34px;text-align:left;color:var(--st-redInk,#FF6066)!important}
+body.stage #sl-root .sl-t{color:var(--st-ink)!important}
+body.stage #sl-root .sl-ok .sl-t{color:var(--st-mute)!important}
+@media (hover:hover) and (pointer:fine){body.stage #sl-root .sl-step a:hover{background:rgba(255,255,255,.05)}}
+@media (hover:none){body.stage #app #sl-root .sl-row:focus-visible,body.stage #app #sl-root .sl-step a:focus-visible,body.stage #app #av-root a:focus-visible{outline:none!important}}
 @media (min-width:900px){#yr-mini{display:none}}
 @media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
 </style>
@@ -23406,8 +23415,8 @@ body.stage #side.sd-sl .sd-nav a.sd-mod.on{background:#2A1416}
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 12:50';
-  var BUILD_ID = '2026-11-14T12:50';
+  var BUILD = '14 nov 2026 · 12:59';
+  var BUILD_ID = '2026-11-14T12:59';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
