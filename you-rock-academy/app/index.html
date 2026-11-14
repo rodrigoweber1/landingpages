@@ -1699,14 +1699,22 @@ html body.stage #app .stg-home>header .stg-h1{margin:0!important;max-width:none!
 body.stage #app .stg-home .stg-h1r{display:block;color:var(--st-red,#E31B23)}
 body.stage #app .stg-home .stg-intro{max-width:340px;margin:6px auto 0!important;text-align:center}
 @media (min-width:900px){html body.stage #app .stg-home>header .stg-h1{font-size:76px!important}}
-body.stage #app .rs{background:var(--st-red)!important;box-shadow:none!important;border-radius:22px!important}
+body.stage #app .rs{background:var(--st-floor)!important;box-shadow:none!important;border:1px solid rgba(244,238,230,.09)!important;border-radius:16px!important}
 body.stage #app .rs::before{display:none!important}
-body.stage #app .rs-e,body.stage #app .rs-t,body.stage #app .rs-n{color:#FFFFFF!important}
-body.stage #app .rs-m{color:rgba(255,255,255,.85)!important}
-body.stage #app .rs-e{opacity:.92}
-body.stage #app .rs-b{background:rgba(255,255,255,.3)!important}
-body.stage #app .rs-b span{background:linear-gradient(90deg,#FFFFFF,#FFC400)!important}
-body.stage #app .rs-go{background:#FFFFFF!important;color:var(--st-red,#E31B23)!important}
+body.stage #app .rs-b span{background:linear-gradient(90deg,#E31B23,#FFC400)!important}
+/* the home list as flat cards (thin border, tag, title, text, round arrow) */
+body.stage #app .stg-home .stg-grid{border-top:0!important;gap:10px!important}
+html body.stage #app .stg-home .stg-grid>.stg-row{display:grid!important;grid-template-columns:minmax(0,1fr) 36px;column-gap:12px;row-gap:4px;align-items:center;padding:18px!important;border:1px solid rgba(244,238,230,.09)!important;border-bottom:1px solid rgba(244,238,230,.09)!important;border-radius:16px!important;background:var(--st-floor)!important;box-shadow:none!important}
+html body.stage #app .stg-home .stg-grid>.stg-row .stg-ico{display:none!important}
+html body.stage #app .stg-home .stg-grid>.stg-row .stg-go{grid-column:2;grid-row:1/6;width:36px!important;height:36px!important;padding:8px;box-sizing:border-box;border-radius:50%;background:var(--st-floor2)!important;box-shadow:none!important;stroke:var(--st-ink)!important}
+html body.stage #app .stg-home .stg-grid>.stg-row .stg-sr{position:static!important;grid-column:1;justify-self:start;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;margin-bottom:2px;padding:2px 10px;border:1px solid var(--st-mute);border-radius:999px;color:var(--st-mute)!important;font:600 11px/18px 'Inter',sans-serif!important;letter-spacing:.04em}
+html body.stage #app .stg-home .stg-grid>.stg-row h2{grid-column:1;font-size:22px!important;line-height:1.1!important}
+html body.stage #app .stg-home .stg-grid>.stg-row p{grid-column:1;font-size:14px!important;line-height:20px!important}
+html body.stage #app .stg-home .stg-grid>.stg-row .stg-meta{grid-column:1;margin-top:4px;color:var(--st-mute)!important;font-size:12px!important;font-weight:500!important}
+html body.stage #app .stg-home .stg-grid>.stg-row:first-child{border-color:rgba(255,196,0,.35)!important}
+html body.stage #app .stg-home .stg-grid>.stg-row:first-child .stg-sr{border-color:#FFC400;color:#FFC400!important;box-shadow:0 0 12px -2px #FFC400}
+html body.stage #app .stg-home .stg-grid>.stg-row:first-child .stg-go{background:#FFC400!important;stroke:#0D0B0A!important}
+html body.stage #app .stg-home .stg-grid>.stg-soon{padding:16px 18px!important;border:1px dashed rgba(244,238,230,.14)!important;border-radius:16px!important;background:transparent!important;opacity:.6}
 /* ===== fin hero de la home ===== */
 /* ===== one list style across the app, taken from the Ruta list: wide heavy title in caps, grey second line, dashed rules, outline numbers ===== */
 body.stage #app .stg-home .stg-grid{border-top:2px solid var(--st-ink)}
@@ -23337,8 +23345,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 09:15';
-  var BUILD_ID = '2026-11-14T09:15';
+  var BUILD = '14 nov 2026 · 09:19';
+  var BUILD_ID = '2026-11-14T09:19';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
