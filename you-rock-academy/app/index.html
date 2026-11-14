@@ -23575,6 +23575,10 @@ body.stage .sp-open{color:var(--st-mute)!important}
 #sp-dock[data-min="true"] .yt-rates,#sp-dock[data-min="true"] .yt-msg{display:none!important}
 @media (min-width:900px){#sp-dock{left:auto;right:24px;bottom:24px;width:380px}}
 /* ===== fin reproductor ===== */
+/* segmented control "Bajo / Guitarra / Los dos": equal cells, text centred, red pill for the chosen one */
+body.stage #app #sk-root .ej-chips{display:flex!important;flex-wrap:nowrap!important;gap:4px!important}
+body.stage #app #sk-root .ej-chips .ej-chip{flex:1 1 0!important;min-width:0;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;text-align:center!important;min-height:44px!important;padding:0 10px!important;border:0!important;background:transparent!important;color:var(--st-ink2)!important;font:700 14px/20px 'Inter',system-ui,sans-serif!important;white-space:nowrap}
+body.stage #app #sk-root .ej-chips .ej-chip[aria-pressed="true"]{background:var(--st-red,#E31B23)!important;color:#fff!important}
 @media (min-width:900px){#yr-mini{display:none}body.home #yr-mini{display:flex;left:max(24px,calc(50% - 460px));right:auto;width:920px;max-width:calc(100% - 48px);border-radius:0 0 20px 20px;border:1px solid #3A302A;border-top:0;padding:6px 28px 6px 32px!important}}
 @media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
 </style>
@@ -23629,8 +23633,8 @@ body.stage .sp-open{color:var(--st-mute)!important}
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 15:32';
-  var BUILD_ID = '2026-11-14T15:32';
+  var BUILD = '14 nov 2026 · 15:34';
+  var BUILD_ID = '2026-11-14T15:34';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
