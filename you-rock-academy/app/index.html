@@ -21270,8 +21270,23 @@ function slSideMeta(m, i, dn, en) {
   if (d === n) return head + (en ? 'Done' : 'Terminado') + ' · ' + scr;
   return head + (d ? d + (en ? ' of ' : ' de ') + scr : scr);
 }
+// side menu lists for Música (songs), Guitarra avanzada and Herramientas: same numbered rows as the Principiante menu
+const HUBLIST = {
+  es: { av: [["TeoriaAcordes","Teoría esencial","Cómo se forman los acordes: tríadas, séptimas y novenas."],["Batidas","Ritmos de acompañamiento","Patrones de rasgueo para practicar."],["RitmoAvanzado","Ritmo avanzado","Seis patrones: corcheas, semicorcheas, galope, síncopa, contratiempo y shuffle."],["ImproEj","Improvisación guiada","Lleva una frase por varias posiciones y muévete por todo el mástil."],["Teoria","Teoría de escalas","Cómo se construye una escala: tonos y semitonos."],["Posiciones","Escalas en 5 posiciones","Las cinco posiciones de la escala sobre el mástil."],["Arpegios","Arpegios en el mástil","Los arpegios de los acordes sobre el mástil."],["Modos","Modos: mixolidio y dórico","Los modos mixolidio y dórico sobre el mástil."],["ModosCurso","Modos como concepto","Qué son los modos y de dónde salen."],["MenoresAv","Menor armónica y melódica","Las escalas menor armónica y menor melódica."]],
+    tl: [["OtrasAfinaciones","Afinador","Afina con el micrófono en estándar, medio tono abajo o Drop D."],["Pulso","Metrónomo","BPM, compás y sonido del clic."],["Braco","Las notas en la guitarra","Todas las notas sobre el mástil."],["Biblioteca","Biblioteca","Todas las lecciones y canciones en una lista, con buscador y filtros."],["Oido","Entrenamiento de oído","Reconoce intervalos, acordes y notas sin mirar el mástil."],["Buscador","Buscador de acordes","Escribe un acorde y te enseño sus posiciones."],["CambioAcordes","Cambio de acordes","Un mástil animado al ritmo del metrónomo."],["PowerQuiz","Quiz de power chords","Mira el diagrama y adivina qué power chord es."],["Cejillas","Acordes con cejilla","Las formas de Mi, La, Re y Do recorriendo el mástil."],["Acentos","Acentuación con la púa","Acentos y dirección de la púa."],["Aranha","La araña","Ejercicio de digitación para la mano izquierda."]],
+    song: ["Delta Blues","Rock n' Roll","Jazz / Swing","Balada","Disco","Rock","Reggae","Hard rock","Country"] },
+  en: { av: [["TeoriaAcordes","Essential theory","How chords are built: triads, sevenths and ninths."],["Batidas","Accompaniment rhythms","Strumming patterns to practice."],["RitmoAvanzado","Advanced rhythm","Six patterns: eighths, sixteenths, gallop, syncopation, offbeat and shuffle."],["ImproEj","Guided improvisation","Take a phrase through several positions and move around the whole neck."],["Teoria","Scale theory","How a scale is built: whole steps and half steps."],["Posiciones","Scales in 5 positions","The five positions of the scale on the neck."],["Arpegios","Arpeggios on the fretboard","Chord arpeggios on the neck."],["Modos","Modes: mixolydian and dorian","The mixolydian and dorian modes on the neck."],["ModosCurso","Modes as a concept","What modes are and where they come from."],["MenoresAv","Harmonic and melodic minor","The harmonic and melodic minor scales."]],
+    tl: [["OtrasAfinaciones","Tuner","Tune with the microphone in standard, half step down or Drop D."],["Pulso","Metronome","BPM, time signature and click sound."],["Braco","Notes on the guitar","Every note on the fretboard."],["Biblioteca","Library","All lessons and songs in one list, with search and filters."],["Oido","Ear training","Recognise intervals, chords and notes without looking at the neck."],["Buscador","Chord finder","Type a chord and I\u2019ll show you its positions."],["CambioAcordes","Chord changes","An animated neck in time with the metronome."],["PowerQuiz","Power chord quiz","Look at the diagram and guess which power chord it is."],["Cejillas","Barre chords","The E, A, D and C shapes travelling along the neck."],["Acentos","Picking accents","Accents and pick direction."],["Aranha","The spider","Fingering exercise for the left hand."]],
+    song: ["Delta Blues","Rock n' Roll","Jazz / Swing","Ballad","Disco","Rock","Reggae","Hard rock","Country"] }
+};
+const SD_CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+function sdRows(items, name) {
+  return items.map((it, i) => '<a class="sd-mod' + (it.href === name ? ' on' : '') + '" href="#/' + it.href + '"' + (it.href === name ? ' aria-current="page"' : '') + '><span class="n">' + String(i + 1).padStart(2, '0') + '</span><span class="t">' + esc(it.t) + '<small class="sm">' + esc(it.s) + '</small></span>' + SD_CHEV + '</a>').join('');
+}
 function renderSide(name, lang) {
-  const key = name + '|' + lang + '|' + menu;
+  const hubMode = name === 'Avanzada' || name === 'Herramientas' || (toolsMode && TOOLS.indexOf(name) >= 0);
+  const hubKey = hubMode ? ((name === 'Avanzada' || ADV.indexOf(name) >= 0) ? 'av' : 'tl') : null;
+  const key = name + '|' + lang + '|' + menu + '|' + hubKey;
   if (key === sideKey) return;
   sideKey = key;
   const nav = menuNav(lang);
@@ -21294,13 +21309,16 @@ function renderSide(name, lang) {
   const dn = isRuta && HECHO_ON ? slDoneGet() : null;
   let nowMod = curMod;
   if (dn && nowMod < 0) nowMod = nav.mods.findIndex((m) => m.steps.some((s) => !dn.has(s.href)));
-  nav.mods.forEach((m, i) => {
+  let customRows = null;
+  if (hubKey) customRows = sdRows(HUBLIST[lang === 'en' ? 'en' : 'es'][hubKey].map((r) => ({ href: r[0], t: r[1], s: r[2] })), name);
+  else if (menu === 'musica' && nav.mods[0]) { const sty = HUBLIST[lang === 'en' ? 'en' : 'es'].song; customRows = sdRows(nav.mods[0].steps.map((st, i) => ({ href: base(st.href), t: st.label, s: sty[i] || '' })), name); }
+  if (customRows !== null) h += customRows; else nav.mods.forEach((m, i) => {
     const mCls = dn ? ((m.steps.every((s) => dn.has(s.href)) ? 'sd-mdone' : '') + (i === nowMod ? ' sd-mnow' : '')).trim() : '';
     h += '<details data-i="' + i + '"' + (mCls ? ' class="' + mCls + '"' : '') + (opens.has(i) ? ' open' : '') + '><summary><span class="n">' + String(i + 1).padStart(2, '0') + '</span><span class="t">' + esc(m.title) + '<small class="sm">' + esc(isRuta ? slSideMeta(m, i, dn || new Set(), en) : (m.steps.length + (menu === 'musica' ? (en ? (m.steps.length === 1 ? ' song' : ' songs') : (m.steps.length === 1 ? ' canción' : ' canciones')) : (en ? (m.steps.length === 1 ? ' screen' : ' screens') : (m.steps.length === 1 ? ' pantalla' : ' pantallas'))))) + '</small></span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>';
     m.steps.forEach((st, si) => { const on = base(st.href) === name || (st.href === 'ArmoniaAv' && AV_SUBS.indexOf(name) >= 0); h += '<a class="it' + (on ? ' on' : '') + (dn && dn.has(st.href) ? ' dn' : '') + '" href="#/' + st.href + '"' + (on ? ' aria-current="page"' : '') + '>' + (menu === 'ruta' ? '<b class="sn">' + (i + 1) + '.' + (si + (m.z ? 0 : 1)) + '</b> ' : '') + esc(st.label) + '</a>'; });
     h += '</details>';
   });
-  h += '</div><div class="sd-foot">'
+  h += hubKey ? '</div><div class="sd-foot" style="display:none">' : '</div><div class="sd-foot">'
     + (prev ? '<a class="prev" href="#/' + prev + '"><small>← ' + esc(L.prev) + '</small><span>' + esc(menuLabel(lang, base(prev))) + '</span></a>' : '<a class="prev off"><small>← ' + esc(L.prev) + '</small><span>&nbsp;</span></a>')
     + (next ? '<a class="next" href="#/' + next + '"><small>' + esc(L.next) + ' →</small><span>' + esc(menuLabel(lang, base(next))) + '</span></a>' : '<a class="next off"><small>' + esc(L.next) + ' →</small><span>&nbsp;</span></a>')
     + '<div class="sd-key">' + esc(L.key) + '</div></div>';
@@ -23324,6 +23342,16 @@ body.stage #app .mu-head .sl-h1{font-size:clamp(36px,8vw,72px)!important;line-he
 body.stage #app .mu-head .sl-h1 em{color:#E31B23!important}
 body.stage #app .yl-song .yl-num{color:var(--st-ink2,#CFC6BA)!important}
 body.stage #app .yl-song .yl-s{color:#A39A8E!important}
+/* side menu rows for Música, Guitarra avanzada and Herramientas (same look as the Principiante modules) */
+body.stage #side.sd-sl .sd-nav a.sd-mod{display:grid;grid-template-columns:52px minmax(0,1fr) 22px;align-items:center;gap:10px;box-sizing:border-box;min-height:72px;padding:12px 2px;border-bottom:1px dashed var(--st-rule,#3A302A);color:var(--st-ink)}
+body.stage #side.sd-sl .sd-nav a.sd-mod .n{font:400 34px/1 'Inter',system-ui,sans-serif;letter-spacing:-.03em;color:transparent;-webkit-text-stroke:1.5px var(--st-ink)}
+body.stage #side.sd-sl .sd-nav a.sd-mod .t{min-width:0;font:400 17px/1.15 'Archivo Black',sans-serif;letter-spacing:0;text-transform:uppercase;color:var(--st-ink)}
+body.stage #side.sd-sl .sd-nav a.sd-mod .t .sm{display:block;margin-top:2px;font:400 13px/18px 'Inter',system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--st-mute)}
+body.stage #side.sd-sl .sd-nav a.sd-mod .chev{width:22px;height:22px;stroke:var(--st-mute)}
+body.stage #side.sd-sl .sd-nav a.sd-mod.on{background:#2A1416}
+@media (hover:hover) and (pointer:fine){body.stage #side.sd-sl .sd-nav a.sd-mod:hover{background:rgba(255,255,255,.03)}}
+/* on a wide screen the list lives in the side menu, like Principiante: the page keeps the title and the intro */
+@media (min-width:900px){#av-root .sl-list,body.stage #app .mu-head ~ .yl-list,body.stage #app .mu-head ~ nav.yl-list{display:none!important}}
 @media (min-width:900px){#yr-mini{display:none}}
 @media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
 </style>
@@ -23378,8 +23406,8 @@ body.stage #app .yl-song .yl-s{color:#A39A8E!important}
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 12:14';
-  var BUILD_ID = '2026-11-14T12:14';
+  var BUILD = '14 nov 2026 · 12:23';
+  var BUILD_ID = '2026-11-14T12:23';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
