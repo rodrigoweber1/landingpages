@@ -23305,6 +23305,8 @@ try { route(); } catch (e) { fail(e); }
 /* Música / Herramientas: the compact logo bar stays on, the old bar with arrow is hidden, the title moves into the page */
 @media (max-width:899px){
 body.yr-always #app>div>header{display:block!important;position:static!important;visibility:hidden!important;height:auto!important;min-height:0!important;padding:calc(env(safe-area-inset-top) + 66px) 16px 0!important;border:0!important;box-shadow:none!important}
+body.yr-logohub #app>div>header{padding-top:calc(env(safe-area-inset-top) + 58px)!important}
+body.yr-logohub #app>div>header>div:first-child,body.yr-logohub #app>div>header a[href="#/Inicio"]{display:none!important}
 body.yr-always #app>div>header>:not(h1){display:none!important}
 body.yr-always #app>div>header h1{visibility:visible!important;display:block!important;margin:0 0 4px!important;text-align:left!important;font-size:28px!important;line-height:1.05!important;white-space:normal!important}
 }
@@ -23362,8 +23364,8 @@ body.yr-always #app>div>header h1{visibility:visible!important;display:block!imp
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 11:49';
-  var BUILD_ID = '2026-11-14T11:49';
+  var BUILD = '14 nov 2026 · 11:54';
+  var BUILD_ID = '2026-11-14T11:54';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
@@ -23400,7 +23402,9 @@ body.yr-always #app>div>header h1{visibility:visible!important;display:block!imp
       // the compact bar belongs to the night look; the light home keeps its own header
       if (document.body.classList.contains('stage')) { on = true; build(p); }
     }
-    if (p && p.hub && !home && p.btns.length && document.body.classList.contains('stage') && (window.scrollY || 0) > 90) { on = true; build(p); }
+    var lh = !!(p && p.hub && !p.always && !home && p.btns.length && document.body.classList.contains('stage'));
+    if (lh) { on = true; build(p); }
+    document.body.classList.toggle('yr-logohub', lh);
     var al = !!(p && p.always && document.body.classList.contains('stage') && p.btns.length);
     if (al) { on = true; build(p); }
     document.body.classList.toggle('yr-always', al);
