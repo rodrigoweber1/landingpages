@@ -6146,47 +6146,118 @@ C["Biblioteca"] = (DCLogic) => {
   }
   return Component;
 };
-// Spotify: one persistent player for the whole app. The buttons only tell it which track to load.
+// Reference version of each song: one persistent window for the whole app.
+// Plays the YouTube video when SONG_YT has one (full song, no login, speed control); otherwise the Spotify embed (30 s preview).
+// SONG_YT: Spotify track id -> YouTube video id. Fill the ids here as the links arrive (the 11 characters after v= in the link).
+var SONG_YT = {
+  '5F1PDuoQ9ajtBnKAPVOqT4': '', // 1 The Sky Is Crying - Albert King
+  '2iXcvnD3d1gfLBum0cE5Eg': '', // 2 Tutti Frutti - Little Richard
+  '7FXj7Qg3YorUxdrzvrcY25': '', // 3 Fly Me to the Moon - Frank Sinatra
+  '4Y3WqmBWmG23thvU9xEhMv': '', // 4 Easy - Commodores
+  '3K7Q9PHUWPTaknlbFPThn2': '', // 5 Celebration - Kool & the Gang
+  '5PklEat9V4riVvqfQmXrGs': '', // 6 Paint It Black - The Rolling Stones
+  '7vggqxNKwd6xdRoYS0pQtM': '', // 7 Three Little Birds - Bob Marley & The Wailers
+  '2z71jdeVcC782NgsYZ6N8q': '', // 8 Paranoid - Black Sabbath
+  '2T3jgoAMbBXiMMD8pSc6QL': ''  // 9 This Is the Life - Amy Macdonald
+};
 (function () {
-  var dock = null, host = null, ctrl = null, api = null, loading = false, pending = null;
+  var dock = null, ytBox = null, ytMsg = null, spBox = null, rateRow = null;
+  var yt = null, ytLoading = false, ytPending = null, rate = 1;
+  var spCtrl = null, spLoading = false, spPending = null;
+  function lang() { try { return localStorage.getItem('guitar.lang') === 'en' ? 'en' : 'es'; } catch (e) { return 'es'; } }
   function build() {
     if (dock) return;
-    dock = document.createElement('div'); dock.id = 'sp-dock'; dock.setAttribute('role', 'region'); dock.setAttribute('aria-label', 'Spotify');
-    host = document.createElement('div');
-    var x = document.createElement('button'); x.type = 'button'; x.className = 'sp-x'; x.setAttribute('aria-label', 'Cerrar'); x.textContent = '\u00d7';
-    x.addEventListener('click', function () { try { if (ctrl && ctrl.pause) ctrl.pause(); } catch (e) {} dock.removeAttribute('data-on'); });
-    dock.appendChild(x); dock.appendChild(host); document.body.appendChild(dock);
+    dock = document.createElement('div'); dock.id = 'sp-dock'; dock.setAttribute('role', 'region'); dock.setAttribute('aria-label', 'Player');
+    var x = document.createElement('button'); x.type = 'button'; x.className = 'sp-x'; x.setAttribute('aria-label', 'Cerrar / Close'); x.textContent = '\u00d7';
+    x.addEventListener('click', function () {
+      try { if (yt && yt.pauseVideo) yt.pauseVideo(); } catch (e) {}
+      try { if (spCtrl && spCtrl.pause) spCtrl.pause(); } catch (e) {}
+      dock.removeAttribute('data-on');
+    });
+    ytBox = document.createElement('div'); ytBox.className = 'yt-box';
+    ytMsg = document.createElement('div'); ytMsg.className = 'yt-msg'; ytMsg.hidden = true;
+    rateRow = document.createElement('div'); rateRow.className = 'yt-rates'; rateRow.setAttribute('role', 'group'); rateRow.setAttribute('aria-label', 'Speed');
+    [0.5, 0.75, 1].forEach(function (r) {
+      var c = document.createElement('button'); c.type = 'button'; c.className = 'yt-rate'; c.setAttribute('data-r', r);
+      c.textContent = String(r).replace('.', ',') + '\u00d7'; c.setAttribute('aria-pressed', r === rate ? 'true' : 'false');
+      c.addEventListener('click', function () {
+        rate = r; Array.prototype.forEach.call(rateRow.children, function (k) { k.setAttribute('aria-pressed', k === c ? 'true' : 'false'); });
+        try { if (yt && yt.setPlaybackRate) yt.setPlaybackRate(rate); } catch (e) {}
+      });
+      rateRow.appendChild(c);
+    });
+    spBox = document.createElement('div'); spBox.className = 'sp-box';
+    dock.appendChild(x); dock.appendChild(ytBox); dock.appendChild(ytMsg); dock.appendChild(rateRow); dock.appendChild(spBox);
+    document.body.appendChild(dock);
   }
-  function plain(id) {
-    // fallback without the Spotify script: a plain embed iframe
-    host.innerHTML = '';
+  function mode(m) { build(); dock.setAttribute('data-on', 'true'); dock.setAttribute('data-mode', m); }
+  // ---- YouTube
+  function ytFail(id) {
+    var es = lang() === 'es';
+    ytMsg.hidden = false;
+    ytMsg.innerHTML = '';
+    var p = document.createElement('p'); p.textContent = es ? 'Este v\u00eddeo no se puede reproducir aqu\u00ed.' : 'This video cannot be played here.';
+    var a = document.createElement('a'); a.href = 'https://www.youtube.com/watch?v=' + id; a.target = '_blank'; a.rel = 'noopener'; a.textContent = es ? 'Verlo en YouTube' : 'Watch on YouTube';
+    ytMsg.appendChild(p); ytMsg.appendChild(a);
+  }
+  function ytMake(id) {
+    ytBox.innerHTML = ''; var el = document.createElement('div'); ytBox.appendChild(el);
+    yt = new window.YT.Player(el, {
+      width: '100%', height: '100%', videoId: id,
+      playerVars: { playsinline: 1, rel: 0, modestbranding: 1, autoplay: 1 },
+      events: {
+        onReady: function (e) { try { e.target.setPlaybackRate(rate); e.target.playVideo(); } catch (err) {} },
+        onStateChange: function (e) { try { if (e.data === 1 && e.target.getPlaybackRate() !== rate) e.target.setPlaybackRate(rate); } catch (err) {} },
+        onError: function () { ytFail(ytPending || id); }
+      }
+    });
+  }
+  function playYt(id) {
+    mode('yt'); ytMsg.hidden = true; ytPending = id;
+    try { if (spCtrl && spCtrl.pause) spCtrl.pause(); } catch (e) {}
+    if (yt && yt.loadVideoById) { try { yt.loadVideoById(id); yt.setPlaybackRate(rate); return; } catch (e) {} }
+    if (window.YT && window.YT.Player) { ytMake(id); return; }
+    if (ytLoading) return;
+    ytLoading = true;
+    var prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = function () { try { if (prev) prev(); } catch (e) {} ytMake(ytPending); };
+    var sc = document.createElement('script'); sc.src = 'https://www.youtube.com/iframe_api'; sc.async = true;
+    sc.onerror = function () { ytLoading = false; ytFail(ytPending); };
+    document.head.appendChild(sc);
+  }
+  // ---- Spotify (songs without a YouTube video yet)
+  function spPlain(id) {
+    spBox.innerHTML = '';
     var f = document.createElement('iframe');
     f.src = 'https://open.spotify.com/embed/track/' + id + '?utm_source=generator&theme=0';
     f.height = '152'; f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture'; f.loading = 'lazy';
-    host.appendChild(f);
+    spBox.appendChild(f);
   }
-  function play(id) {
-    build(); dock.setAttribute('data-on', 'true');
+  function playSp(id) {
+    mode('sp');
+    try { if (yt && yt.pauseVideo) yt.pauseVideo(); } catch (e) {}
     var uri = 'spotify:track:' + id;
-    if (ctrl) { try { ctrl.loadUri(uri); ctrl.play(); } catch (e) { plain(id); } return; }
-    pending = id;
-    if (loading) return;
-    loading = true;
+    if (spCtrl) { try { spCtrl.loadUri(uri); spCtrl.play(); } catch (e) { spPlain(id); } return; }
+    spPending = id;
+    if (spLoading) return;
+    spLoading = true;
     var done = false;
-    var timer = setTimeout(function () { if (!done) { done = true; plain(pending); } }, 4000);
+    var timer = setTimeout(function () { if (!done) { done = true; spPlain(spPending); } }, 4000);
     window.onSpotifyIframeApiReady = function (A) {
-      if (done) return; done = true; clearTimeout(timer); api = A;
-      var el = document.createElement('div'); host.innerHTML = ''; host.appendChild(el);
-      api.createController(el, { uri: 'spotify:track:' + pending, width: '100%', height: 152, theme: 0 }, function (c) { ctrl = c; try { c.play(); } catch (e) {} });
+      if (done) return; done = true; clearTimeout(timer);
+      var el = document.createElement('div'); spBox.innerHTML = ''; spBox.appendChild(el);
+      A.createController(el, { uri: 'spotify:track:' + spPending, width: '100%', height: 152, theme: 0 }, function (c) { spCtrl = c; try { c.play(); } catch (e) {} });
     };
     var sc = document.createElement('script'); sc.src = 'https://open.spotify.com/embed/iframe-api/v1'; sc.async = true;
-    sc.onerror = function () { if (!done) { done = true; clearTimeout(timer); plain(pending); } };
+    sc.onerror = function () { if (!done) { done = true; clearTimeout(timer); spPlain(spPending); } };
     document.head.appendChild(sc);
   }
   document.addEventListener('click', function (e) {
     var b = e.target && e.target.closest ? e.target.closest('.sp-play') : null;
     if (!b) return;
-    e.preventDefault(); play(b.getAttribute('data-sp'));
+    e.preventDefault();
+    var sp = b.getAttribute('data-sp'), v = b.getAttribute('data-yt') || SONG_YT[sp] || '';
+    if (v) playYt(v); else playSp(sp);
   });
 })();
 // ===== fin Celebration al piano =====
@@ -23444,18 +23515,27 @@ body.stage #sl-root .sl-tag,body.stage #sl-root .sl-now .sl-tag{background:trans
 body.stage #side.sd-sl .sd-nav details.sd-mdone summary .n{color:var(--st-ok,#4FD08A)!important}
 body.stage #side.sd-sl .sd-nav details.sd-mdone summary .t{text-decoration-color:var(--st-ok,#4FD08A)!important}
 body.stage #side.sd-sl .sd-nav a.it.dn::after{color:var(--st-ok,#4FD08A)!important}
-/* ===== Spotify: botón en la canción + reproductor fijo ===== */
+/* ===== Reproductor de la versión original (YouTube / Spotify) ===== */
 .sp-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.sp-play{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:999px;background:#1DB954;color:#04210F;font:700 14px/20px 'Inter',system-ui,sans-serif;cursor:pointer}
+.sp-play{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:999px;background:#E31B23;color:#FFFFFF;font:700 14px/20px 'Inter',system-ui,sans-serif;cursor:pointer}
 .sp-play:active{transform:scale(.97)}
 .sp-open{font:500 14px/20px 'Inter',system-ui,sans-serif;color:#3A3A3A;text-decoration:underline;text-underline-offset:3px}
 body.stage .sp-open{color:var(--st-mute)!important}
 #sp-dock{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 84px);z-index:78;display:none;padding:8px;border-radius:16px;background:rgba(23,18,15,.94);border:1px solid #3A302A;box-shadow:0 10px 30px rgba(0,0,0,.6);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 #sp-dock[data-on="true"]{display:block}
-#sp-dock iframe{display:block;width:100%;border:0;border-radius:12px;background:transparent}
-#sp-dock .sp-x{position:absolute;top:-12px;right:-4px;width:30px;height:30px;border:1px solid #3A302A;border-radius:50%;background:#221B17;color:#F4EEE6;font:600 16px/1 'Inter',sans-serif;cursor:pointer}
+#sp-dock .yt-box,#sp-dock .yt-msg,#sp-dock .yt-rates,#sp-dock .sp-box{display:none}
+#sp-dock[data-mode="yt"] .yt-box{display:block;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
+#sp-dock[data-mode="yt"] .yt-box iframe{display:block;width:100%;height:100%;border:0}
+#sp-dock[data-mode="yt"] .yt-msg:not([hidden]){display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;color:#CFC6BA;font:500 14px/20px 'Inter',system-ui,sans-serif;text-align:center}
+#sp-dock[data-mode="yt"] .yt-msg a{color:#FF6B70;text-decoration:underline;text-underline-offset:3px}
+#sp-dock[data-mode="yt"] .yt-rates{display:flex;gap:6px;justify-content:center;padding-top:8px}
+.yt-rate{min-width:56px;min-height:36px;padding:0 12px;border:1px solid #3A302A;border-radius:999px;background:#221B17;color:#CFC6BA;font:600 13px/1 'Inter',system-ui,sans-serif;cursor:pointer}
+.yt-rate[aria-pressed="true"]{border-color:#FFC400;color:#FFC400}
+#sp-dock[data-mode="sp"] .sp-box{display:block}
+#sp-dock .sp-box iframe{display:block;width:100%;border:0;border-radius:12px;background:transparent}
+#sp-dock .sp-x{position:absolute;top:-12px;right:-4px;z-index:2;width:30px;height:30px;border:1px solid #3A302A;border-radius:50%;background:#221B17;color:#F4EEE6;font:600 16px/1 'Inter',sans-serif;cursor:pointer}
 @media (min-width:900px){#sp-dock{left:auto;right:24px;bottom:24px;width:380px}}
-/* ===== fin Spotify ===== */
+/* ===== fin reproductor ===== */
 @media (min-width:900px){#yr-mini{display:none}body.home #yr-mini{display:flex;left:max(24px,calc(50% - 460px));right:auto;width:920px;max-width:calc(100% - 48px);border-radius:0 0 20px 20px;border:1px solid #3A302A;border-top:0;padding:6px 28px 6px 32px!important}}
 @media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
 </style>
@@ -23510,8 +23590,8 @@ body.stage .sp-open{color:var(--st-mute)!important}
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 14:03';
-  var BUILD_ID = '2026-11-14T14:03';
+  var BUILD = '14 nov 2026 · 14:21';
+  var BUILD_ID = '2026-11-14T14:21';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
