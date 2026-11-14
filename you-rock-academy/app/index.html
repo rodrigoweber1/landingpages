@@ -670,6 +670,9 @@ body.dark .rl-legend{color:#BDB6AA}
 .cf-row span{font-size:12px;color:#475569}
 .cf-row b{font-size:15px;line-height:20px;color:#0F172A}
 body #app .sp-row .sp-play{border-radius:999px!important}
+/* aviso bajo los botones: Spotify entero en escritorio, 30 s en el móvil */
+body #app .sp-row::after{content:"Spotify: canción completa en el ordenador (con tu sesión); en el móvil, solo 30 s.";flex:0 0 100%;text-align:center;font:500 12px/16px 'Inter',system-ui,sans-serif;color:#BDB6AA}
+html[lang="en"] body #app .sp-row::after{content:"Spotify: full song on desktop (when logged in); on mobile, only 30 s."}
 /* compact ficha: two columns, tight rows (phone) */
 body #app .cf-card .cf-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px 14px!important;margin:6px 0 0!important;padding:0!important}
 body #app .cf-card .cf-row{display:flex!important;flex-direction:column!important;gap:0!important;margin:0!important;padding:4px 0!important;min-height:0!important;background:transparent!important;border:0!important;border-top:1px solid rgba(128,128,128,.25)!important;border-radius:0!important}
@@ -23681,8 +23684,8 @@ body.stage #app #sk-root .ej-chips .ej-chip[aria-pressed="true"]{background:var(
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 16:02';
-  var BUILD_ID = '2026-11-14T16:02';
+  var BUILD = '14 nov 2026 · 16:08';
+  var BUILD_ID = '2026-11-14T16:08';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
