@@ -23633,6 +23633,8 @@ body.stage #app .ej-chips:not(.ej-figs):not(:has(small)):not(:has(.ej-chip:nth-c
 body.stage #app #sk-root .ej-chips{padding:0!important;border:0!important}
 body.stage #app .ej-chips:not(.ej-figs):not(:has(small)):not(:has(.ej-chip:nth-child(5))) .ej-chip{flex:1 1 0!important;min-width:0;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;text-align:center!important;min-height:44px!important;padding:0 10px!important;border:0!important;border-radius:999px!important;background:transparent!important;color:var(--st-ink2)!important;font:700 14px/20px 'Inter',system-ui,sans-serif!important;white-space:nowrap;box-shadow:none!important}
 body.stage #app .ej-chips:not(.ej-figs):not(:has(small)):not(:has(.ej-chip:nth-child(5))) .ej-chip[aria-pressed="true"]{background:var(--st-red,#E31B23)!important;color:#fff!important}
+/* search bar: only the pill is outlined when focused, never the inner text box */
+body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body #sbar input:focus,body #sbar input:focus-visible{outline:none!important;box-shadow:none!important}
 /* a screen whose intro line was removed leaves no empty gap */
 #app main p:empty{display:none}
 @media (min-width:900px){#yr-mini{display:none}body.home #yr-mini{display:flex;left:max(24px,calc(50% - 460px));right:auto;width:920px;max-width:calc(100% - 48px);border-radius:0 0 20px 20px;border:1px solid #3A302A;border-top:0;padding:6px 28px 6px 32px!important}}
@@ -23689,8 +23691,8 @@ body.stage #app .ej-chips:not(.ej-figs):not(:has(small)):not(:has(.ej-chip:nth-c
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 16:14';
-  var BUILD_ID = '2026-11-14T16:14';
+  var BUILD = '14 nov 2026 · 16:30';
+  var BUILD_ID = '2026-11-14T16:30';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
