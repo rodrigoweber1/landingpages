@@ -5558,11 +5558,11 @@ const SONG_SHEETS = [
   key: ['La♭ mayor', 'A♭ major'], bpm: '≈ 121 BPM', meter: '4/4', date: ['1980 · sencillo del álbum «Celebrate!»', '1980 · single from the album “Celebrate!”'],
   learn: ['El groove disco: bombo en cada pulso, guitarra rítmica muy corta y apagada, y semicorcheas en la mano derecha.', 'The disco groove: kick drum on every beat, very short muted rhythm guitar and sixteenth notes in the picking hand.'] },
 { n: 6, style: ['Rock', 'Rock'], title: 'Paint It Black', artist: 'The Rolling Stones',
-  key: ['Mi menor', 'E minor'], bpm: '≈ 158 BPM', meter: '4/4', date: ['7 de mayo de 1966 (EE. UU.) · 13 de mayo de 1966 (Reino Unido)', '7 May 1966 (US) · 13 May 1966 (UK)'],
+  key: ['Mi menor', 'E minor'], bpm: '≈ 158 BPM', meter: '4/4', date: ['1966 · sencillo', '1966 · single'],
   learn: ['Un riff en menor con sabor oriental (el sitar de Brian Jones) sobre un pulso muy rápido y constante.', 'A minor-key riff with an eastern flavor (Brian Jones’s sitar) over a very fast, steady pulse.'] },
 { n: 7, style: ['Reggae', 'Reggae'], title: 'Three Little Birds', artist: 'Bob Marley & The Wailers',
-  key: ['La mayor', 'A major'], bpm: ['≈ 74 BPM (148 si cuentas el doble de rápido)', '≈ 74 BPM (148 if you count it twice as fast)'], meter: '4/4', date: ['1977 · álbum «Exodus»', '1977 · album “Exodus”'],
-  learn: ['El contratiempo del reggae: la guitarra suena en la «y» de cada pulso, con acordes cortos y apagados.', 'The reggae offbeat: the guitar plays on the “&” of every beat, with short, muted chords.'] },
+  key: ['La mayor', 'A major'], bpm: '≈ 74 BPM', meter: '4/4', date: ['1977 · álbum «Exodus»', '1977 · album “Exodus”'],
+  learn: ['El contratiempo del reggae: la guitarra suena en la «y» de cada pulso, con acordes cortos y apagados. Si cuentas el doble de rápido, son 148 BPM.', 'The reggae offbeat: the guitar plays on the “&” of every beat, with short, muted chords. If you count it twice as fast, it is 148 BPM.'] },
 { n: 8, style: ['Hard rock', 'Hard rock'], title: 'Paranoid', artist: 'Black Sabbath',
   key: ['Mi menor', 'E minor'], bpm: '≈ 162 BPM', meter: '4/4', date: ['1970 · álbum «Paranoid»', '1970 · album “Paranoid”'],
   learn: ['Corcheas rock con power chords y el contraste entre estrofa y estribillo.', 'Rock eighths with power chords and the contrast between verse and chorus.'], link: 'Batidas' },
@@ -23666,8 +23666,8 @@ body.stage #app #sk-root .ej-chips .ej-chip[aria-pressed="true"]{background:var(
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 15:50';
-  var BUILD_ID = '2026-11-14T15:50';
+  var BUILD = '14 nov 2026 · 15:52';
+  var BUILD_ID = '2026-11-14T15:52';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
