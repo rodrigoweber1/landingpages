@@ -23383,7 +23383,7 @@ body.stage #sl-root .sl-tag,body.stage #sl-root .sl-now .sl-tag{background:trans
 body.stage #side.sd-sl .sd-nav details.sd-mdone summary .n{color:var(--st-ok,#4FD08A)!important}
 body.stage #side.sd-sl .sd-nav details.sd-mdone summary .t{text-decoration-color:var(--st-ok,#4FD08A)!important}
 body.stage #side.sd-sl .sd-nav a.it.dn::after{color:var(--st-ok,#4FD08A)!important}
-@media (min-width:900px){#yr-mini{display:none}}
+@media (min-width:900px){#yr-mini{display:none}body.home #yr-mini{display:flex;left:max(24px,calc(50% - 460px));right:auto;width:920px;max-width:calc(100% - 48px);border-radius:0 0 20px 20px;border:1px solid #3A302A;border-top:0;padding:6px 28px 6px 32px!important}}
 @media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
 </style>
 <script>
@@ -23437,8 +23437,8 @@ body.stage #side.sd-sl .sd-nav a.it.dn::after{color:var(--st-ok,#4FD08A)!importa
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 13:37';
-  var BUILD_ID = '2026-11-14T13:37';
+  var BUILD = '14 nov 2026 · 13:41';
+  var BUILD_ID = '2026-11-14T13:41';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
@@ -23482,6 +23482,8 @@ body.stage #side.sd-sl .sd-nav a.it.dn::after{color:var(--st-ok,#4FD08A)!importa
     if (al) { on = true; build(p); }
     document.body.classList.toggle('yr-always', al);
     stamp(home);
+    // wide screens: the translucent bar only appears once the page has scrolled past the big logo row
+    if (on && home && window.innerWidth >= 900 && (window.pageYOffset || 0) < 90) on = false;
     if (bar) { bar.setAttribute('data-on', on ? 'true' : 'false'); if (!on) bar.setAttribute('aria-hidden', 'true'); else bar.removeAttribute('aria-hidden'); }
   }
   function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
