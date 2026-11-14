@@ -669,6 +669,13 @@ body.dark .rl-legend{color:#BDB6AA}
 .cf-row{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:8px;background:#F1F5F9}
 .cf-row span{font-size:12px;color:#475569}
 .cf-row b{font-size:15px;line-height:20px;color:#0F172A}
+/* compact ficha: two columns, tight rows (phone) */
+body #app .cf-card .cf-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px 14px!important;margin:6px 0 0!important;padding:0!important}
+body #app .cf-card .cf-row{display:flex!important;flex-direction:column!important;gap:0!important;margin:0!important;padding:4px 0!important;min-height:0!important;background:transparent!important;border:0!important;border-top:1px solid rgba(128,128,128,.25)!important;border-radius:0!important}
+body #app .cf-card .cf-row:nth-child(odd):last-child{grid-column:1 / -1}
+body #app .cf-card .cf-row span{font-size:12px!important;line-height:16px!important;margin:0!important}
+body #app .cf-card .cf-row b{font-size:15px!important;line-height:19px!important;margin:0!important}
+body #app .cf-card .pt-p{margin:8px 0 0!important}
 .cf-link{align-self:flex-start;font:600 14px 'Inter',system-ui,sans-serif;color:#B3121A}
 .cf-soon{padding:12px;border:1px dashed #CBD5E1;border-radius:10px;font-size:13px;color:#475569}
 body.dark .cf-row{background:#272727}
@@ -23673,8 +23680,8 @@ body.stage #app #sk-root .ej-chips .ej-chip[aria-pressed="true"]{background:var(
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 15:55';
-  var BUILD_ID = '2026-11-14T15:55';
+  var BUILD = '14 nov 2026 · 16:00';
+  var BUILD_ID = '2026-11-14T16:00';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
