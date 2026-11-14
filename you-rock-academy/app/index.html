@@ -972,11 +972,13 @@ body.dark .ls-stp[data-on="true"]{background:#E31B23;color:#FFFFFF}
 .bib-cnt{font-size:13px;line-height:18px;color:#5A5A5A}
 .bib-tab{display:flex;flex-direction:column;border:1px solid rgba(18,18,18,0.1);border-radius:16px;overflow:hidden}
 .bib-hd{display:none}
-.bib-row{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t plus" "cat lv";align-items:center;gap:6px 10px;padding:12px 14px;border-top:1px solid rgba(18,18,18,0.08);color:inherit;text-decoration:none}
+.bib-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"t bpm plus" "cat lv lv";align-items:center;gap:6px 10px;padding:12px 14px;border-top:1px solid rgba(18,18,18,0.08);color:inherit;text-decoration:none}
 .bib-body .bib-row:first-child{border-top:0}
 .bib-row:active{background:rgba(255,196,0,0.12)}
 .bib-t{grid-area:t;font:700 15px/1.3 'Inter',system-ui,sans-serif}
 .bib-cat{grid-area:cat;justify-self:start;max-width:100%;padding:2px 10px;border-radius:999px;border:1px solid var(--c);color:var(--c);box-shadow:0 0 12px -2px var(--c);font:600 12px/18px 'Inter',system-ui,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bib-bpm{grid-area:bpm;font:500 12px 'Inter',system-ui,sans-serif;color:#5A5A5A;white-space:nowrap}
+.bib-bpm b{font:700 15px 'Inter',system-ui,sans-serif;color:#E31B23}
 .bib-lv{grid-area:lv;justify-self:end;display:inline-flex;align-items:center;gap:6px;font:600 12px 'Inter',system-ui,sans-serif;color:#5A5A5A}
 .bib-lv i{width:8px;height:8px;border-radius:50%;background:#4FD08A}
 .bib-lv[data-l="1"] i{background:#FFC400}
@@ -984,15 +986,16 @@ body.dark .ls-stp[data-on="true"]{background:#E31B23;color:#FFFFFF}
 .bib-plus{grid-area:plus;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid rgba(18,18,18,0.14);border-radius:50%;font:500 18px/1 'Inter',system-ui,sans-serif;color:#B3121A}
 .bib-none{margin:0;padding:20px 14px;font-size:14px;line-height:20px;color:#5A5A5A}
 @media (min-width:640px){
-.bib-hd{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) 120px 32px;gap:10px;padding:10px 14px;font:600 12px 'Inter',system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5A5A5A;background:rgba(18,18,18,0.03)}
-.bib-row{grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) 120px 32px;grid-template-areas:"t cat lv plus"}
+.bib-hd{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) 90px 120px 32px;gap:10px;padding:10px 14px;font:600 12px 'Inter',system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5A5A5A;background:rgba(18,18,18,0.03)}
+.bib-row{grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) 90px 120px 32px;grid-template-areas:"t cat bpm lv plus"}
 .bib-lv{justify-self:start}
 }
 body.dark .bib-q{background:#17120F;border-color:rgba(244,238,230,0.12);color:#F4EEE6}
 body.dark .bib-q:focus{background:#221B17}
 body.dark .bib-chip{background:rgba(244,238,230,0.035);border-color:rgba(244,238,230,0.12);color:#F4EEE6}
 body.dark .bib-chip[aria-pressed="true"]{background:#FFC400;border-color:#FFC400;color:#0D0B0A}
-body.dark .bib-cnt,body.dark .bib-lv,body.dark .bib-none{color:#BDB6AA}
+body.dark .bib-bpm b{color:#FF6066}
+body.dark .bib-cnt,body.dark .bib-bpm,body.dark .bib-lv,body.dark .bib-none{color:#BDB6AA}
 body.dark .bib-tab{border-color:rgba(244,238,230,0.09)}
 body.dark .bib-row{border-top-color:rgba(244,238,230,0.07)}
 body.dark .bib-hd{color:#A3978A;background:rgba(244,238,230,0.035)}
@@ -6022,17 +6025,19 @@ C["LeadCeleb"] = (DCLogic) => {
 // level of each module of the main path (0 beginner, 1 intermediate, 2 advanced) and of each song; my own assignment, easy to edit
 const BIB_LVL = [0, 0, 0, 1, 1, 1, 2, 1, 0];
 const BIB_SONG = [2, 1, 2, 0, 1, 1, 0, 1, 1];
+// tempos that really exist in the app: songs 5-9 (original recordings) and the first exercise (its default tempo)
+const BIB_BPM = { Can5: 121, Can6: 158, Can7: 74, Can8: 162, Can9: 95, Ejercicios1: 70 };
 const BIB_COL = ['#5B8DEF', '#FFC400', '#FF6066', '#4FD08A', '#EC4899', '#2FC4C9', '#D9A84A', '#7FB2FF', '#FF9A5B', '#E87070'];
 function bibItems(lang) {
   const N = NAV[lang], out = [];
-  N.mods.forEach((m, mi) => m.steps.forEach((s) => out.push({ t: s.label, h: s.href, cat: m.title, ci: mi, lv: BIB_LVL[mi] == null ? 1 : BIB_LVL[mi] })));
+  N.mods.forEach((m, mi) => m.steps.forEach((s) => out.push({ t: s.label, h: s.href, cat: m.title, ci: mi, bpm: BIB_BPM[s.href] || 0, lv: BIB_LVL[mi] == null ? 1 : BIB_LVL[mi] })));
   const mu = N.music.mods[0];
-  mu.steps.forEach((s, i) => out.push({ t: s.label, h: s.href, cat: mu.title, ci: N.mods.length, lv: BIB_SONG[i] == null ? 1 : BIB_SONG[i] }));
+  mu.steps.forEach((s, i) => out.push({ t: s.label, h: s.href, cat: mu.title, ci: N.mods.length, bpm: BIB_BPM[s.href] || 0, lv: BIB_SONG[i] == null ? 1 : BIB_SONG[i] }));
   return out;
 }
 function bibPaint(root, es, st) {
-  const T = es ? { all: 'Todo', lvs: ['Principiante', 'Intermedio', 'Avanzado'], lvAll: 'Cualquier nivel', ph: 'Buscar una lección o canción', c: ['Lección', 'Categoría', 'Nivel'], n: (k) => k + (k === 1 ? ' resultado' : ' resultados'), none: 'Nada coincide con tu búsqueda. Prueba con otra palabra o quita un filtro.', cat: 'Categoría', open: 'Abrir' }
-    : { all: 'All', lvs: ['Beginner', 'Intermediate', 'Advanced'], lvAll: 'Any level', ph: 'Search a lesson or song', c: ['Lesson', 'Category', 'Level'], n: (k) => k + (k === 1 ? ' result' : ' results'), none: 'Nothing matches your search. Try another word or remove a filter.', cat: 'Category', open: 'Open' };
+  const T = es ? { all: 'Todo', lvs: ['Principiante', 'Intermedio', 'Avanzado'], lvAll: 'Cualquier nivel', ph: 'Buscar una lección o canción', c: ['Lección', 'Categoría', 'BPM', 'Nivel'], n: (k) => k + (k === 1 ? ' resultado' : ' resultados'), none: 'Nada coincide con tu búsqueda. Prueba con otra palabra o quita un filtro.', cat: 'Categoría', open: 'Abrir' }
+    : { all: 'All', lvs: ['Beginner', 'Intermediate', 'Advanced'], lvAll: 'Any level', ph: 'Search a lesson or song', c: ['Lesson', 'Category', 'BPM', 'Level'], n: (k) => k + (k === 1 ? ' result' : ' results'), none: 'Nothing matches your search. Try another word or remove a filter.', cat: 'Category', open: 'Open' };
   const items = bibItems(es ? 'es' : 'en');
   const cats = [], seen = {};
   items.forEach((i) => { if (!seen[i.cat]) { seen[i.cat] = 1; cats.push({ n: i.cat, ci: i.ci }); } });
@@ -6042,13 +6047,13 @@ function bibPaint(root, es, st) {
   const chip = (attr, v, on, label) => '<button type="button" class="bib-chip" ' + attr + '="' + esc(v) + '" aria-pressed="' + on + '">' + esc(label) + '</button>';
   root.innerHTML = '<div class="bib-bar"><input class="bib-q" type="search" inputmode="search" autocomplete="off" enterkeyhint="search" placeholder="' + esc(T.ph) + '" aria-label="' + esc(T.ph) + '" value="' + esc(st.q) + '"></div>'
     + '<div class="bib-chips" role="group" aria-label="' + T.cat + '">' + chip('data-cat', 'all', st.cat === 'all', T.all) + cats.map((c) => chip('data-cat', c.n, st.cat === c.n, c.n)).join('') + '</div>'
-    + '<div class="bib-chips" role="group" aria-label="' + T.c[2] + '">' + chip('data-lv', 'all', st.lv === 'all', T.lvAll) + T.lvs.map((l, i) => chip('data-lv', String(i), st.lv === String(i), l)).join('') + '</div>'
-    + '<div class="bib-cnt" aria-live="polite"></div><div class="bib-tab" role="table"><div class="bib-hd" role="row"><span>' + T.c[0] + '</span><span>' + T.c[1] + '</span><span>' + T.c[2] + '</span><span></span></div><div class="bib-body"></div></div>';
+    + '<div class="bib-chips" role="group" aria-label="' + T.c[3] + '">' + chip('data-lv', 'all', st.lv === 'all', T.lvAll) + T.lvs.map((l, i) => chip('data-lv', String(i), st.lv === String(i), l)).join('') + '</div>'
+    + '<div class="bib-cnt" aria-live="polite"></div><div class="bib-tab" role="table"><div class="bib-hd" role="row"><span>' + T.c[0] + '</span><span>' + T.c[1] + '</span><span>' + T.c[2] + '</span><span>' + T.c[3] + '</span><span></span></div><div class="bib-body"></div></div>';
   const list = () => {
     const q = norm(st.q.trim());
     const f = items.filter((i) => (st.cat === 'all' || i.cat === st.cat) && (st.lv === 'all' || String(i.lv) === st.lv) && (!q || norm(i.t + ' ' + i.cat).indexOf(q) >= 0));
     root.querySelector('.bib-cnt').textContent = T.n(f.length);
-    root.querySelector('.bib-body').innerHTML = f.length ? f.map((i) => '<a class="bib-row" role="row" href="#/' + i.h + '" aria-label="' + T.open + ': ' + esc(i.t) + '"><span class="bib-t">' + esc(i.t) + '</span><span class="bib-cat" style="--c:' + BIB_COL[i.ci % BIB_COL.length] + '">' + esc(i.cat) + '</span><span class="bib-lv" data-l="' + i.lv + '"><i></i>' + T.lvs[i.lv] + '</span><span class="bib-plus" aria-hidden="true">+</span></a>').join('') : '<p class="bib-none">' + T.none + '</p>';
+    root.querySelector('.bib-body').innerHTML = f.length ? f.map((i) => '<a class="bib-row" role="row" href="#/' + i.h + '" aria-label="' + T.open + ': ' + esc(i.t) + '"><span class="bib-t">' + esc(i.t) + '</span><span class="bib-cat" style="--c:' + BIB_COL[i.ci % BIB_COL.length] + '">' + esc(i.cat) + '</span><span class="bib-bpm">' + (i.bpm ? '<b>' + i.bpm + '</b> BPM' : '—') + '</span><span class="bib-lv" data-l="' + i.lv + '"><i></i>' + T.lvs[i.lv] + '</span><span class="bib-plus" aria-hidden="true">+</span></a>').join('') : '<p class="bib-none">' + T.none + '</p>';
   };
   list();
   root.querySelector('.bib-q').oninput = (e) => { st.q = e.target.value; list(); };
@@ -23307,8 +23312,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 08:51';
-  var BUILD_ID = '2026-11-14T08:51';
+  var BUILD = '14 nov 2026 · 08:54';
+  var BUILD_ID = '2026-11-14T08:54';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
