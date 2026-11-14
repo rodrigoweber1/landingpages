@@ -1201,6 +1201,9 @@ body.stage #sbar .sb-m{color:var(--st-redInk)!important}
 body.stage #fnav{background:rgba(23,18,15,.92)!important;box-shadow:0 0 0 1px var(--st-rule),0 10px 30px rgba(0,0,0,.6)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 body.stage #fnav a{color:var(--st-mute)!important;font-family:'Archivo Black','Inter',sans-serif!important;font-weight:400!important;font-size:10px!important;letter-spacing:0!important}
 body.stage #fnav a.on{background:var(--st-floor3)!important;color:var(--st-ink)!important}
+/* selected menu item = yellow (chosen), like the rest of the app */
+html body.stage #app #fnav a.on,html body.stage #fnav a.on,html body.stage #fnav a[aria-current]{background:rgba(255,196,0,.12)!important;color:#FFC400!important;box-shadow:inset 0 0 0 1.5px #FFC400!important}
+html body.stage #fnav a.on *,html body.stage #fnav a[aria-current] *{color:#FFC400!important;stroke:#FFC400}
 body.stage #side{background:#100D0B!important;border-right-color:#2A221D!important;color:var(--st-ink)!important}
 body.stage #side .sd-nav a.it.on{background:#2A1416!important;color:var(--st-ink)!important}
 body.stage #side .sd-nav summary .n{background:transparent!important;color:var(--st-redInk)!important}
@@ -23426,8 +23429,8 @@ body.stage #side.sd-sl .sd-nav a.it.dn::after{color:var(--st-ok,#4FD08A)!importa
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 13:24';
-  var BUILD_ID = '2026-11-14T13:24';
+  var BUILD = '14 nov 2026 · 13:29';
+  var BUILD_ID = '2026-11-14T13:29';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
