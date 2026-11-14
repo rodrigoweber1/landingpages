@@ -23302,6 +23302,12 @@ try { route(); } catch (e) { fail(e); }
 #yr-upd button{flex:none;min-height:44px;padding:0 18px;border:0;border-radius:10px;background:#FFFFFF;color:#B3121A;font:700 14px/20px 'Inter',system-ui,sans-serif;cursor:pointer}
 @media (min-width:900px){#yr-upd{left:auto;right:24px;bottom:24px;width:380px}}
 @media (max-width:899px){body.stage #app .stg-home{padding-top:calc(env(safe-area-inset-top) + 53px + 20px)!important}body.stage #app .stg-home>header>.thm-wrap,body.stage #app .stg-home>header>div:nth-child(2){display:none!important}}
+/* Música / Herramientas: the compact logo bar stays on, the old bar with arrow is hidden, the title moves into the page */
+@media (max-width:899px){
+body.yr-always #app>div>header{display:block!important;position:static!important;visibility:hidden!important;height:auto!important;min-height:0!important;padding:calc(env(safe-area-inset-top) + 66px) 16px 0!important;border:0!important;box-shadow:none!important}
+body.yr-always #app>div>header>:not(h1){display:none!important}
+body.yr-always #app>div>header h1{visibility:visible!important;display:block!important;margin:0 0 4px!important;text-align:left!important;font-size:28px!important;line-height:1.05!important;white-space:normal!important}
+}
 @media (min-width:900px){#yr-mini{display:none}}
 @media (prefers-reduced-motion:reduce){#yr-mini{transition:none}}
 </style>
@@ -23313,10 +23319,12 @@ try { route(); } catch (e) { fail(e); }
     var h = document.querySelector('.stg-home>header'), hub = false;
     // hub screens with the tall logo header (Main, Avanzada…): same compact bar once the header has scrolled away
     if (!h) { var c = document.querySelector('#app>div>header'); if (c && !/grid-template-columns/.test(c.getAttribute('style') || '') && c.querySelector('[role="img"]')) { h = c; hub = true; } }
+    var always = false;
+    if (!h && /^#\/?(Cancionero|Herramientas)\/?/.test(location.hash || '')) { var g = document.querySelector('#app>div>header'); if (g) { h = g; hub = true; always = true; } }
     if (!h) return null;
     var btns = [].filter.call(h.querySelectorAll(hub ? 'button' : '.thm-top button'), function (b) { return /^(ES|EN)$/.test((b.textContent || '').trim()); });
     var logo = h.querySelector('[role="img"]');
-    return { h: h, btns: btns, logo: logo, hub: hub };
+    return { h: h, btns: btns, logo: logo, hub: hub, always: always };
   }
   function build(p) {
     var langs = [];
@@ -23330,13 +23338,14 @@ try { route(); } catch (e) { fail(e); }
     left.className = 'ym-logo'; left.href = '#/Inicio';
     left.setAttribute('aria-label', 'You Rock Academy');
     if (p.logo) left.appendChild(p.logo.cloneNode(true));
+    else { try { var tmp = document.createElement('div'); tmp.innerHTML = '<div role="img" aria-label="You Rock Academy" style="display:flex;align-items:center;gap:8px"><img src="' + URIS[0] + '" alt="" style="height:60px;width:auto;display:block;flex:none"><span class="yr-logo" role="img" aria-label="You Rock Academy by Arcadio Falcón" style="--yr:26px"><span class="yr-w" aria-hidden="true">YOU R<span class="yr-o"><svg viewBox="0 0 100 112" aria-hidden="true"><path d="M50 4C80 4 96 15 96 36C96 64 68 94 50 108C32 94 4 64 4 36C4 15 20 4 50 4Z" fill="#E31B23"></path><path d="M50 16C72 16 84 24 84 39C84 60 63 83 50 94" fill="none" stroke="#FFFFFE" stroke-opacity="0.3" stroke-width="7" stroke-linecap="round"></path></svg></span>CK ACADEMY</span><span class="yr-by" aria-hidden="true" style="font-family:Inter,system-ui,sans-serif;font-weight:700;letter-spacing:0">BY ARCADIO FALCÓN</span></span></div>'; left.appendChild(tmp.firstChild); } catch (e) {} }
     bar.appendChild(left);
     var g = document.createElement('div');
     g.className = 'ym-lang'; g.setAttribute('role', 'group');
     langs.forEach(function (l, i) {
       var b = document.createElement('button');
       b.type = 'button'; b.textContent = l.t; b.setAttribute('aria-pressed', l.on ? 'true' : 'false');
-      b.addEventListener('click', function () { var real = realParts(); if (real && real.btns[i]) real.btns[i].click(); setTimeout(update, 120); });
+      b.addEventListener('click', function () { var real = realParts(); if (real && real.btns[i]) real.btns[i].click(); setTimeout(update, 120); setTimeout(update, 500); setTimeout(update, 1100); });
       g.appendChild(b);
     });
     var rt = document.createElement('div'); rt.className = 'ym-right';
@@ -23353,8 +23362,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 11:38';
-  var BUILD_ID = '2026-11-14T11:38';
+  var BUILD = '14 nov 2026 · 11:49';
+  var BUILD_ID = '2026-11-14T11:49';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
@@ -23392,6 +23401,9 @@ try { route(); } catch (e) { fail(e); }
       if (document.body.classList.contains('stage')) { on = true; build(p); }
     }
     if (p && p.hub && !home && p.btns.length && document.body.classList.contains('stage') && (window.scrollY || 0) > 90) { on = true; build(p); }
+    var al = !!(p && p.always && document.body.classList.contains('stage') && p.btns.length);
+    if (al) { on = true; build(p); }
+    document.body.classList.toggle('yr-always', al);
     stamp(home);
     if (bar) { bar.setAttribute('data-on', on ? 'true' : 'false'); if (!on) bar.setAttribute('aria-hidden', 'true'); else bar.removeAttribute('aria-hidden'); }
   }
@@ -23402,6 +23414,7 @@ try { route(); } catch (e) { fail(e); }
   var appEl = document.getElementById('app');
   if (appEl && window.MutationObserver) new MutationObserver(req).observe(appEl, { childList: true });
   req(); setTimeout(req, 300); setTimeout(req, 1200);
+  setInterval(function () { if (document.body.classList.contains('yr-always')) req(); }, 800);
   checkNew();
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') checkNew(); });
   // phones keep the app open for a long time (and Safari restores it from memory): also look every 45 s while it is visible, and when the page comes back or the network returns
