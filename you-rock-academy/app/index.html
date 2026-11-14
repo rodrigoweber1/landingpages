@@ -6663,6 +6663,8 @@ function songSheet(n) {
         let h = '<div class="pt-card cf-card"><span class="cf-style">' + v(S.style) + '</span><h2 class="cr-h" style="margin:0">' + S.title + '</h2><span class="cf-artist">' + (S.artist || (es ? 'Artista por confirmar' : 'Artist to be confirmed')) + '</span>'
           + '<div class="cf-grid">' + row(es ? 'Tonalidad' : 'Key', v(S.key)) + row(es ? 'Tempo (aprox.)' : 'Tempo (approx.)', v(S.bpm)) + row(es ? 'Métrica' : 'Meter', S.meter) + row(es ? 'Publicación' : 'Released', v(S.date)) + '</div></div>';
         h += '<h3 class="bt-h3">' + (es ? 'Qué vas a aprender' : 'What you will learn') + '</h3><p class="pt-p">' + v(S.learn) + '</p>';
+        const SPID = { 5: '3K7Q9PHUWPTaknlbFPThn2', 6: '5PklEat9V4riVvqfQmXrGs', 7: '7vggqxNKwd6xdRoYS0pQtM', 8: '2z71jdeVcC782NgsYZ6N8q', 9: '2T3jgoAMbBXiMMD8pSc6QL' }[S.n];
+        if (SPID) h += '<div class="sp-row" style="margin:4px 0 12px"><button type="button" class="sp-play" data-sp="' + SPID + '" data-sp-name="' + S.title + '"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span>' + (es ? 'Escuchar la original' : 'Listen to the original') + '</span></button><a class="sp-open" href="https://open.spotify.com/track/' + SPID + '" target="_blank" rel="noopener">' + (es ? 'Abrir en Spotify' : 'Open in Spotify') + '</a></div>';
         if (S.link) h += '<a class="cf-link" href="#/' + S.link + '">' + (es ? 'Practicar el ritmo →' : 'Practice the rhythm →') + '</a>';
         if (S.check) h += '<div class="pt-note"><p class="pt-p">' + v(S.check) + '</p></div>';
         // Celebration also has its piano exercise
@@ -23508,8 +23510,8 @@ body.stage .sp-open{color:var(--st-mute)!important}
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 14:00';
-  var BUILD_ID = '2026-11-14T14:00';
+  var BUILD = '14 nov 2026 · 14:03';
+  var BUILD_ID = '2026-11-14T14:03';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
