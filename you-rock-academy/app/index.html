@@ -6783,7 +6783,7 @@ function songSheet(n) {
         let h = '<div class="pt-card cf-card"><span class="cf-style">' + v(S.style) + '</span><h2 class="cr-h" style="margin:0">' + S.title + '</h2><span class="cf-artist">' + (S.artist || (es ? 'Artista por confirmar' : 'Artist to be confirmed')) + '</span>'
           + '<div class="cf-grid">' + row(es ? 'Tonalidad' : 'Key', v(S.key)) + row(es ? 'Tempo (aprox.)' : 'Tempo (approx.)', v(S.bpm)) + row(es ? 'Métrica' : 'Meter', S.meter) + row(es ? 'Publicación' : 'Released', v(S.date)) + '</div><p class="pt-p" style="margin:12px 0 0">' + v(S.learn) + '</p></div>';
         const SPID = { 5: '3K7Q9PHUWPTaknlbFPThn2', 6: '5PklEat9V4riVvqfQmXrGs', 7: '7vggqxNKwd6xdRoYS0pQtM', 8: '2z71jdeVcC782NgsYZ6N8q', 9: '2T3jgoAMbBXiMMD8pSc6QL' }[S.n];
-        if (SPID) h += '<h3 class="bt-h3">' + (es ? 'Para practicar' : 'To practice') + '</h3><div class="sp-row" style="margin:4px 0 12px"><button type="button" class="sp-play" data-sp="' + SPID + '" data-sp-name="' + S.title + '"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span>YouTube</span></button><button type="button" class="sp-play sp-green" data-sp="' + SPID + '" data-only="sp" data-sp-name="' + S.title + '"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span>Spotify</span></button></div>';
+        if (SPID) h += '<div class="pt-card"><h2 style="margin:0;font-size:16px;line-height:1.33;font-weight:400;font-family:\'Archivo Black\',\'Inter\',sans-serif;letter-spacing:.01em">' + (es ? 'Para practicar' : 'To practice') + '</h2><div class="sp-row" style="margin:0"><button type="button" class="sp-play" data-sp="' + SPID + '" data-sp-name="' + S.title + '"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span>YouTube</span></button><button type="button" class="sp-play sp-green" data-sp="' + SPID + '" data-only="sp" data-sp-name="' + S.title + '"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span>Spotify</span></button></div></div>';
         if (S.link) h += '<a class="cf-link" href="#/' + S.link + '">' + (es ? 'Practicar el ritmo →' : 'Practice the rhythm →') + '</a>';
         if (S.check) h += '<div class="pt-note"><p class="pt-p">' + v(S.check) + '</p></div>';
         // Celebration also has its piano exercise
@@ -23684,8 +23684,8 @@ body.stage #app #sk-root .ej-chips .ej-chip[aria-pressed="true"]{background:var(
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 16:08';
-  var BUILD_ID = '2026-11-14T16:08';
+  var BUILD = '14 nov 2026 · 16:10';
+  var BUILD_ID = '2026-11-14T16:10';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
