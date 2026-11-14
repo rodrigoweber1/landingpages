@@ -1702,6 +1702,14 @@ body.stage #app .stg-home .stg-intro{max-width:340px;margin:6px auto 0!important
 body.stage #app .rs{background:var(--st-floor)!important;box-shadow:none!important;border:1px solid rgba(244,238,230,.09)!important;border-radius:16px!important}
 body.stage #app .rs::before{display:none!important}
 body.stage #app .rs-b span{background:linear-gradient(90deg,#E31B23,#FFC400)!important}
+/* Continue card on one line: title | short bar + count | arrow */
+body.stage #app .rs{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"e e" "t p";align-items:center;column-gap:14px;row-gap:2px;padding:14px 66px 14px 16px!important}
+body.stage #app .rs-e{grid-area:e;order:0;margin:0!important}
+body.stage #app .rs-t{grid-area:t;order:0;font-size:22px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.stage #app .rs-m{display:none!important}
+body.stage #app .rs-p{grid-area:p;order:0;margin:0!important;gap:8px}
+body.stage #app .rs-b{flex:none!important;width:64px}
+body.stage #app .rs-go{width:40px!important;height:40px!important;right:14px!important}
 /* the home list as flat cards (thin border, tag, title, text, round arrow) */
 body.stage #app .stg-home .stg-grid{border-top:0!important;gap:10px!important}
 html body.stage #app .stg-home .stg-grid>.stg-row{display:grid!important;grid-template-columns:minmax(0,1fr) 36px;column-gap:12px;row-gap:4px;align-items:center;padding:18px!important;border:1px solid rgba(244,238,230,.09)!important;border-bottom:1px solid rgba(244,238,230,.09)!important;border-radius:16px!important;background:var(--st-floor)!important;box-shadow:none!important}
@@ -23345,8 +23353,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 09:19';
-  var BUILD_ID = '2026-11-14T09:19';
+  var BUILD = '14 nov 2026 · 11:21';
+  var BUILD_ID = '2026-11-14T11:21';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
