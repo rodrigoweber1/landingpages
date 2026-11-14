@@ -2038,7 +2038,7 @@ const D = {
   "avaT": "Guitarra avanzada",
   "avaX": "Teoría, escalas, modos, ritmo avanzado e improvisación guiada.",
   "avaMeta": "10 pantallas",
-  "teoEye": "Nueva sección",
+  "teoEye": "Música",
   "soonEye": "Próximamente",
   "teoT": "Aprende teoría con música",
   "teoX": "10 canciones para entender la teoría tocando: del blues al jazz, y cada una te enseña un concepto.",
@@ -2071,7 +2071,7 @@ const D = {
   "avaT": "Advanced guitar",
   "avaX": "Theory, scales, modes, advanced rhythm and guided improvisation.",
   "avaMeta": "10 screens",
-  "teoEye": "New section",
+  "teoEye": "Music",
   "soonEye": "Coming soon",
   "teoT": "Learn theory through music",
   "teoX": "10 songs to understand theory by playing: from blues to jazz, and each one teaches you a concept.",
@@ -21822,7 +21822,7 @@ function attachMarker(name, lang) {
   if (by) by.remove();
   // only a section marked as new gets the badge
   app.querySelectorAll('a').forEach((card) => {
-    if (!card.querySelector('h2') || !/^(Nueva sección|New section)$/m.test(card.innerText || '')) return;
+    if (!card.querySelector('h2') || !/Cancionero/.test(card.getAttribute('href') || '')) return;
     card.style.position = 'relative';
     const b = document.createElement('span');
     b.className = 'mk mk-badge';
@@ -23406,8 +23406,8 @@ body.stage #side.sd-sl .sd-nav a.sd-mod.on{background:#2A1416}
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 12:23';
-  var BUILD_ID = '2026-11-14T12:23';
+  var BUILD = '14 nov 2026 · 12:44';
+  var BUILD_ID = '2026-11-14T12:44';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
