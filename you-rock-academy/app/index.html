@@ -1201,6 +1201,14 @@ body.stage #sbar .sb-m{color:var(--st-redInk)!important}
 body.stage #fnav{background:rgba(23,18,15,.92)!important;box-shadow:0 0 0 1px var(--st-rule),0 10px 30px rgba(0,0,0,.6)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 body.stage #fnav a{color:var(--st-mute)!important;font-family:'Archivo Black','Inter',sans-serif!important;font-weight:400!important;font-size:10px!important;letter-spacing:0!important}
 body.stage #fnav a.on{background:var(--st-floor3)!important;color:var(--st-ink)!important}
+/* bottom menu: long labels (Principiante, Herramientas) get room instead of touching the edges */
+@media (max-width:899px){body.stage #fnav{gap:0!important;padding:5px 4px!important}body.stage #fnav a{flex:1 1 auto!important;min-width:0!important;padding:0 5px!important;white-space:nowrap}}
+@media (max-width:359px){body.stage #fnav a{padding:0 2px!important;font-size:9px!important}}
+/* desktop side menu tabs: same as the phone menu (yellow symbol only), labels with room */
+body.stage #side .sd-tabs{grid-template-columns:repeat(4,1fr)!important;gap:0!important;padding:4px!important}
+body.stage #side .sd-tabs a{min-width:0;padding:8px 2px 7px!important;font-family:'Archivo Black','Inter',sans-serif!important;font-weight:400!important;font-size:10px!important;letter-spacing:0!important;white-space:nowrap;color:var(--st-mute)!important}
+html body.stage #side .sd-tabs a.on{background:var(--st-floor3)!important;color:var(--st-ink)!important;box-shadow:none!important}
+html body.stage #side .sd-tabs a.on svg,html body.stage #side .sd-tabs a.on svg *{color:#FFC400!important;stroke:#FFC400!important}
 /* selected menu item = yellow (chosen), like the rest of the app */
 html body.stage #app #fnav a.on,html body.stage #fnav a.on,html body.stage #fnav a[aria-current]{background:var(--st-floor3)!important;color:var(--st-ink)!important;box-shadow:none!important}
 html body.stage #fnav a.on svg,html body.stage #fnav a[aria-current] svg,html body.stage #fnav a.on svg *{color:#FFC400!important;stroke:#FFC400!important}
@@ -23429,8 +23437,8 @@ body.stage #side.sd-sl .sd-nav a.it.dn::after{color:var(--st-ok,#4FD08A)!importa
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 13:35';
-  var BUILD_ID = '2026-11-14T13:35';
+  var BUILD = '14 nov 2026 · 13:37';
+  var BUILD_ID = '2026-11-14T13:37';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
