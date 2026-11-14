@@ -1705,7 +1705,7 @@ body.stage #app .rs-b span{background:linear-gradient(90deg,#E31B23,#FFC400)!imp
 /* Continue card on one line: title | short bar + count | arrow */
 body.stage #app .rs{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"e e" "t p";align-items:center;column-gap:14px;row-gap:2px;padding:14px 66px 14px 16px!important}
 body.stage #app .rs-e{grid-area:e;order:0;margin:0!important}
-body.stage #app .rs-t{grid-area:t;order:0;font-size:22px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.stage #app .rs-t{grid-area:t;order:0;font-family:'Archivo Black','Inter',sans-serif!important;font-weight:400!important;letter-spacing:0!important;font-size:17px!important;line-height:1.2!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.stage #app .rs-m{display:none!important}
 body.stage #app .rs-p{grid-area:p;order:0;margin:0!important;gap:8px}
 body.stage #app .rs-b{flex:none!important;width:64px}
@@ -23353,8 +23353,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 11:21';
-  var BUILD_ID = '2026-11-14T11:21';
+  var BUILD = '14 nov 2026 · 12:27';
+  var BUILD_ID = '2026-11-14T12:27';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
