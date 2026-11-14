@@ -85,6 +85,10 @@ html{scroll-padding-top:calc(env(safe-area-inset-top) + 130px)}
 /* translucent top bar (glass): content slides softly under it */
 #app>div:not(.stg-home)>header{background:rgba(255,255,255,0.82)!important;-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
 body.dark #app>div:not(.stg-home)>header{background:rgba(13,11,10,0.78)!important}
+/* tall logo headers of the hub screens (no grid bar) scroll away like the home; they are not a bar */
+#app>div>header:not([style*="grid-template-columns"]){position:static!important;background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+body.dark #app>div>header:not([style*="grid-template-columns"]){background:transparent!important}
+#app>div:has(>header:not([style*="grid-template-columns"])) #sbar,#app>div:has(>header:not([style*="grid-template-columns"])) #sbar.has,#app>div:has(>header:not([style*="grid-template-columns"])) #sbar:focus-within{top:env(safe-area-inset-top)!important}
 /* phone held sideways (short and wide): slim top bar, search scrolls away, bottom bar becomes a narrow icon rail in the left gutter */
 @media (max-width:899px) and (orientation:landscape) and (max-height:520px){
 #app{width:var(--aw,560px)!important;zoom:1!important;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)!important}
@@ -99,7 +103,7 @@ body.dark #app>div:not(.stg-home)>header{background:rgba(13,11,10,0.78)!importan
 #app #sbar.has,#app #sbar:focus-within{position:sticky!important;top:calc(env(safe-area-inset-top) + 44px)!important}
 #fnav{left:calc(env(safe-area-inset-left) + 8px)!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;width:56px!important;flex-direction:column!important;padding:4px!important;gap:2px!important;border-radius:22px!important}
 #fnav a{height:46px!important;width:100%!important;font-size:0!important;line-height:0!important;border-radius:18px!important}
-#yr-mini{padding:calc(env(safe-area-inset-top) + 2px) 14px 2px 16px!important}
+#yr-mini{padding:calc(env(safe-area-inset-top) + 2px) 14px 2px 16px!important;min-height:0!important}
 #yr-mini .ym-logo img{height:24px!important}
 #yr-mini .ym-lang button{height:30px!important}
 body.stage #app .stg-home{padding-top:calc(env(safe-area-inset-top) + 40px + 12px)!important}
@@ -23248,7 +23252,7 @@ try { route(); } catch (e) { fail(e); }
 </script>
 <!-- Barra compacta de la portada: aparece al rolar, cuando el hero ya salió de la pantalla -->
 <style>
-#yr-mini{position:fixed;left:0;right:0;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;padding:calc(env(safe-area-inset-top) + 6px) 14px 6px 16px;background:rgba(13,11,10,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #3A302A;transform:translateY(-110%);transition:transform .22s cubic-bezier(.23,1,.32,1);pointer-events:none;visibility:hidden}
+#yr-mini{position:fixed;left:0;right:0;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;padding:calc(env(safe-area-inset-top) + 6px) 14px 6px 16px;background:rgba(13,11,10,.78);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid #3A302A;transform:translateY(-110%);transition:transform .22s cubic-bezier(.23,1,.32,1);pointer-events:none;visibility:hidden}
 #yr-mini[data-on="true"]{transform:none;pointer-events:auto;visibility:visible}
 #yr-mini .ym-logo{display:flex;align-items:center;gap:6px;min-width:0;color:#F4EEE6}
 #yr-mini .ym-logo img{height:30px!important;width:auto!important;flex:none!important;filter:invert(1)}
@@ -23258,7 +23262,7 @@ try { route(); } catch (e) { fail(e); }
 #yr-mini .ym-lang{display:flex;gap:2px;padding:2px;border-radius:999px;background:#221B17}
 #yr-mini .ym-lang button{min-width:44px;height:36px;border:0;border-radius:999px;background:transparent;color:#A3978A;font:500 14px 'Inter',system-ui,sans-serif;cursor:pointer}
 #yr-mini .ym-lang button[aria-pressed="true"]{background:#E31B23;color:#FFFFFF;box-shadow:none}
-#yr-mini{transition:none}
+#yr-mini{transition:none;min-height:calc(env(safe-area-inset-top) + 56px)}
 #yr-upd{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 92px);z-index:95;display:flex;align-items:center;justify-content:space-between;gap:12px;box-sizing:border-box;padding:10px 10px 10px 16px;border-radius:14px;background:#E31B23;color:#FFFFFF;font:600 14px/20px 'Inter',system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45)}
 #yr-upd button{flex:none;min-height:44px;padding:0 18px;border:0;border-radius:10px;background:#FFFFFF;color:#B3121A;font:700 14px/20px 'Inter',system-ui,sans-serif;cursor:pointer}
 @media (min-width:900px){#yr-upd{left:auto;right:24px;bottom:24px;width:380px}}
@@ -23271,11 +23275,13 @@ try { route(); } catch (e) { fail(e); }
   'use strict';
   var bar = null, shown = false, ticking = false, sig = '';
   function realParts() {
-    var h = document.querySelector('.stg-home>header');
+    var h = document.querySelector('.stg-home>header'), hub = false;
+    // hub screens with the tall logo header (Main, Avanzada…): same compact bar once the header has scrolled away
+    if (!h) { var c = document.querySelector('#app>div>header'); if (c && !/grid-template-columns/.test(c.getAttribute('style') || '') && c.querySelector('[role="img"]')) { h = c; hub = true; } }
     if (!h) return null;
-    var btns = [].filter.call(h.querySelectorAll('.thm-top button'), function (b) { return /^(ES|EN)$/.test((b.textContent || '').trim()); });
+    var btns = [].filter.call(h.querySelectorAll(hub ? 'button' : '.thm-top button'), function (b) { return /^(ES|EN)$/.test((b.textContent || '').trim()); });
     var logo = h.querySelector('[role="img"]');
-    return { h: h, btns: btns, logo: logo };
+    return { h: h, btns: btns, logo: logo, hub: hub };
   }
   function build(p) {
     var langs = [];
@@ -23312,8 +23318,8 @@ try { route(); } catch (e) { fail(e); }
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 08:54';
-  var BUILD_ID = '2026-11-14T08:54';
+  var BUILD = '14 nov 2026 · 09:02';
+  var BUILD_ID = '2026-11-14T09:02';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
@@ -23350,6 +23356,7 @@ try { route(); } catch (e) { fail(e); }
       // the compact bar belongs to the night look; the light home keeps its own header
       if (document.body.classList.contains('stage')) { on = true; build(p); }
     }
+    if (p && p.hub && !home && p.btns.length && document.body.classList.contains('stage') && (window.scrollY || 0) > 90) { on = true; build(p); }
     stamp(home);
     if (bar) { bar.setAttribute('data-on', on ? 'true' : 'false'); if (!on) bar.setAttribute('aria-hidden', 'true'); else bar.removeAttribute('aria-hidden'); }
   }
