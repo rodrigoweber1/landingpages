@@ -140,7 +140,8 @@ function strumHTML(ex) {
 }
 
 // ---------- sessão de treino ----------
-const Sess = { queue: [], qi: 0, ex: null, bpm: 80, sub: 2, run: false, demo: false, passes: [], events: [], ui: -1, cleanStreak: 0, elapsed: 0, lastTick: 0, raf: 0, timer: 0, statusKey: {}, passAcc: null, bestClean: 0, offs: [] };
+const Sess = { queue: [], qi: 0, ex: null, bpm: 80, sub: 2, run: false, demo: false, passes: [], events: [], ui: -1, cleanStreak: 0, elapsed: 0, lastTick: 0, raf: 0, timer: 0, statusKey: {}, passAcc: null, bestClean: 0, offs: [], loop: false, stopAt: null, ended: false, endT: 0 };
+const exSecs = () => (+S().exMin || 2) * 60;
 function setQueue(ids, startAt = 0) {
   stopRun(); Sess.queue = ids.map(id => ({ id, done: false })); Sess.qi = startAt; Sess.ex = null;
   if (location.hash === '#/train') render(); else location.hash = '#/train';
@@ -152,21 +153,28 @@ function dropPass(pass) {
 function loadEx(i) {
   stopRun(); const q = Sess.queue[i]; if (!q) return; Sess.qi = i; const ex = EXMAP[q.id]; Sess.ex = ex;
   Sess.bpm = (DB.best[ex.id] && DB.best[ex.id].last) || ex.bpm; Sess.sub = ex.type === 'rhythm' ? ex.sub : LEVELS[ex.lvl].sub;
-  Sess.passes = []; Sess.cleanStreak = 0; Sess.elapsed = 0; Sess.bestClean = 0; Sess.offs = []; Sess.passAcc = null; Sess.statusKey = {};
+  Sess.passes = []; Sess.cleanStreak = 0; Sess.elapsed = 0; Sess.bestClean = 0; Sess.offs = []; Sess.passAcc = null; Sess.statusKey = {}; Sess.loop = false; Sess.stopAt = null; Sess.ended = false;
 }
 function ensureEx() { if (Sess.queue.length && !Sess.ex) loadEx(Sess.qi); }
 function startRun(demo) {
   ensureCtx(); if (Sess.run) stopRun();
   Sess.run = true; Sess.demo = demo; Sess.events = []; Sess.ui = -1; Sess.step = 0; Sess.nextT = AC.currentTime + 0.2; Sess.countBeats = Math.max(0, Math.min(4, S().count == null ? 4 : +S().count)); Sess.countSteps = Sess.countBeats * Sess.sub; Sess.playStart = null; Sess.beats = [];
-  Sess.curPass = 0; Sess.lastTick = performance.now(); Sess.statusKey = {}; clearBoardStatus();
+  Sess.curPass = 0; Sess.lastTick = performance.now(); Sess.statusKey = {}; clearBoardStatus(); Sess.stopAt = null; Sess.ended = false; { const dn = $('#done'); if (dn) dn.style.display = 'none'; }
   Mic.lat = S().latency / 1000;
   Sess.timer = setInterval(schedule, 25); Sess.raf = requestAnimationFrame(frame); refreshCtl();
+}
+// parou o exercício: o microfone não fica ligado à toa (liga de novo sozinho no próximo Iniciar)
+function micOff() { if (Mic.on) Mic.stop(); refreshCtl(); showRate(false); }
+function runDone() {
+  stopRun(); micOff(); clearBoardStatus();
+  const dn = $('#done'); if (dn) dn.style.display = 'flex';
 }
 function stopRun() { Sess.run = false; clearInterval(Sess.timer); cancelAnimationFrame(Sess.raf); $('#cd') && ($('#cd').style.display = 'none'); refreshCtl(); }
 function schedule() {
   const ex = Sess.ex; if (!Sess.run) return;
   while (Sess.nextT < AC.currentTime + 0.2) {
     const sub = Sess.sub, dur = 60 / Sess.bpm / sub, i = Sess.step, t = Sess.nextT;
+    if (Sess.stopAt != null && i - Sess.countSteps >= Sess.stopAt) { if (!Sess.ended) { Sess.ended = true; Sess.endT = t; } Sess.nextT = Infinity; break; }
     if (i % sub === 0) { click(t, (i / sub) % 4 === 0); Sess.beats.push({ t, n: (i / sub) % 4, ci: i < Sess.countSteps }); }
     const ni = i - Sess.countSteps;
     if (ni >= 0) {
@@ -215,6 +223,9 @@ function frame() {
     for (const ev of evs) { if (ev.res !== null) continue; if (now < ev.t + ev.dur) break; ev.res = 'unk'; if (ev.pos === ex.len - 1) { Sess.curPass = ev.pass + 1; dropPass(ev.pass); updHud(); showRate(true); break; } }
   }
   const tn = performance.now(); Sess.elapsed += (tn - Sess.lastTick) / 1000; Sess.lastTick = tn; updHud();
+  // duração fixa: ao acabar o tempo, termina a passada em andamento e para (a menos que o loop esteja ligado)
+  if (!Sess.loop && !Sess.demo && Sess.stopAt == null && Sess.elapsed >= exSecs()) { const ni = Sess.step - Sess.countSteps, len = ex.len; Sess.stopAt = Math.max(len, Math.ceil(Math.max(ni, 1) / len) * len); }
+  if (Sess.ended && now > Sess.endT + 0.3 && (!Sess.events.length || now > Sess.endT + 2)) { runDone(); return; }
   Sess.raf = requestAnimationFrame(frame);
 }
 function endPass(pass) {
@@ -263,12 +274,17 @@ function clearBoardStatus() { document.querySelectorAll('.dot.hit,.dot.miss,.slo
 function updHud() {
   const g = id => $('#' + id); if (!g('bpm')) return;
   g('bpm').textContent = Sess.bpm;
+  if (g('durInfo') && Sess.ex) {
+    const ps = Sess.ex.len * 60 / Sess.bpm / Sess.sub, nc = P().needClean, fm = x => (x < 90 ? Math.round(x) + ' s' : x < 3600 ? Math.floor(x / 60) + ' min' + (Math.round(x % 60) ? ' ' + Math.round(x % 60) + ' s' : '') : '1 h+');
+    g('durInfo').textContent = (Sess.loop ? T('🔁 Loop ligado: sem tempo fixo. Toque em Concluir e salvar quando terminar.')
+      : `⏱ ${T('Duração:')} ${fm(exSecs())} · ${T('cada passada')} ≈ ${fm(ps)}` + (S().speed ? ` · ${T('Para subir o BPM:')} ${nc} ${T('passadas limpas seguidas')}` : '') + '. ' + T('No fim você escolhe: continuar em loop ou concluir.'));
+  }
   if (!Sess.rateReady) updRate();
   if (g('bpmL')) g('bpmL').textContent = 'BPM (1 clique = 1 tempo) · ' + subText(Sess.ex, Sess.sub);
   g('acc').textContent = Sess.passAcc == null ? '–' : Math.round(Sess.passAcc * 100) + '%';
   g('acc').style.color = Sess.passAcc == null ? '' : Sess.passAcc >= P().thr / 100 ? 'var(--ok)' : Sess.passAcc >= 0.6 ? 'var(--warn)' : 'var(--bad)';
   g('pass').textContent = Sess.passes.length;
-  const m = Math.floor(Sess.elapsed / 60), s = Math.floor(Sess.elapsed % 60); g('timer').textContent = m + ':' + String(s).padStart(2, '0');
+  const m = Math.floor(Sess.elapsed / 60), s = Math.floor(Sess.elapsed % 60); g('timer').textContent = m + ':' + String(s).padStart(2, '0') + (Sess.loop ? '' : ' / ' + Math.floor(exSecs() / 60) + ':' + String(exSecs() % 60).padStart(2, '0'));
   g('streak').textContent = S().speed ? `${Sess.cleanStreak}/${P().needClean}` : '–';
   if (g('off')) { const o = Sess.offs.slice(-12); g('off').textContent = o.length ? (o.reduce((a, b) => a + b, 0) / o.length * 1000 >= 0 ? '+' : '') + Math.round(o.reduce((a, b) => a + b, 0) / o.length * 1000) + ' ms' : '–'; }
 }
@@ -286,15 +302,24 @@ function updRate() {
   const i = $('#rateInfo'), ex = Sess.ex;
   if (i && ex) i.textContent = Sess.rateReady ? 'Como foi a última passada?' : `Autoavaliação: libera ao fim de cada passada (${ex.len} notas ≈ ${Math.round(ex.len * 60 / Sess.bpm / Sess.sub)} s).`;
 }
+// motivo do erro do microfone (antes era uma mensagem genérica); só para de tentar sozinho quando o usuário bloqueou a permissão
+function micFail(e) {
+  const n = e && e.name;
+  if (n === 'NotAllowedError' || n === 'SecurityError') { Mic.denied = true; toast('Microfone bloqueado: libere nas permissões do site e toque no 🎤.'); }
+  else if (n === 'NotFoundError' || n === 'OverconstrainedError') toast('Nenhum microfone encontrado. Dá para treinar com autoavaliação.');
+  else if (!navigator.mediaDevices) toast('Este navegador não permite microfone aqui (use HTTPS).');
+  else toast('Não consegui ligar o microfone (' + (n || 'erro') + '). Toque no 🎤 para tentar de novo.');
+}
 function refreshCtl() {
   const b = $('#btnRun'); if (!b) return;
   b.textContent = Sess.run && !Sess.demo ? '■ Parar' : '▶ Iniciar'; b.classList.toggle('pri', !(Sess.run && !Sess.demo));
   $('#btnDemo').textContent = Sess.run && Sess.demo ? '■ Parar demo' : '🔊 Demo';
   $('#btnMic').classList.toggle('on', Mic.on); $('#btnMic').innerHTML = Mic.on ? '<span class="rec"></span>' : '🎤';
   $('#btnSpeed').classList.toggle('on', S().speed);
+  { const bl = $('#btnLoop'); if (bl) bl.classList.toggle('on', Sess.loop); }
 }
 function finishEx(next) {
-  const was = Sess.run; stopRun();
+  const was = Sess.run; stopRun(); if (Mic.on) Mic.stop();
   if (Sess.ex && Sess.elapsed >= 8) {
     const accs = Sess.passes.map(p => p.acc), acc = accs.length ? accs.reduce((a, b) => a + b, 0) / accs.length : null;
     const clean = Math.max(Sess.bestClean, 0);
@@ -382,7 +407,7 @@ function viewTrain() {
   ensureEx(); const ex = Sess.ex;
   if (!ex) return viewTrilha();
   const lefty = S().lefty;
-  view.innerHTML = `<div class="row sp"><div><div class="meta row">${pill(ex.focus)}<span class="tag">${LVL[ex.lvl]}</span><span class="tag">meta ${ex.target} BPM</span></div><h2 style="margin-top:6px">${esc(ex.name)}</h2><div class="mut small">${esc(ex.desc)}</div></div>
+  view.innerHTML = `<div class="row sp"><div><div class="meta row">${pill(ex.focus)}<span class="tag">${LVL[ex.lvl]}</span><span class="tag">meta ${ex.target} BPM</span></div><h2 style="margin-top:6px">${esc(ex.name)}</h2><div class="mut small">${esc(ex.desc)}</div><div class="small" id="durInfo" style="margin-top:6px"></div></div>
     <div class="tag">${Sess.qi + 1} / ${Sess.queue.length}</div></div>
   <div class="board" style="margin-top:12px">${ex.type === 'notes' ? fretboardSVG(ex, lefty, S().label) : strumHTML(ex)}<div class="cd" id="cd"></div></div>
   <div class="hud">
@@ -391,15 +416,16 @@ function viewTrain() {
     <div class="box"><div class="v" id="pass">0</div><div class="l">passadas · limpas seguidas <b id="streak">–</b></div></div>
     <div class="box"><div class="v" id="timer">0:00</div><div class="l">tempo${ex.type === 'rhythm' ? ' · timing <b id="off">–</b>' : ''}</div></div>
   </div>
+  <div id="done" class="row card" style="display:none"><span style="flex:1"><b>⏱ Tempo concluído!</b></span><button class="btn pri" data-act="loopOn">🔁 Continuar em loop</button><button class="btn" data-act="finish">Concluir e salvar ▸</button></div>
   <div id="rate" class="row card"><span id="rateInfo">Autoavaliação</span><button class="btn sm" data-act="rate" data-v="1">✓ Limpa</button><button class="btn sm" data-act="rate" data-v="0.5">✗ Com erros</button></div>
-  <div class="row"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnDemo" data-act="demo">🔊 Demo</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">🎤</button><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button>
+  <div class="row"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnDemo" data-act="demo">🔊 Demo</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">🎤</button><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button><button class="btn" id="btnLoop" data-act="loop">🔁 Loop</button>
     ${ex.type === 'notes' ? `<select id="subSel" style="width:auto">${[1, 2, 4].map(v => `<option value="${v}">Notas por clique: ${v}</option>`).join('')}</select>` : ''}</div>
   <div class="row" style="margin-top:10px"><button class="btn" data-act="finish">Concluir e salvar ▸</button><button class="btn ghost" data-act="skip">Pular</button><button class="btn ghost" data-act="restart">Reiniciar</button><span class="mut small">Dica: use fones para o clique do metrônomo não entrar no microfone. Barra de espaço inicia/para.</span></div>
   <h3 style="margin:18px 0 8px">Fila de hoje</h3><div class="qlist">${Sess.queue.map((q, i) => `<div class="qi ${i === Sess.qi ? 'cur' : ''} ${q.done ? 'done' : ''}" data-act="goQ" data-i="${i}" style="cursor:pointer">${q.done ? '✓' : i + 1}. ${esc(EXMAP[q.id].name)}</div>`).join('')}</div>`;
   const ss = $('#subSel'); if (ss) { ss.value = Sess.sub; ss.onchange = e => { stopRun(); Sess.sub = +e.target.value; updHud(); }; }
   refreshCtl(); updHud(); showRate(false);
   const key =e => { if (e.code === 'Space' && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) { e.preventDefault(); act.run(); } };
-  addEventListener('keydown', key); cleanup = () => removeEventListener('keydown', key);
+  addEventListener('keydown', key); cleanup = () => { removeEventListener('keydown', key); stopRun(); if (Mic.on) Mic.stop(); };
 }
 let TL = null;
 function guided(l) {   // sessão guiada: até 4 exercícios do nível, começando pelos já iniciados e ainda não dominados
@@ -462,6 +488,7 @@ function viewSettings() {
   <label class="lbl">Quanto subir/descer o BPM: <b id="v-step">${s.step}</b></label><input type="range" min="1" max="10" value="${s.step}" data-in="step">
   <label class="lbl">Latência do dispositivo: <b id="v-latency">${s.latency}</b> ms</label><input type="range" min="0" max="300" step="5" value="${s.latency}" data-in="latency">
   <div class="row" style="margin-top:6px"><button class="btn sm" data-act="calib">Calibrar automaticamente</button><span class="mut small">Precisa de microfone e alto-falante (sem fones). Compensa o atraso entre ouvir o clique e o som voltar.</span></div>
+  <label class="lbl">Duração de cada exercício</label><select data-in="exMin">${[1, 2, 3, 5, 10].map(n => `<option value="${n}" ${(+s.exMin || 2) === n ? 'selected' : ''}>${n} min</option>`).join('')}</select>
   <label class="lbl">Contagem regressiva antes de começar</label><select data-in="count">${[4, 3, 2, 1, 0].map(n => `<option value="${n}" ${+s.count === n ? 'selected' : ''}>${n ? n + (n === 1 ? ' tempo' : ' tempos') + ' (' + Array.from({ length: n }, (_, i) => n - i).join(', ') + ')' : 'Sem contagem'}</option>`).join('')}</select>
   <div class="mut small" style="margin-top:4px">Cada número aparece junto com um clique do metrônomo; a primeira nota vem logo depois do 1.</div>
   <label class="lbl">Rótulo das bolinhas no braço</label><select data-in="label"><option value="note" ${s.label === 'note' ? 'selected' : ''}>Nome da nota</option><option value="fret" ${s.label === 'fret' ? 'selected' : ''}>Número da casa</option></select>
@@ -514,12 +541,14 @@ const act = {
   prev(d) { const el = $('#pv-' + d.id); if (el.innerHTML) { el.innerHTML = ''; return; } const e = EXMAP[d.id]; el.innerHTML = '<div class="board" style="margin-top:8px">' + (e.type === 'notes' ? fretboardSVG(e, S().lefty, S().label) : strumHTML(e)) + '</div>'; },
   async run() {
     ensureEx(); if (!Sess.ex) return;
-    if (Sess.run && !Sess.demo) { stopRun(); return; }
-    if (!Mic.on && !Mic.denied) { try { await Mic.start(); refreshCtl(); showRate(false); } catch (e) { Mic.denied = true; toast('Não consegui acessar o microfone. Dá para treinar com autoavaliação.'); } }
+    if (Sess.run && !Sess.demo) { stopRun(); micOff(); return; }
+    if (!Mic.on && !Mic.denied) { try { await Mic.start(); refreshCtl(); showRate(false); } catch (e) { micFail(e); } }
     startRun(false);
   },
   demo() { if (Sess.run && Sess.demo) stopRun(); else startRun(true); },
-  async mic() { if (Mic.on) { Mic.stop(); refreshCtl(); showRate(false); return; } try { await Mic.start(); Mic.denied = false; refreshCtl(); showRate(false); toast('Microfone ligado. Use fones para o clique não ser captado.'); } catch (e) { toast('Não consegui acessar o microfone. Dá para treinar com autoavaliação.'); } },
+  async mic() { if (Mic.on) { Mic.stop(); refreshCtl(); showRate(false); return; } try { await Mic.start(); Mic.denied = false; refreshCtl(); showRate(false); toast('Microfone ligado. Use fones para o clique não ser captado.'); } catch (e) { Mic.denied = false; micFail(e); } },
+  loop() { Sess.loop = !Sess.loop; if (Sess.loop) Sess.stopAt = null; refreshCtl(); updHud(); },
+  loopOn() { Sess.loop = true; Sess.stopAt = null; Sess.ended = false; startRun(false); refreshCtl(); updHud(); },
   speed() { S().speed = !S().speed; save(); refreshCtl(); updHud(); },
   bpm(d) { Sess.bpm = Math.max(30, Math.min(240, Sess.bpm + +d.d)); updHud(); },
   rate(d) { if (!Sess.rateReady) return; passDone(+d.v); showRate(false); },

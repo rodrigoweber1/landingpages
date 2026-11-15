@@ -1,8 +1,12 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.0.1';
+var APP_VERSION = '1.1.0';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
+  { pt: 'O microfone desliga ao parar ou concluir o exercício', en: 'The microphone turns off when you stop or finish an exercise', es: 'El micrófono se apaga al parar o terminar el ejercicio' },
+  { pt: 'Duração fixa por exercício (ajustável) com botão para continuar em loop', en: 'Fixed duration per exercise (adjustable) with a keep-looping button', es: 'Duración fija por ejercicio (ajustable) con botón para seguir en bucle' },
+  { pt: 'Duração de cada passada e do exercício explicada na tela de treino', en: 'Pass and exercise duration explained on the training screen', es: 'Duración de cada pasada y del ejercicio explicada en la pantalla de entrenamiento' },
+  { pt: 'Erros do microfone agora explicam o motivo', en: 'Microphone errors now explain the cause', es: 'Los errores del micrófono ahora explican la causa' },
   { pt: 'Versão visível na página inicial', en: 'Version shown on the home page', es: 'Versión visible en la página de inicio' },
   { pt: 'Versionamento: número da versão e botão para atualizar em Ajustes', en: 'Versioning: version number and update button in Settings', es: 'Versionado: número de versión y botón para actualizar en Ajustes' },
   { pt: 'Microfone liga ao iniciar o exercício; oitava conferida nas notas', en: 'Microphone turns on when an exercise starts; octave is checked', es: 'El micrófono se enciende al iniciar el ejercicio; se comprueba la octava' },

@@ -82,6 +82,21 @@ Refazer o quiz de nível|Retake the level quiz|Repetir el quiz de nivel
 Idioma|Language|Idioma
 Alto contraste|High contrast|Alto contraste
 Biblioteca|Library|Biblioteca
+Duração:|Duration:|Duración:
+cada passada|each pass|cada pasada
+No fim você escolhe: continuar em loop ou concluir.|At the end you choose: keep looping or finish.|Al final eliges: seguir en bucle o terminar.
+🔁 Loop ligado: sem tempo fixo. Toque em Concluir e salvar quando terminar.|🔁 Loop on: no fixed time. Tap Finish and save when you are done.|🔁 Bucle activado: sin tiempo fijo. Toca Terminar y guardar cuando termines.
+⏱ Tempo concluído!|⏱ Time is up!|⏱ ¡Tiempo cumplido!
+🔁 Continuar em loop|🔁 Keep looping|🔁 Seguir en bucle
+🔁 Loop|🔁 Loop|🔁 Bucle
+Duração de cada exercício|Exercise duration|Duración de cada ejercicio
+Cada passada dura|Each pass takes|Cada pasada dura
+Para subir o BPM:|To raise the BPM:|Para subir el BPM:
+passadas limpas seguidas|clean passes in a row|pasadas limpias seguidas
+Sem tempo fixo: toque em Concluir e salvar quando terminar.|No fixed time: tap Finish and save when you are done.|Sin tiempo fijo: toca Terminar y guardar cuando termines.
+Microfone bloqueado: libere nas permissões do site e toque no 🎤.|Microphone blocked: allow it in the site permissions and tap 🎤.|Micrófono bloqueado: permítelo en los permisos del sitio y toca 🎤.
+Nenhum microfone encontrado. Dá para treinar com autoavaliação.|No microphone found. You can still train with self-assessment.|No se encontró micrófono. Puedes entrenar con autoevaluación.
+Este navegador não permite microfone aqui (use HTTPS).|This browser does not allow the microphone here (use HTTPS).|Este navegador no permite el micrófono aquí (usa HTTPS).
 Sobre|About|Acerca de
 Novidades|What's new|Novedades
 Atualizar app|Update app|Actualizar app
