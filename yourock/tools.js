@@ -238,12 +238,14 @@ function findVoicings(root, iv, bass) {
 function chordSVG(v) {
   const fr = v.f.map((f, s) => (f > 0 ? f : null)).filter(x => x != null), mn = fr.length ? Math.min(...fr) : 1, base = fr.length && Math.max(...fr) > 5 ? mn : 1;   // só 'desce' pelo braço quando o acorde não cabe nas 5 primeiras casas
   const X = s => 24 + s * 19, Y = r => 36 + r * 24;
-  let o = `<svg viewBox="2 14 126 148" xmlns="http://www.w3.org/2000/svg">`;
+  let o = `<svg viewBox="-9 14 143 148" xmlns="http://www.w3.org/2000/svg">`;
   for (let r = 0; r <= 5; r++) o += `<line class="${r === 0 && base === 1 ? 'nut' : 'fret'}" x1="${X(0)}" x2="${X(5)}" y1="${Y(r)}" y2="${Y(r)}"/>`;
   for (let s = 0; s < 6; s++) o += `<line class="strg" x1="${X(s)}" x2="${X(s)}" y1="${Y(0)}" y2="${Y(5)}" stroke-width="1.2"/>`;
-  if (base > 1) o += `<text class="fnum" x="6" y="${Y(0) + 17}" style="font-size:13px;font-weight:700;fill:var(--tx);text-anchor:start">${base}ª</text>`;
-  if (v.barre && base === 1) o += `<text class="fnum" x="6" y="${Y(v.barre.fret - 1) + 17}" style="font-size:13px;font-weight:700;fill:var(--tx);text-anchor:start">${v.barre.fret}ª</text>`;   // número da casa da pestana
-  if (v.barre) { const r = v.barre.fret - base; o += `<rect x="${X(v.barre.from) - 9}" y="${Y(r) + 5}" width="${X(v.barre.to) - X(v.barre.from) + 18}" height="14" rx="7" fill="var(--acc)" opacity=".55"/>`; }
+  // número da casa: termina antes da coluna da corda grave, para não ficar embaixo da bolinha (cabe "10ª", "12ª")
+  if (base > 1) o += `<text class="fnum" x="12" y="${Y(0) + 17}" style="font-size:12px;font-weight:700;fill:var(--tx);text-anchor:end">${base}ª</text>`;
+  if (v.barre && base === 1) o += `<text class="fnum" x="12" y="${Y(v.barre.fret - 1) + 17}" style="font-size:12px;font-weight:700;fill:var(--tx);text-anchor:end">${v.barre.fret}ª</text>`;   // número da casa da pestana
+  // pestana: cápsula da altura da casa, maior que as bolinhas (antes ficava escondida atrás delas quando cobria poucas cordas)
+  if (v.barre) { const r = v.barre.fret - base; o += `<rect x="${X(v.barre.from) - 13}" y="${Y(r) + 1}" width="${X(v.barre.to) - X(v.barre.from) + 26}" height="22" rx="11" fill="var(--acc)" opacity=".6"/>`; }
   v.f.forEach((f, s) => {
     if (f < 0) { o += `<text class="fnum" x="${X(s)}" y="${Y(0) - 10}" style="font-size:13px">×</text>`; return; }
     if (f === 0) { o += `<circle cx="${X(s)}" cy="${Y(0) - 14}" r="5" fill="none" stroke="var(--strc)" stroke-width="1.5"/>`; return; }
