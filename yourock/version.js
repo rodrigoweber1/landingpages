@@ -1,8 +1,9 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.1.1';
+var APP_VERSION = '1.2.0';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
+  { pt: 'Acerto ou erro aparece na hora, nota por nota (com o microfone ligado)', en: 'Hit or miss shows right away, note by note (with the microphone on)', es: 'Acierto o error aparece al instante, nota por nota (con el micrófono encendido)' },
   { pt: 'Microfone mais compatível com iPhone/Safari', en: 'Microphone more compatible with iPhone/Safari', es: 'Micrófono más compatible con iPhone/Safari' },
   { pt: 'O microfone desliga ao parar ou concluir o exercício', en: 'The microphone turns off when you stop or finish an exercise', es: 'El micrófono se apaga al parar o terminar el ejercicio' },
   { pt: 'Duração fixa por exercício (ajustável) com botão para continuar em loop', en: 'Fixed duration per exercise (adjustable) with a keep-looping button', es: 'Duración fija por ejercicio (ajustable) con botón para seguir en bucle' },

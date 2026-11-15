@@ -253,18 +253,19 @@ function showCursor(ev) {
     document.querySelectorAll('.dot.cur').forEach(e => e.classList.remove('cur'));
     const n = ex.notes[ev.pos], d = $('#d' + n[0] + '_' + n[1]);
     if (d) { void d.getBoundingClientRect(); d.classList.add('cur'); }
-    if (ev.pos === Math.min(3, ex.len - 1)) clearBoardStatus();   // resultado da passada anterior some depois de alguns toques
+    if (ev.pos === 0) clearBoardStatus();   // resultado da passada anterior some depois de alguns toques
   } else {
     document.querySelectorAll('.slot.cur').forEach(e => e.classList.remove('cur'));
     const s = $('#sl' + ev.pos); if (s) { void s.getBoundingClientRect(); s.classList.add('cur'); }
     if (ex.chords && ev.pos === 0) { const c = $('#chordNow'); c && (c.textContent = ex.chords[ev.pass % ex.chords.length]); }
-    if (ev.pos === Math.min(3, ex.len - 1)) clearBoardStatus();
+    if (ev.pos === 0) clearBoardStatus();
   }
 }
 function paintResult(ev) {
   // só registra; as cores aparecem de uma vez no fim da passada (nada pisca fora do tempo durante o treino)
   const k = Sess.ex.type === 'notes' ? 'd' + ev.key : 'sl' + ev.pos;
   if (ev.res === 'miss') Sess.statusKey[k] = 'miss'; else if (Sess.statusKey[k] !== 'miss') Sess.statusKey[k] = 'hit';
+  const el = document.getElementById(k); if (el) { el.classList.remove('hit', 'miss'); el.classList.add(Sess.statusKey[k]); markDot(el, Sess.statusKey[k]); }
 }
 function applyStatus() {
   Object.entries(Sess.statusKey).forEach(([k, v]) => { const el = document.getElementById(k); if (el) { el.classList.remove('hit', 'miss'); el.classList.add(v); markDot(el, v); } });
