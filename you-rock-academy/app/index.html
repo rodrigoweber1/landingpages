@@ -21572,7 +21572,7 @@ function renderSide(name, lang) {
   });
 }
 // in-page links follow the active menu (next button, back arrow)
-const TOOLS = ['OtrasAfinaciones', 'Pulso', 'Braco', 'Oido', 'TeoriaAcordes', 'Buscador', 'CambioAcordes', 'PowerQuiz', 'Cejillas', 'Batidas', 'Acentos', 'RitmoAvanzado', 'Aranha', 'ImproEj', 'Teoria', 'Posiciones', 'Arpegios', 'Modos', 'ModosCurso', 'MenoresAv'];
+const TOOLS = ['OtrasAfinaciones', 'Pulso', 'Braco', 'Biblioteca', 'Oido', 'TeoriaAcordes', 'Buscador', 'CambioAcordes', 'PowerQuiz', 'Cejillas', 'Batidas', 'Acentos', 'RitmoAvanzado', 'Aranha', 'ImproEj', 'Teoria', 'Posiciones', 'Arpegios', 'Modos', 'ModosCurso', 'MenoresAv'];
 const ADV = ['TeoriaAcordes', 'Batidas', 'RitmoAvanzado', 'ImproEj', 'Teoria', 'Posiciones', 'Arpegios', 'Modos', 'ModosCurso', 'MenoresAv'];
 const hubOf = (n) => ADV.indexOf(n) >= 0 ? 'Avanzada' : 'Herramientas';
 let toolsMode = false;
@@ -23699,8 +23699,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '14 nov 2026 · 21:17';
-  var BUILD_ID = '2026-11-14T21:17';
+  var BUILD = '15 nov 2026 · 09:50';
+  var BUILD_ID = '2026-11-15T09:50';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
