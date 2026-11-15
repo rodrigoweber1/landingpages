@@ -32,8 +32,8 @@ function quizPlan(a, L) {
     if (plan.length >= 5) break;
     const fl = Math.min(L, sc[f] != null ? sc[f] + 1 : L);
     let c = EX.filter(e => e.focus === f && e.lvl <= fl).sort((x, y) => (y.lvl === fl) - (x.lvl === fl) || x.ord - y.ord)[0];
-    if (!c) c = EX.filter(e => e.focus === f).sort((x, y) => x.lvl - y.lvl || x.ord - y.ord)[0];
-    if (c && c.lvl > fl + 1) c = null;   // não empurra uma técnica distante do que o aluno já fez
+    let fb = false; if (!c) { c = EX.filter(e => e.focus === f).sort((x, y) => x.lvl - y.lvl || x.ord - y.ord)[0]; fb = true; }
+    if (c && c.lvl > fl + (fb ? 0 : 1)) c = null;   // sem exercício no nível do aluno para essa técnica: pula (nada acima do nível dele)   // não empurra uma técnica distante do que o aluno já fez
     if (c && !plan.some(p => p.id === c.id)) plan.push({ id: c.id, why: goalF.includes(f) ? 'Combina com o seu objetivo' : weak.includes(f) ? 'Ponto a reforçar' : 'Base do seu treino' });
   }
   return plan;
