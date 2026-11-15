@@ -1589,6 +1589,7 @@ body.stage .thm button[aria-pressed="true"]{background:var(--st-red)!important;b
 /* la página la maneja la app (scrollTo tras cada dibujo): el navegador no debe «anclar» el scroll por su cuenta */
 html,body,#app{overflow-anchor:none}
 /* etiqueta de sección / «Módulo · Paso»: amarillo, mayúsculas */
+body.stage #app [data-lbl][data-lbl][data-lbl]{display:block;font-size:12px!important;line-height:16px!important;font-weight:700!important;letter-spacing:.14em;text-transform:uppercase;color:var(--st-amber)!important}
 body.stage #app .eb{font-size:12px!important;line-height:16px!important;font-weight:700!important;letter-spacing:.14em;text-transform:uppercase;color:var(--st-amber)!important}
 /* tarjeta = fondo floor, borde rule, radio 16; aviso = fondo rojo oscuro (el script tagCards marca cada caja) */
 body.stage #app [data-card]{border-radius:16px!important}
@@ -22495,6 +22496,23 @@ function tagSegs(root) {
     todo.push(g);
   });
   todo.forEach((g) => g.setAttribute('data-seg', ''));
+  try { tagLabels(parents); } catch (e) {}
+}
+// the short title right above a group of options ("Compás", "Tempos para practicar") is a section label:
+// yellow caps, like the "Módulo · Paso" line. Looked up from the groups, so it works whatever markup the screen used.
+function tagLabels(groups) {
+  const todo = [];
+  groups.forEach((g) => {
+    if (!g.closest('main') || g.closest('header')) return;
+    const p = g.previousElementSibling;
+    if (!p || p.hasAttribute('data-lbl') || p.classList.contains('eb') || p.hasAttribute('data-card') || !/^(SPAN|B|P|DIV|LABEL|STRONG)$/.test(p.tagName)) return;
+    if (p.querySelector('button,input,select,svg,textarea,img,div,p') || p.hasAttribute('aria-pressed')) return;
+    const tx = (p.textContent || '').trim();
+    if (tx.length < 2 || tx.length > 60 || /[.?!:]$/.test(tx)) return;
+    if ((parseFloat(getComputedStyle(p).fontSize) || 0) > 15.5) return;
+    todo.push(p);
+  });
+  todo.forEach((p) => p.setAttribute('data-lbl', ''));
 }
 function tagNecks(root) {
   const r = root || app;
@@ -23715,8 +23733,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '15 nov 2026 · 10:08';
-  var BUILD_ID = '2026-11-15T10:08';
+  var BUILD = '15 nov 2026 · 11:52';
+  var BUILD_ID = '2026-11-15T11:52';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
