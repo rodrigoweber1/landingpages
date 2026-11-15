@@ -123,8 +123,8 @@ R('rBasic', 'Rasgueado básico ↓ ↓↑ ↑↓↑', 'beg', 70, 110, ['D','-','
 R('r8', 'Colcheias contínuas', 'beg', 70, 120, ['D','U','D','U','D','U','D','U'], 'Mão constante pra baixo e pra cima.', { sub: 2, chords: ['Em'] });
 R('rReg', 'Contratempo (reggae)', 'int', 70, 110, ['-','U','-','U','-','U','-','U'], 'Acentue o "e" de cada tempo.', { sub: 2, chords: ['Am','Dm'] });
 R('rFunk', 'Funk 16 com abafado', 'adv', 70, 100, ['D','x','U','x','D','x','U','D','x','U','x','D','x','U','D','U'], 'Abafe com a mão esquerda nos "x" e mantenha a mão direita contínua.', { sub: 4, chords: ['E9'] });
-R('rTrans', 'Troca de acordes Em–Am', 'beg', 50, 80, ['D','-','-','-','D','-','-','-'], 'Uma passada por compasso, só dois acordes. Troque de acorde antes do próximo tempo 1.', { sub: 2, chords: ['Em','Am'] });
-R('rTrans4', 'Troca de acordes Am–C–G–Em', 'int', 50, 100, ['D','-','-','-','D','-','-','-'], 'Uma passada por compasso, agora com quatro acordes. Troque antes do próximo tempo 1.', { sub: 2, chords: ['Am','C','G','Em'] });
+R('rTrans', 'Troca de acordes Em–Am', 'beg', 50, 80, ['D','-','-','-','D','-','-','-'], 'Uma passada por compasso, só dois acordes. Troque de acorde antes do próximo tempo 1.', { focus: 'chords', sub: 2, chords: ['Em','Am'] });
+R('rTrans4', 'Troca de acordes Am–C–G–Em', 'int', 50, 100, ['D','-','-','-','D','-','-','-'], 'Uma passada por compasso, agora com quatro acordes. Troque antes do próximo tempo 1.', { focus: 'chords', sub: 2, chords: ['Am','C','G','Em'] });
 // degrau 1 da palhetada alternada: só a mão da palheta, sem mão esquerda nem troca de corda
 add({ id: 'altOpen', name: 'Palhetada alternada em corda solta', focus: 'pick', rep: true, notes: Array(32).fill([4, 0]),
   desc: 'Repita a corda Si solta com palhetadas ↓↑ constantes. Só a mão da palheta trabalha: pulso relaxado, movimento pequeno.' });
@@ -191,10 +191,10 @@ add({ id: 'moveE', name: 'Formas móveis: forma de Mi em F · G · A', focus: 'c
   desc: 'O mesmo desenho de pestana deslizando pelo braço (casas 1, 3 e 5). Quem sabe uma forma sabe todos os acordes maiores.' });
 add({ id: 'moveA', name: 'Formas móveis: forma de Lá em Bb · C · D', focus: 'chords', notes: [].concat(ARP(ASH(1)), ARP(ASH(3)), ARP(ASH(5))),
   desc: 'A forma de Lá com pestana nas casas 1, 3 e 5. A fundamental fica na corda 5 (Lá): é dela que vem o nome do acorde.' });
-R('rBarreFC', 'Troca F · C rasgueada', 'beg', 50, 90, ['D','-','D','-','D','-','D','-'], 'Quatro batidas em F (pestana) e quatro em C (aberto), alternando. Prepare o indicador antes do tempo 1 de cada acorde.', { sub: 2, chords: ['F','C'] });
-R('rBarreFBbC', 'Troca F · Bb · C rasgueada', 'beg', 50, 90, ['D','-','D','-','D','-','D','-'], 'Três acordes que aparecem juntos em muitas músicas: F e Bb com pestana, C aberto. A pestana desliza uma casa e a forma muda de Mi para Lá.', { sub: 2, chords: ['F','Bb','C'] });
+R('rBarreFC', 'Troca F · C rasgueada', 'beg', 50, 90, ['D','-','D','-','D','-','D','-'], 'Quatro batidas em F (pestana) e quatro em C (aberto), alternando. Prepare o indicador antes do tempo 1 de cada acorde.', { focus: 'chords', sub: 2, chords: ['F','C'] });
+R('rBarreFBbC', 'Troca F · Bb · C rasgueada', 'beg', 50, 90, ['D','-','D','-','D','-','D','-'], 'Três acordes que aparecem juntos em muitas músicas: F e Bb com pestana, C aberto. A pestana desliza uma casa e a forma muda de Mi para Lá.', { focus: 'chords', sub: 2, chords: ['F','Bb','C'] });
 R('rBarreStrum', 'Rasgueado pop com pestana (F · Bm)', 'beg', 60, 100, ['D','-','-','U','-','U','D','U'], 'Padrão de pop com pausa no tempo 2, alternando F e Bm. Solte um pouco a pressão da pestana entre as batidas para descansar a mão.', { sub: 2, chords: ['F','Bm'] });
-R('rBarreProg', 'Progressão com pestana: F · Bb · Gm · C', 'beg', 60, 100, ['D','-','D','U','-','U','D','U'], 'Quatro acordes em ciclo, três deles com pestana (Gm usa a forma de Mi menor na casa 3). Troque sem parar o ritmo, mesmo que o acorde saia imperfeito.', { sub: 2, chords: ['F','Bb','Gm','C'] });
+R('rBarreProg', 'Progressão com pestana: F · Bb · Gm · C', 'beg', 60, 100, ['D','-','D','U','-','U','D','U'], 'Quatro acordes em ciclo, três deles com pestana (Gm usa a forma de Mi menor na casa 3). Troque sem parar o ritmo, mesmo que o acorde saia imperfeito.', { focus: 'chords', sub: 2, chords: ['F','Bb','Gm','C'] });
 
 // Currículo: [id, nível, BPM inicial, BPM meta]. A ordem aqui é a ordem pedagógica dentro do nível.
 // Regra: cada exercício acrescenta uma única dificuldade nova (ver revisao-niveis/reference/auditoria-niveis.html).

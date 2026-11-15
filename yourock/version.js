@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.4.15';
+var APP_VERSION = '1.4.16';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Exercícios de troca de acordes agora são da área Acordes (antes apareciam como Ritmo)', en: 'Chord-change exercises are now in the Chords area (they used to show as Rhythm)', es: 'Los ejercicios de cambio de acordes ahora son del área Acordes (antes aparecían como Ritmo)' },
   { pt: 'Biblioteca: busca corrigida (ignora acentos, aceita várias palavras e funciona no idioma escolhido)', en: 'Library: search fixed (ignores accents, accepts several words and works in the chosen language)', es: 'Biblioteca: búsqueda corregida (ignora acentos, acepta varias palabras y funciona en el idioma elegido)' },
   { pt: 'Troca de acordes: diagramas maiores, sem o nome grande do acorde e com o rasgueado menor', en: 'Chord changes: larger diagrams, no big chord name, smaller strumming pattern', es: 'Cambio de acordes: diagramas más grandes, sin el nombre grande del acorde y con el rasgueo más pequeño' },
   { pt: 'Exercícios de troca de acordes: diagramas pequenos dos acordes (como na seção Acordes), com o acorde da vez em destaque', en: 'Chord-change exercises: small chord diagrams (as in the Chords section), with the current chord highlighted', es: 'Ejercicios de cambio de acordes: diagramas pequeños de los acordes (como en la sección Acordes), con el acorde actual resaltado' },
