@@ -436,7 +436,11 @@ function viewVault() {
   $('#vact').onchange = e => { DB.active = e.target.value; save(); };
 }
 function vaultList() {
-  const q = VF.q.toLowerCase(), l = EX.filter(e => (VF.focus === 'all' || e.focus === VF.focus) && (VF.lvl === 'all' || e.lvl === VF.lvl) && (!VF.fav || DB.fav.includes(e.id)) && (e.name + ' ' + FOCUS[e.focus].n + ' ' + e.desc).toLowerCase().includes(q));
+  // busca: ignora acentos/maiúsculas, aceita várias palavras em qualquer ordem e procura no texto como aparece na tela (idioma escolhido) e no original em português
+  const nrm = x => String(x).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const words = nrm(VF.q).split(/\s+/).filter(Boolean);
+  const hay = e => nrm([e.name, e.desc, FOCUS[e.focus].n, LVL[e.lvl], T(e.name), T(e.desc), T(FOCUS[e.focus].n), T(LVL[e.lvl])].join(' '));
+  const l = EX.filter(e => (VF.focus === 'all' || e.focus === VF.focus) && (VF.lvl === 'all' || e.lvl === VF.lvl) && (!VF.fav || DB.fav.includes(e.id)) && (!words.length || (h => words.every(w => h.includes(w)))(hay(e))));
   $('#vcount').textContent = l.length + ' exercícios';
   $('#vlist').innerHTML = l.map(e => { const b = DB.best[e.id]; return `<div class="card ex" style="margin:0"><div class="meta">${pill(e.focus)}<span class="tag">${LVL[e.lvl]}</span><span class="tag">${e.type === 'rhythm' ? 'ritmo (por ataque)' : e.len + ' notas'}</span></div>
     <h3>${esc(e.name)}</h3><div class="mut small">${esc(e.desc)}</div><div class="small">Sugerido: ${e.bpm}–${e.target} BPM · ${subText(e, e.type === 'rhythm' ? e.sub : LEVELS[e.lvl].sub)}${b && b.clean ? ` · seu melhor limpo: <b style="color:var(--ok)">${b.clean}</b>` : ''}</div>
