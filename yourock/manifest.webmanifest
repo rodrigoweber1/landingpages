@@ -1,0 +1,16 @@
+{
+  "name": "YouRock – treino de guitarra",
+  "short_name": "YouRock",
+  "description": "Treino de guitarra que escuta você, sobe o BPM quando você toca limpo e mostra onde evoluir.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#101114",
+  "theme_color": "#101114",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

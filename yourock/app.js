@@ -1,0 +1,540 @@
+'use strict';
+const $ = (s, e = document) => e.querySelector(s);
+const view = $('#view');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// ---------- persistência ----------
+const KEY = 'fretforge.v1';
+function fresh() {
+  return { v: 1, sessions: [], routines: seedRoutines(), active: 'r1', fav: [], best: {},
+    settings: { latency: 90, step: 5, needClean: 2, thr: 85, sub: 0, subAuto: 1, count: 4, lefty: false, label: 'note', goal: 120, level: 'auto', levelParams: true, planMin: 20, speed: true } };
+}
+function loadDB() {
+  try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && d.v === 1) { d.settings = Object.assign(fresh().settings, d.settings); if (!d.settings.subAuto) { d.settings.sub = 0; d.settings.subAuto = 1; } if (!['auto', '1', '2', '3', '4'].includes(String(d.settings.level))) d.settings.level = 'auto'; return d; } } catch (e) {}
+  return fresh();
+}
+let DB = loadDB();
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} };
+const S = () => DB.settings;
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
+
+// ---------- estatísticas ----------
+const dkey = d => { const x = new Date(d); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+const fmtH = s => s >= 3600 ? (s / 3600).toFixed(1) + ' h' : Math.round(s / 60) + ' min';
+function stats() {
+  const ss = DB.sessions, perDay = {}, focus = {};
+  let total = 0, bestClean = 0;
+  Object.keys(FOCUS).forEach(k => focus[k] = { secs: 0, accSum: 0, accN: 0 });
+  ss.forEach(s => {
+    total += s.secs; const k = dkey(s.t); perDay[k] = (perDay[k] || 0) + s.secs;
+    const f = focus[s.focus]; if (f) { f.secs += s.secs; if (s.acc != null) { f.accSum += s.acc; f.accN++; } }
+    if (s.clean > bestClean) bestClean = s.clean;
+  });
+  Object.values(focus).forEach(f => f.acc = f.accN ? f.accSum / f.accN : null);
+  let streak = 0; const d = new Date(); if (!perDay[dkey(d)]) d.setDate(d.getDate() - 1);
+  while (perDay[dkey(d)]) { streak++; d.setDate(d.getDate() - 1); }
+  const days = []; for (let i = 29; i >= 0; i--) { const x = new Date(); x.setDate(x.getDate() - i); days.push({ k: dkey(x), s: perDay[dkey(x)] || 0 }); }
+  const mon = new Date(); mon.setHours(0, 0, 0, 0); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
+  const week = ss.filter(s => s.t >= mon.getTime()).reduce((a, s) => a + s.secs, 0);
+  return { total, perDay, focus, streak, days, week, bestClean, n: ss.length };
+}
+function insights(st) {
+  const out = [], ss = DB.sessions;
+  if (!ss.length) return [{ t: 'warn', m: 'Ainda sem dados. Faça seu primeiro treino para eu começar a analisar seus pontos fortes e fracos.' }];
+  const cl = curLevel(), lp = lvlProgress(cl);
+  if (cl < 4 && lp.pct >= UNLOCK_AT) out.push({ t: 'good', m: `Você dominou ${lp.mastered}/${lp.total} do Nível ${LEVELS[cl].roman}. Pronto para avançar para o Nível ${LEVELS[cl + 1].roman}.` });
+  else out.push({ t: '', m: `Nível ${LEVELS[cl].roman} (${LEVELS[cl].name}): ${lp.mastered}/${lp.total} exercícios dominados. Faltam ${Math.max(0, Math.ceil(UNLOCK_AT * lp.total) - lp.mastered)} para liberar o próximo nível.` });
+  if (st.streak >= 3) out.push({ t: 'good', m: `Sequência de ${st.streak} dias seguidos. Consistência vale mais que sessões longas e raras.` });
+  else if (!st.perDay[dkey(Date.now())]) out.push({ t: 'warn', m: 'Você ainda não treinou hoje. Dez minutos já mantêm o hábito.' });
+  const fa = Object.entries(st.focus).filter(([, f]) => f.accN >= 2).sort((a, b) => a[1].acc - b[1].acc);
+  if (fa.length && fa[0][1].acc < 0.8) out.push({ t: 'warn', m: `Ponto fraco: ${FOCUS[fa[0][0]].n} (${Math.round(fa[0][1].acc * 100)}% de precisão). Vou priorizar isso no treino do dia.` });
+  const tot = st.total || 1;
+  const neglected = Object.entries(st.focus).filter(([, f]) => f.secs / tot < 0.06).map(([k]) => FOCUS[k].n);
+  if (neglected.length && st.n >= 5) out.push({ t: '', m: `Pouca prática em: ${neglected.join(', ')}. Um treino equilibrado evita lacunas.` });
+  const byEx = {}; ss.forEach(s => (byEx[s.ex] = byEx[s.ex] || []).push(s));
+  Object.entries(byEx).forEach(([id, l]) => {
+    if (l.length >= 4 && EXMAP[id]) {
+      const last3 = l.slice(-3).map(x => x.clean), prev = Math.max(...l.slice(0, -3).map(x => x.clean));
+      if (last3.every(c => c <= prev)) out.push({ t: 'warn', m: `Platô em "${EXMAP[id].name}": sem evolução há 3 sessões em ${prev} BPM. Tente baixar 10%, mudar a subdivisão ou treinar em blocos de 30 s.` });
+    }
+    if (l.length >= 3 && l[l.length - 1].clean > l[0].clean && EXMAP[id]) {
+      const g = l[l.length - 1].clean - l[0].clean;
+      if (g >= 15) out.push({ t: 'good', m: `Evolução em "${EXMAP[id].name}": +${g} BPM limpos desde a primeira sessão.` });
+    }
+  });
+  const g = S().goal * 60, w = st.week;
+  if (g) out.push({ t: w >= g ? 'good' : '', m: w >= g ? 'Meta semanal batida! 🎯' : `Meta semanal: ${Math.round(w / 60)} de ${S().goal} min (${Math.round(100 * w / g)}%).` });
+  return out.slice(0, 7);
+}
+function achievements(st) {
+  const A = [['Primeiro treino', st.n >= 1], ['3 dias seguidos', st.streak >= 3], ['7 dias seguidos', st.streak >= 7], ['10 horas de prática', st.total >= 36000],
+    ['100 BPM limpos', st.bestClean >= 100], ['Mestre da precisão (≥95%)', DB.sessions.some(s => s.acc != null && s.acc >= 0.95)], ['Explorador: 5 focos', Object.values(st.focus).filter(f => f.secs > 0).length >= 5], ['Meta semanal', S().goal && st.week >= S().goal * 60]];
+  return A.map(([n, ok]) => ({ n, ok: !!ok }));
+}
+
+// ---------- níveis e domínio ----------
+const isMastered = id => ((DB.best[id] && DB.best[id].clean) || 0) >= MASTER_AT * EXMAP[id].target;
+function lvlProgress(l) {
+  const ids = LV_EX[l]; let m = 0, s = 0;
+  ids.forEach(id => { if (DB.best[id]) s++; if (isMastered(id)) m++; });
+  return { total: ids.length, mastered: m, started: s, pct: m / ids.length };
+}
+function autoLevel() { let r = 4; for (let l = 1; l < 4; l++) if (lvlProgress(l).pct < UNLOCK_AT) { r = l; break; } return Math.max(r, DB.placed || 1); }
+function curLevel() { const v = S().level; return v === 'auto' ? autoLevel() : +v; }
+// parâmetros de ritmo de aprendizado do exercício em treino (ou do nível atual)
+function P() {
+  const L = LEVELS[Sess.ex ? Sess.ex.lvl : curLevel()];
+  return S().levelParams ? { thr: L.thr, needClean: L.needClean, step: L.step } : { thr: S().thr, needClean: S().needClean, step: S().step };
+}
+
+// ---------- treino do dia (adaptativo, baseado em regras) ----------
+function recommend(min) {
+  const n = Math.max(2, Math.round(min / 4)), st = stats(), now = Date.now(), ul = curLevel();
+  const sc = EX.filter(e => e.lvl <= ul).map(e => {
+    const f = st.focus[e.focus], b = DB.best[e.id];
+    const weak = f.acc != null ? 1 - f.acc : 0.35;
+    const days = b ? Math.min(14, (now - b.t) / 864e5) / 14 : 0.6;
+    const score = 1.6 * weak + 0.9 * days + Math.random() * 0.25 + (e.lvl === ul ? 0.5 : 0) - (isMastered(e.id) ? 0.4 : 0);
+    let why = b ? `Não treinado há ${Math.max(1, Math.round((now - b.t) / 864e5))} dia(s)` : 'Novo para você';
+    if (f.acc != null && f.acc < 0.8) why = `Ponto fraco: ${FOCUS[e.focus].n} (${Math.round(f.acc * 100)}% de precisão)`;
+    return { e, score, why };
+  }).sort((a, b) => b.score - a.score);
+  const pick = [], cnt = {};
+  for (const c of sc) { if ((cnt[c.e.focus] || 0) >= 2) continue; cnt[c.e.focus] = (cnt[c.e.focus] || 0) + 1; pick.push(c); if (pick.length >= n) break; }
+  pick.sort((a, b) => ['mech', 'pick'].indexOf(b.e.focus) - ['mech', 'pick'].indexOf(a.e.focus) || a.e.lvl - b.e.lvl);
+  return pick.map(c => ({ id: c.e.id, why: c.why }));
+}
+let TODAY = null;
+
+// ---------- fretboard ----------
+function fretboardSVG(ex, lefty, label) {
+  const notes = ex.notes, fr = notes.map(n => n[1]);
+  const lo = Math.min(...fr), hi = Math.max(...fr);
+  const first = lo <= 1 ? 0 : lo, last = Math.max(hi, first + 5), cols = last - first + 1;
+  const W = 640, H = 200, mL = 34, mR = 12, cw = (W - mL - mR) / cols, X = f => { const x = mL + (f - first + 0.5) * cw; return lefty ? W - x : x; };
+  const L = k => { const x = mL + k * cw; return lefty ? W - x : x; };
+  const Y = s => 28 + (5 - s) * 28;
+  let o = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  [3, 5, 7, 9, 12, 15, 17].forEach(f => { if (f >= first && f <= last) { const two = f === 12; (two ? [-14, 14] : [0]).forEach(dy => o += `<circle class="inlay" cx="${X(f)}" cy="${(Y(2) + Y(3)) / 2 + dy * 0}" r="${two ? 6 : 7}" ${two ? `transform="translate(0 ${dy})"` : ''}/>`); } });
+  for (let k = 1; k <= cols; k++) o += `<line class="${first === 0 && k === 1 ? 'nut' : 'fret'}" x1="${L(k)}" x2="${L(k)}" y1="${Y(5) - 10}" y2="${Y(0) + 10}"/>`;
+  for (let s = 0; s < 6; s++) { o += `<line class="strg" x1="${L(0)}" x2="${L(cols)}" y1="${Y(s)}" y2="${Y(s)}" stroke-width="${1 + (5 - s) * 0.45}"/>`; o += `<text class="slab" x="${lefty ? W - 14 : 14}" y="${Y(s)}">${'EADGBe'[s]}</text>`; }
+  for (let f = first; f <= last; f++) o += `<text class="fnum" x="${X(f)}" y="${H - 6}">${f === 0 ? '' : f}</text>`;
+  const seen = new Set();
+  notes.forEach(([s, f]) => { const k = s + '_' + f; if (seen.has(k)) return; seen.add(k);
+    o += `<g class="dot" id="d${k}"><circle cx="${X(f)}" cy="${Y(s)}" r="12"/><text x="${X(f)}" y="${Y(s)}">${label === 'fret' ? f : pcName(OPEN[s] + f)}</text></g>`; });
+  return o + '</svg>';
+}
+function slotLabel(i, sub) { const b = Math.floor(i / sub) + 1, r = i % sub; return sub === 2 ? (r ? '&' : b) : (r === 0 ? b : ['', 'e', '&', 'a'][r]); }
+function strumHTML(ex) {
+  const arrows = { D: '↓', U: '↑', x: '✕', '-': '·' };
+  return `<div class="chord" id="chordNow">${esc((ex.chords || [''])[0])}</div><div class="slots" style="grid-template-columns:repeat(${Math.min(8, ex.pattern.length)},1fr)">` +
+    ex.pattern.map((p, i) => `<div class="slot ${p === '-' ? 'rest' : ''}" id="sl${i}">${arrows[p]}<small>${slotLabel(i, ex.sub)}</small></div>`).join('') + '</div>';
+}
+
+// ---------- sessão de treino ----------
+const Sess = { queue: [], qi: 0, ex: null, bpm: 80, sub: 2, run: false, demo: false, passes: [], events: [], ui: -1, cleanStreak: 0, elapsed: 0, lastTick: 0, raf: 0, timer: 0, statusKey: {}, passAcc: null, bestClean: 0, offs: [] };
+function setQueue(ids, startAt = 0) {
+  stopRun(); Sess.queue = ids.map(id => ({ id, done: false })); Sess.qi = startAt; Sess.ex = null;
+  if (location.hash === '#/train') render(); else location.hash = '#/train';
+}
+function dropPass(pass) {
+  const before = Sess.events.length; Sess.events = Sess.events.filter(e => e.pass !== pass);
+  Sess.ui = Math.max(-1, Sess.ui - (before - Sess.events.length));
+}
+function loadEx(i) {
+  stopRun(); const q = Sess.queue[i]; if (!q) return; Sess.qi = i; const ex = EXMAP[q.id]; Sess.ex = ex;
+  Sess.bpm = (DB.best[ex.id] && DB.best[ex.id].last) || ex.bpm; Sess.sub = ex.type === 'rhythm' ? ex.sub : LEVELS[ex.lvl].sub;
+  Sess.passes = []; Sess.cleanStreak = 0; Sess.elapsed = 0; Sess.bestClean = 0; Sess.offs = []; Sess.passAcc = null; Sess.statusKey = {};
+}
+function ensureEx() { if (Sess.queue.length && !Sess.ex) loadEx(Sess.qi); }
+function startRun(demo) {
+  ensureCtx(); if (Sess.run) stopRun();
+  Sess.run = true; Sess.demo = demo; Sess.events = []; Sess.ui = -1; Sess.step = 0; Sess.nextT = AC.currentTime + 0.2; Sess.countBeats = Math.max(0, Math.min(4, S().count == null ? 4 : +S().count)); Sess.countSteps = Sess.countBeats * Sess.sub; Sess.playStart = null; Sess.beats = [];
+  Sess.curPass = 0; Sess.lastTick = performance.now(); Sess.statusKey = {}; clearBoardStatus();
+  Mic.lat = S().latency / 1000;
+  Sess.timer = setInterval(schedule, 25); Sess.raf = requestAnimationFrame(frame); refreshCtl();
+}
+function stopRun() { Sess.run = false; clearInterval(Sess.timer); cancelAnimationFrame(Sess.raf); $('#cd') && ($('#cd').style.display = 'none'); refreshCtl(); }
+function schedule() {
+  const ex = Sess.ex; if (!Sess.run) return;
+  while (Sess.nextT < AC.currentTime + 0.2) {
+    const sub = Sess.sub, dur = 60 / Sess.bpm / sub, i = Sess.step, t = Sess.nextT;
+    if (i % sub === 0) { click(t, (i / sub) % 4 === 0); Sess.beats.push({ t, n: (i / sub) % 4, ci: i < Sess.countSteps }); }
+    const ni = i - Sess.countSteps;
+    if (ni >= 0) {
+      if (ni === 0) Sess.playStart = t;
+      const len = ex.len, pos = ni % len, pass = Math.floor(ni / len);
+      const ev = { t, pos, pass, dur, res: null };
+      if (ex.type === 'notes') { ev.exp = midiOf(ex.notes[pos]); ev.prev = midiOf(ex.notes[(pos + len - 1) % len]); ev.key = ex.notes[pos][0] + '_' + ex.notes[pos][1]; if (Sess.demo) pluck(t, ev.exp, dur); }
+      else ev.exp = ex.pattern[pos] !== '-' ? 1 : null;
+      Sess.events.push(ev);
+    }
+    Sess.step++; Sess.nextT += dur;
+  }
+}
+function judge(ev) {
+  const ex = Sess.ex;
+  if (ex.type === 'notes') {
+    const w0 = ev.t - 0.25 * ev.dur, w1 = ev.t + 0.9 * ev.dur;
+    const ok = Mic.hist.some(d => d.t >= w0 && d.t <= w1 && (((d.midi - ev.exp) % 12) + 12) % 12 === 0);
+    if (!ok) return false;
+    if (ex.rep || ev.prev === ev.exp) return Mic.onsets.some(o => o.t >= w0 && o.t <= w1);
+    return true;
+  }
+  const tol = Math.max(0.09, 0.35 * ev.dur); let best = null;
+  Mic.onsets.forEach(o => { const d = o.t - ev.t; if (Math.abs(d) <= tol && (best == null || Math.abs(d) < Math.abs(best))) best = d; });
+  if (best != null) Sess.offs.push(best);
+  return best != null;
+}
+function frame() {
+  if (!Sess.run) return;
+  const now = AC.currentTime, ex = Sess.ex, evs = Sess.events;
+  // o que se vê deve coincidir com o que se ouve: desconta o atraso de saída do áudio (maior em Bluetooth)
+  const vnow = now - (AC.outputLatency || AC.baseLatency || 0);
+  while (Sess.beats.length && Sess.beats[0].t <= vnow) { const b = Sess.beats.shift(); document.querySelectorAll('.beats i').forEach((x, k) => x.classList.toggle('on', k === b.n));
+    // contagem regressiva: mostra N, ..., 2, 1 exatamente em cada clique; some quando a primeira nota acende
+    const cd = $('#cd'); if (cd && b.ci) { cd.style.display = 'grid'; cd.textContent = Sess.countBeats - b.n; } }
+  while (evs[Sess.ui + 1] && evs[Sess.ui + 1].t <= vnow) { Sess.ui++; showCursor(evs[Sess.ui]); }
+  if (Mic.on && !Sess.demo) {
+    for (const ev of evs) {
+      if (ev.res !== null || ev.exp == null && ev.res !== null) continue;
+      if (now < ev.t + 0.9 * ev.dur + 0.06) break;
+      ev.res = ev.exp == null ? 'skip' : (judge(ev) ? 'hit' : 'miss');
+      if (ev.res !== 'skip') paintResult(ev);
+      if (ev.pos === ex.len - 1) endPass(ev.pass);
+    }
+  } else if (!Sess.demo) {
+    for (const ev of evs) { if (ev.res !== null) continue; if (now < ev.t + ev.dur) break; ev.res = 'unk'; if (ev.pos === ex.len - 1) { Sess.curPass = ev.pass + 1; dropPass(ev.pass); updHud(); showRate(true); break; } }
+  }
+  const tn = performance.now(); Sess.elapsed += (tn - Sess.lastTick) / 1000; Sess.lastTick = tn; updHud();
+  Sess.raf = requestAnimationFrame(frame);
+}
+function endPass(pass) {
+  const evs = Sess.events.filter(e => e.pass === pass && e.res && e.res !== 'skip');
+  if (!evs.length) return;
+  const acc = evs.filter(e => e.res === 'hit').length / evs.length;
+  dropPass(pass);
+  passDone(acc);
+  applyStatus(); Sess.statusKey = {};
+}
+function passDone(acc) {
+  Sess.passes.push({ acc, bpm: Sess.bpm }); Sess.passAcc = acc; Sess.curPass = Sess.passes.length;
+  const pp = P(), thr = pp.thr / 100, clean = acc >= thr;
+  if (clean) { Sess.cleanStreak++; Sess.bestClean = Math.max(Sess.bestClean, Sess.bpm); } else Sess.cleanStreak = 0;
+  if (S().speed) {
+    if (clean && Sess.cleanStreak >= pp.needClean) { Sess.bpm = Math.min(240, Sess.bpm + pp.step); Sess.cleanStreak = 0; toast(`🚀 ${Math.round(acc * 100)}% limpo ×${pp.needClean} → ${Sess.bpm} BPM`); }
+    else if (acc < 0.6) { Sess.bpm = Math.max(30, Sess.bpm - pp.step); toast(`↓ ${Math.round(acc * 100)}% – voltando para ${Sess.bpm} BPM`); }
+  }
+  updHud();
+}
+function showCursor(ev) {
+  const ex = Sess.ex, cd = $('#cd'); if (cd) cd.style.display = 'none';   // fim da contagem
+  if (ex.type === 'notes') {
+    // só UMA nota acende, no instante do clique (mesma nota repetida também pisca de novo)
+    document.querySelectorAll('.dot.cur').forEach(e => e.classList.remove('cur'));
+    const n = ex.notes[ev.pos], d = $('#d' + n[0] + '_' + n[1]);
+    if (d) { void d.getBoundingClientRect(); d.classList.add('cur'); }
+    if (ev.pos === Math.min(3, ex.len - 1)) clearBoardStatus();   // resultado da passada anterior some depois de alguns toques
+  } else {
+    document.querySelectorAll('.slot.cur').forEach(e => e.classList.remove('cur'));
+    const s = $('#sl' + ev.pos); if (s) { void s.getBoundingClientRect(); s.classList.add('cur'); }
+    if (ex.chords && ev.pos === 0) { const c = $('#chordNow'); c && (c.textContent = ex.chords[ev.pass % ex.chords.length]); }
+    if (ev.pos === Math.min(3, ex.len - 1)) clearBoardStatus();
+  }
+}
+function paintResult(ev) {
+  // só registra; as cores aparecem de uma vez no fim da passada (nada pisca fora do tempo durante o treino)
+  const k = Sess.ex.type === 'notes' ? 'd' + ev.key : 'sl' + ev.pos;
+  if (ev.res === 'miss') Sess.statusKey[k] = 'miss'; else if (Sess.statusKey[k] !== 'miss') Sess.statusKey[k] = 'hit';
+}
+function applyStatus() {
+  Object.entries(Sess.statusKey).forEach(([k, v]) => { const el = document.getElementById(k); if (el) { el.classList.remove('hit', 'miss'); el.classList.add(v); markDot(el, v); } });
+}
+function markDot(el, v) { if (!el.classList.contains('dot')) return; const c = el.querySelector('circle'); if (!c) return; let t = el.querySelector('.mk'); if (!t) { t = document.createElementNS('http://www.w3.org/2000/svg', 'text'); t.setAttribute('class', 'mk'); el.appendChild(t); } t.setAttribute('x', +c.getAttribute('cx') + 10); t.setAttribute('y', +c.getAttribute('cy') - 10); t.textContent = v === 'miss' ? '\u2717' : '\u2713'; }
+function clearBoardStatus() { document.querySelectorAll('.dot.hit,.dot.miss,.slot.hit,.slot.miss').forEach(e => e.classList.remove('hit', 'miss')); document.querySelectorAll('.dot .mk').forEach(e => e.remove()); }
+function updHud() {
+  const g = id => $('#' + id); if (!g('bpm')) return;
+  g('bpm').textContent = Sess.bpm;
+  if (!Sess.rateReady) updRate();
+  if (g('bpmL')) g('bpmL').textContent = 'BPM (1 clique = 1 tempo) · ' + subText(Sess.ex, Sess.sub);
+  g('acc').textContent = Sess.passAcc == null ? '–' : Math.round(Sess.passAcc * 100) + '%';
+  g('acc').style.color = Sess.passAcc == null ? '' : Sess.passAcc >= P().thr / 100 ? 'var(--ok)' : Sess.passAcc >= 0.6 ? 'var(--warn)' : 'var(--bad)';
+  g('pass').textContent = Sess.passes.length;
+  const m = Math.floor(Sess.elapsed / 60), s = Math.floor(Sess.elapsed % 60); g('timer').textContent = m + ':' + String(s).padStart(2, '0');
+  g('streak').textContent = S().speed ? `${Sess.cleanStreak}/${P().needClean}` : '–';
+  if (g('off')) { const o = Sess.offs.slice(-12); g('off').textContent = o.length ? (o.reduce((a, b) => a + b, 0) / o.length * 1000 >= 0 ? '+' : '') + Math.round(o.reduce((a, b) => a + b, 0) / o.length * 1000) + ' ms' : '–'; }
+}
+function subText(ex, sub) {
+  if (!ex) return '';
+  if (ex.type === 'rhythm') return sub + ' divisões por tempo';
+  return sub === 1 ? '1 nota por clique' : sub === 2 ? '2 notas por clique (colcheias)' : '4 notas por clique (semicolcheias)';
+}
+// autoavaliação (sem microfone): painel sempre visível; os botões liberam ao fim de cada passada
+function showRate(on) { Sess.rateReady = !!on && !Mic.on; updRate(); }
+function updRate() {
+  const r = $('#rate'); if (!r) return;
+  r.style.display = Mic.on ? 'none' : 'flex';
+  r.querySelectorAll('button').forEach(b => { b.disabled = !Sess.rateReady; });
+  const i = $('#rateInfo'), ex = Sess.ex;
+  if (i && ex) i.textContent = Sess.rateReady ? 'Como foi a última passada?' : `Autoavaliação: libera ao fim de cada passada (${ex.len} notas ≈ ${Math.round(ex.len * 60 / Sess.bpm / Sess.sub)} s).`;
+}
+function refreshCtl() {
+  const b = $('#btnRun'); if (!b) return;
+  b.textContent = Sess.run && !Sess.demo ? '■ Parar' : '▶ Iniciar'; b.classList.toggle('pri', !(Sess.run && !Sess.demo));
+  $('#btnDemo').textContent = Sess.run && Sess.demo ? '■ Parar demo' : '🔊 Ouvir exemplo';
+  $('#btnMic').classList.toggle('on', Mic.on); $('#btnMic').innerHTML = Mic.on ? '<span class="rec"></span> Escutando' : '🎤 Ativar microfone';
+  $('#btnSpeed').classList.toggle('on', S().speed);
+}
+function finishEx(next) {
+  const was = Sess.run; stopRun();
+  if (Sess.ex && Sess.elapsed >= 8) {
+    const accs = Sess.passes.map(p => p.acc), acc = accs.length ? accs.reduce((a, b) => a + b, 0) / accs.length : null;
+    const clean = Math.max(Sess.bestClean, 0);
+    DB.sessions.push({ t: Date.now(), ex: Sess.ex.id, focus: Sess.ex.focus, secs: Math.round(Sess.elapsed), acc, bpm: Sess.bpm, clean });
+    const id = Sess.ex.id, wasM = DB.best[id] ? isMastered(id) : false, wasLv = autoLevel();
+    const b = DB.best[id] || { n: 0, clean: 0 }; b.n++; b.last = Sess.bpm; b.t = Date.now(); b.clean = Math.max(b.clean || 0, clean); DB.best[id] = b; save();
+    let msg = `Salvo: ${Math.round(Sess.elapsed / 60 * 10) / 10} min${acc != null ? ' · ' + Math.round(acc * 100) + '% de precisão' : ''}${clean ? ' · ' + clean + ' BPM limpos' : ''}`;
+    if (!wasM && isMastered(id)) msg = `🏆 Exercício dominado (${clean}/${Sess.ex.target} BPM)! ` + msg;
+    if (autoLevel() > wasLv) msg = `🎉 Nível ${LEVELS[autoLevel()].roman} liberado! ` + msg;
+    toast(msg);
+    const q = Sess.queue[Sess.qi]; if (q) q.done = true;
+  }
+  if (next === 'stay') { loadEx(Sess.qi); render(); return; }
+  const nx = Sess.queue.findIndex((q, i) => i > Sess.qi && !q.done);
+  if (nx >= 0) { loadEx(nx); render(); } else { Sess.ex = null; render(); if (was || Sess.queue.some(q => q.done)) toast('🎉 Treino completo!'); }
+}
+
+// ---------- views ----------
+const NAV = [['home', 'Hoje', 'i-home'], ['vault', 'Library', 'i-vault'], ['train', 'Treinar', 'i-play'], ['stats', 'Progresso', 'i-stats'], ['metro', 'Metrônomo', 'i-metro'], ['notes', 'Notas', 'i-note'], ['chords', 'Acordes', 'i-chord'], ['tuner', 'Afinador', 'i-tuner'], ['settings', 'Ajustes', 'i-gear']];
+function navHTML(cur) { return NAV.map(([k, n, i]) => `<a href="#/${k}" title="${n}" class="${k === cur ? 'on' : ''}"><svg><use href="#${i}"/></svg><span>${n}</span></a>`).join(''); }
+const routes = { home: viewHome, vault: viewVault, train: viewTrain, stats: viewStats, metro: viewMetro, notes: viewNotes, chords: viewChords, tuner: viewTuner, settings: viewSettings, quiz: viewQuiz };
+let cleanup = () => {};
+function render() {
+  cleanup(); cleanup = () => {}; stopRun();
+  const h = (location.hash || '#/home').slice(2).split('?')[0], r = routes[h] ? h : 'home';
+  if (r === 'home' && !DB.placed && !DB.placeSkip && !DB.sessions.length) { location.hash = '#/quiz'; return; }
+  $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navHTML(r);
+  view.innerHTML = ''; routes[r](); window.scrollTo(0, 0);
+}
+addEventListener('hashchange', render);
+
+const pill = k => `<span class="pill" style="background:${FOCUS[k].c}">${FOCUS[k].n}</span>`;
+const estMin = ids => ids.length * 4;
+function viewHome() {
+  const st = stats(); if (!TODAY) TODAY = recommend(S().planMin);
+  const goal = S().goal * 60, pct = goal ? Math.min(100, Math.round(100 * st.week / goal)) : 0;
+  const ins = insights(st).slice(0, 3);
+  view.innerHTML = `
+  <div class="row sp" style="margin:6px 0 14px"><div><h1>Bora treinar 🎸</h1><div class="mut">Treino que escuta você, ajusta a velocidade e mostra onde evoluir.</div></div></div>
+  ${DB.placed ? '' : '<div class="card row sp" style="margin-bottom:12px"><div><b>Descubra seu nível</b><div class="mut small">Um quiz de 2 minutos para começar no exercício certo.</div></div><button class="btn pri" data-act="qzStart">Fazer o quiz</button></div>'}
+  <div class="grid g3">
+    <div class="card kpi row"><div class="ring" style="--p:${pct}" data-t="${pct}%"></div><div><div class="l">Meta semanal</div><div class="v" style="font-size:22px">${Math.round(st.week / 60)} / ${S().goal} min</div></div></div>
+    <div class="card kpi"><div class="l">Sequência</div><div class="v">🔥 ${st.streak} <span class="mut" style="font-size:14px">dia${st.streak === 1 ? '' : 's'}</span></div></div>
+    <a href="#/train" class="card kpi" style="display:block"><div class="l">Nível atual</div><div class="v" style="color:${LEVELS[curLevel()].color}">${LEVELS[curLevel()].roman} <span class="mut" style="font-size:14px">${LEVELS[curLevel()].name} · ${lvlProgress(curLevel()).mastered}/${lvlProgress(curLevel()).total} dominados</span></div></a>
+  </div>
+  <div class="card">
+    <div class="row sp"><div><h2>Treino de hoje</h2><div class="mut small">Escolhido pelos seus pontos fracos e pelo que você não pratica há mais tempo.</div></div>
+      <div class="row"><select id="planMin" style="width:auto">${[10, 20, 30, 45, 60].map(m => `<option value="${m}" ${m === S().planMin ? 'selected' : ''}>${m} min</option>`).join('')}</select>
+      <button class="btn sm" data-act="regen">↻ Gerar outro</button></div></div>
+    <div class="grid" style="margin-top:12px">${TODAY.map((p, i) => { const e = EXMAP[p.id]; return `<div class="ex card" style="margin:0"><div class="meta">${pill(e.focus)}<b>${i + 1}. ${esc(e.name)}</b><span class="tag">${LVL[e.lvl]} · ${(DB.best[e.id] && DB.best[e.id].last) || e.bpm} BPM</span></div><div><span class="reason">${esc(p.why)}</span></div></div>`; }).join('')}</div>
+    <div class="row" style="margin-top:14px"><button class="btn pri" data-act="startToday">▶ Começar treino (${TODAY.length} exercícios)</button><button class="btn" data-act="saveToday">Salvar como rotina</button></div>
+  </div>
+  <div class="grid g2"><div class="card"><h2>Insights</h2>${ins.map(i => `<div class="ins ${i.t}">${esc(i.m)}</div>`).join('')}<a class="btn sm" href="#/stats" style="display:inline-block;margin-top:6px">Ver progresso completo</a></div>
+  <div class="card"><div class="row sp"><h2>Minhas rotinas</h2><button class="btn sm" data-act="newRoutine">+ Nova</button></div><div id="routines">${routinesHTML()}</div></div></div>`;
+  $('#planMin').onchange = e => { S().planMin = +e.target.value; save(); TODAY = recommend(S().planMin); render(); };
+}
+let editR = null;
+function routinesHTML() {
+  return DB.routines.map(r => `<div class="card" style="margin:8px 0;padding:12px"><div class="row sp"><div><b>${esc(r.name)}</b> <span class="tag">${r.items.length} exerc. · ~${estMin(r.items)} min</span></div>
+    <div class="row"><button class="btn sm pri" data-act="playR" data-id="${r.id}" ${r.items.length ? '' : 'disabled'}>▶</button><button class="btn sm" data-act="editR" data-id="${r.id}">✎</button><button class="btn sm danger" data-act="delR" data-id="${r.id}">🗑</button></div></div>
+    ${editR === r.id ? `<div class="qlist" style="margin-top:8px">${r.items.map((id, i) => `<div class="qi"><span style="flex:1">${esc(EXMAP[id].name)}</span><button class="btn sm" data-act="mvR" data-id="${r.id}" data-i="${i}" data-d="-1">↑</button><button class="btn sm" data-act="mvR" data-id="${r.id}" data-i="${i}" data-d="1">↓</button><button class="btn sm danger" data-act="rmR" data-id="${r.id}" data-i="${i}">✕</button></div>`).join('') || '<div class="mut small">Vazia: adicione exercícios na Library.</div>'}<button class="btn sm" data-act="renR" data-id="${r.id}">Renomear</button></div>` : ''}</div>`).join('');
+}
+const VF = { q: '', focus: 'all', lvl: 'all', fav: false };
+function viewVault() {
+  view.innerHTML = `<div class="row sp"><h1>Library</h1><span class="mut small" id="vcount"></span></div>
+  <div class="card"><input type="search" id="vq" placeholder="Buscar exercício…" value="${esc(VF.q)}">
+  <div class="row" style="margin-top:10px" id="vfocus"></div><div class="row" style="margin-top:8px" id="vlvl"></div>
+  <div class="row" style="margin-top:10px"><label class="small mut">Adicionar na rotina:</label><select id="vact" style="width:auto">${DB.routines.map(r => `<option value="${r.id}" ${r.id === DB.active ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select></div></div>
+  <div id="vlist" class="grid g2"></div>`;
+  const fch = () => $('#vfocus').innerHTML = ['all', ...Object.keys(FOCUS), 'fav'].map(k => `<span class="chip ${(k === 'fav' ? VF.fav : VF.focus === k) ? 'on' : ''}" data-act="vf" data-k="${k}">${k === 'all' ? 'Todos' : k === 'fav' ? '★ Favoritos' : FOCUS[k].n}</span>`).join('');
+  const lch = () => $('#vlvl').innerHTML = ['all', 1, 2, 3, 4].map(k => `<span class="chip ${VF.lvl === k ? 'on' : ''}" data-act="vl" data-k="${k}">${k === 'all' ? 'Todos os níveis' : LVL[k]}</span>`).join('');
+  fch(); lch(); vaultList();
+  $('#vq').oninput = e => { VF.q = e.target.value; vaultList(); };
+  $('#vact').onchange = e => { DB.active = e.target.value; save(); };
+}
+function vaultList() {
+  const q = VF.q.toLowerCase(), l = EX.filter(e => (VF.focus === 'all' || e.focus === VF.focus) && (VF.lvl === 'all' || e.lvl === VF.lvl) && (!VF.fav || DB.fav.includes(e.id)) && (e.name + ' ' + FOCUS[e.focus].n + ' ' + e.desc).toLowerCase().includes(q));
+  $('#vcount').textContent = l.length + ' exercícios';
+  $('#vlist').innerHTML = l.map(e => { const b = DB.best[e.id]; return `<div class="card ex" style="margin:0"><div class="meta">${pill(e.focus)}<span class="tag">${LVL[e.lvl]}</span><span class="tag">${e.type === 'rhythm' ? 'ritmo (por ataque)' : e.len + ' notas'}</span></div>
+    <h3>${esc(e.name)}</h3><div class="mut small">${esc(e.desc)}</div><div class="small">Sugerido: ${e.bpm}–${e.target} BPM · ${subText(e, e.type === 'rhythm' ? e.sub : LEVELS[e.lvl].sub)}${b && b.clean ? ` · seu melhor limpo: <b style="color:var(--ok)">${b.clean}</b>` : ''}</div>
+    <div class="row"><button class="btn sm pri" data-act="train1" data-id="${e.id}">▶ Treinar</button><button class="btn sm" data-act="addR" data-id="${e.id}">+ Rotina</button><button class="btn sm ${DB.fav.includes(e.id) ? 'on' : ''}" data-act="fav" data-id="${e.id}">${DB.fav.includes(e.id) ? '★' : '☆'}</button><button class="btn sm ghost" data-act="prev" data-id="${e.id}">Ver</button></div><div id="pv-${e.id}"></div></div>`; }).join('') || '<div class="mut">Nada encontrado.</div>';
+}
+function viewTrain() {
+  ensureEx(); const ex = Sess.ex;
+  if (!ex) return viewTrilha();
+  const lefty = S().lefty;
+  view.innerHTML = `<div class="row sp"><div><div class="meta row">${pill(ex.focus)}<span class="tag">${LVL[ex.lvl]}</span><span class="tag">meta ${ex.target} BPM</span></div><h2 style="margin-top:6px">${esc(ex.name)}</h2><div class="mut small">${esc(ex.desc)}</div></div>
+    <div class="tag">${Sess.qi + 1} / ${Sess.queue.length}</div></div>
+  <div class="board" style="margin-top:12px">${ex.type === 'notes' ? fretboardSVG(ex, lefty, S().label) : strumHTML(ex)}<div class="cd" id="cd"></div></div>
+  <div class="hud">
+    <div class="box"><div class="bpmrow"><button class="btn sm" data-act="bpm" data-d="-5">−5</button><button class="btn sm" data-act="bpm" data-d="-1">−</button><div class="v" id="bpm">${Sess.bpm}</div><button class="btn sm" data-act="bpm" data-d="1">+</button><button class="btn sm" data-act="bpm" data-d="5">+5</button></div><div class="beats"><i id="bt0"></i><i id="bt1"></i><i id="bt2"></i><i id="bt3"></i></div><div class="l" id="bpmL">BPM</div></div>
+    <div class="box"><div class="v" id="acc">–</div><div class="l">precisão da passada</div></div>
+    <div class="box"><div class="v" id="pass">0</div><div class="l">passadas · limpas seguidas <b id="streak">–</b></div></div>
+    <div class="box"><div class="v" id="timer">0:00</div><div class="l">tempo${ex.type === 'rhythm' ? ' · timing <b id="off">–</b>' : ''}</div></div>
+  </div>
+  <div id="rate" class="row card"><span id="rateInfo">Autoavaliação</span><button class="btn sm" data-act="rate" data-v="1">✓ Limpa</button><button class="btn sm" data-act="rate" data-v="0.5">✗ Com erros</button></div>
+  <div class="row"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnDemo" data-act="demo">🔊 Ouvir exemplo</button><button class="btn" id="btnMic" data-act="mic">🎤 Ativar microfone</button><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button>
+    ${ex.type === 'notes' ? `<select id="subSel" style="width:auto">${[1, 2, 4].map(v => `<option value="${v}">Notas por clique: ${v}${v === LEVELS[ex.lvl].sub ? ' (padrão do nível)' : ''}</option>`).join('')}</select>` : ''}</div>
+  <div class="row" style="margin-top:10px"><button class="btn" data-act="finish">Concluir e salvar ▸</button><button class="btn ghost" data-act="skip">Pular</button><button class="btn ghost" data-act="restart">Reiniciar</button><span class="mut small">Dica: use fones para o clique do metrônomo não entrar no microfone. Barra de espaço inicia/para.</span></div>
+  <h3 style="margin:18px 0 8px">Fila de hoje</h3><div class="qlist">${Sess.queue.map((q, i) => `<div class="qi ${i === Sess.qi ? 'cur' : ''} ${q.done ? 'done' : ''}" data-act="goQ" data-i="${i}" style="cursor:pointer">${q.done ? '✓' : i + 1}. ${esc(EXMAP[q.id].name)}</div>`).join('')}</div>`;
+  const ss = $('#subSel'); if (ss) { ss.value = Sess.sub; ss.onchange = e => { stopRun(); Sess.sub = +e.target.value; updHud(); }; }
+  refreshCtl(); updHud(); showRate(false);
+  const key =e => { if (e.code === 'Space' && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) { e.preventDefault(); act.run(); } };
+  addEventListener('keydown', key); cleanup = () => removeEventListener('keydown', key);
+}
+let TL = null;
+function guided(l) {   // sessão guiada: até 4 exercícios do nível, começando pelos já iniciados e ainda não dominados
+  const ids = LV_EX[l], open = ids.filter(id => !isMastered(id));
+  const pool = open.length ? open : ids;
+  const started = pool.filter(id => DB.best[id]), fresh = pool.filter(id => !DB.best[id]);
+  return started.concat(fresh).slice(0, 4).sort((a, b) => EXMAP[a].ord - EXMAP[b].ord);
+}
+function viewTrilha() {
+  const cur = curLevel(); if (TL == null) TL = cur;
+  const L = LEVELS[TL], pr = lvlProgress(TL), prev = TL > 1 ? lvlProgress(TL - 1) : null, gs = guided(TL);
+  view.innerHTML = `<h1>Treinar</h1><div class="mut" style="margin:4px 0 14px">Siga a trilha em ordem. Um nível é recomendado como concluído quando você domina ${Math.round(UNLOCK_AT * 100)}% dos exercícios (BPM limpo ≥ ${Math.round(MASTER_AT * 100)}% da meta).</div>
+  <div class="grid g4m">${[1, 2, 3, 4].map(l => { const x = LEVELS[l], p = lvlProgress(l);
+    return `<div class="card lvl ${TL === l ? 'on' : ''} ${l > cur ? 'lock' : ''}" data-act="tl" data-l="${l}" style="--c:${x.color}"><div class="roman">${x.roman}</div><b>${x.name}</b><div class="meter" style="margin:8px 0 4px"><b style="width:${Math.round(100 * p.pct)}%;background:${x.color}"></b></div><div class="small mut">${p.mastered}/${p.total} dominados${l === cur ? ' · <b style="color:var(--acc)">você está aqui</b>' : l > cur ? ' · 🔒 recomendado depois' : ' · ✓'}</div></div>`; }).join('')}</div>
+  <div class="card" style="--c:${L.color};border-left:4px solid ${L.color}"><div class="row sp"><h2>Nível ${L.roman} · ${L.name}</h2><span class="tag">${LVL[TL]}</span></div>
+    <p class="mut" style="margin:8px 0">${L.desc}</p>
+    <div class="row small"><span class="chip">⏱ ${L.session}</span><span class="chip">🎯 precisão ≥ ${L.thr}%</span><span class="chip">✔ ${L.needClean} passadas limpas para subir</span><span class="chip">↑ passo de ${L.step} BPM</span></div>
+    ${TL > cur ? `<div class="ins warn" style="margin-top:12px">Este nível é mais avançado que o seu momento. Recomendo dominar antes ${Math.round(UNLOCK_AT * 100)}% do Nível ${LEVELS[TL - 1].roman} (hoje: ${Math.round(100 * prev.pct)}%). Você pode treinar mesmo assim.</div>` : ''}
+    <div class="row" style="margin:14px 0"><button class="btn pri" data-act="guided" data-l="${TL}">▶ Sessão guiada (${gs.length} exercícios, ~${gs.length * 4} min)</button><button class="btn" data-act="startToday2">Treino de hoje</button>${DB.routines.map(r => `<button class="btn sm" data-act="playR" data-id="${r.id}">${esc(r.name)}</button>`).join('')}</div>
+    <div class="qlist">${LV_EX[TL].map((id, i) => { const e = EXMAP[id], b = DB.best[id], m = isMastered(id), clean = (b && b.clean) || 0;
+      return `<div class="qi" style="flex-wrap:wrap"><span style="width:22px;font-size:18px;color:${m ? 'var(--ok)' : b ? 'var(--warn)' : 'var(--mut)'}">${m ? '●' : b ? '◐' : '○'}</span><div style="flex:1;min-width:160px"><b>${i + 1}. ${esc(e.name)}</b> ${pill(e.focus)}<div class="mut small">${esc(e.desc)}</div><div class="meter" style="margin-top:6px;max-width:260px"><b style="width:${Math.min(100, Math.round(100 * clean / e.target))}%;background:${m ? 'var(--ok)' : L.color}"></b></div><div class="small mut">${clean ? clean + ' BPM limpos' : 'não iniciado'} · começar em ${e.bpm} · meta ${e.target} BPM · ${subText(e, e.type === 'rhythm' ? e.sub : LEVELS[e.lvl].sub)}</div></div><button class="btn sm pri" data-act="train1" data-id="${id}">▶</button></div>`; }).join('')}</div></div>`;
+}
+function viewStats() {
+  const st = stats(), mx = Math.max(60, ...st.days.map(d => d.s)), tot = st.total || 1;
+  view.innerHTML = `<h1>Progresso</h1>
+  <div class="grid g4m" style="margin-top:12px"><div class="card kpi"><div class="v">${fmtH(st.total)}</div><div class="l">tempo total</div></div><div class="card kpi"><div class="v">${st.n}</div><div class="l">sessões</div></div><div class="card kpi"><div class="v">🔥 ${st.streak}</div><div class="l">dias seguidos</div></div><div class="card kpi"><div class="v">${st.bestClean || '–'}</div><div class="l">maior BPM limpo</div></div></div>
+  <div class="card"><h2>Últimos 30 dias</h2><div class="bars" style="margin-top:12px">${st.days.map((d, i) => `<i class="${i === 29 ? 'today' : ''}" style="height:${Math.max(2, 100 * d.s / mx)}%" title="${d.k}: ${Math.round(d.s / 60)} min"></i>`).join('')}</div></div>
+  <div class="grid g2"><div class="card"><h2>Foco e precisão</h2>${Object.entries(st.focus).map(([k, f]) => `<div style="margin:10px 0"><div class="row sp small"><span>${pill(k)}</span><span class="mut">${fmtH(f.secs)} · ${f.acc == null ? 'sem dados' : Math.round(f.acc * 100) + '% precisão'}</span></div><div class="meter" style="margin-top:4px"><b style="width:${Math.round(100 * f.secs / tot)}%;background:${FOCUS[k].c}"></b></div></div>`).join('')}</div>
+  <div class="card"><h2>Insights</h2>${insights(st).map(i => `<div class="ins ${i.t}">${esc(i.m)}</div>`).join('')}</div></div>
+  <div class="card"><h2>Evolução por exercício</h2>${Object.entries(DB.best).filter(([id]) => EXMAP[id]).sort((a, b) => b[1].t - a[1].t).map(([id, b]) => { const e = EXMAP[id]; return `<div style="margin:10px 0"><div class="row sp small"><span>${esc(e.name)}</span><span class="mut">${b.clean || 0} / ${e.target} BPM limpos · ${b.n}×</span></div><div class="meter" style="margin-top:4px"><b style="width:${Math.min(100, 100 * (b.clean || 0) / e.target)}%"></b></div></div>`; }).join('') || '<div class="mut">Treine para ver a evolução.</div>'}</div>
+  <div class="card"><h2>Conquistas</h2><div class="grid g4m" style="margin-top:10px">${achievements(st).map(a => `<div class="ach ${a.ok ? 'on' : ''}">${a.ok ? '🏆 ' : '🔒 '}${a.n}</div>`).join('')}</div></div>
+  <div class="row"><button class="btn" data-act="demoData">Carregar dados de exemplo</button><button class="btn" data-act="export">Exportar JSON</button><button class="btn danger" data-act="wipe">Apagar tudo</button></div>`;
+}
+function viewTuner() {
+  view.innerHTML = `<h1>Afinador</h1><div class="card" style="margin-top:12px"><div class="tunerbig" id="tn">–</div><div class="mut" style="text-align:center" id="th">Toque uma corda solta</div><div class="needle"><i id="nd" style="left:50%"></i></div><div class="row" style="justify-content:center" id="tc">–</div>
+  <div class="row" style="justify-content:center;margin-top:14px"><button class="btn pri" id="tbtn" data-act="tuner">🎤 Ativar microfone</button></div>
+  <div class="row" style="justify-content:center;margin-top:14px"><span class="mut small">Tom de referência:</span>${OPEN.map((m, i) => `<button class="btn sm" data-act="ref" data-m="${m}">${'EADGBe'[i]}</button>`).join('')}</div></div>`;
+  let raf = 0, buf = [];
+  window.tunerLoop = () => {
+    const d = Mic.last;
+    if (d && Mic.on) { buf.push(d.f); if (buf.length > 5) buf.shift(); const f = [...buf].sort((a, b) => a - b)[buf.length >> 1], m = 69 + 12 * Math.log2(f / 440), r = Math.round(m), c = Math.round((m - r) * 100);
+      $('#tn').textContent = noteName(r); $('#th').textContent = `${f.toFixed(1)} Hz · ${c > 0 ? '+' : ''}${c} cents`; $('#nd').style.left = (50 + Math.max(-50, Math.min(50, c))) + '%';
+      $('#tn').style.color = Math.abs(c) <= 5 ? 'var(--ok)' : Math.abs(c) <= 15 ? 'var(--warn)' : 'var(--bad)'; $('#tc').textContent = Math.abs(c) <= 5 ? '✓ afinado' : c > 0 ? 'alto demais: afrouxe' : 'baixo demais: aperte'; }
+    raf = requestAnimationFrame(window.tunerLoop);
+  };
+  if (Mic.on) { $('#tbtn').textContent = '■ Parar'; raf = requestAnimationFrame(window.tunerLoop); }
+  cleanup = () => { cancelAnimationFrame(raf); };
+}
+function viewSettings() {
+  const s = S();
+  view.innerHTML = `<h1>Ajustes</h1><div class="card" style="margin-top:12px"><label class="lbl" style="margin-top:0">Tema de cores</label><div class="themes">${themePicker()}</div><label class="lbl">Idioma</label><select id="langSel" aria-label="Idioma">${[['pt', 'Português'], ['en', 'English'], ['es', 'Español']].map(([k, n]) => `<option value="${k}" ${LANG === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div><div class="card">
+  <label class="lbl">Meu nível</label><select data-in="level"><option value="auto" ${s.level === 'auto' ? 'selected' : ''}>Automático (pelo seu domínio dos exercícios)</option>${Object.entries(LVL).map(([k, v]) => `<option value="${k}" ${String(s.level) === k ? 'selected' : ''}>${v} · ${LEVELS[k].name}</option>`).join('')}</select>
+  <div class="row" style="margin-top:8px"><button class="btn sm" data-act="qzStart">Refazer o quiz de nível</button>${DB.placed ? `<span class="mut small">Último resultado: Nível ${LEVELS[DB.placed].roman}</span>` : ''}</div>
+  <label class="lbl"><input type="checkbox" data-in="levelParams" ${s.levelParams ? 'checked' : ''}> Usar o ritmo de aprendizado de cada nível (recomendado). Desmarque para usar os valores manuais abaixo.</label>
+  <label class="lbl">Meta semanal: <b id="v-goal">${s.goal}</b> min</label><input type="range" min="0" max="600" step="10" value="${s.goal}" data-in="goal">
+  <label class="lbl">Precisão para a passada contar como limpa: <b id="v-thr">${s.thr}</b>%</label><input type="range" min="60" max="100" step="1" value="${s.thr}" data-in="thr">
+  <label class="lbl">Passadas limpas seguidas para subir o BPM: <b id="v-needClean">${s.needClean}</b></label><input type="range" min="1" max="5" value="${s.needClean}" data-in="needClean">
+  <label class="lbl">Quanto subir/descer o BPM: <b id="v-step">${s.step}</b></label><input type="range" min="1" max="10" value="${s.step}" data-in="step">
+  <label class="lbl">Latência do dispositivo: <b id="v-latency">${s.latency}</b> ms</label><input type="range" min="0" max="300" step="5" value="${s.latency}" data-in="latency">
+  <div class="row" style="margin-top:6px"><button class="btn sm" data-act="calib">Calibrar automaticamente</button><span class="mut small">Precisa de microfone e alto-falante (sem fones). Compensa o atraso entre ouvir o clique e o som voltar.</span></div>
+  <label class="lbl">Contagem regressiva antes de começar</label><select data-in="count">${[4, 3, 2, 1, 0].map(n => `<option value="${n}" ${+s.count === n ? 'selected' : ''}>${n ? n + (n === 1 ? ' tempo' : ' tempos') + ' (' + Array.from({ length: n }, (_, i) => n - i).join(', ') + ')' : 'Sem contagem'}</option>`).join('')}</select>
+  <div class="mut small" style="margin-top:4px">Cada número aparece junto com um clique do metrônomo; a primeira nota vem logo depois do 1.</div>
+  <label class="lbl">Rótulo das bolinhas no braço</label><select data-in="label"><option value="note" ${s.label === 'note' ? 'selected' : ''}>Nome da nota</option><option value="fret" ${s.label === 'fret' ? 'selected' : ''}>Número da casa</option></select>
+  <label class="lbl">Nomes das notas</label><select data-in="names"><option value="cifra" ${s.names !== 'solfejo' ? 'selected' : ''}>Cifra (C D E F G A B)</option><option value="solfejo" ${s.names === 'solfejo' ? 'selected' : ''}>Solfejo (Dó Ré Mi Fá Sol Lá Si)</option></select>
+  <label class="lbl">Acidentes</label><select data-in="acc"><option value="#" ${s.acc !== 'b' ? 'selected' : ''}>Sustenidos (C#, D#…)</option><option value="b" ${s.acc === 'b' ? 'selected' : ''}>Bemóis (Db, Eb…)</option></select>
+  <label class="lbl"><input type="checkbox" data-in="lefty" ${s.lefty ? 'checked' : ''}> Modo canhoto (espelha o braço)</label></div>
+  <div class="card"><h2>Teste do microfone</h2><div class="mut small">Ligue, toque uma corda solta e veja: o nível deve passar de ~20%, a nota detectada deve bater com a corda e cada palhetada deve contar um ataque.</div>
+  <div class="row" style="margin:12px 0"><button class="btn pri" id="mtBtn" data-act="mtest">🎤 Ligar teste</button><span class="mut small" id="mtErr"></span></div>
+  <div class="meter" style="height:14px"><b id="mtLvl" style="width:0;background:var(--ok)"></b></div>
+  <div class="grid g3" style="margin-top:12px"><div class="card kpi" style="margin:0"><div class="v" id="mtNote">–</div><div class="l">nota detectada</div></div><div class="card kpi" style="margin:0"><div class="v" id="mtHz">–</div><div class="l">frequência</div></div><div class="card kpi" style="margin:0"><div class="v" id="mtOn">0</div><div class="l">ataques (últimos 6 s)</div></div></div>
+  <div class="small mut" id="mtTip" style="margin-top:10px"></div></div>`;
+  let raf = 0, n0 = 0;
+  const loop = () => {
+    if (Mic.on && $('#mtLvl')) {
+      const lv = Math.min(100, Mic.rms * 600); $('#mtLvl').style.width = lv + '%'; $('#mtLvl').style.background = lv < 8 ? 'var(--bad)' : lv > 90 ? 'var(--warn)' : 'var(--ok)';
+      const d = Mic.last; $('#mtNote').textContent = d ? noteName(d.midi) + Math.floor(d.midi / 12 - 1) : '–'; $('#mtHz').textContent = d ? d.f.toFixed(1) + ' Hz' : '–';
+      $('#mtOn').textContent = Mic.onsets.length;
+      $('#mtTip').textContent = lv < 8 ? 'Sinal fraco: aproxime o microfone, aumente o ganho/volume de entrada do sistema ou toque mais forte.' : lv > 90 ? 'Sinal alto demais (pode saturar): afaste um pouco ou reduza o ganho de entrada.' : 'Nível bom.';
+    }
+    raf = requestAnimationFrame(loop);
+  };
+  if (Mic.on) { $('#mtBtn').textContent = '■ Parar teste'; }
+  raf = requestAnimationFrame(loop); cleanup = () => cancelAnimationFrame(raf);
+}
+
+// ---------- ações ----------
+const act = {
+  regen() { TODAY = recommend(S().planMin); render(); },
+  startToday() { setQueue(TODAY.map(p => p.id)); },
+  startToday2() { if (!TODAY) TODAY = recommend(S().planMin); setQueue(TODAY.map(p => p.id)); },
+  saveToday() { const n = prompt('Nome da rotina:', 'Treino de ' + new Date().toLocaleDateString('pt-BR')); if (!n) return; DB.routines.push({ id: 'r' + Date.now(), name: n, items: TODAY.map(p => p.id) }); save(); render(); toast('Rotina salva'); },
+  newRoutine() { const n = prompt('Nome da rotina:'); if (!n) return; const id = 'r' + Date.now(); DB.routines.push({ id, name: n, items: [] }); DB.active = id; save(); render(); },
+  playR(d) { const r = DB.routines.find(x => x.id === d.id); if (r && r.items.length) setQueue(r.items.slice()); },
+  editR(d) { editR = editR === d.id ? null : d.id; $('#routines').innerHTML = routinesHTML(); },
+  delR(d) { if (!confirm('Apagar esta rotina?')) return; DB.routines = DB.routines.filter(r => r.id !== d.id); if (!DB.routines.find(r => r.id === DB.active)) DB.active = (DB.routines[0] || {}).id; save(); $('#routines').innerHTML = routinesHTML(); },
+  mvR(d) { const r = DB.routines.find(x => x.id === d.id), i = +d.i, j = i + +d.d; if (j < 0 || j >= r.items.length) return; [r.items[i], r.items[j]] = [r.items[j], r.items[i]]; save(); $('#routines').innerHTML = routinesHTML(); },
+  rmR(d) { DB.routines.find(x => x.id === d.id).items.splice(+d.i, 1); save(); $('#routines').innerHTML = routinesHTML(); },
+  renR(d) { const r = DB.routines.find(x => x.id === d.id), n = prompt('Novo nome:', r.name); if (n) { r.name = n; save(); $('#routines').innerHTML = routinesHTML(); } },
+  vf(d) { if (d.k === 'fav') VF.fav = !VF.fav; else VF.focus = d.k; viewVault(); },
+  vl(d) { VF.lvl = d.k === 'all' ? 'all' : +d.k; viewVault(); },
+  train1(d) { setQueue([d.id]); },
+  tl(d) { TL = +d.l; viewTrilha(); },
+  guided(d) { setQueue(guided(+d.l)); },
+  addR(d) { const r = DB.routines.find(x => x.id === DB.active); if (!r) return toast('Crie uma rotina primeiro'); r.items.push(d.id); save(); toast('Adicionado a "' + r.name + '"'); },
+  fav(d) { const i = DB.fav.indexOf(d.id); i >= 0 ? DB.fav.splice(i, 1) : DB.fav.push(d.id); save(); vaultList(); },
+  prev(d) { const el = $('#pv-' + d.id); if (el.innerHTML) { el.innerHTML = ''; return; } const e = EXMAP[d.id]; el.innerHTML = '<div class="board" style="margin-top:8px">' + (e.type === 'notes' ? fretboardSVG(e, S().lefty, S().label) : strumHTML(e)) + '</div>'; },
+  run() { ensureEx(); if (!Sess.ex) return; if (Sess.run && !Sess.demo) stopRun(); else startRun(false); },
+  demo() { if (Sess.run && Sess.demo) stopRun(); else startRun(true); },
+  async mic() { if (Mic.on) { Mic.stop(); refreshCtl(); showRate(false); return; } try { await Mic.start(); refreshCtl(); showRate(false); toast('Microfone ligado. Use fones para o clique não ser captado.'); } catch (e) { toast('Não consegui acessar o microfone. Dá para treinar com autoavaliação.'); } },
+  speed() { S().speed = !S().speed; save(); refreshCtl(); updHud(); },
+  bpm(d) { Sess.bpm = Math.max(30, Math.min(240, Sess.bpm + +d.d)); updHud(); },
+  rate(d) { if (!Sess.rateReady) return; passDone(+d.v); showRate(false); },
+  finish() { finishEx(); },
+  skip() { const nx = Sess.queue.findIndex((q, i) => i > Sess.qi && !q.done); if (nx >= 0) { loadEx(nx); render(); } else toast('Esse é o último exercício'); },
+  restart() { loadEx(Sess.qi); render(); },
+  goQ(d) { loadEx(+d.i); render(); },
+  async tuner() { if (Mic.on) { Mic.stop(); $('#tbtn').textContent = '🎤 Ativar microfone'; return; } try { await Mic.start(); $('#tbtn').textContent = '■ Parar'; requestAnimationFrame(window.tunerLoop); } catch (e) { toast('Sem acesso ao microfone'); } },
+  async mtest() {
+    if (Mic.on) { Mic.stop(); $('#mtBtn').textContent = '🎤 Ligar teste'; return; }
+    try { await Mic.start(); Mic.onsets = []; $('#mtBtn').textContent = '■ Parar teste'; $('#mtErr').textContent = ''; }
+    catch (e) { $('#mtErr').textContent = 'Falhou: ' + (e && e.name === 'NotAllowedError' ? 'permissão negada (libere o microfone no navegador).' : e && e.name === 'NotFoundError' ? 'nenhum microfone encontrado.' : 'use localhost ou HTTPS.'); }
+  },
+  ref(d) { tone(mtof(+d.m), 2.5); },
+  async calib() { toast('Calibrando… fique em silêncio, sem fones'); try { const v = await Mic.calibrate(); if (v == null) return toast('Não ouvi os cliques. Aumente o volume e tente de novo.'); S().latency = Math.round(v * 1000); save(); viewSettings(); toast('Latência: ' + S().latency + ' ms'); } catch (e) { toast('Sem acesso ao microfone'); } },
+  demoData() {
+    const now = Date.now(); const ids = EX.map(e => e.id), out = [];
+    for (let d = 29; d >= 0; d--) { if (Math.random() < 0.25) continue; const n = 1 + Math.floor(Math.random() * 3);
+      for (let k = 0; k < n; k++) { const e = EXMAP[ids[Math.floor(Math.random() * ids.length)]], prog = (30 - d) / 30, bpm = Math.round(e.bpm + (e.target - e.bpm) * prog * 0.8), acc = Math.max(0.4, Math.min(0.99, (e.focus === 'legato' ? 0.6 : 0.78) + prog * 0.15 + (Math.random() - .5) * 0.12));
+        out.push({ t: now - d * 864e5 - k * 3e6, ex: e.id, focus: e.focus, secs: 180 + Math.floor(Math.random() * 420), acc, bpm, clean: acc >= .85 ? bpm : Math.round(bpm * .9) }); } }
+    DB.sessions = out; DB.best = {}; out.forEach(s => { const b = DB.best[s.ex] || { n: 0, clean: 0 }; b.n++; b.last = s.bpm; b.t = s.t; b.clean = Math.max(b.clean, s.clean); DB.best[s.ex] = b; }); save(); TODAY = null; render(); toast('Dados de exemplo carregados');
+  },
+  export() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' })); a.download = 'yourock-backup.json'; a.click(); },
+  wipe() { if (!confirm('Apagar todos os seus dados? Isso não pode ser desfeito.')) return; DB = fresh(); save(); TODAY = null; Sess.queue = []; Sess.ex = null; render(); },
+};
+Object.assign(act, toolActs, quizActs);
+act.theme = d => { S().theme = d.k; save(); applyTheme(); document.querySelectorAll('.th').forEach(b => b.classList.toggle('on', b.dataset.k === d.k)); };
+applyTheme();
+document.addEventListener('click', e => { const a = e.target.closest('[data-act]'); if (a && act[a.dataset.act]) act[a.dataset.act](a.dataset, a); });
+document.addEventListener('input', e => {
+  const k = e.target.dataset.in; if (!k) return; const t = e.target;
+  S()[k] = t.type === 'checkbox' ? t.checked : (t.type === 'range' ? +t.value : t.value); save();
+  const v = $('#v-' + k); if (v) v.textContent = t.value;
+});
+
+if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+render();

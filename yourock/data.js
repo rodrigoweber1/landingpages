@@ -1,0 +1,208 @@
+'use strict';
+// Cordas: 0 = Mi grave (E2) ... 5 = Mi agudo (E4). Nota = [corda, casa]
+const OPEN = [40, 45, 50, 55, 59, 64];
+const NN = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const noteName = m => NN[((m % 12) + 12) % 12];
+const midiOf = ([s, f]) => OPEN[s] + f;
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+const FOCUS = {
+  mech:   { n: 'Mecânica',  c: 'var(--f-mech)' },
+  pick:   { n: 'Palhetada', c: 'var(--f-pick)' },
+  lead:   { n: 'Solo',      c: 'var(--f-lead)' },
+  legato: { n: 'Legato',    c: 'var(--f-legato)' },
+  sweep:  { n: 'Sweep',     c: 'var(--f-sweep)' },
+  chords: { n: 'Acordes',   c: 'var(--f-chords)' },
+  rhythm: { n: 'Ritmo',     c: 'var(--f-rhythm)' },
+};
+const LVL = { 1: 'Nível I', 2: 'Nível II', 3: 'Nível III', 4: 'Nível IV' };
+// Ritmo de aprendizado de cada nível: precisão exigida, passadas limpas seguidas antes de subir o BPM e tamanho do passo.
+// Níveis iniciais priorizam consolidar (mais repetições limpas, passos pequenos); os avançados exigem mais precisão.
+const LEVELS = {
+  1: { roman: 'I',   name: 'Fundamentos',  color: 'var(--lv1)', sub: 1, thr: 80, needClean: 3, step: 3, session: '10–15 min por dia, 5×/semana',
+       desc: 'Coordenação das duas mãos, palhetada alternada e os primeiros acordes. Uma nota por clique do metrônomo, em andamento lento. O objetivo é soar limpo, não rápido.' },
+  2: { roman: 'II',  name: 'Consolidação', color: 'var(--lv2)', sub: 2, thr: 85, needClean: 3, step: 4, session: '15–25 min por dia, 5×/semana',
+       desc: 'Troca de cordas com palhetada alternada, digitações menos óbvias, primeiro legato e rasgueados com síncopa. A partir daqui, duas notas por clique (colcheias).' },
+  3: { roman: 'III', name: 'Técnica',      color: 'var(--lv3)', sub: 2, thr: 85, needClean: 2, step: 5, session: '25–40 min por dia, 5–6×/semana',
+       desc: 'Contratempo, saltos de terça e de corda, trinados com abertura maior e tremolo. Exige relaxamento e controle em velocidades médias.' },
+  4: { roman: 'IV',  name: 'Domínio',      color: 'var(--lv4)', sub: 2, thr: 90, needClean: 2, step: 5, session: '40–60 min por dia, 6×/semana',
+       desc: 'Primeiro sweep, economy picking, sequências longas, outras posições do braço e funk em semicolcheias. Pede precisão de 90% ou mais.' },
+};
+const MASTER_AT = 0.9;   // exercício dominado = BPM limpo ≥ 90% da meta
+const UNLOCK_AT = 0.7;   // próximo nível recomendado quando 70% do nível atual estiver dominado
+
+// ---------- geradores de padrões ----------
+const SH3  = [[5,7,8],[5,7,8],[5,7,9],[4,5,7],[5,6,8],[5,7,8]];   // Lá menor natural, 3 notas por corda
+const PENT = [[5,8],[5,7],[5,7],[5,7],[5,8],[5,8]];               // Lá menor pentatônica, pos. 1
+const flat = sh => sh.flatMap((fr, s) => fr.map(f => [s, f]));
+const updown = l => l.concat(l.slice(0, -1).reverse());
+const groups = (l, g) => { const o = []; for (let i = 0; i <= l.length - g; i++) for (let j = 0; j < g; j++) o.push(l[i + j]); return o; };
+const thirds = l => { const o = []; for (let i = 0; i + 2 < l.length; i++) o.push(l[i], l[i + 2]); return o; };
+const spider = order => { const n = []; for (let b = 0; b < 3; b++) for (let s = 0; s < 6; s++) for (const o of order) n.push([s, 5 + b + o - 1]); return n; };
+const trills = k => { const n = []; for (let s = 0; s < 6; s++) for (let r = 0; r < 4; r++) n.push([s, 5], [s, 5 + k]); return n; };
+
+const EX = [];
+const add = e => EX.push(Object.assign({ type: 'notes', sub: 2 }, e));
+
+// Mecânica
+// Spider Walk: as 24 ordens possíveis dos dedos 1-2-3-4 (nível e BPM definidos na tabela CURR)
+const PERMS = (function p(a) { return a.length < 2 ? [a] : a.flatMap((x, i) => p(a.filter((_, j) => j !== i)).map(r => [x, ...r])); })([1, 2, 3, 4]);
+PERMS.forEach(o => { const n = o.join('-'); add({ id: 'sp' + n, name: 'Spider Walk ' + n, focus: 'mech', lvl: 1, bpm: 60, target: 100, notes: spider(o),
+   desc: 'Um dedo por casa, subindo corda por corda. Mantenha a mão relaxada e as notas limpas.' }); });
+const spCost = n => { const d = n.split('-').map(Number); let c = 0; for (let i = 1; i < 4; i++) c += Math.abs(d[i] - d[i - 1]); return c; };
+add({ id: 'chrom', name: 'Cromático ida e volta', focus: 'mech', lvl: 'beg', bpm: 60, target: 110,
+  notes: [0,1,2,3,4,5].flatMap(s => [5,6,7,8,8,7,6,5].map(f => [s, f])), desc: 'Quatro casas, quatro dedos, em todas as cordas.' });
+// Palhetada
+add({ id: 'alt', name: 'Palhetada alternada – cordas A/D/G/B', focus: 'pick', lvl: 'beg', bpm: 70, target: 130,
+  notes: [1,2,3,4].flatMap(s => [5,6,7,8,7,6].map(f => [s, f])), desc: 'Pra baixo e pra cima, sempre alternando. Palheta relaxada.' });
+add({ id: 'trem', name: 'Tremolo picking', focus: 'pick', lvl: 'int', bpm: 60, target: 100, rep: true,
+  notes: [0,1,2,3,4,5].flatMap(s => Array(8).fill([s, 5])), desc: 'Oito palhetadas na mesma nota. Cada palhetada precisa soar (usa detecção de ataque).' });
+add({ id: 'skip', name: 'Salto de cordas', focus: 'pick', lvl: 'int', bpm: 70, target: 120,
+  notes: [0,1,2,3].flatMap(b => [[b,5],[b+2,5],[b,7],[b+2,7]]), desc: 'Pule uma corda mantendo a palhetada alternada.' });
+add({ id: 'econ', name: 'Economy em 3 notas por corda (Mi menor, casa 12)', focus: 'pick', lvl: 'adv', bpm: 80, target: 140,
+  notes: updown(flat(SH3.map(a => a.map(f => f + 7)))), desc: 'Mesma escala em 3 notas por corda, agora na região da casa 12 (Mi menor). Varra a palheta ao trocar de corda na mesma direção.' });
+// Solo
+add({ id: 'pent', name: 'Pentatônica menor – posição 1', focus: 'lead', lvl: 'beg', bpm: 60, target: 120,
+  notes: updown(flat(PENT)), desc: 'Subir e descer a escala de Lá menor pentatônica.' });
+add({ id: 'pent4', name: 'Pentatônica em grupos de 4', focus: 'lead', lvl: 'int', bpm: 70, target: 120,
+  notes: groups(flat(PENT), 4), desc: 'Sequência 1-2-3-4, 2-3-4-5... na escala.' });
+add({ id: 'pent3rd', name: 'Pentatônica em terças', focus: 'lead', lvl: 'int', bpm: 70, target: 120,
+  notes: thirds(flat(PENT)), desc: 'Saltos de uma nota sobre a escala, ótimo para frases.' });
+add({ id: 'nps3', name: '3 notas por corda – Lá menor', focus: 'lead', lvl: 'int', bpm: 60, target: 120,
+  notes: updown(flat(SH3)), desc: 'A escala natural em 3 notas por corda, subindo e descendo.' });
+add({ id: 'nps3g', name: '3nps em grupos de 3', focus: 'lead', lvl: 'adv', bpm: 70, target: 130,
+  notes: groups(flat(SH3), 3), desc: 'Sequências de 3 notas deslizando pela escala.' });
+const PENT2 = [[8,10],[7,10],[7,10],[7,9],[8,10],[8,10]];          // Lá menor pentatônica, pos. 2
+const PENT3 = [[10,12],[10,12],[10,12],[9,12],[10,13],[10,12]];    // pos. 3
+const BLUES = [[5,8],[5,6,7],[5,7],[5,7],[5,8],[5,8]];             // pos. 1 + blue note (Mib)
+const PENTM = [[5,7],[4,7],[4,7],[4,6],[5,7],[5,7]];               // Lá maior pentatônica
+const DIAG  = [[5,8],[5,7],[5,7],[7,9],[8,10],[8,10]];             // pos. 1 ligada à pos. 2
+const DOR   = [[7,9,10],[7,9,10],[7,9,11],[7,9,11],[7,8,10],[7,9,10]]; // Mi dórico, casa 7
+const HARM  = [[5,7,8],[5,7,8],[6,7,9],[4,5,7],[5,6],[5,7,8]];     // Lá menor harmônica, casa 5
+const LICKS = [
+  [[5,8],[5,5],[4,8],[4,5],[3,7],[3,5],[2,7],[2,5]],
+  [[4,8],[4,5],[3,7],[4,5],[4,8],[5,5],[5,8],[5,5]],
+  [[1,5],[1,7],[2,5],[2,7],[3,5],[3,7],[2,7],[2,5]],
+];
+add({ id: 'pent2', name: 'Pentatônica menor – posição 2', focus: 'lead', notes: updown(flat(PENT2)),
+  desc: 'A mesma escala de Lá menor pentatônica, agora na casa 7. Aprenda a forma nova sem olhar a anterior.' });
+add({ id: 'pent3', name: 'Pentatônica menor – posição 3', focus: 'lead', notes: updown(flat(PENT3)),
+  desc: 'Terceira forma da pentatônica, na casa 10. Note onde ela se encaixa entre as outras posições.' });
+add({ id: 'blues', name: 'Escala blues menor – Lá', focus: 'lead', notes: updown(flat(BLUES)),
+  desc: 'Pentatônica com a "blue note" (Mib) na corda Lá. Passe por ela sem parar: é a nota do blues.' });
+add({ id: 'pent3g', name: 'Pentatônica em grupos de 3', focus: 'lead', notes: groups(flat(PENT), 3),
+  desc: 'Sequências de 3 notas deslizando pela pentatônica, no mesmo estilo dos grupos de 4.' });
+add({ id: 'pentM', name: 'Pentatônica maior – Lá', focus: 'lead', notes: updown(flat(PENTM)),
+  desc: 'Escala de som aberto e alegre (country, rock clássico). Fica na casa 4 a 7.' });
+add({ id: 'nps3rd', name: '3 notas por corda em terças', focus: 'lead', notes: thirds(flat(SH3)),
+  desc: 'Saltos de uma nota na escala de Lá menor em 3 notas por corda. Boa base para frases melódicas.' });
+add({ id: 'licks', name: '3 licks clássicos na pentatônica', focus: 'lead', notes: [].concat(...LICKS, ...LICKS),
+  desc: 'Três frases curtas de 8 notas, repetidas duas vezes cada. Toque como frase, não como escala.' });
+add({ id: 'diag', name: 'Pentatônica ligando posições 1 e 2', focus: 'lead', notes: updown(flat(DIAG)),
+  desc: 'Sobe pela diagonal, saindo da posição 1 e chegando à posição 2. É assim que o solo anda pelo braço.' });
+add({ id: 'dor', name: 'Mi dórico – 3 notas por corda (casa 7)', focus: 'lead', notes: updown(flat(DOR)),
+  desc: 'Modo dórico: som menor com a 6ª maior (Dó#). Muito usado em rock, funk e fusion.' });
+add({ id: 'harm', name: 'Lá menor harmônica – casa 5', focus: 'lead', notes: updown(flat(HARM)),
+  desc: 'Menor com sétima maior (Sol#). Cuidado com o salto entre Fá e Sol#, que dá o som neoclássico.' });
+// Legato
+add({ id: 'ham', name: 'Hammer-on e pull-off 5-7-8', focus: 'legato', lvl: 'beg', bpm: 60, target: 110,
+  notes: [0,1,2,3,4,5].flatMap(s => [5,7,8,7].map(f => [s, f])), desc: 'Só a primeira nota é palhetada; o resto vem dos dedos.' });
+[[1,'beg'],[2,'int'],[3,'adv']].forEach(([k, l]) => add({ id: 'tr' + k, name: 'Trinados 1-' + (k + 1), focus: 'legato', lvl: l, bpm: 60 + 10 * k, target: 110 + 10 * k,
+  notes: trills(k), desc: 'Alterne rápido entre duas casas só com martelinho e puxada.' }));
+// Sweep
+add({ id: 'sweepAm', name: 'Arpejo Am (6 cordas, subir e descer)', focus: 'sweep', lvl: 'int', bpm: 50, target: 100,
+  notes: updown([[0,5],[1,7],[2,7],[3,5],[4,5],[5,5]]), desc: 'Deslize a palheta de forma contínua pelas cordas, uma nota por corda.' });
+add({ id: 'sweep2', name: 'Arpejo Am repetido', focus: 'sweep', lvl: 'adv', bpm: 60, target: 120,
+  notes: [].concat(updown([[0,5],[1,7],[2,7],[3,5],[4,5],[5,5]]), updown([[0,5],[1,7],[2,7],[3,5],[4,5],[5,5]])), desc: 'Duas voltas seguidas, com ênfase na limpeza.' });
+// Acordes (arpejos dedilhados)
+add({ id: 'arpAmC', name: 'Arpejo Am | C dedilhado', focus: 'chords', lvl: 'beg', bpm: 60, target: 110,
+  notes: [].concat([[1,0],[2,2],[3,2],[4,1],[3,2],[2,2]], [[1,3],[2,2],[3,0],[4,1],[3,0],[2,2]]), desc: 'Dois acordes, um padrão de dedilhado. Deixe as notas soarem.' });
+// Ritmo (valida o tempo pelo ataque, sem nota)
+const R = (id, name, l, b, t, pattern, desc, o = {}) => add(Object.assign({ id, name, focus: 'rhythm', lvl: l, bpm: b, target: t, type: 'rhythm', pattern, desc }, o));
+R('rBasic', 'Rasgueado básico ↓ ↓↑ ↑↓↑', 'beg', 70, 110, ['D','-','D','U','-','U','D','U'], 'O padrão clássico do pop/folk.', { sub: 2, chords: ['Am','C','G','Em'] });
+R('r8', 'Colcheias contínuas', 'beg', 70, 120, ['D','U','D','U','D','U','D','U'], 'Mão constante pra baixo e pra cima.', { sub: 2, chords: ['Em'] });
+R('rReg', 'Contratempo (reggae)', 'int', 70, 110, ['-','U','-','U','-','U','-','U'], 'Acentue o "e" de cada tempo.', { sub: 2, chords: ['Am','Dm'] });
+R('rFunk', 'Funk 16 com abafado', 'adv', 70, 100, ['D','x','U','x','D','x','U','D','x','U','x','D','x','U','D','U'], 'Abafe com a mão esquerda nos "x" e mantenha a mão direita contínua.', { sub: 4, chords: ['E9'] });
+R('rTrans', 'Troca de acordes Em–Am', 'beg', 50, 80, ['D','-','-','-','D','-','-','-'], 'Uma passada por compasso, só dois acordes. Troque de acorde antes do próximo tempo 1.', { sub: 2, chords: ['Em','Am'] });
+R('rTrans4', 'Troca de acordes Am–C–G–Em', 'int', 50, 100, ['D','-','-','-','D','-','-','-'], 'Uma passada por compasso, agora com quatro acordes. Troque antes do próximo tempo 1.', { sub: 2, chords: ['Am','C','G','Em'] });
+// degrau 1 da palhetada alternada: só a mão da palheta, sem mão esquerda nem troca de corda
+add({ id: 'altOpen', name: 'Palhetada alternada em corda solta', focus: 'pick', rep: true, notes: Array(32).fill([4, 0]),
+  desc: 'Repita a corda Si solta com palhetadas ↓↑ constantes. Só a mão da palheta trabalha: pulso relaxado, movimento pequeno.' });
+// novos exercícios para o Nível IV
+add({ id: 'spMix', name: 'Spider Walk misto (1-3-2-4 + 4-2-3-1)', focus: 'mech', notes: [].concat(spider([1,3,2,4]), spider([4,2,3,1])),
+  desc: 'Duas digitações alternadas na mesma passada, sem perder o tempo.' });
+add({ id: 'econ4', name: 'Economy em grupos de 4', focus: 'pick', notes: groups(flat(SH3), 4),
+  desc: 'Sequências de 4 notas pela escala, varrendo a palheta nas trocas de corda.' });
+
+// novos exercícios: legato, sweep, palhetada, acordes e ritmo
+const ARP = c => c.concat(c.slice(1, -1).reverse());
+add({ id: 'slide', name: 'Slide 5-7-9 por corda', focus: 'legato', notes: [0,1,2,3,4,5].flatMap(s => [5,7,9,7,5].map(f => [s, f])),
+  desc: 'Palhete só a primeira nota e deslize o dedo para as casas seguintes sem soltar a corda.' });
+add({ id: 'legPent', name: 'Pentatônica em legato', focus: 'legato', notes: updown(flat(PENT)),
+  desc: 'Palhete só a primeira nota de cada corda; a segunda sai com martelinho ou puxada.' });
+add({ id: 'leg3', name: 'Legato em 3 notas por corda', focus: 'legato', notes: SH3.flatMap((fr, s) => [fr[0], fr[1], fr[2], fr[1]].map(f => [s, f])),
+  desc: 'Martelinho e puxada com três dedos em cada corda. Só a primeira nota de cada corda é palhetada.' });
+add({ id: 'legChrom', name: 'Legato cromático 1-2-3-4', focus: 'legato', notes: [0,1,2,3,4,5].flatMap(s => [5,6,7,8,7,6].map(f => [s, f])),
+  desc: 'Os quatro dedos em casas vizinhas, só com martelinho e puxada. Cuide da força do dedo mínimo.' });
+add({ id: 'leg6', name: 'Legato em sequências de 6 notas', focus: 'legato', notes: groups(flat(SH3), 6),
+  desc: 'Três notas em cada corda, trocando de corda sem perder o ritmo. Palhete só a primeira de cada corda.' });
+add({ id: 'sweep3', name: 'Sweep de 3 cordas – Am', focus: 'sweep', notes: [].concat(updown([[3,5],[4,5],[5,5]]), updown([[3,5],[4,5],[5,5]]), updown([[3,5],[4,5],[5,5]])),
+  desc: 'Arpejo de Lá menor nas três cordas agudas. Um único movimento de palheta, sem bloquear a nota anterior.' });
+add({ id: 'sweep4', name: 'Sweep de 4 cordas – Am', focus: 'sweep', notes: [].concat(updown([[2,7],[3,5],[4,5],[5,5]]), updown([[2,7],[3,5],[4,5],[5,5]]), updown([[2,7],[3,5],[4,5],[5,5]])),
+  desc: 'Arpejo de Lá menor em quatro cordas. Cada nota soa limpa e sem se misturar com a seguinte.' });
+add({ id: 'sweep5', name: 'Sweep de 5 cordas – Am', focus: 'sweep', notes: [].concat(updown([[1,7],[2,7],[3,5],[4,5],[5,5]]), updown([[1,7],[2,7],[3,5],[4,5],[5,5]]), updown([[1,7],[2,7],[3,5],[4,5],[5,5]])),
+  desc: 'Arpejo de Lá menor em cinco cordas, na casa 5 a 7. Prepare o próximo dedo antes da palheta chegar.' });
+add({ id: 'sweepC', name: 'Arpejo C maior (6 cordas)', focus: 'sweep', notes: updown([[0,8],[1,7],[2,5],[3,5],[4,5],[5,8]]),
+  desc: 'O sweep de seis cordas em Dó maior. Compare o som maior com o arpejo de Lá menor.' });
+add({ id: 'down', name: 'Palhetada só para baixo', focus: 'pick', notes: [1,2,3,4].flatMap(s => [5,7,5,7].map(f => [s, f])),
+  desc: 'Toque todas as notas com palhetadas para baixo, sem alternar. Cria um som firme e constante.' });
+add({ id: 'inout', name: 'Palhetada inside e outside', focus: 'pick', notes: [0,1,2,3].flatMap(b => [[b,5],[b+1,7],[b,7],[b+1,5]]),
+  desc: 'Alterne entre duas cordas vizinhas em padrões que fazem a palheta passar por dentro ou por fora.' });
+add({ id: 'pedal', name: 'Pedal point com corda solta', focus: 'pick', notes: [2,3,5,3].flatMap(f => [[1,0],[2,f]]),
+  desc: 'A corda Lá solta serve de base e alterna com notas na corda Ré. Mantenha a palhetada alternada.' });
+add({ id: 'arpEmAm', name: 'Arpejo Em · Am dedilhado', focus: 'chords', notes: [].concat(ARP([[0,0],[1,2],[2,2],[3,0],[4,0],[5,0]]), ARP([[1,0],[2,2],[3,2],[4,1],[5,0]])),
+  desc: 'Dois acordes abertos, tocados nota a nota de baixo para cima e de volta. Deixe as notas soarem.' });
+add({ id: 'arp4', name: 'Arpejo G · Em · C · D dedilhado', focus: 'chords', notes: [].concat(ARP([[0,3],[1,2],[2,0],[3,0],[4,0],[5,3]]), ARP([[0,0],[1,2],[2,2],[3,0],[4,0],[5,0]]), ARP([[1,3],[2,2],[3,0],[4,1],[5,0]]), ARP([[2,0],[3,2],[4,3],[5,2]])),
+  desc: 'A sequência mais comum do pop em quatro acordes abertos. Prepare o próximo acorde antes de trocar.' });
+add({ id: 'arpAmDmE', name: 'Arpejo Am · Dm · E dedilhado', focus: 'chords', notes: [].concat(ARP([[1,0],[2,2],[3,2],[4,1],[5,0]]), ARP([[2,0],[3,2],[4,3],[5,1]]), ARP([[0,0],[1,2],[2,2],[3,1],[4,0],[5,0]])),
+  desc: 'A progressão menor clássica (i, iv, V). Observe como o acorde E resolve para o Am.' });
+add({ id: 'power', name: 'Power chords E5 · A5 · D5 (nota a nota)', focus: 'chords', notes: [[0,0],[1,2],[1,0],[2,2],[2,0],[3,2],[2,0],[2,2],[1,0],[1,2],[0,0]],
+  desc: 'Duas notas por acorde (fundamental e quinta). Base do rock: toque limpo, sem encostar nas outras cordas.' });
+add({ id: 'arpF', name: 'Arpejo F (pestana) · C', focus: 'chords', notes: [].concat(ARP([[0,1],[1,3],[2,3],[3,2],[4,1],[5,1]]), ARP([[1,3],[2,2],[3,0],[4,1],[5,0]])),
+  desc: 'O primeiro acorde com pestana. Pressione com a lateral do indicador e deixe todas as notas soarem.' });
+add({ id: 'arpBm', name: 'Arpejo Bm (pestana) · G · D', focus: 'chords', notes: [].concat(ARP([[1,2],[2,4],[3,4],[4,3],[5,2]]), ARP([[0,3],[1,2],[2,0],[3,0],[4,0],[5,3]]), ARP([[2,0],[3,2],[4,3],[5,2]])),
+  desc: 'Pestana na casa 2 com a forma de Lá menor. Depois volte para acordes abertos sem perder o tempo.' });
+add({ id: 'arpCaged', name: 'C maior em duas formas (aberto e casa 3)', focus: 'chords', notes: [].concat(ARP([[1,3],[2,2],[3,0],[4,1],[5,0]]), ARP([[1,3],[2,5],[3,5],[4,5],[5,3]])),
+  desc: 'O mesmo acorde de Dó maior, primeiro aberto e depois com a forma de Lá na casa 3. É a ideia do sistema CAGED.' });
+R('rQ', 'Rasgueado em semínimas ↓ ↓ ↓ ↓', 'beg', 60, 100, ['D','-','D','-','D','-','D','-'], 'Uma batida para baixo por tempo, em um único acorde. O primeiro passo antes de usar a mão para cima.', { sub: 2, chords: ['Em'] });
+R('rPM', 'Palm mute em colcheias (power chord)', 'beg', 70, 110, ['D','D','D','D','D','D','D','D'], 'Apoie a lateral da mão direita perto da ponte para abafar. Colcheias constantes, todas para baixo.', { sub: 2, chords: ['E5'] });
+R('rSync', 'Síncopa pop (pausa no 2)', 'beg', 70, 110, ['D','-','-','U','-','U','D','U'], 'O tempo 2 fica em silêncio e a mão continua se movendo. Esse é o ritmo de muitas músicas pop.', { sub: 2, chords: ['G','D','Em','C'] });
+R('r16', 'Semicolcheias contínuas', 'beg', 60, 90, ['D','U','D','U','D','U','D','U','D','U','D','U','D','U','D','U'], 'Quatro batidas por tempo, alternando baixo e cima. Mão relaxada e movimento pequeno.', { sub: 4, chords: ['Em'] });
+R('rGallop', 'Galope (colcheia + 2 semicolcheias)', 'beg', 70, 110, ['D','-','D','D','D','-','D','D','D','-','D','D','D','-','D','D'], 'Uma batida longa e duas curtas em cada tempo. O ritmo clássico do heavy metal.', { sub: 4, chords: ['E5'] });
+
+// Currículo: [id, nível, BPM inicial, BPM meta]. A ordem aqui é a ordem pedagógica dentro do nível.
+// Regra: cada exercício acrescenta uma única dificuldade nova (ver revisao-niveis/reference/auditoria-niveis.html).
+const CURR = [
+  // Nível I: mão da palheta isolada, depois mão esquerda, depois troca de corda, ritmo e acordes (2 acordes)
+  // (Nível I usa 1 nota por clique: 50–100 BPM = 50–100 notas/min, que fecha com o início do Nível II, 60 BPM × 2 = 120 notas/min)
+  ['altOpen', 1, 60, 100], ['chrom', 1, 50, 100], ['sp1-2-3-4', 1, 50, 100], ['rQ', 1, 60, 100], ['r8', 1, 60, 90], ['sp4-3-2-1', 1, 50, 100], ['pent', 1, 50, 100], ['pent2', 1, 50, 100], ['pent3', 1, 50, 100], ['blues', 1, 50, 100], ['rTrans', 1, 50, 80], ['arpAmC', 1, 50, 100], ['arpEmAm', 1, 50, 100],
+  // Nível II: troca de cordas com palhetada alternada, digitações salteadas, primeiro legato, síncopa, 4 acordes
+  ['alt', 2, 60, 100], ['down', 2, 60, 100], ['sp1-2-4-3', 2, 60, 100], ['sp2-1-3-4', 2, 60, 100], ['sp1-3-2-4', 2, 60, 100], ['ham', 2, 60, 100], ['slide', 2, 60, 100], ['legPent', 2, 60, 100], ['sp1-3-4-2', 2, 60, 100], ['sp2-3-4-1', 2, 60, 100], ['sp3-4-2-1', 2, 60, 100], ['sp4-3-1-2', 2, 60, 100], ['sp2-4-1-3', 2, 60, 100], ['nps3', 2, 60, 100], ['tr1', 2, 60, 100], ['pent4', 2, 70, 110], ['pent3g', 2, 70, 110], ['pentM', 2, 60, 110], ['rBasic', 2, 70, 100], ['rTrans4', 2, 50, 100], ['rPM', 2, 70, 110], ['arp4', 2, 50, 100], ['arpAmDmE', 2, 50, 100], ['power', 2, 50, 100],
+  // Nível III: contratempo, saltos de terça e de corda, aberturas maiores, tremolo
+  ['rReg', 3, 70, 110], ['rSync', 3, 70, 110], ['rGallop', 3, 70, 110], ['r16', 3, 60, 90], ['pent3rd', 3, 80, 120], ['nps3rd', 3, 70, 115], ['licks', 3, 60, 110], ['tr2', 3, 70, 110], ['leg3', 3, 60, 110], ['legChrom', 3, 60, 110], ['skip', 3, 70, 110], ['sp1-4-3-2', 3, 70, 115], ['sp2-1-4-3', 3, 70, 115], ['sp2-4-3-1', 3, 70, 115], ['sp3-1-2-4', 3, 70, 115], ['sp3-2-1-4', 3, 70, 115], ['sp3-4-1-2', 3, 70, 115], ['sp4-1-2-3', 3, 70, 115], ['sp4-2-1-3', 3, 70, 115], ['sp3-1-4-2', 3, 70, 115], ['trem', 3, 70, 110], ['inout', 3, 70, 115], ['pedal', 3, 70, 115], ['sp4-2-3-1', 3, 70, 115], ['sweep3', 3, 40, 80], ['arpF', 3, 50, 100], ['arpBm', 3, 50, 100],
+  // Nível IV: sweep, economy, sequências longas, funk em semicolcheias
+  ['sweep4', 4, 40, 80], ['sweepAm', 4, 40, 80], ['sweep5', 4, 40, 80], ['sweepC', 4, 40, 80], ['leg6', 4, 70, 110], ['arpCaged', 4, 50, 100], ['nps3g', 4, 90, 140], ['diag', 4, 80, 130], ['dor', 4, 80, 130], ['harm', 4, 70, 120], ['econ', 4, 90, 140], ['econ4', 4, 90, 150], ['tr3', 4, 80, 130], ['sweep2', 4, 80, 130], ['sp1-4-2-3', 4, 80, 120], ['sp2-3-1-4', 4, 80, 120], ['sp3-2-4-1', 4, 80, 120], ['sp4-1-3-2', 4, 80, 120], ['spMix', 4, 90, 140], ['rFunk', 4, 80, 110],
+];
+const LV_EX = { 1: [], 2: [], 3: [], 4: [] };
+CURR.forEach(([id, l, b, t], i) => { const e = EX.find(x => x.id === id); e.lvl = l; e.bpm = b; e.target = t; e.ord = i; LV_EX[l].push(id); });
+EX.sort((a, b) => a.ord - b.ord);
+EX.forEach(e => { e.len = e.type === 'notes' ? e.notes.length : e.pattern.length; });
+const EXMAP = Object.fromEntries(EX.map(e => [e.id, e]));
+
+function seedRoutines() {
+  return [
+    { id: 'r1', name: 'Aquecimento 10 min', items: ['chrom', 'sp1-2-3-4', 'pent'] },
+    { id: 'r2', name: 'Velocidade e solo', items: ['alt', 'pent4', 'nps3', 'tr2'] },
+    { id: 'r3', name: 'Ritmo e acordes', items: ['r8', 'rTrans', 'arpAmC', 'rBasic'] },
+  ];
+}

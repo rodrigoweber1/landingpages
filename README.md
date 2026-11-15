@@ -17,6 +17,10 @@ you-rock-academy/
   media/                    Fotos e vídeos usados pelas duas landing pages
   versoes-antigas/          Versões anteriores, guardadas só como referência
 
+yourock/
+  index.html              App de treino de guitarra YouRock (PWA, com sw.js e manifest ao lado)
+  quiz.js, app.js, ...    Código do app, todos na mesma pasta
+
 cast/
   portfolio-scan.html       Discovery de portfólio CAST
   diagnostico-ia.html       Diagnóstico de IA para a carteira de aplicações
