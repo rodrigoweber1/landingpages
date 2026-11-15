@@ -166,3 +166,5 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .nav.bottom a,.nav.bottom button{padding-left:1px;padding-right:1px}
 
 .exdd>summary>span:first-child{flex:1}
+
+.dot.open circle{fill:var(--acc);stroke:var(--acc)}.dot.open text{fill:var(--on);font-weight:800}.dot.open.cur circle{stroke:#fff}

@@ -119,11 +119,13 @@ function fretboardSVG(ex, lefty, label, horiz) {
   let o = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   [3, 5, 7, 9, 12, 15, 17].forEach(f => { if (f >= first && f <= last) { const two = f === 12; (two ? [-14, 14] : [0]).forEach(dy => o += `<circle class="inlay" cx="${X(f)}" cy="${(Y(2) + Y(3)) / 2 + dy * 0}" r="${two ? 6 : 7}" ${two ? `transform="translate(0 ${dy})"` : ''}/>`); } });
   for (let k = 1; k <= cols; k++) o += `<line class="${first === 0 && k === 1 ? 'nut' : 'fret'}" x1="${L(k)}" x2="${L(k)}" y1="${Y(5) - 10}" y2="${Y(0) + 10}"/>`;
-  for (let s = 0; s < 6; s++) { o += `<line class="strg" x1="${L(0)}" x2="${L(cols)}" y1="${Y(s)}" y2="${Y(s)}" stroke-width="${1 + (5 - s) * 0.45}"/>`; o += `<text class="slab" x="${lefty ? W - 14 : 14}" y="${Y(s)}">${'EADGBe'[s]}</text>`; }
+  const openS = new Set(notes.filter(n => n[1] === 0).map(n => n[0]));   // corda solta: não desenha bolinha extra, destaca o nome da corda
+  for (let s = 0; s < 6; s++) { o += `<line class="strg" x1="${L(0)}" x2="${L(cols)}" y1="${Y(s)}" y2="${Y(s)}" stroke-width="${1 + (5 - s) * 0.45}"/>`; if (!openS.has(s)) o += `<text class="slab" x="${lefty ? W - 14 : 14}" y="${Y(s)}">${'EADGBe'[s]}</text>`; }
   o += fretMarks(X, Y(0) + 22, Math.max(first, 1), last);
   for (let f = first; f <= last; f++) o += `<text class="fnum${isMark(f) ? ' mk' : ''}" x="${X(f)}" y="${H - 6}">${f === 0 ? '' : f}</text>`;
   const seen = new Set();
   notes.forEach(([s, f]) => { const k = s + '_' + f; if (seen.has(k)) return; seen.add(k);
+    if (f === 0) { const lx = lefty ? W - 14 : 14; o += `<g class="dot open" id="d${k}"><circle cx="${lx}" cy="${Y(s)}" r="11"/><text x="${lx}" y="${Y(s)}">${'EADGBe'[s]}</text></g>`; return; }
     o += `<g class="dot" id="d${k}"><circle cx="${X(f)}" cy="${Y(s)}" r="12"/><text x="${X(f)}" y="${Y(s)}">${label === 'fret' ? f : pcName(OPEN[s] + f)}</text></g>`; });
   return o + '</svg>';
 }
