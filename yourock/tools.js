@@ -20,6 +20,36 @@ function fretMarks(X, y, from, to) {
   MARK.forEach(f => { if (f < from || f > to) return; o += f % 12 === 0 ? `<circle class="fmk" cx="${X(f) - 6}" cy="${y}" r="3.5"/><circle class="fmk" cx="${X(f) + 6}" cy="${y}" r="3.5"/>` : `<circle class="fmk" cx="${X(f)}" cy="${y}" r="3.5"/>`; });
   return o;
 }
+// ---- braço na vertical (celular): cordas em colunas, casas descendo, como nos diagramas de acorde ----
+const useVBoard = () => S().boardV !== false && window.matchMedia && matchMedia('(max-width:759px)').matches;
+function vGeom(first, last, lefty) {
+  const W = 340, mL = 40, mR = 36, SP = (W - mL - mR) / 5, FH = 44, base = first === 0 ? 1 : first, nutY = first === 0 ? 70 : 34;
+  const X = s => mL + (lefty ? 5 - s : s) * SP, Y = f => (f === 0 ? nutY - 24 : nutY + (f - base + 0.5) * FH);
+  return { W, H: nutY + (last - base + 1) * FH + 12, X, Y, nutY, base, FH, rows: last - base + 1 };
+}
+function vNeckBase(first, last, lefty, g) {
+  let o = '';
+  const xa = Math.min(g.X(0), g.X(5)) - 8, xb = Math.max(g.X(0), g.X(5)) + 8;
+  for (let k = 0; k <= g.rows; k++) o += `<line class="${k === 0 && first === 0 ? 'nut' : 'fret'}" x1="${xa}" x2="${xb}" y1="${g.nutY + k * g.FH}" y2="${g.nutY + k * g.FH}"/>`;
+  for (let s = 0; s < 6; s++) o += `<line class="strg" x1="${g.X(s)}" x2="${g.X(s)}" y1="${first === 0 ? 28 : g.nutY}" y2="${g.nutY + g.rows * g.FH}" stroke-width="${1 + (5 - s) * 0.45}"/><text class="slab" x="${g.X(s)}" y="12">${'EADGBe'[s]}</text>`;
+  const nx = lefty ? g.W - 16 : 16, mx = lefty ? 16 : g.W - 16;
+  for (let f = g.base; f <= last; f++) {
+    o += `<text class="fnum${isMark(f) ? ' mk' : ''}" x="${nx}" y="${g.Y(f)}" style="dominant-baseline:middle">${f}</text>`;
+    if (isMark(f)) o += f % 12 === 0 ? `<circle class="fmk" cx="${mx}" cy="${g.Y(f) - 8}" r="4"/><circle class="fmk" cx="${mx}" cy="${g.Y(f) + 8}" r="4"/>` : `<circle class="fmk" cx="${mx}" cy="${g.Y(f)}" r="4"/>`;
+  }
+  return o;
+}
+const dotFontV = t => (t.length <= 2 ? 13 : t.length === 3 ? 11 : 10);
+function notesBoardVSVG() {
+  const N = NT.frets, g = vGeom(0, N, S().lefty);
+  let o = `<svg viewBox="0 0 ${g.W} ${g.H}" xmlns="http://www.w3.org/2000/svg">` + vNeckBase(0, N, S().lefty, g);
+  for (let f = 0; f <= N; f++) for (let s = 0; s < 6; s++) {
+    const pc = (OPEN[s] + f) % 12; if (NT.show === 'nat' && !NAT.has(pc)) continue;
+    const cls = 'dot' + (NT.sel != null ? (pc === NT.sel ? ' sel' : ' dim') : ''), t = NT.lab === 'fret' ? String(f) : pcName(pc);
+    o += `<g class="${cls}" data-act="nplay" data-s="${s}" data-f="${f}" style="cursor:pointer"><circle cx="${g.X(s)}" cy="${g.Y(f)}" r="17"/><text x="${g.X(s)}" y="${g.Y(f)}" style="font-size:${dotFontV(t)}px">${t}</text></g>`;
+  }
+  return o + '</svg>';
+}
 const dotFont = t => (t.length <= 2 ? 11 : t.length === 3 ? 9 : 8);
 const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -114,7 +144,8 @@ function notesBoardSVG() {
 }
 function notesDraw() {
   if (NT.show === 'nat' && NT.sel != null && !NAT.has(NT.sel)) NT.sel = null;
-  $('#nBoard').innerHTML = notesBoardSVG();
+  $('#nBoard').innerHTML = `<div class="bh">${notesBoardSVG()}</div><div class="bv">${notesBoardVSVG()}</div>`;
+  $('#nBoard').classList.toggle('vmob', S().boardV !== false);
   $('#nChips').innerHTML = `<span class="chip ${NT.sel == null ? 'on' : ''}" data-act="nsel" data-pc="-1">Todas</span>` + Array.from({ length: 12 }, (_, pc) => pc).filter(pc => NT.show !== 'nat' || NAT.has(pc)).map(pc => `<span class="chip ${NT.sel === pc ? 'on' : ''}" data-act="nsel" data-pc="${pc}">${pcName(pc)}</span>`).join('');
   const so = S().names === 'solfejo', fl = S().acc === 'b', nat = NT.show === 'nat', on = b => (b ? 'on' : '');
   $('#nCtl').innerHTML = `<label class="small mut">Nomes</label><span class="chip ${on(!so)}" data-act="nname" data-v="cifra">C D E</span><span class="chip ${on(so)}" data-act="nname" data-v="solfejo">Dó Ré Mi</span>

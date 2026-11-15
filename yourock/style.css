@@ -133,3 +133,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 [data-theme=ardosia] .nav a.on{color:var(--tx);background:var(--bg3)}
 [data-theme=ardosia] .nav a.on svg{color:var(--acc)}
 [data-theme=ardosia] .card{border-color:transparent}
+
+/* braço vertical no celular */
+.bv{display:none}
+@media(max-width:759px){.vmob .bh{display:none}.vmob .bv{display:block}.vmob{overflow-x:visible!important}}
