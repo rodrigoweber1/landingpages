@@ -1,8 +1,9 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.2.9';
+var APP_VERSION = '1.3.0';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
+  { pt: 'Ajustes: liga/desliga o reconhecimento de som; desligado, o microfone e o afinador somem das telas', en: 'Settings: turn sound recognition on/off; when off, the microphone and tuner disappear from the screens', es: 'Ajustes: activa/desactiva el reconocimiento de sonido; apagado, el micrófono y el afinador desaparecen de las pantallas' },
   { pt: 'Exercícios no celular: braço na horizontal mostrando só o trecho com as notas', en: 'Exercises on phones: horizontal fretboard showing only the part with the notes', es: 'Ejercicios en el móvil: mástil horizontal mostrando solo el tramo con las notas' },
   { pt: 'Biblioteca: o diagrama de cada exercício aparece na horizontal', en: 'Library: each exercise diagram is shown horizontally', es: 'Biblioteca: el diagrama de cada ejercicio se muestra en horizontal' },
   { pt: 'Teste de nível: quem nunca tocou vai direto ao Nível I, sem as outras perguntas', en: 'Level quiz: if you have never played, you go straight to Level I', es: 'Test de nivel: quien nunca tocó va directo al Nivel I, sin las demás preguntas' },

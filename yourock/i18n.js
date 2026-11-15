@@ -82,6 +82,7 @@ Refazer o quiz de nível|Retake the level quiz|Repetir el quiz de nivel
 Idioma|Language|Idioma
 Alto contraste|High contrast|Alto contraste
 Biblioteca|Library|Biblioteca
+Reconhecimento de som (microfone). Desligado: o microfone, o afinador e a calibração somem e você usa a autoavaliação.|Sound recognition (microphone). When off, the microphone, tuner and calibration disappear and you use self-assessment.|Reconocimiento de sonido (micrófono). Apagado: el micrófono, el afinador y la calibración desaparecen y usas la autoevaluación.
 Não ouvi som nessa nota|I did not hear a sound on this note|No oí sonido en esta nota
 Nota certa, mas não detectei uma nova palhetada|Right note, but no new pick was detected|Nota correcta, pero no detecté una nueva púa
 Ouvi|I heard|Oí
