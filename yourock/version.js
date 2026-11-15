@@ -1,8 +1,9 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.0.0';
+var APP_VERSION = '1.0.1';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
+  { pt: 'Versão visível na página inicial', en: 'Version shown on the home page', es: 'Versión visible en la página de inicio' },
   { pt: 'Versionamento: número da versão e botão para atualizar em Ajustes', en: 'Versioning: version number and update button in Settings', es: 'Versionado: número de versión y botón para actualizar en Ajustes' },
   { pt: 'Microfone liga ao iniciar o exercício; oitava conferida nas notas', en: 'Microphone turns on when an exercise starts; octave is checked', es: 'El micrófono se enciende al iniciar el ejercicio; se comprueba la octava' },
   { pt: 'Afinador mais estável, com controle de sensibilidade', en: 'Steadier tuner with a sensitivity control', es: 'Afinador más estable, con control de sensibilidad' },

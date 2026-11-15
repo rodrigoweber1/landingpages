@@ -348,7 +348,8 @@ function viewHome() {
     <div class="row" style="margin-top:14px"><button class="btn pri" data-act="startToday">▶ Começar treino (${TODAY.length} exercícios)</button><button class="btn" data-act="saveToday">Salvar como rotina</button></div>
   </div>
   <div class="grid g2"><div class="card"><h2>Insights</h2>${ins.map(i => `<div class="ins ${i.t}">${esc(i.m)}</div>`).join('')}<a class="btn sm" href="#/stats" style="display:inline-block;margin-top:6px">Ver progresso completo</a></div>
-  <div class="card"><div class="row sp"><h2>Minhas rotinas</h2><button class="btn sm" data-act="newRoutine">+ Nova</button></div><div id="routines">${routinesHTML()}</div></div></div>`;
+  <div class="card"><div class="row sp"><h2>Minhas rotinas</h2><button class="btn sm" data-act="newRoutine">+ Nova</button></div><div id="routines">${routinesHTML()}</div></div></div>
+  <div class="mut small" style="text-align:center;margin:18px 0 6px"><a href="#/settings" style="color:inherit;text-decoration:none">YouRock v${APP_VERSION}</a></div>`;
   $('#planMin').onchange = e => { S().planMin = +e.target.value; save(); TODAY = recommend(S().planMin); render(); };
 }
 let editR = null;
