@@ -236,13 +236,14 @@ function findVoicings(root, iv, bass) {
   return [...found.values()].sort((a, b) => a.score - b.score).slice(0, 6);
 }
 function chordSVG(v) {
-  const fr = v.f.map((f, s) => (f > 0 ? f : null)).filter(x => x != null), mn = fr.length ? Math.min(...fr) : 1, base = mn > 3 ? mn : 1;
+  const fr = v.f.map((f, s) => (f > 0 ? f : null)).filter(x => x != null), mn = fr.length ? Math.min(...fr) : 1, base = fr.length && Math.max(...fr) > 5 ? mn : 1;   // só 'desce' pelo braço quando o acorde não cabe nas 5 primeiras casas
   const X = s => 24 + s * 19, Y = r => 36 + r * 24;
   let o = `<svg viewBox="2 14 126 148" xmlns="http://www.w3.org/2000/svg">`;
   for (let r = 0; r <= 5; r++) o += `<line class="${r === 0 && base === 1 ? 'nut' : 'fret'}" x1="${X(0)}" x2="${X(5)}" y1="${Y(r)}" y2="${Y(r)}"/>`;
   for (let s = 0; s < 6; s++) o += `<line class="strg" x1="${X(s)}" x2="${X(s)}" y1="${Y(0)}" y2="${Y(5)}" stroke-width="1.2"/>`;
-  if (base > 1) o += `<text class="fnum" x="8" y="${Y(0) + 17}" style="font-size:11px;text-anchor:start">${base}ª</text>`;
-  if (v.barre) { const r = v.barre.fret - base; o += `<rect x="${X(v.barre.from) - 9}" y="${Y(r) + 5}" width="${X(v.barre.to) - X(v.barre.from) + 18}" height="14" rx="7" fill="var(--acc)" opacity=".35"/>`; }
+  if (base > 1) o += `<text class="fnum" x="6" y="${Y(0) + 17}" style="font-size:13px;font-weight:700;fill:var(--tx);text-anchor:start">${base}ª</text>`;
+  if (v.barre && base === 1) o += `<text class="fnum" x="6" y="${Y(v.barre.fret - 1) + 17}" style="font-size:13px;font-weight:700;fill:var(--tx);text-anchor:start">${v.barre.fret}ª</text>`;   // número da casa da pestana
+  if (v.barre) { const r = v.barre.fret - base; o += `<rect x="${X(v.barre.from) - 9}" y="${Y(r) + 5}" width="${X(v.barre.to) - X(v.barre.from) + 18}" height="14" rx="7" fill="var(--acc)" opacity=".55"/>`; }
   v.f.forEach((f, s) => {
     if (f < 0) { o += `<text class="fnum" x="${X(s)}" y="${Y(0) - 10}" style="font-size:13px">×</text>`; return; }
     if (f === 0) { o += `<circle cx="${X(s)}" cy="${Y(0) - 14}" r="5" fill="none" stroke="var(--strc)" stroke-width="1.5"/>`; return; }
@@ -257,7 +258,7 @@ function chordRes() {
   CH.v = findVoicings(CH.root, q.iv, CH.bass);
   $('#chRes').innerHTML = `<div class="card"><div class="row sp"><div><div class="chtitle">${esc(chordTitle(cm))}</div><div class="mut">${q.n}${CH.bass != null ? ' · baixo em ' + pcName(CH.bass) : ''}</div></div><button class="btn pri" data-act="chPlay" data-i="-1">▶ Ouvir acorde</button></div>
     <div class="row small" style="margin-top:10px"><span class="chip">Notas: <b>${esc(names)}</b></span><span class="chip">Fórmula: <b>${ivs}</b></span></div></div>
-    ${CH.v.length ? `<div class="cgrid">${CH.v.map((v, i) => `<div class="card cv" style="margin:0"><div class="small mut" style="min-height:20px">${v.hasOpen ? 'Posição aberta' : 'Casa ' + v.minF}${v.barre ? ' · pestana' : ''} · ${v.fingers} dedo${v.fingers === 1 ? '' : 's'}</div>${chordSVG(v)}<div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn sm" data-act="chPlay" data-i="${i}" style="flex:1" aria-label="${T('Ouvir')}" title="${T('Ouvir')}">▶</button><button class="btn sm" data-act="chAdd" data-i="${i}" style="flex:1" aria-label="${T('Adicionar à sequência')}" title="${T('Adicionar à sequência')}">+</button></div></div>`).join('')}</div>` : '<div class="card mut">Não encontrei uma digitação simples (até 4 dedos) para esse acorde com essa nota no baixo.</div>'}`;
+    ${CH.v.length ? `<div class="cgrid">${CH.v.map((v, i) => `<div class="card cv" style="margin:0">${chordSVG(v)}<div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn sm" data-act="chPlay" data-i="${i}" style="flex:1" aria-label="${T('Ouvir')}" title="${T('Ouvir')}">▶</button><button class="btn sm" data-act="chAdd" data-i="${i}" style="flex:1" aria-label="${T('Adicionar à sequência')}" title="${T('Adicionar à sequência')}">+</button></div></div>`).join('')}</div>` : '<div class="card mut">Não encontrei uma digitação simples (até 4 dedos) para esse acorde com essa nota no baixo.</div>'}`;
 }
 function chordSync() {
   document.querySelectorAll('#chRoots .chip').forEach(c => c.classList.toggle('on', +c.dataset.pc === CH.root));
@@ -274,7 +275,7 @@ function viewChords() {
   chordSync(); chordRes();
   if (window.ChordSequencer) {
     try {
-      const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, diagram: v => { const fr = v.f.filter(x => x > 0), nf = v.barre ? fr.filter(x => x !== v.barre.fret).length + 1 : fr.length; return `<div class="small mut" style="min-height:20px">${v.f.some(x => x === 0) && v.lo <= 4 ? 'Posição aberta' : 'Casa ' + v.lo}${v.barre ? ' · pestana' : ''} · ${nf} dedo${nf === 1 ? '' : 's'}</div>` + chordSVG(v); }, names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); } });
+      const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, diagram: v => chordSVG(v), names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); } });
       if (DB.chordSeq) seq.setState(DB.chordSeq);
       CH.seq = seq; cleanup = () => { CH.seq = null; seq.destroy(); };
     } catch (e) {}
