@@ -1,5 +1,5 @@
-const CACHE = 'yourock-v14';
-const FILES = ['./', 'index.html', 'style.css', 'data.js', 'audio.js', 'tools.js', 'quiz.js', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon.svg'];
+const CACHE = 'yourock-v15';
+const FILES = ['./', 'index.html', 'style.css', 'data.js', 'audio.js', 'tools.js', 'quiz.js', 'chord-sequencer.js', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon.svg'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== CACHE).map(x => caches.delete(x)))).then(() => self.clients.claim())); });
 // network-first: com internet sempre carrega a versão mais nova (evita mostrar exercícios antigos); sem internet usa o cache

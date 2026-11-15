@@ -226,8 +226,16 @@ function viewChords() {
     <div class="small mut" id="chErr" style="margin-top:6px;min-height:18px"></div>
     <div class="row" id="chRoots" style="margin-top:8px">${Array.from({ length: 12 }, (_, pc) => `<span class="chip" data-act="chRoot" data-pc="${pc}">${pcName(pc, true)}</span>`).join('')}</div>
     <div class="row" style="margin-top:10px"><select id="chQ" data-tin="chq" style="width:auto">${QUAL.map(q => `<option value="${q.k}">${q.n}${q.k ? ' (' + q.k + ')' : ''}</option>`).join('')}</select></div></div>
-  <div id="chRes"></div>`;
+  <div id="chRes"></div>
+  <div id="seq" style="margin-top:26px"></div>`;
   chordSync(); chordRes();
+  if (window.ChordSequencer) {
+    try {
+      const seq = ChordSequencer.mount('#seq', { lang: LANG, names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); } });
+      if (DB.chordSeq) seq.setState(DB.chordSeq);
+      cleanup = () => seq.destroy();
+    } catch (e) {}
+  }
 }
 function chordUpdateText() { $('#chTxt').value = chordTitle({ root: CH.root, q: CH.q, bass: CH.bass }); CH.text = $('#chTxt').value; $('#chErr').textContent = ''; }
 
