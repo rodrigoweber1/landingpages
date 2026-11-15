@@ -45,7 +45,7 @@ function notesBoardVSVG() {
   let o = `<svg viewBox="0 0 ${g.W} ${g.H}" xmlns="http://www.w3.org/2000/svg">` + vNeckBase(0, N, S().lefty, g);
   for (let f = 0; f <= N; f++) for (let s = 0; s < 6; s++) {
     const pc = (OPEN[s] + f) % 12; if (NT.show === 'nat' && !NAT.has(pc)) continue;
-    const cls = 'dot' + (NT.sel != null ? (pc === NT.sel ? ' sel' : ' dim') : ''), t = NT.lab === 'fret' ? String(f) : pcName(pc);
+    const cls = 'dot' + (NT.sel != null ? (pc === NT.sel ? ' sel' : ' dim') : ''), t = S().label === 'fret' ? String(f) : pcName(pc);
     o += `<g class="${cls}" data-act="nplay" data-s="${s}" data-f="${f}" style="cursor:pointer"><circle cx="${g.X(s)}" cy="${g.Y(f)}" r="17"/><text x="${g.X(s)}" y="${g.Y(f)}" style="font-size:${dotFontV(t)}px">${t}</text></g>`;
   }
   return o + '</svg>';
@@ -137,7 +137,7 @@ function notesBoardSVG() {
   for (let f = 0; f <= N; f++) o += `<text class="fnum${isMark(f) ? ' mk' : ''}" x="${X(f)}" y="${H - 6}">${f}</text>`;
   for (let s = 0; s < 6; s++) for (let f = 0; f <= N; f++) {
     const pc = (OPEN[s] + f) % 12; if (NT.show === 'nat' && !NAT.has(pc)) continue;
-    const cls = 'dot' + (NT.sel != null ? (pc === NT.sel ? ' sel' : ' dim') : ''), t = NT.lab === 'fret' ? String(f) : pcName(pc);
+    const cls = 'dot' + (NT.sel != null ? (pc === NT.sel ? ' sel' : ' dim') : ''), t = S().label === 'fret' ? String(f) : pcName(pc);
     o += `<g class="${cls}" data-act="nplay" data-s="${s}" data-f="${f}" style="cursor:pointer"><circle cx="${X(f)}" cy="${Y(s)}" r="13"/><text x="${X(f)}" y="${Y(s)}" style="font-size:${dotFont(t)}px">${t}</text></g>`;
   }
   return o + '</svg>';
@@ -155,7 +155,7 @@ function viewNotes() {
   view.innerHTML = `<h1>Notas da Guitarra</h1><div class="mut" style="margin:4px 0 12px">Toque em uma nota para ouvir e ver todas as posições dela no braço.</div>
   <div class="card"><div class="row" id="nCtl" style="margin-bottom:12px"></div><div class="row" id="nChips"></div>
     <div class="row" style="margin-top:12px"><label class="small mut">Casas</label><select data-tin="nfrets" style="width:auto">${[12, 15, 19, 22].map(n => `<option value="${n}" ${NT.frets === n ? 'selected' : ''}>0 a ${n}</option>`).join('')}</select>
-    <label class="small mut">Rótulo</label><select data-tin="nlab" style="width:auto"><option value="name" ${NT.lab === 'name' ? 'selected' : ''}>Nome da nota</option><option value="fret" ${NT.lab === 'fret' ? 'selected' : ''}>Número da casa</option></select></div></div>
+    <label class="small mut">Rótulo</label><select data-tin="nlab" style="width:auto"><option value="name" ${S().label !== 'fret' ? 'selected' : ''}>Nome da nota</option><option value="fret" ${S().label === 'fret' ? 'selected' : ''}>Número da casa</option></select></div></div>
   <div class="board" id="nBoard" style="overflow-x:auto"></div>
   <div class="grid g2" style="margin-top:14px">
     <div class="card"><h3>Cordas soltas</h3><div class="row" style="margin-top:8px">${[5, 4, 3, 2, 1, 0].map(s => `<button class="btn" data-act="nplay" data-s="${s}" data-f="0">${'6EADGB'.length ? ['E', 'B', 'G', 'D', 'A', 'E'][5 - s] : ''} <span class="mut small">${pcName(OPEN[s])}</span></button>`).join('')}</div><div class="mut small" style="margin-top:8px">Da mais fina (1ª) para a mais grossa (6ª). Nomes em cifra e, ao lado, no seu estilo de nomes.</div></div>
@@ -247,7 +247,7 @@ function chordSVG(v) {
   v.f.forEach((f, s) => {
     if (f < 0) { o += `<text class="fnum" x="${X(s)}" y="${Y(0) - 10}" style="font-size:13px">×</text>`; return; }
     if (f === 0) { o += `<circle cx="${X(s)}" cy="${Y(0) - 14}" r="5" fill="none" stroke="var(--strc)" stroke-width="1.5"/>`; return; }
-    const t = pcName(OPEN[s] + f), r = f - base;
+    const t = S().label === 'fret' ? String(f) : pcName(OPEN[s] + f), r = f - base;
     o += `<g class="dot sel"><circle cx="${X(s)}" cy="${Y(r) + 12}" r="9"/><text x="${X(s)}" y="${Y(r) + 12}" style="font-size:${t.length > 2 ? 7 : 9}px">${t}</text></g>`;
   });
   return o + '</svg>';
@@ -336,7 +336,7 @@ const toolIn = {
   maccent(v) { M().accent = v; },
   mtrainer(v) { M().trainer = v; Metro.bar = 0; },
   minc(v) { M().inc = clampN(v || 1, 1, 20); }, mevery(v) { M().every = clampN(v || 1, 1, 32); }, mmax(v) { M().max = clampN(v || 40, 40, 240); },
-  nshow(v) { NT.show = v; notesDraw(); }, nfrets(v) { NT.frets = v; notesDraw(); }, nlab(v) { NT.lab = v; notesDraw(); },
+  nshow(v) { NT.show = v; notesDraw(); }, nfrets(v) { NT.frets = v; notesDraw(); }, nlab(v) { S().label = v === 'fret' ? 'fret' : 'note'; save(); notesDraw(); },
   chq(v) { CH.q = v; chordUpdateText(); chordRes(); },
   chtxt(v) { CH.text = v; const c = parseChord(v); const err = $('#chErr'); if (!c) { err.textContent = v.trim() ? 'Não reconheci esse acorde. Exemplos: Am, F#m7, Bb, C7, G/B, Dsus4.' : ''; return; } err.textContent = ''; CH.root = c.root; CH.q = c.q; CH.bass = c.bass; chordSync(); chordRes(); },
 };
