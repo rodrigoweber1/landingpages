@@ -146,7 +146,8 @@ function chordStripHTML(ex) {
 function chordStripOn(name) { document.querySelectorAll('.cmini').forEach(e => e.classList.toggle('on', e.dataset.ch === name)); }
 function strumHTML(ex) {
   const arrows = { D: '↓', U: '↑', x: '✕', '-': '·' };
-  return `<div class="chord" id="chordNow">${esc((ex.chords || [''])[0])}</div>${chordStripHTML(ex)}<div class="slots" style="grid-template-columns:repeat(${Math.min(8, ex.pattern.length)},1fr)">` +
+  const strip = chordStripHTML(ex);   // com os diagramas na tela, o nome grande do acorde sai e o rasgueado fica menor
+  return `<div class="chord" id="chordNow"${strip ? ' style="display:none"' : ''}>${esc((ex.chords || [''])[0])}</div>${strip}<div class="slots${strip ? ' sm' : ''}" style="grid-template-columns:repeat(${Math.min(8, ex.pattern.length)},1fr)">` +
     ex.pattern.map((p, i) => `<div class="slot ${p === '-' ? 'rest' : ''}" id="sl${i}">${arrows[p]}<small>${slotLabel(i, ex.sub)}</small></div>`).join('') + '</div>';
 }
 

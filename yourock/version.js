@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.4.13';
+var APP_VERSION = '1.4.14';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Troca de acordes: diagramas maiores, sem o nome grande do acorde e com o rasgueado menor', en: 'Chord changes: larger diagrams, no big chord name, smaller strumming pattern', es: 'Cambio de acordes: diagramas más grandes, sin el nombre grande del acorde y con el rasgueo más pequeño' },
   { pt: 'Exercícios de troca de acordes: diagramas pequenos dos acordes (como na seção Acordes), com o acorde da vez em destaque', en: 'Chord-change exercises: small chord diagrams (as in the Chords section), with the current chord highlighted', es: 'Ejercicios de cambio de acordes: diagramas pequeños de los acordes (como en la sección Acordes), con el acorde actual resaltado' },
   { pt: 'Exercícios só com cordas soltas: diagrama mais curto (menos casas vazias)', en: 'Open-string-only exercises: shorter diagram (fewer empty frets)', es: 'Ejercicios solo con cuerdas al aire: diagrama más corto (menos trastes vacíos)' },
   { pt: 'Exercícios: cordas soltas não repetem a nota; o nome da corda à esquerda é que fica destacado', en: 'Exercises: open strings no longer repeat the note; the string name on the left is highlighted instead', es: 'Ejercicios: las cuerdas al aire ya no repiten la nota; se resalta el nombre de la cuerda a la izquierda' },
