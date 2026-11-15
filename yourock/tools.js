@@ -274,7 +274,7 @@ function viewChords() {
   chordSync(); chordRes();
   if (window.ChordSequencer) {
     try {
-      const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); } });
+      const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, diagram: v => { const fr = v.f.filter(x => x > 0), nf = v.barre ? fr.filter(x => x !== v.barre.fret).length + 1 : fr.length; return `<div class="small mut" style="min-height:20px">${v.f.some(x => x === 0) && v.lo <= 4 ? 'Posição aberta' : 'Casa ' + v.lo}${v.barre ? ' · pestana' : ''} · ${nf} dedo${nf === 1 ? '' : 's'}</div>` + chordSVG(v); }, names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); } });
       if (DB.chordSeq) seq.setState(DB.chordSeq);
       CH.seq = seq; cleanup = () => { CH.seq = null; seq.destroy(); };
     } catch (e) {}

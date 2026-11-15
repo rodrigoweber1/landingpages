@@ -192,7 +192,7 @@
   var D = {
     pt: {
       title: 'Sequência de prática',
-      intro: 'Monte a sua progressão: escolha a nota e o tipo de cada acorde, toque no diagrama para trocar de posição e aperte play.',
+      intro: 'Monte sua própria progressão com o + dos acordes acima, arraste para mudar a ordem e toque em play.',
       empty: 'Ainda não há acordes. Toque em «Adicionar acorde».', emptyAdd: 'Ainda não há acordes. Toque no + de um acorde acima para adicioná-lo.', add: 'Adicionar acorde', full: 'Sequência cheia (8)',
       drag: 'Arraste para mudar a ordem', rem: 'Remover este acorde', root: 'Nota', type: 'Tipo',
       pos: 'Posição', cycle: 'Trocar de posição', fret: 'casa', open: 'Posição aberta', barre: 'Pestana na casa',
@@ -202,7 +202,7 @@
     },
     es: {
       title: 'Secuencia de práctica',
-      intro: 'Monta tu propia progresión: elige la nota y el tipo de cada acorde, toca el diagrama para cambiar de posición y pulsa play.',
+      intro: 'Monta tu propia progresión con el + de los acordes de arriba, arrastra para cambiar el orden y pulsa play.',
       empty: 'Todavía no hay acordes. Pulsa «Añadir acorde».', emptyAdd: 'Todavía no hay acordes. Pulsa el + de un acorde de arriba para añadirlo.', add: 'Añadir acorde', full: 'Secuencia llena (8)',
       drag: 'Arrastra para cambiar el orden', rem: 'Quitar este acorde', root: 'Nota', type: 'Tipo',
       pos: 'Posición', cycle: 'Cambiar de posición', fret: 'traste', open: 'Posición abierta', barre: 'Cejilla en el traste',
@@ -212,7 +212,7 @@
     },
     en: {
       title: 'Practice sequence',
-      intro: 'Build your own progression: pick the note and type of each chord, tap the diagram to change position and hit play.',
+      intro: 'Build your own progression with the + on the chords above, drag to reorder and hit play.',
       empty: 'No chords yet. Tap “Add chord”.', emptyAdd: 'No chords yet. Tap the + on a chord above to add it.', add: 'Add chord', full: 'Sequence full (8)',
       drag: 'Drag to change the order', rem: 'Remove this chord', root: 'Note', type: 'Type',
       pos: 'Position', cycle: 'Change position', fret: 'fret', open: 'Open position', barre: 'Barre at fret',
@@ -276,6 +276,9 @@
     '.cs-top{display:flex;align-items:center;justify-content:space-between;width:100%}' +
     '.cs-drag{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 8px;border-radius:999px;background:var(--bg3);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;font-size:13px;font-weight:700}' +
     '.cs-x{width:32px;height:32px;padding:0;border:0;border-radius:999px;background:transparent;color:var(--mut);font-size:20px;line-height:1;cursor:pointer}' +
+    '.cs-nm{font-size:15px;font-weight:700}' +
+    '.cs-st svg{width:100%;height:auto;display:block}' +
+    '@media(max-width:759px){.cs-grid{grid-template-columns:repeat(3,1fr);gap:8px;max-width:none}.cs-slot{padding:8px 6px}.cs-slot[aria-pressed="true"]{padding:7px 5px}.cs-st .small{font-size:10px;line-height:1.25;min-height:26px}}' +
     '.cs-sels{display:flex;gap:4px;width:100%}' +
     '.cs-sels select{flex:1 1 0;width:auto;min-width:0;height:40px;padding:0 4px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:15px}' +
     '.cs-d{width:100%;display:flex;flex-direction:column;align-items:center}' +
@@ -358,7 +361,10 @@
       var sl = S.sl[i], t = D[lang], on = S.run && S.cur === i;
       var h = '<div class="cs-slot" data-i="' + i + '" aria-pressed="' + on + '"><div class="cs-top"><span class="cs-drag" data-drag="' + i + '" role="button" aria-label="' + esc(t.drag) + '" title="' + esc(t.drag) + '">' +
         '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/><circle cx="9" cy="12" r="1.8"/><circle cx="15" cy="12" r="1.8"/><circle cx="9" cy="18" r="1.8"/><circle cx="15" cy="18" r="1.8"/></svg>' + (i + 1) + '</span>' +
-        '<button type="button" class="cs-x" data-a="rem" data-i="' + i + '" aria-label="' + esc(t.rem) + '">×</button></div><div class="cs-sels">';
+        (opts.diagram ? '<span class="cs-nm">' + esc(noteName(ROOTS[sl.r][0], ROOTS[sl.r][1], nl()) + Q[sl.q].sym) + '</span>' : '') +
+        '<button type="button" class="cs-x" data-a="rem" data-i="' + i + '" aria-label="' + esc(t.rem) + '">×</button></div>';
+      if (opts.diagram) { var vv = V(i); return h + '<div class="cs-d cs-st">' + (vv ? opts.diagram(vv) : '<span style="font-size:13px;color:var(--mut);padding:40px 0">' + esc(t.none) + '</span>') + '</div></div>'; }
+      h += '<div class="cs-sels">';
       h += '<select data-a="r" data-i="' + i + '" aria-label="' + esc(t.root) + '">' + ROOTS.map(function (r, k) { return '<option value="' + k + '"' + (k === sl.r ? ' selected' : '') + '>' + esc(noteName(r[0], r[1], nl())) + '</option>'; }).join('') + '</select>';
       h += '<select data-a="q" data-i="' + i + '" aria-label="' + esc(t.type) + '">' + Object.keys(Q).map(function (k) { return '<option value="' + k + '"' + (k === sl.q ? ' selected' : '') + '>' + esc(Q[k][lang] || Q[k].es) + '</option>'; }).join('') + '</select></div>';
       return h + '<div class="cs-d">' + diagram(i) + '</div></div>';

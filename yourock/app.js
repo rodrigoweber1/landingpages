@@ -184,7 +184,7 @@ function judge(ev) {
   const ex = Sess.ex;
   if (ex.type === 'notes') {
     const w0 = ev.t - 0.25 * ev.dur, w1 = ev.t + 0.9 * ev.dur;
-    const ok = Mic.hist.some(d => d.t >= w0 && d.t <= w1 && (((d.midi - ev.exp) % 12) + 12) % 12 === 0);
+    const ok = Mic.hist.some(d => d.t >= w0 && d.t <= w1 && d.midi === ev.exp);
     if (!ok) return false;
     if (ex.rep || ev.prev === ev.exp) return Mic.onsets.some(o => o.t >= w0 && o.t <= w1);
     return true;
@@ -313,7 +313,7 @@ function finishEx(next) {
 }
 
 // ---------- views ----------
-const NAV = [['home', 'Hoje', 'i-home'], ['vault', 'Library', 'i-vault'], ['train', 'Treinar', 'i-play'], ['stats', 'Progresso', 'i-stats'], ['metro', 'Metrônomo', 'i-metro'], ['notes', 'Notas', 'i-note'], ['chords', 'Acordes', 'i-chord'], ['tuner', 'Afinador', 'i-tuner'], ['settings', 'Ajustes', 'i-gear']];
+const NAV = [['home', 'Hoje', 'i-home'], ['vault', 'Biblioteca', 'i-vault'], ['train', 'Treinar', 'i-play'], ['stats', 'Progresso', 'i-stats'], ['metro', 'Metrônomo', 'i-metro'], ['notes', 'Notas', 'i-note'], ['chords', 'Acordes', 'i-chord'], ['tuner', 'Afinador', 'i-tuner'], ['settings', 'Ajustes', 'i-gear']];
 function navHTML(cur) { return NAV.map(([k, n, i]) => `<a href="#/${k}" title="${n}" class="${k === cur ? 'on' : ''}"><svg><use href="#${i}"/></svg><span>${n}</span></a>`).join(''); }
 const routes = { home: viewHome, vault: viewVault, train: viewTrain, stats: viewStats, metro: viewMetro, notes: viewNotes, chords: viewChords, tuner: viewTuner, settings: viewSettings, quiz: viewQuiz };
 let cleanup = () => {};
@@ -355,11 +355,11 @@ let editR = null;
 function routinesHTML() {
   return DB.routines.map(r => `<div class="card" style="margin:8px 0;padding:12px"><div class="row sp"><div><b>${esc(r.name)}</b> <span class="tag">${r.items.length} exerc. · ~${estMin(r.items)} min</span></div>
     <div class="row"><button class="btn sm pri" data-act="playR" data-id="${r.id}" ${r.items.length ? '' : 'disabled'}>▶</button><button class="btn sm" data-act="editR" data-id="${r.id}">✎</button><button class="btn sm danger" data-act="delR" data-id="${r.id}">🗑</button></div></div>
-    ${editR === r.id ? `<div class="qlist" style="margin-top:8px">${r.items.map((id, i) => `<div class="qi"><span style="flex:1">${esc(EXMAP[id].name)}</span><button class="btn sm" data-act="mvR" data-id="${r.id}" data-i="${i}" data-d="-1">↑</button><button class="btn sm" data-act="mvR" data-id="${r.id}" data-i="${i}" data-d="1">↓</button><button class="btn sm danger" data-act="rmR" data-id="${r.id}" data-i="${i}">✕</button></div>`).join('') || '<div class="mut small">Vazia: adicione exercícios na Library.</div>'}<button class="btn sm" data-act="renR" data-id="${r.id}">Renomear</button></div>` : ''}</div>`).join('');
+    ${editR === r.id ? `<div class="qlist" style="margin-top:8px">${r.items.map((id, i) => `<div class="qi"><span style="flex:1">${esc(EXMAP[id].name)}</span><button class="btn sm" data-act="mvR" data-id="${r.id}" data-i="${i}" data-d="-1">↑</button><button class="btn sm" data-act="mvR" data-id="${r.id}" data-i="${i}" data-d="1">↓</button><button class="btn sm danger" data-act="rmR" data-id="${r.id}" data-i="${i}">✕</button></div>`).join('') || '<div class="mut small">Vazia: adicione exercícios na Biblioteca.</div>'}<button class="btn sm" data-act="renR" data-id="${r.id}">Renomear</button></div>` : ''}</div>`).join('');
 }
 const VF = { q: '', focus: 'all', lvl: 'all', fav: false };
 function viewVault() {
-  view.innerHTML = `<div class="row sp"><h1>Library</h1><span class="mut small" id="vcount"></span></div>
+  view.innerHTML = `<div class="row sp"><h1>Biblioteca</h1><span class="mut small" id="vcount"></span></div>
   <div class="card"><input type="search" id="vq" placeholder="Buscar exercício…" value="${esc(VF.q)}">
   <div class="row" style="margin-top:10px" id="vfocus"></div><div class="row" style="margin-top:8px" id="vlvl"></div>
   <div class="row" style="margin-top:10px"><label class="small mut">Adicionar na rotina:</label><select id="vact" style="width:auto">${DB.routines.map(r => `<option value="${r.id}" ${r.id === DB.active ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select></div></div>
@@ -435,17 +435,19 @@ function viewStats() {
 function viewTuner() {
   view.innerHTML = `<h1>Afinador</h1><div class="card" style="margin-top:12px"><div class="tunerbig" id="tn">–</div><div class="mut" style="text-align:center" id="th">Toque uma corda solta</div><div class="needle"><i id="nd" style="left:50%"></i></div><div class="row" style="justify-content:center" id="tc">–</div>
   <div class="row" style="justify-content:center;margin-top:14px"><button class="btn pri" id="tbtn" data-act="tuner">🎤 Ativar microfone</button></div>
+  <div class="row" style="justify-content:center;margin-top:14px"><span class="mut small">Sensibilidade</span><input type="range" id="tsens" min="1" max="5" step="1" value="${S().tunerSens || 3}" data-in="tunerSens" style="width:140px"></div>
   <div class="row" style="justify-content:center;margin-top:14px"><span class="mut small">Tom de referência:</span>${OPEN.map((m, i) => `<button class="btn sm" data-act="ref" data-m="${m}">${'EADGBe'[i]}</button>`).join('')}</div></div>`;
-  let raf = 0, buf = [];
+  let raf = 0, buf = [], miss = 0;
+  const GATE = [0.03, 0.02, 0.012, 0.007, 0.004]; Mic.gate = GATE[(S().tunerSens || 3) - 1]; if (Mic.on) Mic.setTune(true);
   window.tunerLoop = () => {
     const d = Mic.last;
-    if (d && Mic.on) { buf.push(d.f); if (buf.length > 5) buf.shift(); const f = [...buf].sort((a, b) => a - b)[buf.length >> 1], m = 69 + 12 * Math.log2(f / 440), r = Math.round(m), c = Math.round((m - r) * 100);
+    if (!d) { if (++miss > 30) buf = []; } if (d && Mic.on) { miss = 0; if (buf.length && Math.abs(12 * Math.log2(d.f / buf[buf.length - 1])) > 0.7) buf = []; buf.push(d.f); if (buf.length > 9) buf.shift(); const f = [...buf].sort((a, b) => a - b)[buf.length >> 1], m = 69 + 12 * Math.log2(f / 440), r = Math.round(m), c = Math.round((m - r) * 100);
       $('#tn').textContent = noteName(r); $('#th').textContent = `${f.toFixed(1)} Hz · ${c > 0 ? '+' : ''}${c} cents`; $('#nd').style.left = (50 + Math.max(-50, Math.min(50, c))) + '%';
-      $('#tn').style.color = Math.abs(c) <= 5 ? 'var(--ok)' : Math.abs(c) <= 15 ? 'var(--warn)' : 'var(--bad)'; $('#tc').textContent = Math.abs(c) <= 5 ? '✓ afinado' : c > 0 ? 'alto demais: afrouxe' : 'baixo demais: aperte'; }
+      $('#tn').style.color = Math.abs(c) <= 3 ? 'var(--ok)' : Math.abs(c) <= 10 ? 'var(--warn)' : 'var(--bad)'; $('#tc').textContent = Math.abs(c) <= 3 ? '✓ afinado' : c > 0 ? 'alto demais: afrouxe' : 'baixo demais: aperte'; }
     raf = requestAnimationFrame(window.tunerLoop);
   };
   if (Mic.on) { $('#tbtn').textContent = '■ Parar'; raf = requestAnimationFrame(window.tunerLoop); }
-  cleanup = () => { cancelAnimationFrame(raf); };
+  cleanup = () => { cancelAnimationFrame(raf); Mic.setTune(false); Mic.gate = 0.012; };
 }
 function viewSettings() {
   const s = S();
@@ -466,6 +468,8 @@ function viewSettings() {
   <label class="lbl">Acidentes</label><select data-in="acc"><option value="#" ${s.acc !== 'b' ? 'selected' : ''}>Sustenidos (C#, D#…)</option><option value="b" ${s.acc === 'b' ? 'selected' : ''}>Bemóis (Db, Eb…)</option></select>
   <label class="lbl"><input type="checkbox" data-in="boardV" ${s.boardV !== false ? 'checked' : ''}> Braço na vertical no celular (bolinhas maiores)</label>
   <label class="lbl"><input type="checkbox" data-in="lefty" ${s.lefty ? 'checked' : ''}> Modo canhoto (espelha o braço)</label></div>
+  <div class="card"><h2>Sobre</h2><div class="row sp"><div><b>YouRock</b> <span class="mut">v${APP_VERSION}</span><div class="mut small">${APP_DATE}</div></div><button class="btn sm" data-act="upd">Atualizar app</button></div>
+  <div class="small" style="margin-top:12px"><b>Novidades</b></div><ul class="small mut" style="margin:6px 0 0;padding-left:18px">${APP_NOTES.map(n => `<li>${esc(n[LANG] || n.pt)}</li>`).join('')}</ul></div>
   <div class="card"><h2>Teste do microfone</h2><div class="mut small">Ligue, toque uma corda solta e veja: o nível deve passar de ~20%, a nota detectada deve bater com a corda e cada palhetada deve contar um ataque.</div>
   <div class="row" style="margin:12px 0"><button class="btn pri" id="mtBtn" data-act="mtest">🎤 Ligar teste</button><span class="mut small" id="mtErr"></span></div>
   <div class="meter" style="height:14px"><b id="mtLvl" style="width:0;background:var(--ok)"></b></div>
@@ -501,14 +505,20 @@ const act = {
   vf(d) { if (d.k === 'fav') VF.fav = !VF.fav; else VF.focus = d.k; viewVault(); },
   vl(d) { VF.lvl = d.k === 'all' ? 'all' : +d.k; viewVault(); },
   train1(d) { setQueue([d.id]); },
+  async upd() { toast('Atualizando…'); try { for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); for (const c of await caches.keys()) await caches.delete(c); } catch (e) {} location.reload(); },
   tl(d) { TL = +d.l; viewTrilha(); },
   guided(d) { setQueue(guided(+d.l)); },
   addR(d) { const r = DB.routines.find(x => x.id === DB.active); if (!r) return toast('Crie uma rotina primeiro'); r.items.push(d.id); save(); toast('Adicionado a "' + r.name + '"'); },
   fav(d) { const i = DB.fav.indexOf(d.id); i >= 0 ? DB.fav.splice(i, 1) : DB.fav.push(d.id); save(); vaultList(); },
   prev(d) { const el = $('#pv-' + d.id); if (el.innerHTML) { el.innerHTML = ''; return; } const e = EXMAP[d.id]; el.innerHTML = '<div class="board" style="margin-top:8px">' + (e.type === 'notes' ? fretboardSVG(e, S().lefty, S().label) : strumHTML(e)) + '</div>'; },
-  run() { ensureEx(); if (!Sess.ex) return; if (Sess.run && !Sess.demo) stopRun(); else startRun(false); },
+  async run() {
+    ensureEx(); if (!Sess.ex) return;
+    if (Sess.run && !Sess.demo) { stopRun(); return; }
+    if (!Mic.on && !Mic.denied) { try { await Mic.start(); refreshCtl(); showRate(false); } catch (e) { Mic.denied = true; toast('Não consegui acessar o microfone. Dá para treinar com autoavaliação.'); } }
+    startRun(false);
+  },
   demo() { if (Sess.run && Sess.demo) stopRun(); else startRun(true); },
-  async mic() { if (Mic.on) { Mic.stop(); refreshCtl(); showRate(false); return; } try { await Mic.start(); refreshCtl(); showRate(false); toast('Microfone ligado. Use fones para o clique não ser captado.'); } catch (e) { toast('Não consegui acessar o microfone. Dá para treinar com autoavaliação.'); } },
+  async mic() { if (Mic.on) { Mic.stop(); refreshCtl(); showRate(false); return; } try { await Mic.start(); Mic.denied = false; refreshCtl(); showRate(false); toast('Microfone ligado. Use fones para o clique não ser captado.'); } catch (e) { toast('Não consegui acessar o microfone. Dá para treinar com autoavaliação.'); } },
   speed() { S().speed = !S().speed; save(); refreshCtl(); updHud(); },
   bpm(d) { Sess.bpm = Math.max(30, Math.min(240, Sess.bpm + +d.d)); updHud(); },
   rate(d) { if (!Sess.rateReady) return; passDone(+d.v); showRate(false); },
@@ -516,7 +526,7 @@ const act = {
   skip() { const nx = Sess.queue.findIndex((q, i) => i > Sess.qi && !q.done); if (nx >= 0) { loadEx(nx); render(); } else toast('Esse é o último exercício'); },
   restart() { loadEx(Sess.qi); render(); },
   goQ(d) { loadEx(+d.i); render(); },
-  async tuner() { if (Mic.on) { Mic.stop(); $('#tbtn').textContent = '🎤 Ativar microfone'; return; } try { await Mic.start(); $('#tbtn').textContent = '■ Parar'; requestAnimationFrame(window.tunerLoop); } catch (e) { toast('Sem acesso ao microfone'); } },
+  async tuner() { if (Mic.on) { Mic.stop(); $('#tbtn').textContent = '🎤 Ativar microfone'; return; } try { await Mic.start(); Mic.setTune(true); $('#tbtn').textContent = '■ Parar'; requestAnimationFrame(window.tunerLoop); } catch (e) { toast('Sem acesso ao microfone'); } },
   async mtest() {
     if (Mic.on) { Mic.stop(); $('#mtBtn').textContent = '🎤 Ligar teste'; return; }
     try { await Mic.start(); Mic.onsets = []; $('#mtBtn').textContent = '■ Parar teste'; $('#mtErr').textContent = ''; }
@@ -542,6 +552,7 @@ document.addEventListener('input', e => {
   const k = e.target.dataset.in; if (!k) return; const t = e.target;
   S()[k] = t.type === 'checkbox' ? t.checked : (t.type === 'range' ? +t.value : t.value); save();
   const v = $('#v-' + k); if (v) v.textContent = t.value;
+  if (k === 'tunerSens') Mic.gate = [0.03, 0.02, 0.012, 0.007, 0.004][+t.value - 1];
 });
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});

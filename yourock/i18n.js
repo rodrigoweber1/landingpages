@@ -81,7 +81,12 @@ Fazer o quiz|Take the quiz|Hacer el quiz
 Refazer o quiz de nível|Retake the level quiz|Repetir el quiz de nivel
 Idioma|Language|Idioma
 Alto contraste|High contrast|Alto contraste
-Library|Library|Biblioteca
+Biblioteca|Library|Biblioteca
+Sobre|About|Acerca de
+Novidades|What's new|Novedades
+Atualizar app|Update app|Actualizar app
+Atualizando…|Updating…|Actualizando…
+Sensibilidade|Sensitivity|Sensibilidad
 Treinar|Train|Entrenar
 Progresso|Progress|Progreso
 Metrônomo|Metronome|Metrónomo
@@ -118,7 +123,7 @@ Todos|All|Todos
 ★ Favoritos|★ Favorites|★ Favoritos
 Todos os níveis|All levels|Todos los niveles
 Nada encontrado.|Nothing found.|No se encontró nada.
-Vazia: adicione exercícios na Library.|Empty: add exercises from the Library.|Vacía: añade ejercicios desde la Biblioteca.
+Vazia: adicione exercícios na Biblioteca.|Empty: add exercises from the Library.|Vacía: añade ejercicios desde la Biblioteca.
 Adicionar na rotina:|Add to routine:|Añadir a la rutina:
 ▶ Treinar|▶ Train|▶ Entrenar
 + Rotina|+ Routine|+ Rutina

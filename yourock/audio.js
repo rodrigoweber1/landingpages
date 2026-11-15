@@ -56,7 +56,7 @@ function tone(freq, secs) {
 // ---------- microfone ----------
 const Mic = {
   on: false, an: null, buf: null, stream: null, timer: null,
-  hist: [], onsets: [], last: null, lat: 0.09, avg: 0, lastOnset: -1, rms: 0,
+  hist: [], onsets: [], last: null, lat: 0.09, avg: 0, lastOnset: -1, rms: 0, gate: 0.012, tune: false,
   async start() {
     if (this.on) return true;
     ensureCtx();
@@ -68,6 +68,11 @@ const Mic = {
     this.hist = []; this.onsets = []; this.on = true;
     this.timer = setInterval(() => this.tick(), 20);
     return true;
+  },
+  // afinador: janela maior (4096 amostras) separa melhor as cordas graves; os exercícios continuam com 2048 (resposta rápida)
+  setTune(on) {
+    this.tune = on; if (!this.an) return;
+    this.an.fftSize = on ? 4096 : 2048; this.buf = new Float32Array(this.an.fftSize);
   },
   stop() {
     this.on = false; clearInterval(this.timer);
@@ -84,11 +89,11 @@ const Mic = {
     }
     this.avg = this.avg * 0.88 + rms * 0.12;
     let det = null;
-    if (rms > 0.012) {
+    if (rms > this.gate) {
       const r = yin(this.buf, AC.sampleRate);
-      if (r && r.conf > 0.8) { const m = Math.round(69 + 12 * Math.log2(r.f / 440)); det = { t, midi: m, f: r.f, rms }; }
+      if (r && r.conf > (this.tune ? 0.9 : 0.8)) { const m = Math.round(69 + 12 * Math.log2(r.f / 440)); det = { t, midi: m, f: r.f, rms }; }
     }
-    this.last = det ? det : (rms > 0.012 ? this.last : null);
+    this.last = det ? det : (rms > this.gate ? this.last : null);
     if (det) this.hist.push(det);
     const cut = t - 6;
     while (this.hist.length && this.hist[0].t < cut) this.hist.shift();
