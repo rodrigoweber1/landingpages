@@ -1,8 +1,9 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.4.5';
+var APP_VERSION = '1.4.6';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
+  { pt: 'Resultado do quiz: áreas sem exercício no seu nível (ex.: Acordes, Legato e Sweep no Nível I) mostram "a partir do Nível X"', en: 'Quiz result: areas with no exercises at your level (e.g. Chords, Legato and Sweep at Level I) show "from Level X"', es: 'Resultado del test: las áreas sin ejercicios en tu nivel (p. ej. Acordes, Legato y Sweep en el Nivel I) muestran "a partir del Nivel X"' },
   { pt: 'Ícone de Ajustes agora é uma engrenagem', en: 'Settings icon is now a gear', es: 'El icono de Ajustes ahora es un engranaje' },
   { pt: 'Menu inferior: rótulos longos (ex.: Herramientas) cabem dentro do destaque', en: 'Bottom menu: long labels (e.g. Herramientas) fit inside the highlight', es: 'Menú inferior: las etiquetas largas (p. ej. Herramientas) caben dentro del resaltado' },
   { pt: 'Treinar: ao escolher um nível, a lista de exercícios abre e a tela rola até ela; o nível escolhido fica em destaque', en: 'Train: picking a level opens its exercise list and scrolls to it; the chosen level stays highlighted', es: 'Entrenar: al elegir un nivel se abre su lista de ejercicios y la pantalla se desplaza hasta ella; el nivel elegido queda resaltado' },

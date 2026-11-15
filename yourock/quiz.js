@@ -56,7 +56,9 @@ function quizResult() {
   const a = QZ.a, { L, sum } = quizLevel(a), plan = quizPlan(a, L), lv = LEVELS[L];
   DB.placed = L; DB.placement = { t: Date.now(), sum, level: L, a: a.slice() }; DB.placeSkip = false; save();
   TODAY = plan;
-  const rows = QZ_Q.filter(q => q.f && q.f !== 'goal').map(q => `<div class="row sp" style="padding:4px 0">${pill(q.f)}<span>${QZ_STEP[a[QZ_Q.indexOf(q)]]}</span></div>`).join('');
+  // área sem exercício no nível do aluno (ex.: Acordes, Legato e Sweep no Nível I): mostra "a partir do Nível X" em vez de um nível que ele não treina ainda
+  const areaTxt = q => { const mn = Math.min(...EX.filter(e => e.focus === q.f).map(e => e.lvl)); return mn > L ? `<span class="mut">a partir do Nível ${LEVELS[mn].roman}</span>` : `<span>${QZ_STEP[a[QZ_Q.indexOf(q)]]}</span>`; };
+  const rows = QZ_Q.filter(q => q.f && q.f !== 'goal').map(q => `<div class="row sp" style="padding:4px 0">${pill(q.f)}${areaTxt(q)}</div>`).join('');
   view.innerHTML = `<div class="card" style="margin-top:12px"><div class="mut small">Seu ponto de partida</div>
     <h1 style="color:${lv.color}">Nível ${lv.roman} · ${lv.name}</h1><p class="mut">${lv.desc}</p>
     <div class="small mut">Pontuação: ${sum} de 21. Você pode mudar o nível quando quiser em Ajustes.</div></div>
