@@ -168,3 +168,5 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .exdd>summary>span:first-child{flex:1}
 
 .dot.open circle{fill:var(--acc);stroke:var(--acc)}.dot.open text{fill:var(--on);font-weight:800}.dot.open.cur circle{stroke:#fff}
+
+.cstrip{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:6px 0 12px}.cmini{width:68px;text-align:center;padding:4px 2px 2px;border-radius:12px;border:1px solid transparent;opacity:.55;transition:.15s}.cmini b{display:block;font-size:13px}.cmini svg{width:100%;height:auto;display:block}.cmini.on{opacity:1;border-color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,transparent)}

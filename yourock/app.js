@@ -132,9 +132,21 @@ function fretboardSVG(ex, lefty, label, horiz) {
   return o + '</svg>';
 }
 function slotLabel(i, sub) { const b = Math.floor(i / sub) + 1, r = i % sub; return sub === 2 ? (r ? '&' : b) : (r === 0 ? b : ['', 'e', '&', 'a'][r]); }
+const CHV = {};   // cache: acorde -> digitação mais simples (mesma da seção Acordes)
+function chordMini(name) {
+  if (!(name in CHV)) { const c = parseChord(name); CHV[name] = c ? (findVoicings(c.root, QUAL.find(x => x.k === c.q).iv, c.bass)[0] || null) : null; }
+  return CHV[name];
+}
+// exercícios de troca de acordes: mostra os diagramas pequenos (verticais, como na seção Acordes); o acorde da vez fica em destaque
+function chordStripHTML(ex) {
+  const list = [...new Set(ex.chords || [])]; if (list.length < 2) return '';
+  const items = list.map((n, i) => { const v = chordMini(n); return v ? `<div class="cmini${i === 0 ? ' on' : ''}" data-ch="${esc(n)}"><b>${esc(n)}</b>${chordSVG(v)}</div>` : ''; }).join('');
+  return items ? `<div class="cstrip">${items}</div>` : '';
+}
+function chordStripOn(name) { document.querySelectorAll('.cmini').forEach(e => e.classList.toggle('on', e.dataset.ch === name)); }
 function strumHTML(ex) {
   const arrows = { D: '↓', U: '↑', x: '✕', '-': '·' };
-  return `<div class="chord" id="chordNow">${esc((ex.chords || [''])[0])}</div><div class="slots" style="grid-template-columns:repeat(${Math.min(8, ex.pattern.length)},1fr)">` +
+  return `<div class="chord" id="chordNow">${esc((ex.chords || [''])[0])}</div>${chordStripHTML(ex)}<div class="slots" style="grid-template-columns:repeat(${Math.min(8, ex.pattern.length)},1fr)">` +
     ex.pattern.map((p, i) => `<div class="slot ${p === '-' ? 'rest' : ''}" id="sl${i}">${arrows[p]}<small>${slotLabel(i, ex.sub)}</small></div>`).join('') + '</div>';
 }
 
@@ -262,7 +274,7 @@ function showCursor(ev) {
   } else {
     document.querySelectorAll('.slot.cur').forEach(e => e.classList.remove('cur'));
     const s = $('#sl' + ev.pos); if (s) { void s.getBoundingClientRect(); s.classList.add('cur'); }
-    if (ex.chords && ev.pos === 0) { const c = $('#chordNow'); c && (c.textContent = ex.chords[ev.pass % ex.chords.length]); }
+    if (ex.chords && ev.pos === 0) { const c = $('#chordNow'); c && (c.textContent = ex.chords[ev.pass % ex.chords.length], chordStripOn(c.textContent)); }
     if (ev.pos === 0) clearBoardStatus();
   }
 }
