@@ -63,6 +63,7 @@ function quizResult() {
   const rows = ar.filter(x => x.mn <= L).map(rowOn).join('') + ar.filter(x => x.mn > L).map(rowOff).join('');
   view.innerHTML = `<div class="card" style="margin-top:12px"><div class="mut small">Seu ponto de partida</div>
     <h1 style="color:${lv.color}">Nível ${lv.roman} · ${lv.name}</h1><p class="mut">${lv.desc}</p>
+    <div class="row" style="gap:8px;margin:12px 0 4px">${[1, 2, 3, 4].map(n => { const x = LEVELS[n], on = n === L; return `<div style="flex:1;min-width:64px;text-align:center;padding:8px 4px;border-radius:12px;border:1px solid ${on ? x.color : 'var(--line)'};${on ? `background:color-mix(in srgb,${x.color} 14%,transparent);` : 'opacity:.4;'}"><div style="font-size:20px;font-weight:800;line-height:1;color:${x.color}">${x.roman}</div><div class="small ${on ? '' : 'mut'}" style="margin-top:3px">${x.name}</div></div>`; }).join('')}</div>
     <div class="small mut">Pontuação: ${sum} de 21. Você pode mudar o nível quando quiser em Ajustes.</div></div>
     <div class="grid g2"><div class="card"><h2>Por área</h2>${rows}</div>
     <div class="card"><h2>Primeiro treino sugerido</h2>${plan.map((p, i) => { const e = EXMAP[p.id]; return `<div class="ex card" style="margin:6px 0"><div class="meta">${pill(e.focus)}<b>${i + 1}. ${esc(e.name)}</b><span class="tag">${LVL[e.lvl]}</span></div><span class="reason">${esc(p.why)}</span></div>`; }).join('')}
