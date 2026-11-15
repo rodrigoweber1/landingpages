@@ -99,7 +99,17 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .dot.sel circle{fill:var(--acc);stroke:#fff}.dot.sel text{fill:var(--on)}.dot.dim{opacity:.35}
 .lang{width:auto;padding:4px 8px;border-radius:8px;font-size:13px;flex:none}
 .cv svg{width:100%;height:auto;display:block}
-.nav.bottom{overflow-x:auto;justify-content:flex-start}.nav.bottom a{flex:0 0 auto;min-width:64px}
+/* menu inferior do celular: 5 itens fixos (Ferramentas abre uma folha com Metronomo, Notas, Acordes e Afinador) */
+.nav.bottom{justify-content:space-around}.nav.bottom a,.nav.bottom button{flex:1;min-width:0;padding:6px 2px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--mut);background:none;border:0;border-radius:12px}
+.nav.bottom button svg{width:22px;height:22px}.nav.bottom button.on{color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,transparent)}
+[data-theme=ardosia] .nav.bottom button{border-radius:999px}[data-theme=ardosia] .nav.bottom button.on{color:var(--tx);background:var(--bg3)}[data-theme=ardosia] .nav.bottom button.on svg{color:var(--acc)}
+.gear{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;color:var(--mut);flex:none}.gear svg{width:22px;height:22px}.gear.on{color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,transparent)}
+@media(min-width:760px){.gear{display:none}}
+#toolsSheet{position:fixed;inset:0;z-index:30}#toolsSheet .tsb{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+#toolsSheet .tsp{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 16px calc(78px + env(safe-area-inset-bottom));background:var(--hdr2);border-top:1px solid var(--line);border-radius:18px 18px 0 0}
+#toolsSheet .tsp a{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 8px;border-radius:14px;background:var(--bg3,rgba(255,255,255,.06));font-size:14px;font-weight:600}
+#toolsSheet .tsp a svg{width:28px;height:28px;color:var(--acc)}#toolsSheet .tsp a.on{outline:2px solid var(--acc)}
+@media(min-width:760px){#toolsSheet{display:none}}
 @media(min-width:760px) and (max-width:1100px){#navTop a span{display:none}#navTop a{padding:8px 10px}}
 
 .themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:6px}

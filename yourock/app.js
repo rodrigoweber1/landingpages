@@ -350,15 +350,24 @@ function finishEx(next) {
 
 // ---------- views ----------
 const NAV = [['home', 'Hoje', 'i-home'], ['vault', 'Biblioteca', 'i-vault'], ['train', 'Treinar', 'i-play'], ['stats', 'Progresso', 'i-stats'], ['metro', 'Metrônomo', 'i-metro'], ['notes', 'Notas', 'i-note'], ['chords', 'Acordes', 'i-chord'], ['tuner', 'Afinador', 'i-tuner'], ['settings', 'Ajustes', 'i-gear']];
-const micEnabled = () => S().mic !== false;   // Ajustes: reconhecimento de som ligado (padrão) ou desligado
-function navHTML(cur) { return NAV.filter(n => n[0] !== 'tuner' || micEnabled()).map(([k, n, i]) => `<a href="#/${k}" title="${n}" class="${k === cur ? 'on' : ''}"><svg><use href="#${i}"/></svg><span>${n}</span></a>`).join(''); }
+const micEnabled = () => S().mic !== false;   // Ajustes: liga o microfone sozinho ao iniciar (padrão: sim); o botão 🎤 funciona sempre
+function navHTML(cur) { return NAV.map(([k, n, i]) => `<a href="#/${k}" title="${n}" class="${k === cur ? 'on' : ''}"><svg><use href="#${i}"/></svg><span>${n}</span></a>`).join(''); }
+const TOOLS = [['metro', 'Metrônomo', 'i-metro'], ['notes', 'Notas', 'i-note'], ['chords', 'Acordes', 'i-chord'], ['tuner', 'Afinador', 'i-tuner']];
+const NAVB = [['home', 'Hoje', 'i-home'], ['train', 'Treinar', 'i-play'], ['vault', 'Biblioteca', 'i-vault'], ['tools', 'Ferramentas', 'i-tools'], ['stats', 'Progresso', 'i-stats']];
+function navBotHTML(cur) {
+  const inTools = TOOLS.some(t => t[0] === cur);
+  return NAVB.map(([k, n, i]) => k === 'tools'
+    ? `<button type="button" data-act="toolsMenu" class="${inTools ? 'on' : ''}" aria-haspopup="true"><svg><use href="#${i}"/></svg><span>${n}</span></button>`
+    : `<a href="#/${k}" title="${n}" class="${k === cur ? 'on' : ''}"><svg><use href="#${i}"/></svg><span>${n}</span></a>`).join('');
+}
+function closeTools() { const e = $('#toolsSheet'); if (e) e.remove(); }
 const routes = { home: viewHome, vault: viewVault, train: viewTrain, stats: viewStats, metro: viewMetro, notes: viewNotes, chords: viewChords, tuner: viewTuner, settings: viewSettings, quiz: viewQuiz };
 let cleanup = () => {};
 function render() {
   cleanup(); cleanup = () => {}; stopRun();
-  const h = (location.hash || '#/home').slice(2).split('?')[0], r = routes[h] && !(h === 'tuner' && !micEnabled()) ? h : 'home';
+  const h = (location.hash || '#/home').slice(2).split('?')[0], r = routes[h] ? h : 'home';
   if (r === 'home' && !DB.placed && !DB.placeSkip && !DB.sessions.length) { location.hash = '#/quiz'; return; }
-  $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navHTML(r);
+  closeTools(); $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navBotHTML(r); const gb = $('#gearBtn'); if (gb) gb.classList.toggle('on', r === 'settings');
   view.innerHTML = ''; routes[r](); window.scrollTo(0, 0);
 }
 addEventListener('hashchange', render);
@@ -431,9 +440,9 @@ function viewTrain() {
   </div>
   <div id="done" class="row card" style="display:none"><span style="flex:1"><b>⏱ Tempo concluído!</b></span><button class="btn pri" data-act="loopOn">🔁 Continuar em loop</button><button class="btn" data-act="finish">Concluir e salvar ▸</button></div>
   <div id="rate" class="row card"><span id="rateInfo">Autoavaliação</span><button class="btn sm" data-act="rate" data-v="1">✓ Limpa</button><button class="btn sm" data-act="rate" data-v="0.5">✗ Com erros</button></div>
-  <div class="row"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnDemo" data-act="demo">🔊 Demo</button>${micEnabled() ? '<button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">🎤</button>' : ''}<button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button><button class="btn" id="btnLoop" data-act="loop">🔁 Loop</button>
+  <div class="row"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnDemo" data-act="demo">🔊 Demo</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">🎤</button><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button><button class="btn" id="btnLoop" data-act="loop">🔁 Loop</button>
     ${ex.type === 'notes' ? `<select id="subSel" style="width:auto">${[1, 2, 4].map(v => `<option value="${v}">Notas por clique: ${v}</option>`).join('')}</select>` : ''}</div>
-  <div class="row" style="margin-top:10px"><button class="btn" data-act="finish">Concluir e salvar ▸</button><button class="btn ghost" data-act="skip">Pular</button><button class="btn ghost" data-act="restart">Reiniciar</button><span class="mut small">${micEnabled() ? 'Dica: use fones para o clique do metrônomo não entrar no microfone. Barra de espaço inicia/para.' : 'Barra de espaço inicia/para.'}</span></div>
+  <div class="row" style="margin-top:10px"><button class="btn" data-act="finish">Concluir e salvar ▸</button><button class="btn ghost" data-act="skip">Pular</button><button class="btn ghost" data-act="restart">Reiniciar</button><span class="mut small">Dica: use fones para o clique do metrônomo não entrar no microfone. Barra de espaço inicia/para.</span></div>
   <h3 style="margin:18px 0 8px">Fila de hoje</h3><div class="qlist">${Sess.queue.map((q, i) => `<div class="qi ${i === Sess.qi ? 'cur' : ''} ${q.done ? 'done' : ''}" data-act="goQ" data-i="${i}" style="cursor:pointer">${q.done ? '✓' : i + 1}. ${esc(EXMAP[q.id].name)}</div>`).join('')}</div>`;
   const ss = $('#subSel'); if (ss) { ss.value = Sess.sub; ss.onchange = e => { stopRun(); Sess.sub = +e.target.value; updHud(); }; }
   refreshCtl(); updHud(); showRate(false);
@@ -492,7 +501,7 @@ function viewTuner() {
 function viewSettings() {
   const s = S();
   view.innerHTML = `<h1>Ajustes</h1><div class="card" style="margin-top:12px"><label class="lbl" style="margin-top:0">Tema de cores</label><div class="themes">${themePicker()}</div><label class="lbl">Idioma</label><select id="langSel" aria-label="Idioma">${[['pt', 'Português'], ['en', 'English'], ['es', 'Español']].map(([k, n]) => `<option value="${k}" ${LANG === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div><div class="card">
-  <label class="lbl"><input type="checkbox" data-in="mic" ${micEnabled() ? 'checked' : ''}> Reconhecimento de som (microfone). Desligado: o microfone, o afinador e a calibração somem e você usa a autoavaliação.</label>
+  <label class="lbl"><input type="checkbox" data-in="mic" ${micEnabled() ? 'checked' : ''}> Ligar o microfone automaticamente ao iniciar o exercício (o botão 🎤 continua disponível para ligar quando quiser)</label>
   <label class="lbl">Meu nível</label><select data-in="level"><option value="auto" ${s.level === 'auto' ? 'selected' : ''}>Automático (pelo seu domínio dos exercícios)</option>${Object.entries(LVL).map(([k, v]) => `<option value="${k}" ${String(s.level) === k ? 'selected' : ''}>${v} · ${LEVELS[k].name}</option>`).join('')}</select>
   <div class="row" style="margin-top:8px"><button class="btn sm" data-act="qzStart">Refazer o quiz de nível</button>${DB.placed ? `<span class="mut small">Último resultado: Nível ${LEVELS[DB.placed].roman}</span>` : ''}</div>
   <label class="lbl"><input type="checkbox" data-in="levelParams" ${s.levelParams ? 'checked' : ''}> Usar o ritmo de aprendizado de cada nível (recomendado). Desmarque para usar os valores manuais abaixo.</label>
@@ -500,8 +509,8 @@ function viewSettings() {
   <label class="lbl">Precisão para a passada contar como limpa: <b id="v-thr">${s.thr}</b>%</label><input type="range" min="60" max="100" step="1" value="${s.thr}" data-in="thr">
   <label class="lbl">Passadas limpas seguidas para subir o BPM: <b id="v-needClean">${s.needClean}</b></label><input type="range" min="1" max="5" value="${s.needClean}" data-in="needClean">
   <label class="lbl">Quanto subir/descer o BPM: <b id="v-step">${s.step}</b></label><input type="range" min="1" max="10" value="${s.step}" data-in="step">
-  ${micEnabled() ? `<label class="lbl">Latência do dispositivo: <b id="v-latency">${s.latency}</b> ms</label><input type="range" min="0" max="300" step="5" value="${s.latency}" data-in="latency">
-  <div class="row" style="margin-top:6px"><button class="btn sm" data-act="calib">Calibrar automaticamente</button><span class="mut small">Precisa de microfone e alto-falante (sem fones). Compensa o atraso entre ouvir o clique e o som voltar.</span></div>` : ''}
+  <label class="lbl">Latência do dispositivo: <b id="v-latency">${s.latency}</b> ms</label><input type="range" min="0" max="300" step="5" value="${s.latency}" data-in="latency">
+  <div class="row" style="margin-top:6px"><button class="btn sm" data-act="calib">Calibrar automaticamente</button><span class="mut small">Precisa de microfone e alto-falante (sem fones). Compensa o atraso entre ouvir o clique e o som voltar.</span></div>
   <label class="lbl">Duração de cada exercício</label><select data-in="exMin">${[1, 2, 3, 5, 10].map(n => `<option value="${n}" ${(+s.exMin || 2) === n ? 'selected' : ''}>${n} min</option>`).join('')}</select>
   <label class="lbl">Contagem regressiva antes de começar</label><select data-in="count">${[4, 3, 2, 1, 0].map(n => `<option value="${n}" ${+s.count === n ? 'selected' : ''}>${n ? n + (n === 1 ? ' tempo' : ' tempos') + ' (' + Array.from({ length: n }, (_, i) => n - i).join(', ') + ')' : 'Sem contagem'}</option>`).join('')}</select>
   <div class="mut small" style="margin-top:4px">Cada número aparece junto com um clique do metrônomo; a primeira nota vem logo depois do 1.</div>
@@ -512,11 +521,11 @@ function viewSettings() {
   <label class="lbl"><input type="checkbox" data-in="lefty" ${s.lefty ? 'checked' : ''}> Modo canhoto (espelha o braço)</label></div>
   <div class="card"><h2>Sobre</h2><div class="row sp"><div><b>YouRock</b> <span class="mut">v${APP_VERSION}</span><div class="mut small">${APP_DATE}</div></div><button class="btn sm" data-act="upd">Atualizar app</button></div>
   <div class="small" style="margin-top:12px"><b>Novidades</b></div><ul class="small mut" style="margin:6px 0 0;padding-left:18px">${APP_NOTES.map(n => `<li>${esc(n[LANG] || n.pt)}</li>`).join('')}</ul></div>
-  ${micEnabled() ? `<div class="card"><h2>Teste do microfone</h2><div class="mut small">Ligue, toque uma corda solta e veja: o nível deve passar de ~20%, a nota detectada deve bater com a corda e cada palhetada deve contar um ataque.</div>
+  <div class="card"><h2>Teste do microfone</h2><div class="mut small">Ligue, toque uma corda solta e veja: o nível deve passar de ~20%, a nota detectada deve bater com a corda e cada palhetada deve contar um ataque.</div>
   <div class="row" style="margin:12px 0"><button class="btn pri" id="mtBtn" data-act="mtest">🎤 Ligar teste</button><span class="mut small" id="mtErr"></span></div>
   <div class="meter" style="height:14px"><b id="mtLvl" style="width:0;background:var(--ok)"></b></div>
   <div class="grid g3" style="margin-top:12px"><div class="card kpi" style="margin:0"><div class="v" id="mtNote">–</div><div class="l">nota detectada</div></div><div class="card kpi" style="margin:0"><div class="v" id="mtHz">–</div><div class="l">frequência</div></div><div class="card kpi" style="margin:0"><div class="v" id="mtOn">0</div><div class="l">ataques (últimos 6 s)</div></div></div>
-  <div class="small mut" id="mtTip" style="margin-top:10px"></div></div>` : ''}`;
+  <div class="small mut" id="mtTip" style="margin-top:10px"></div></div>`;
   let raf = 0, n0 = 0;
   const loop = () => {
     if (Mic.on && $('#mtLvl')) {
@@ -560,7 +569,14 @@ const act = {
     startRun(false);
   },
   demo() { if (Sess.run && Sess.demo) stopRun(); else startRun(true); },
-  async mic() { if (!micEnabled()) return; if (Mic.on) { Mic.stop(); refreshCtl(); showRate(false); return; } try { await Mic.start(); Mic.denied = false; refreshCtl(); showRate(false); toast('Microfone ligado. Use fones para o clique não ser captado.'); } catch (e) { Mic.denied = false; micFail(e); } },
+  toolsMenu() {
+    if ($('#toolsSheet')) return closeTools();
+    const cur = (location.hash || '#/home').slice(2).split('?')[0], d = document.createElement('div'); d.id = 'toolsSheet';
+    d.innerHTML = `<div class="tsb" data-act="toolsClose"></div><div class="tsp" role="menu">${TOOLS.map(([k, n, i]) => `<a href="#/${k}" role="menuitem" class="${k === cur ? 'on' : ''}"><svg><use href="#${i}"/></svg><span>${n}</span></a>`).join('')}</div>`;
+    document.body.appendChild(d);
+  },
+  toolsClose() { closeTools(); },
+  async mic() { if (Mic.on) { Mic.stop(); refreshCtl(); showRate(false); return; } try { await Mic.start(); Mic.denied = false; refreshCtl(); showRate(false); toast('Microfone ligado. Use fones para o clique não ser captado.'); } catch (e) { Mic.denied = false; micFail(e); } },
   loop() { Sess.loop = !Sess.loop; if (Sess.loop) Sess.stopAt = null; refreshCtl(); updHud(); },
   loopOn() { Sess.loop = true; Sess.stopAt = null; Sess.ended = false; startRun(false); refreshCtl(); updHud(); },
   speed() { S().speed = !S().speed; save(); refreshCtl(); updHud(); },
@@ -596,7 +612,6 @@ document.addEventListener('input', e => {
   const k = e.target.dataset.in; if (!k) return; const t = e.target;
   S()[k] = t.type === 'checkbox' ? t.checked : (t.type === 'range' ? +t.value : t.value); save();
   const v = $('#v-' + k); if (v) v.textContent = t.value;
-  if (k === 'mic') { if (!t.checked && Mic.on) Mic.stop(); render(); return; }
   if (k === 'tunerSens') Mic.gate = [0.03, 0.02, 0.012, 0.007, 0.004][+t.value - 1];
 });
 
