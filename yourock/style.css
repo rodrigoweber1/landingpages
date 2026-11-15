@@ -161,3 +161,6 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .exdd .qlist{margin-top:10px}
 
 .lvl.lock.on{opacity:1}.lvl:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+/* menu inferior: rotulos longos (ex.: "Herramientas") cabem dentro do destaque */
+.nav.bottom a>span,.nav.bottom button>span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px;letter-spacing:-.01em}
+.nav.bottom a,.nav.bottom button{padding-left:1px;padding-right:1px}

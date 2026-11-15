@@ -1,8 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.4.3';
+var APP_VERSION = '1.4.5';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
+  { pt: 'Ícone de Ajustes agora é uma engrenagem', en: 'Settings icon is now a gear', es: 'El icono de Ajustes ahora es un engranaje' },
+  { pt: 'Menu inferior: rótulos longos (ex.: Herramientas) cabem dentro do destaque', en: 'Bottom menu: long labels (e.g. Herramientas) fit inside the highlight', es: 'Menú inferior: las etiquetas largas (p. ej. Herramientas) caben dentro del resaltado' },
   { pt: 'Treinar: ao escolher um nível, a lista de exercícios abre e a tela rola até ela; o nível escolhido fica em destaque', en: 'Train: picking a level opens its exercise list and scrolls to it; the chosen level stays highlighted', es: 'Entrenar: al elegir un nivel se abre su lista de ejercicios y la pantalla se desplaza hasta ella; el nivel elegido queda resaltado' },
   { pt: 'Treinar: botão Voltar no exercício para escolher outro em qualquer nível', en: 'Train: Back button on the exercise screen to pick another one from any level', es: 'Entrenar: botón Volver en el ejercicio para elegir otro de cualquier nivel' },
   { pt: 'Treinar: a lista de exercícios do nível fica recolhida em um dropdown', en: 'Train: the level exercise list is collapsed in a dropdown', es: 'Entrenar: la lista de ejercicios del nivel queda recogida en un desplegable' },
