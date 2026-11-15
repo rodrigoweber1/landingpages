@@ -69,7 +69,7 @@ function insights(st) {
 }
 function achievements(st) {
   const A = [['Primeiro treino', st.n >= 1], ['3 dias seguidos', st.streak >= 3], ['7 dias seguidos', st.streak >= 7], ['10 horas de prática', st.total >= 36000],
-    ['100 BPM limpos', st.bestClean >= 100], ['Mestre da precisão (≥95%)', DB.sessions.some(s => s.acc != null && s.acc >= 0.95)], ['Explorador: 5 focos', Object.values(st.focus).filter(f => f.secs > 0).length >= 5], ['Meta semanal', S().goal && st.week >= S().goal * 60]];
+    ['100 BPM limpos', st.bestClean >= 100], ['Mestre da precisão (≥95%)', DB.sessions.some(s => s.acc != null && s.acc >= 0.95)], ['Explorador: 5 focos', Object.values(st.focus).filter(f => f.secs > 0).length >= 5], ['Meta semanal', S().goal && st.week >= S().goal * 60], ['Primeira estrela dourada ★★★', EX.some(e => starsOf(e.id) === 3)], ['10 exercícios dominados', EX.filter(e => isMastered(e.id)).length >= 10], ['5 missões do dia', (DB.misCount || 0) >= 5], ['Rank Músico', rankOf(totalXP()).i >= 2], ['Primeira revisão espaçada', EX.some(e => (DB.best[e.id] && DB.best[e.id].rv) > 0)]];
   return A.map(([n, ok]) => ({ n, ok: !!ok }));
 }
 
@@ -88,6 +88,49 @@ function P() {
   return S().levelParams ? { thr: L.thr, needClean: L.needClean, step: L.step } : { thr: S().thr, needClean: S().needClean, step: S().step };
 }
 
+
+// ---------- gamification: estrelas, XP, rank, revisão espaçada e missão do dia ----------
+// estrelas por exercício: 1★ = 50% da meta de BPM limpo, 2★ = 75%, 3★ = dominado (90%)
+const starsOf = id => { const b = DB.best[id], e = EXMAP[id]; if (!b || !e) return 0; const r = (b.clean || 0) / e.target; return r >= MASTER_AT ? 3 : r >= 0.75 ? 2 : r >= 0.5 ? 1 : 0; };
+const starsHTML = id => { const n = starsOf(id); return `<span class="stars" role="img" aria-label="${n}/3">${'★'.repeat(n)}<i>${'★'.repeat(3 - n)}</i></span>`; };
+// XP: 10 por minuto treinado + até 20 pela precisão; bônus por recorde, estrela nova, domínio, revisão e missão
+const RANKS = [[0, 'Iniciante'], [150, 'Aprendiz'], [500, 'Músico'], [1200, 'Guitarrista'], [2500, 'Virtuoso'], [5000, 'Lenda']];
+const baseXP = s => Math.round((s.secs || 0) / 60 * 10) + (s.acc != null ? Math.round(s.acc * 20) : 0);
+const sessXP = s => s.xp != null ? s.xp : baseXP(s);
+const totalXP = () => DB.sessions.reduce((a, s) => a + sessXP(s), 0) + (DB.bonus || 0);
+function rankOf(xp) {
+  let i = 0; RANKS.forEach((r, k) => { if (xp >= r[0]) i = k; });
+  const nx = RANKS[i + 1];
+  return { i, name: RANKS[i][1], next: nx ? nx[1] : null, need: nx ? nx[0] - xp : 0, pct: nx ? Math.round(100 * (xp - RANKS[i][0]) / (nx[0] - RANKS[i][0])) : 100 };
+}
+// revisão espaçada: exercício dominado volta a ser sugerido após 3, 7, 14, 30 e 60 dias (a cada revisão limpa o intervalo cresce)
+const REV_DAYS = [3, 7, 14, 30, 60];
+const isDue = id => { const b = DB.best[id]; return !!b && isMastered(id) && (Date.now() - b.t) / 864e5 >= REV_DAYS[Math.min(b.rv || 0, 4)]; };
+const dueCount = () => EX.filter(e => e.lvl <= curLevel() && isDue(e.id)).length;
+// missão do dia: uma por dia, +30 XP ao cumprir
+const MIS_XP = 30;
+function ensureMission() {
+  const k = dkey(Date.now());
+  if (DB.mis && DB.mis.d === k) return DB.mis;
+  const n = Math.floor(Date.now() / 864e5) % 4, ul = curLevel(), st = stats();
+  let f = null;
+  if (n === 3) { const fs = [...new Set(EX.filter(e => e.lvl <= ul).map(e => e.focus))].sort((a, b) => st.focus[a].secs - st.focus[b].secs); f = fs[0]; }
+  DB.mis = { d: k, t: n, f, done: false }; save(); return DB.mis;
+}
+function missionProgress(m) {
+  const k = dkey(Date.now()), ts = DB.sessions.filter(s => dkey(s.t) === k);
+  if (m.t === 0) { const v = Math.floor(ts.reduce((a, s) => a + s.secs, 0) / 60); return { v: Math.min(15, v), g: 15, unit: ' min' }; }
+  if (m.t === 1) return { v: Math.min(3, new Set(ts.map(s => s.ex)).size), g: 3, unit: '' };
+  if (m.t === 2) return { v: ts.some(s => s.pr) ? 1 : 0, g: 1, unit: '' };
+  return { v: ts.some(s => s.focus === m.f) ? 1 : 0, g: 1, unit: '' };
+}
+function checkMission() {
+  const m = ensureMission(); if (m.done) return '';
+  const p = missionProgress(m); if (p.v < p.g) return '';
+  m.done = true; DB.bonus = (DB.bonus || 0) + MIS_XP; DB.misCount = (DB.misCount || 0) + 1; save();
+  return T('🎯 Missão do dia cumprida!') + ' +' + MIS_XP + ' XP';
+}
+
 // ---------- treino do dia (adaptativo, baseado em regras) ----------
 function recommend(min) {
   const n = Math.max(2, Math.round(min / 4)), st = stats(), now = Date.now(), ul = curLevel();
@@ -95,9 +138,11 @@ function recommend(min) {
     const f = st.focus[e.focus], b = DB.best[e.id];
     const weak = f.acc != null ? 1 - f.acc : 0.35;
     const days = b ? Math.min(14, (now - b.t) / 864e5) / 14 : 0.6;
-    const score = 1.6 * weak + 0.9 * days + Math.random() * 0.25 + (e.lvl === ul ? 0.5 : 0) - (isMastered(e.id) ? 0.4 : 0);
+    const due = isDue(e.id);
+    const score = 1.6 * weak + 0.9 * days + Math.random() * 0.25 + (e.lvl === ul ? 0.5 : 0) - (isMastered(e.id) ? 0.4 : 0) + (due ? 1.8 : 0);
     let why = b ? `Não treinado há ${Math.max(1, Math.round((now - b.t) / 864e5))} dia(s)` : 'Novo para você';
     if (f.acc != null && f.acc < 0.8) why = `Ponto fraco: ${FOCUS[e.focus].n} (${Math.round(f.acc * 100)}% de precisão)`;
+    if (due) why = `Revisão espaçada: dominado, sem treino há ${Math.max(1, Math.round((now - b.t) / 864e5))} dia(s)`;
     return { e, score, why };
   }).sort((a, b) => b.score - a.score);
   const pick = [], cnt = {};
@@ -354,12 +399,21 @@ function finishEx(next) {
   if (Sess.ex && Sess.elapsed >= 8) {
     const accs = Sess.passes.map(p => p.acc), acc = accs.length ? accs.reduce((a, b) => a + b, 0) / accs.length : null;
     const clean = Math.max(Sess.bestClean, 0);
-    DB.sessions.push({ t: Date.now(), ex: Sess.ex.id, focus: Sess.ex.focus, secs: Math.round(Sess.elapsed), acc, bpm: Sess.bpm, clean });
-    const id = Sess.ex.id, wasM = DB.best[id] ? isMastered(id) : false, wasLv = autoLevel();
-    const b = DB.best[id] || { n: 0, clean: 0 }; b.n++; b.last = Sess.bpm; b.t = Date.now(); b.clean = Math.max(b.clean || 0, clean); DB.best[id] = b; save();
+    const id = Sess.ex.id, wasM = DB.best[id] ? isMastered(id) : false, wasLv = autoLevel(), wasDue = isDue(id), st0 = starsOf(id), rk0 = rankOf(totalXP()).i, prevClean = (DB.best[id] && DB.best[id].clean) || 0;
+    const sess = { t: Date.now(), ex: id, focus: Sess.ex.focus, secs: Math.round(Sess.elapsed), acc, bpm: Sess.bpm, clean, pr: clean > prevClean };
+    DB.sessions.push(sess);
+    const b = DB.best[id] || { n: 0, clean: 0 }; b.n++; b.last = Sess.bpm; b.t = Date.now(); b.clean = Math.max(b.clean || 0, clean); DB.best[id] = b;
+    const reviewed = wasDue && clean >= MASTER_AT * Sess.ex.target; if (reviewed) b.rv = (b.rv || 0) + 1;
+    const gain = (sess.pr && prevClean ? 15 : 0) + 10 * Math.max(0, starsOf(id) - st0) + (!wasM && isMastered(id) ? 50 : 0) + (reviewed ? 10 : 0);
+    sess.xp = baseXP(sess) + gain; save();
     let msg = `Salvo: ${Math.round(Sess.elapsed / 60 * 10) / 10} min${acc != null ? ' · ' + Math.round(acc * 100) + '% de precisão' : ''}${clean ? ' · ' + clean + ' BPM limpos' : ''}`;
+    msg += ' · +' + sess.xp + ' XP';
+    if (starsOf(id) > st0) msg = '⭐'.repeat(starsOf(id)) + ' ' + msg;
+    if (reviewed) msg = '🔁 ' + T('Revisão concluída') + '. ' + msg;
     if (!wasM && isMastered(id)) msg = `🏆 Exercício dominado (${clean}/${Sess.ex.target} BPM)! ` + msg;
     if (autoLevel() > wasLv) msg = `🎉 Nível ${LEVELS[autoLevel()].roman} liberado! ` + msg;
+    const mm = checkMission(); if (mm) msg = mm + ' ' + msg;
+    if (rankOf(totalXP()).i > rk0) msg = '🎸 ' + T('Novo rank') + ': ' + T(rankOf(totalXP()).name) + '! ' + msg;
     toast(msg);
     const q = Sess.queue[Sess.qi]; if (q) q.done = true;
   }
@@ -395,6 +449,19 @@ addEventListener('hashchange', render);
 
 const pill = k => `<span class="pill" style="background:${FOCUS[k].c}">${FOCUS[k].n}</span>`;
 const estMin = ids => ids.length * 4;
+function gameHTML() {
+  const m = ensureMission(), p = missionProgress(m), xp = totalXP(), rk = rankOf(xp), due = dueCount();
+  const title = m.t === 0 ? 'Treine 15 minutos hoje' : m.t === 1 ? 'Conclua 3 exercícios diferentes hoje' : m.t === 2 ? 'Bata um recorde: supere seu BPM limpo em um exercício' : 'Treine esta área hoje:';
+  return `<div class="grid g2">
+    <div class="card"><div class="row sp"><h2>Missão do dia</h2><span class="tag">${m.done ? '✓' : '+' + MIS_XP + ' XP'}</span></div>
+      <div style="margin:6px 0 8px">${title} ${m.t === 3 ? pill(m.f) : ''}</div>
+      <div class="meter"><b style="width:${m.done ? 100 : Math.round(100 * p.v / p.g)}%;background:${m.done ? 'var(--ok)' : 'var(--acc)'}"></b></div>
+      <div class="small mut" style="margin-top:6px">${m.done ? '✓ ' : ''}${m.done ? '<span>Missão cumprida</span>' : p.v + ' / ' + p.g + p.unit}</div></div>
+    <div class="card"><div class="row sp"><h2>${T(rk.name)}</h2><span class="tag">${xp} XP</span></div>
+      <div class="meter" style="margin-top:12px"><b style="width:${rk.pct}%"></b></div>
+      <div class="small mut" style="margin-top:6px">${rk.next ? `<span>Próximo rank:</span> ${T(rk.next)} · ${rk.need} XP` : '<span>Rank máximo!</span>'}${due ? ` · <span>🔁 ${due}</span> <span>revisões pendentes</span>` : ''}</div></div>
+  </div>`;
+}
 function viewHome() {
   const st = stats(); if (!TODAY) TODAY = recommend(S().planMin);
   const goal = S().goal * 60, pct = goal ? Math.min(100, Math.round(100 * st.week / goal)) : 0;
@@ -407,6 +474,7 @@ function viewHome() {
     <div class="card kpi"><div class="l">Sequência</div><div class="v">🔥 ${st.streak} <span class="mut" style="font-size:14px">dia${st.streak === 1 ? '' : 's'}</span></div></div>
     <a href="#/train" class="card kpi" style="display:block"><div class="l">Nível atual</div><div class="v" style="color:${LEVELS[curLevel()].color}">${LEVELS[curLevel()].roman} <span class="mut" style="font-size:14px">${LEVELS[curLevel()].name} · ${lvlProgress(curLevel()).mastered}/${lvlProgress(curLevel()).total} dominados</span></div></a>
   </div>
+  ${gameHTML()}
   <div class="card">
     <div class="row sp"><div><h2>Treino de hoje</h2><div class="mut small">Escolhido pelos seus pontos fracos e pelo que você não pratica há mais tempo.</div></div>
       <div class="row"><select id="planMin" style="width:auto">${[10, 20, 30, 45, 60].map(m => `<option value="${m}" ${m === S().planMin ? 'selected' : ''}>${m} min</option>`).join('')}</select>
@@ -429,6 +497,7 @@ const VF = { q: '', focus: 'all', lvl: 'all', fav: false };
 // a área Acordes se divide em três filtros na Biblioteca (não existe mais um filtro só "Acordes")
 const CHKIND = { chOpen: 'Acordes abertos', chBarre: 'Acordes com pestana', chPower: 'Power chords' };
 const CH_BARRE = new Set(['F', 'Bb', 'Bm', 'F#m', 'Gm', 'Cm']);
+const chordKinds = e => e.kinds || [chordKind(e)];   // trocas mistas aparecem em mais de um filtro
 function chordKind(e) {
   if (e.focus !== 'chords') return null;
   if (/power/i.test(e.id + ' ' + e.name)) return 'chPower';
@@ -452,9 +521,9 @@ function vaultList() {
   const nrm = x => String(x).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const words = nrm(VF.q).split(/\s+/).filter(Boolean);
   const hay = e => nrm([e.name, e.desc, FOCUS[e.focus].n, LVL[e.lvl], T(e.name), T(e.desc), T(FOCUS[e.focus].n), T(LVL[e.lvl])].join(' '));
-  const l = EX.filter(e => (VF.focus === 'all' || (CHKIND[VF.focus] ? chordKind(e) === VF.focus : e.focus === VF.focus)) && (VF.lvl === 'all' || e.lvl === VF.lvl) && (!VF.fav || DB.fav.includes(e.id)) && (!words.length || (h => words.every(w => h.includes(w)))(hay(e))));
+  const l = EX.filter(e => (VF.focus === 'all' || (CHKIND[VF.focus] ? chordKinds(e).includes(VF.focus) : e.focus === VF.focus)) && (VF.lvl === 'all' || e.lvl === VF.lvl) && (!VF.fav || DB.fav.includes(e.id)) && (!words.length || (h => words.every(w => h.includes(w)))(hay(e))));
   $('#vcount').textContent = l.length + ' exercícios';
-  $('#vlist').innerHTML = l.map(e => { const b = DB.best[e.id]; return `<div class="card ex" style="margin:0"><div class="meta">${pill(e.focus)}<span class="tag">${LVL[e.lvl]}</span><span class="tag">${e.type === 'rhythm' ? 'ritmo (por ataque)' : e.len + ' notas'}</span></div>
+  $('#vlist').innerHTML = l.map(e => { const b = DB.best[e.id]; return `<div class="card ex" style="margin:0"><div class="meta">${pill(e.focus)}<span class="tag">${LVL[e.lvl]}</span><span class="tag">${e.type === 'rhythm' ? 'ritmo (por ataque)' : e.len + ' notas'}</span>${b ? starsHTML(e.id) : ''}</div>
     <h3>${esc(e.name)}</h3><div class="mut small">${esc(e.desc)}</div><div class="small">Sugerido: ${e.bpm}–${e.target} BPM · ${subText(e, e.type === 'rhythm' ? e.sub : LEVELS[e.lvl].sub)}${b && b.clean ? ` · seu melhor limpo: <b style="color:var(--ok)">${b.clean}</b>` : ''}</div>
     <div class="row"><button class="btn sm pri" data-act="train1" data-id="${e.id}">▶ Treinar</button><button class="btn sm" data-act="addR" data-id="${e.id}">+ Rotina</button><button class="btn sm ${DB.fav.includes(e.id) ? 'on' : ''}" data-act="fav" data-id="${e.id}">${DB.fav.includes(e.id) ? '★' : '☆'}</button><button class="btn sm ghost" data-act="prev" data-id="${e.id}">Ver</button></div><div id="pv-${e.id}"></div></div>`; }).join('') || '<div class="mut">Nada encontrado.</div>';
 }
@@ -504,7 +573,7 @@ function viewTrilha() {
     <div class="row" style="margin:14px 0"><button class="btn pri" data-act="guided" data-l="${TL}">▶ Sessão guiada (${gs.length} exercícios, ~${gs.length * 4} min)</button><button class="btn" data-act="startToday2">Treino de hoje</button>${DB.routines.map(r => `<button class="btn sm" data-act="playR" data-id="${r.id}">${esc(r.name)}</button>`).join('')}</div>
     <details class="exdd"${TLOPEN ? ' open' : ''} ontoggle="TLOPEN = this.open"><summary><span>Nível ${L.roman} · ${L.name}</span><span class="mut small">${LV_EX[TL].length} exercícios</span></summary>
     <div class="qlist">${LV_EX[TL].map((id, i) => { const e = EXMAP[id], b = DB.best[id], m = isMastered(id), clean = (b && b.clean) || 0;
-      return `<div class="qi" style="flex-wrap:wrap"><span style="width:22px;font-size:18px;color:${m ? 'var(--ok)' : b ? 'var(--warn)' : 'var(--mut)'}">${m ? '●' : b ? '◐' : '○'}</span><div style="flex:1;min-width:160px"><b>${i + 1}. ${esc(e.name)}</b> ${pill(e.focus)}<div class="mut small">${esc(e.desc)}</div><div class="meter" style="margin-top:6px;max-width:260px"><b style="width:${Math.min(100, Math.round(100 * clean / e.target))}%;background:${m ? 'var(--ok)' : L.color}"></b></div><div class="small mut">${clean ? clean + ' BPM limpos' : 'não iniciado'} · começar em ${e.bpm} · meta ${e.target} BPM · ${subText(e, e.type === 'rhythm' ? e.sub : LEVELS[e.lvl].sub)}</div></div><button class="btn sm pri" data-act="train1" data-id="${id}">▶</button></div>`; }).join('')}</div></details></div>`;
+      return `<div class="qi" style="flex-wrap:wrap"><span style="width:52px;font-size:14px">${starsHTML(id)}</span><div style="flex:1;min-width:160px"><b>${i + 1}. ${esc(e.name)}</b> ${pill(e.focus)}<div class="mut small">${esc(e.desc)}</div><div class="meter" style="margin-top:6px;max-width:260px"><b style="width:${Math.min(100, Math.round(100 * clean / e.target))}%;background:${m ? 'var(--ok)' : L.color}"></b></div><div class="small mut">${clean ? clean + ' BPM limpos' : 'não iniciado'} · começar em ${e.bpm} · meta ${e.target} BPM · ${subText(e, e.type === 'rhythm' ? e.sub : LEVELS[e.lvl].sub)}</div></div><button class="btn sm pri" data-act="train1" data-id="${id}">▶</button></div>`; }).join('')}</div></details></div>`;
 }
 function viewStats() {
   const st = stats(), mx = Math.max(60, ...st.days.map(d => d.s)), tot = st.total || 1;
@@ -513,7 +582,7 @@ function viewStats() {
   <div class="card"><h2>Últimos 30 dias</h2><div class="bars" style="margin-top:12px">${st.days.map((d, i) => `<i class="${i === 29 ? 'today' : ''}" style="height:${Math.max(2, 100 * d.s / mx)}%" title="${d.k}: ${Math.round(d.s / 60)} min"></i>`).join('')}</div></div>
   <div class="grid g2"><div class="card"><h2>Foco e precisão</h2>${Object.entries(st.focus).map(([k, f]) => `<div style="margin:10px 0"><div class="row sp small"><span>${pill(k)}</span><span class="mut">${fmtH(f.secs)} · ${f.acc == null ? 'sem dados' : Math.round(f.acc * 100) + '% precisão'}</span></div><div class="meter" style="margin-top:4px"><b style="width:${Math.round(100 * f.secs / tot)}%;background:${FOCUS[k].c}"></b></div></div>`).join('')}</div>
   <div class="card"><h2>Insights</h2>${insights(st).map(i => `<div class="ins ${i.t}">${esc(i.m)}</div>`).join('')}</div></div>
-  <div class="card"><h2>Evolução por exercício</h2>${Object.entries(DB.best).filter(([id]) => EXMAP[id]).sort((a, b) => b[1].t - a[1].t).map(([id, b]) => { const e = EXMAP[id]; return `<div style="margin:10px 0"><div class="row sp small"><span>${esc(e.name)}</span><span class="mut">${b.clean || 0} / ${e.target} BPM limpos · ${b.n}×</span></div><div class="meter" style="margin-top:4px"><b style="width:${Math.min(100, 100 * (b.clean || 0) / e.target)}%"></b></div></div>`; }).join('') || '<div class="mut">Treine para ver a evolução.</div>'}</div>
+  <div class="card"><h2>Evolução por exercício</h2>${Object.entries(DB.best).filter(([id]) => EXMAP[id]).sort((a, b) => b[1].t - a[1].t).map(([id, b]) => { const e = EXMAP[id]; return `<div style="margin:10px 0"><div class="row sp small"><span>${starsHTML(id)} ${esc(e.name)}</span><span class="mut">${b.clean || 0} / ${e.target} BPM limpos · ${b.n}×</span></div><div class="meter" style="margin-top:4px"><b style="width:${Math.min(100, 100 * (b.clean || 0) / e.target)}%"></b></div></div>`; }).join('') || '<div class="mut">Treine para ver a evolução.</div>'}</div>
   <div class="card"><h2>Conquistas</h2><div class="grid g4m" style="margin-top:10px">${achievements(st).map(a => `<div class="ach ${a.ok ? 'on' : ''}">${a.ok ? '🏆 ' : '🔒 '}${a.n}</div>`).join('')}</div></div>
   <div class="row"><button class="btn" data-act="demoData">Carregar dados de exemplo</button><button class="btn" data-act="export">Exportar JSON</button><button class="btn danger" data-act="wipe">Apagar tudo</button></div>`;
 }

@@ -118,6 +118,77 @@ Acordes|Chords|Acordes
 Acordes abertos|Open chords|Acordes abiertos
 Acordes com pestana|Barre chords|Acordes con cejilla
 Power chords|Power chords|Power chords
+Primeira estrela dourada ★★★|First golden star ★★★|Primera estrella dorada ★★★
+10 exercícios dominados|10 exercises mastered|10 ejercicios dominados
+5 missões do dia|5 daily missions|5 misiones del día
+Rank Músico|Musician rank|Rango Músico
+Primeira revisão espaçada|First spaced review|Primer repaso espaciado
+Missão do dia|Daily mission|Misión del día
+Treine 15 minutos hoje|Practice for 15 minutes today|Practica 15 minutos hoy
+Conclua 3 exercícios diferentes hoje|Complete 3 different exercises today|Completa 3 ejercicios diferentes hoy
+Bata um recorde: supere seu BPM limpo em um exercício|Set a record: beat your clean BPM in one exercise|Bate un récord: supera tu BPM limpio en un ejercicio
+Treine esta área hoje:|Practice this area today:|Practica esta área hoy:
+Missão cumprida|Mission complete|Misión cumplida
+🎯 Missão do dia cumprida!|🎯 Daily mission complete!|🎯 ¡Misión del día cumplida!
+Revisão concluída|Review done|Repaso completado
+Novo rank|New rank|Nuevo rango
+Próximo rank:|Next rank:|Próximo rango:
+Rank máximo!|Max rank!|¡Rango máximo!
+revisões pendentes|reviews due|repasos pendientes
+Iniciante|Beginner|Principiante
+Aprendiz|Apprentice|Aprendiz
+Músico|Musician|Músico
+Guitarrista|Guitarist|Guitarrista
+Virtuoso|Virtuoso|Virtuoso
+Lenda|Legend|Leyenda
+Palhetada só para baixo em corda solta|Downstrokes only on an open string|Solo púa hacia abajo en cuerda al aire
+Repita a corda Si solta só com palhetadas para baixo ↓. Cada batida igual à anterior, com o pulso solto.|Repeat the open B string with downstrokes only ↓. Make every stroke match the last, with a loose wrist.|Repite la cuerda Si al aire solo con púa hacia abajo ↓. Cada golpe igual al anterior, con la muñeca suelta.
+Alternada entre duas cordas soltas (Si e Mi agudo)|Alternate picking across two open strings (B and high E)|Púa alterna entre dos cuerdas al aire (Si y Mi agudo)
+A palheta troca de corda a cada nota. Mantenha ↓↑ sem parar, mesmo na mudança de corda.|The pick changes string on every note. Keep ↓↑ going, even when you change strings.|La púa cambia de cuerda en cada nota. Mantén ↓↑ sin parar, incluso al cambiar de cuerda.
+Alternada em três cordas soltas (Sol, Si e Mi agudo)|Alternate picking across three open strings (G, B and high E)|Púa alterna en tres cuerdas al aire (Sol, Si y Mi agudo)
+Suba e desça entre três cordas vizinhas. O movimento da palheta continua ↓↑ em todas as notas.|Go up and down across three neighbouring strings. The pick keeps moving ↓↑ on every note.|Sube y baja entre tres cuerdas vecinas. El movimiento de la púa sigue ↓↑ en todas las notas.
+Palhetada em pares por corda (cordas soltas)|Picking in pairs per string (open strings)|Púa en pares por cuerda (cuerdas al aire)
+Duas notas em cada corda, depois muda. A segunda nota de cada par é a palhetada para cima ↑.|Two notes on each string, then move on. The second note of each pair is the upstroke ↑.|Dos notas en cada cuerda y luego cambias. La segunda nota de cada par es la púa hacia arriba ↑.
+Alternada em todas as cordas soltas, subindo e descendo|Alternate picking across all open strings, up and down|Púa alterna en todas las cuerdas al aire, subiendo y bajando
+Percorra as seis cordas soltas e volte. Treine a palheta chegar na corda certa sem olhar.|Run through all six open strings and back. Train the pick to land on the right string without looking.|Recorre las seis cuerdas al aire y vuelve. Entrena la púa para llegar a la cuerda correcta sin mirar.
+Alternada com dois dedos na corda Si (casas 1 e 2)|Alternate picking with two fingers on the B string (frets 1 and 2)|Púa alterna con dos dedos en la cuerda Si (trastes 1 y 2)
+Primeiro contato entre as duas mãos: dedos 1 e 2 na casa 1 e 2, palheta ↓↑ alternada.|First contact between both hands: fingers 1 and 2 on frets 1 and 2, picking ↓↑ alternately.|Primer contacto entre las dos manos: dedos 1 y 2 en los trastes 1 y 2, púa ↓↑ alterna.
+Salto de cordas soltas (Ré, Si, Sol e Mi agudo)|Skipping open strings (D, B, G and high E)|Salto de cuerdas al aire (Re, Si, Sol y Mi agudo)
+A palheta pula uma corda e volta. Mantenha o ↓↑ constante enquanto a mão procura a corda certa.|The pick skips a string and comes back. Keep ↓↑ steady while your hand finds the right string.|La púa salta una cuerda y vuelve. Mantén el ↓↑ constante mientras la mano busca la cuerda correcta.
+Duas batidas por compasso ↓ no 1 e no 3|Two beats per bar ↓ on 1 and 3|Dos golpes por compás ↓ en el 1 y en el 3
+A primeira batida para baixo no tempo 1 e a segunda no tempo 3, com o acorde soando entre elas.|First downstroke on beat 1 and the second on beat 3, letting the chord ring between them.|Primer golpe hacia abajo en el tiempo 1 y el segundo en el 3, dejando sonar el acorde entre ellos.
+Dois para baixo e um ↓↑|Two downs and one ↓↑|Dos hacia abajo y uno ↓↑
+Tempos 2 e 4 com ↓↑. A mão sobe e desce de forma contínua; só toque nas batidas marcadas.|Beats 2 and 4 with ↓↑. The hand keeps moving up and down; only strike on the marked beats.|Tiempos 2 y 4 con ↓↑. La mano sube y baja de forma continua; solo toca en los golpes marcados.
+Três para baixo e dois para cima|Three downs and two ups|Tres hacia abajo y dos hacia arriba
+Três batidas fortes e depois ↓↑ ↑ no fim do compasso. Bom para sentir o contratempo.|Three strong beats and then ↓↑ ↑ at the end of the bar. Good for feeling the off-beat.|Tres golpes fuertes y luego ↓↑ ↑ al final del compás. Bueno para sentir el contratiempo.
+Folk: ↓ ↓↑ ↓↑ ↓↑|Folk: ↓ ↓↑ ↓↑ ↓↑|Folk: ↓ ↓↑ ↓↑ ↓↑
+Um padrão folk muito usado: só o primeiro tempo sem ↑. Alterne G e C a cada compasso.|A very common folk pattern: only the first beat has no ↑. Alternate G and C every bar.|Un patrón folk muy usado: solo el primer tiempo sin ↑. Alterna G y C cada compás.
+Contratempo com troca de acorde|Off-beat with chord change|Contratiempo con cambio de acorde
+O tempo 1 fica em silêncio e a mão continua se movendo. Troque Am e G a cada compasso.|Beat 1 stays silent and the hand keeps moving. Change Am and G every bar.|El tiempo 1 queda en silencio y la mano sigue moviéndose. Cambia Am y G cada compás.
+Country: baixo e contratempo|Country: boom and off-beat|Country: bajo y contratiempo
+Batida forte no 1 e no 3, com um ↑ leve depois. Alterne G, C e D, um acorde por compasso.|Strong beat on 1 and 3 with a light ↑ after each. Alternate G, C and D, one chord per bar.|Golpe fuerte en el 1 y en el 3, con un ↑ suave después. Alterna G, C y D, un acorde por compás.
+Pop em semicolcheias|Pop in sixteenth notes|Pop en semicorcheas
+O padrão pop com quatro divisões por tempo. Fique relaxado e use movimentos pequenos.|The pop pattern with four subdivisions per beat. Stay relaxed and use small movements.|El patrón pop con cuatro subdivisiones por tiempo. Mantente relajado y usa movimientos pequeños.
+Balada em semicolcheias|Ballad in sixteenth notes|Balada en semicorcheas
+Batida longa no 1 e no 3 seguida de ↓↑ ↑. Deixe o acorde soar bem antes de seguir.|A long beat on 1 and 3 followed by ↓↑ ↑. Let the chord ring well before moving on.|Un golpe largo en el 1 y en el 3 seguido de ↓↑ ↑. Deja sonar bien el acorde antes de seguir.
+Pausa no tempo 3 com troca de acorde|Rest on beat 3 with chord change|Pausa en el tiempo 3 con cambio de acorde
+O tempo 3 fica em silêncio e a mão continua. Troque Am e F antes do próximo tempo 1.|Beat 3 stays silent and the hand keeps moving. Change Am and F before the next beat 1.|El tiempo 3 queda en silencio y la mano sigue. Cambia Am y F antes del próximo tiempo 1.
+Funk em semicolcheias com abafado (E9 e Em)|Sixteenth-note funk with muting (E9 and Em)|Funk en semicorcheas con apagado (E9 y Em)
+Abafe com a mão esquerda nos "x" e mantenha a mão direita contínua. Troque entre E9 e Em.|Mute with the left hand on the "x" and keep the right hand continuous. Switch between E9 and Em.|Apaga con la mano izquierda en las "x" y mantén la mano derecha continua. Cambia entre E9 y Em.
+Rasgueado de metal em semicolcheias (power chords)|Metal strumming in sixteenth notes (power chords)|Rasgueo de metal en semicorcheas (power chords)
+Dois ↓↓, pausa, dois ↓↓, pausa, ↓ e pausa. Palm mute firme e troca de power chord a cada compasso.|Two ↓↓, rest, two ↓↓, rest, ↓ and rest. Firm palm mute and a power chord change every bar.|Dos ↓↓, pausa, dos ↓↓, pausa, ↓ y pausa. Palm mute firme y cambio de power chord cada compás.
+Troca mista: G · Em · Bm · C (abertos e pestana)|Mixed change: G · Em · Bm · C (open and barre)|Cambio mixto: G · Em · Bm · C (abiertos y cejilla)
+Três acordes abertos e o Bm com pestana. O Bm é a troca difícil: prepare o indicador antes do tempo 1.|Three open chords and a barre Bm. The Bm is the hard change: get your index finger ready before beat 1.|Tres acordes abiertos y el Bm con cejilla. El Bm es el cambio difícil: prepara el índice antes del tiempo 1.
+Troca mista: E5 · A5 · C · G (power chords e abertos)|Mixed change: E5 · A5 · C · G (power chords and open)|Cambio mixto: E5 · A5 · C · G (power chords y abiertos)
+Dois power chords e dois acordes abertos. Mude a forma da mão esquerda sem perder a batida.|Two power chords and two open chords. Change the left-hand shape without losing the beat.|Dos power chords y dos acordes abiertos. Cambia la forma de la mano izquierda sin perder el pulso.
+Troca mista: F · G5 · A5 · Dm (pestana, power chords e aberto)|Mixed change: F · G5 · A5 · Dm (barre, power chords and open)|Cambio mixto: F · G5 · A5 · Dm (cejilla, power chords y abierto)
+Os três tipos de acorde na mesma sequência. Solte a pressão da pestana ao ir para os power chords.|All three chord types in one sequence. Release the barre pressure when moving to the power chords.|Los tres tipos de acorde en la misma secuencia. Suelta la presión de la cejilla al ir a los power chords.
+Troca mista: Bm · E5 · G · D (pestana, power chord e abertos)|Mixed change: Bm · E5 · G · D (barre, power chord and open)|Cambio mixto: Bm · E5 · G · D (cejilla, power chord y abiertos)
+Pestana, power chord e dois abertos. Preste atenção em quais cordas ficam soando em cada acorde.|Barre, power chord and two open chords. Pay attention to which strings ring in each chord.|Cejilla, power chord y dos abiertos. Presta atención a qué cuerdas suenan en cada acorde.
+Troca mista: A5 · F#m · D · E (power chord, pestana e abertos)|Mixed change: A5 · F#m · D · E (power chord, barre and open)|Cambio mixto: A5 · F#m · D · E (power chord, cejilla y abiertos)
+Do power chord para o F#m com pestana na casa 2, depois dois abertos. Mantenha a mão direita sem parar.|From a power chord to a barre F#m on fret 2, then two open chords. Keep the right hand going.|De un power chord al F#m con cejilla en el traste 2 y luego dos abiertos. Mantén la mano derecha sin parar.
+Troca mista: Dm · Bb · G5 · C5 (aberto, pestana e power chords)|Mixed change: Dm · Bb · G5 · C5 (open, barre and power chords)|Cambio mixto: Dm · Bb · G5 · C5 (abierto, cejilla y power chords)
+Dm aberto, Bb com pestana e dois power chords. O Bb é a troca mais exigente.|Open Dm, barre Bb and two power chords. The Bb is the most demanding change.|Dm abierto, Bb con cejilla y dos power chords. El Bb es el cambio más exigente.
 Power chords: troca E5–A5|Power chords: change E5–A5|Power chords: cambio E5–A5
 Dois power chords com a mesma forma: só o dedo 1 e o dedo 3 se movem juntos, uma corda abaixo. Uma passada por compasso.|Two power chords with the same shape: just fingers 1 and 3 move together, one string lower. One strum per bar.|Dos power chords con la misma forma: solo los dedos 1 y 3 se mueven juntos, una cuerda más abajo. Una pasada por compás.
 Power chords: troca A5–D5|Power chords: change A5–D5|Power chords: cambio A5–D5
@@ -588,6 +659,7 @@ Evolução em|Progress in|Progreso en
 BPM limpos desde a primeira sessão.|clean BPM since the first session.|BPM limpios desde la primera sesión.
 Meta semanal:|Weekly goal:|Meta semanal:
 Não treinado há|Not practiced for|Sin practicar desde hace
+Revisão espaçada: dominado, sem treino há|Spaced review: mastered, not practiced for|Repaso espaciado: dominado, sin practicar desde hace
 dia(s)|day(s)|día(s)
 Autoavaliação: libera ao fim de cada passada|Self-rating: unlocks at the end of each pass|Autoevaluación: se habilita al final de cada pasada
 notas ≈|notes ≈|notas ≈

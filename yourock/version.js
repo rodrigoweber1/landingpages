@@ -1,9 +1,11 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.4.19';
+var APP_VERSION = '1.5.0';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Gamification: estrelas por exercício, XP e ranks, missão do dia, revisão espaçada de exercícios dominados e novas conquistas', en: 'Gamification: stars per exercise, XP and ranks, daily mission, spaced review of mastered exercises and new achievements', es: 'Gamificación: estrellas por ejercicio, XP y rangos, misión del día, repaso espaciado de ejercicios dominados y nuevos logros' },
+  { pt: '24 exercícios novos: 7 de palhetada no Nível I, 11 de ritmo e 6 trocas mistas no Nível IV (abertos, pestana e power chords)', en: '24 new exercises: 7 picking exercises at Level I, 11 rhythm exercises and 6 mixed changes at Level IV (open, barre and power chords)', es: '24 ejercicios nuevos: 7 de púa en el Nivel I, 11 de ritmo y 6 cambios mixtos en el Nivel IV (abiertos, cejilla y power chords)' },
   { pt: 'Nove exercícios novos de power chords (trocas, nota a nota, rasgueado rock, palm mute e galope)', en: 'Nine new power chord exercises (changes, note by note, rock strumming, palm mute and gallop)', es: 'Nueve ejercicios nuevos de power chords (cambios, nota por nota, rasgueo rock, palm mute y galope)' },
   { pt: 'Biblioteca: o filtro "Acordes" foi dividido em Acordes abertos, Acordes com pestana e Power chords', en: 'Library: the "Chords" filter is now split into Open chords, Barre chords and Power chords', es: 'Biblioteca: el filtro "Acordes" se dividió en Acordes abiertos, Acordes con cejilla y Power chords' },
   { pt: 'Diagramas de acordes: a faixa de pestana só aparece quando é pestana de verdade (ex.: o D não tem mais faixa entre o A e o F#)', en: 'Chord diagrams: the barre bar only shows for real barres (e.g. D no longer has a bar between A and F#)', es: 'Diagramas de acordes: la franja de cejilla solo aparece en cejillas reales (p. ej. el D ya no tiene franja entre A y F#)' },
