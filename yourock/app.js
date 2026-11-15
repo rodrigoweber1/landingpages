@@ -135,10 +135,10 @@ function strumHTML(ex) {
 }
 
 // ---------- sessão de treino ----------
-const Sess = { queue: [], qi: 0, ex: null, bpm: 80, sub: 2, run: false, demo: false, passes: [], events: [], ui: -1, cleanStreak: 0, elapsed: 0, lastTick: 0, raf: 0, timer: 0, statusKey: {}, passAcc: null, bestClean: 0, offs: [], loop: false, stopAt: null, ended: false, endT: 0 };
+const Sess = { queue: [], qi: 0, ex: null, bpm: 80, sub: 2, run: false, demo: false, passes: [], events: [], ui: -1, cleanStreak: 0, elapsed: 0, lastTick: 0, raf: 0, timer: 0, statusKey: {}, passAcc: null, bestClean: 0, offs: [], loop: false, stopAt: null, ended: false, endT: 0, browse: false };
 const exSecs = () => (+S().exMin || 2) * 60;
 function setQueue(ids, startAt = 0) {
-  stopRun(); Sess.queue = ids.map(id => ({ id, done: false })); Sess.qi = startAt; Sess.ex = null;
+  stopRun(); Sess.queue = ids.map(id => ({ id, done: false })); Sess.qi = startAt; Sess.ex = null; Sess.browse = false;
   if (location.hash === '#/train') render(); else location.hash = '#/train';
 }
 function dropPass(pass) {
@@ -146,7 +146,7 @@ function dropPass(pass) {
   Sess.ui = Math.max(-1, Sess.ui - (before - Sess.events.length));
 }
 function loadEx(i) {
-  stopRun(); const q = Sess.queue[i]; if (!q) return; Sess.qi = i; const ex = EXMAP[q.id]; Sess.ex = ex;
+  stopRun(); const q = Sess.queue[i]; if (!q) return; Sess.browse = false; Sess.qi = i; const ex = EXMAP[q.id]; Sess.ex = ex;
   Sess.bpm = (DB.best[ex.id] && DB.best[ex.id].last) || ex.bpm; Sess.sub = ex.type === 'rhythm' ? ex.sub : LEVELS[ex.lvl].sub;
   Sess.passes = []; Sess.cleanStreak = 0; Sess.elapsed = 0; Sess.bestClean = 0; Sess.offs = []; Sess.passAcc = null; Sess.statusKey = {}; Sess.loop = false; Sess.stopAt = null; Sess.ended = false;
 }
@@ -426,9 +426,9 @@ function vaultList() {
 }
 function viewTrain() {
   ensureEx(); const ex = Sess.ex;
-  if (!ex) return viewTrilha();
+  if (!ex || Sess.browse) return viewTrilha();
   const lefty = S().lefty;
-  view.innerHTML = `<div class="row sp"><div><div class="meta row">${pill(ex.focus)}<span class="tag">${LVL[ex.lvl]}</span><span class="tag">meta ${ex.target} BPM</span></div><h2 style="margin-top:6px">${esc(ex.name)}</h2><div class="mut small">${esc(ex.desc)}</div><div class="small" id="durInfo" style="margin-top:6px"></div></div>
+  view.innerHTML = `<div style="margin-bottom:10px"><button class="btn sm ghost" data-act="backTrail">← Voltar</button></div><div class="row sp"><div><div class="meta row">${pill(ex.focus)}<span class="tag">${LVL[ex.lvl]}</span><span class="tag">meta ${ex.target} BPM</span></div><h2 style="margin-top:6px">${esc(ex.name)}</h2><div class="mut small">${esc(ex.desc)}</div><div class="small" id="durInfo" style="margin-top:6px"></div></div>
     <div class="tag">${Sess.qi + 1} / ${Sess.queue.length}</div></div>
   <div class="board" style="margin-top:12px">${ex.type === 'notes' ? fretboardSVG(ex, lefty, S().label) : strumHTML(ex)}<div class="cd" id="cd"></div></div>
   <div class="small" id="why" style="min-height:18px;margin-top:6px;color:var(--bad)"></div>
@@ -460,6 +460,7 @@ function viewTrilha() {
   const cur = curLevel(); if (TL == null) TL = cur;
   const L = LEVELS[TL], pr = lvlProgress(TL), prev = TL > 1 ? lvlProgress(TL - 1) : null, gs = guided(TL);
   view.innerHTML = `<h1>Treinar</h1><div class="mut" style="margin:4px 0 14px">Siga a trilha em ordem. Um nível é recomendado como concluído quando você domina ${Math.round(UNLOCK_AT * 100)}% dos exercícios (BPM limpo ≥ ${Math.round(MASTER_AT * 100)}% da meta).</div>
+  ${Sess.queue.length && Sess.ex ? `<div class="card row sp" style="margin:0 0 12px"><div><div class="mut small">Exercício em andamento</div><b>${esc(Sess.ex.name)}</b></div><button class="btn pri" data-act="resumeEx">▶ Continuar</button></div>` : ''}
   <div class="grid g4m">${[1, 2, 3, 4].map(l => { const x = LEVELS[l], p = lvlProgress(l);
     return `<div class="card lvl ${TL === l ? 'on' : ''} ${l > cur ? 'lock' : ''}" data-act="tl" data-l="${l}" style="--c:${x.color}"><div class="roman">${x.roman}</div><b>${x.name}</b><div class="meter" style="margin:8px 0 4px"><b style="width:${Math.round(100 * p.pct)}%;background:${x.color}"></b></div><div class="small mut">${p.mastered}/${p.total} dominados${l === cur ? ' · <b style="color:var(--acc)">você está aqui</b>' : l > cur ? ' · 🔒 recomendado depois' : ' · ✓'}</div></div>`; }).join('')}</div>
   <div class="card" style="--c:${L.color};border-left:4px solid ${L.color}"><div class="row sp"><h2>Nível ${L.roman} · ${L.name}</h2><span class="tag">${LVL[TL]}</span></div>
@@ -586,6 +587,8 @@ const act = {
   finish() { finishEx(); },
   skip() { const nx = Sess.queue.findIndex((q, i) => i > Sess.qi && !q.done); if (nx >= 0) { loadEx(nx); render(); } else toast('Esse é o último exercício'); },
   restart() { loadEx(Sess.qi); render(); },
+  backTrail() { stopRun(); micOff(); Sess.browse = true; render(); },
+  resumeEx() { Sess.browse = false; render(); },
   goQ(d) { loadEx(+d.i); render(); },
   async tuner() { if (Mic.on) { Mic.stop(); $('#tbtn').textContent = '🎤 Ativar microfone'; return; } try { await Mic.start(); Mic.setTune(true); $('#tbtn').textContent = '■ Parar'; requestAnimationFrame(window.tunerLoop); } catch (e) { toast('Sem acesso ao microfone'); } },
   async mtest() {

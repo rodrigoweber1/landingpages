@@ -82,6 +82,8 @@ Refazer o quiz de nível|Retake the level quiz|Repetir el quiz de nivel
 Idioma|Language|Idioma
 Alto contraste|High contrast|Alto contraste
 Biblioteca|Library|Biblioteca
+Exercício em andamento|Exercise in progress|Ejercicio en curso
+▶ Continuar|▶ Resume|▶ Continuar
 Ligar o microfone automaticamente ao iniciar o exercício (o botão 🎤 continua disponível para ligar quando quiser)|Turn the microphone on automatically when an exercise starts (the 🎤 button is always available)|Encender el micrófono automáticamente al iniciar el ejercicio (el botón 🎤 siempre está disponible)
 Ferramentas|Tools|Herramientas
 Não ouvi som nessa nota|I did not hear a sound on this note|No oí sonido en esta nota

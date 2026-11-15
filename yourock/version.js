@@ -1,8 +1,9 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.4.1';
+var APP_VERSION = '1.4.2';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
+  { pt: 'Treinar: botão Voltar no exercício para escolher outro em qualquer nível', en: 'Train: Back button on the exercise screen to pick another one from any level', es: 'Entrenar: botón Volver en el ejercicio para elegir otro de cualquier nivel' },
   { pt: 'Treinar: a lista de exercícios do nível fica recolhida em um dropdown', en: 'Train: the level exercise list is collapsed in a dropdown', es: 'Entrenar: la lista de ejercicios del nivel queda recogida en un desplegable' },
   { pt: 'Menu inferior do celular com 5 itens (Ferramentas reúne Metrônomo, Notas, Acordes e Afinador) e Ajustes na engrenagem; o botão do microfone fica sempre disponível', en: 'Phone bottom menu with 5 items (Tools groups Metronome, Notes, Chords and Tuner) and Settings under the gear; the microphone button is always available', es: 'Menú inferior del móvil con 5 ítems (Herramientas reúne Metrónomo, Notas, Acordes y Afinador) y Ajustes en el engranaje; el botón del micrófono siempre está disponible' },
   { pt: 'Ajustes: liga/desliga o reconhecimento de som; desligado, o microfone e o afinador somem das telas', en: 'Settings: turn sound recognition on/off; when off, the microphone and tuner disappear from the screens', es: 'Ajustes: activa/desactiva el reconocimiento de sonido; apagado, el micrófono y el afinador desaparecen de las pantallas' },
