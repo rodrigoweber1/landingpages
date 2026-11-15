@@ -376,6 +376,60 @@ Acentue o "e" de cada tempo.|Accent the "and" of each beat.|Acentúa el "y" de c
 Funk 16 com abafado|Sixteenth-note funk with muting|Funk a 16 con apagado
 Abafe com a mão esquerda nos "x" e mantenha a mão direita contínua.|Mute with the left hand on the "x" and keep the right hand going.|Apaga con la mano izquierda en las "x" y mantén la mano derecha continua.
 Troca de acordes Em–Am|Chord change Em–Am|Cambio de acordes Em–Am
+Troca de acordes Am–E|Chord change Am–E|Cambio de acordes Am–E
+Os dois acordes têm a mesma forma, só que o E sobe uma corda. Leve os dedos 2 e 3 juntos.|The two chords share a shape, with E one string lower. Move fingers 2 and 3 together.|Los dos acordes comparten forma, con el E una cuerda más abajo. Lleva los dedos 2 y 3 juntos.
+Troca de acordes G–Em|Chord change G–Em|Cambio de acordes G–Em
+Dois acordes com dedos em comum: dois dedos quase não saem do lugar.|Two chords with shared fingers: two fingers barely leave their place.|Dos acordes con dedos en común: dos dedos casi no se mueven.
+Troca de acordes D–G|Chord change D–G|Cambio de acordes D–G
+Um par muito usado em Ré. Prepare o dedo 3 do G antes do tempo 1.|A very common pair in D. Get finger 3 for the G ready before beat 1.|Un par muy usado en Re. Prepara el dedo 3 del G antes del tiempo 1.
+Troca de acordes A–D|Chord change A–D|Cambio de acordes A–D
+Dois acordes de três dedos que ficam na mesma região do braço. Troque sem olhar a mão.|Two three-finger chords in the same area of the neck. Change without looking at your hand.|Dos acordes de tres dedos en la misma zona del mástil. Cambia sin mirar la mano.
+Troca de acordes C–G|Chord change C–G|Cambio de acordes C–G
+Troca de dois acordes grandes: o dedo 3 do C vai para a corda grave do G. Vá devagar.|A change between two big chords: finger 3 of C goes to the low string of G. Go slowly.|Un cambio entre dos acordes grandes: el dedo 3 del C va a la cuerda grave del G. Ve despacio.
+Troca de acordes Em–D|Chord change Em–D|Cambio de acordes Em–D
+Do Em para o D só os dedos mudam de corda; mantenha o punho relaxado.|From Em to D the fingers only change strings; keep your wrist relaxed.|Del Em al D los dedos solo cambian de cuerda; mantén la muñeca relajada.
+Troca de acordes C–Am|Chord change C–Am|Cambio de acordes C–Am
+Dois acordes que dividem dedos: o dedo 3 fica quase parado e só os outros se movem.|Two chords that share fingers: finger 3 barely moves and only the others change.|Dos acordes que comparten dedos: el dedo 3 casi no se mueve y solo cambian los otros.
+Troca de acordes E–A|Chord change E–A|Cambio de acordes E–A
+Dois acordes de rock com a mesma forma, uma corda abaixo. Leve os três dedos juntos.|Two rock chords with the same shape, one string apart. Move all three fingers together.|Dos acordes de rock con la misma forma, una cuerda más abajo. Lleva los tres dedos juntos.
+Troca de acordes D–G–A|Chord change D–G–A|Cambio de acordes D–G–A
+Os três acordes de muitas músicas folk e country em Ré. Mantenha o andamento firme.|The three chords of many folk and country songs in D. Keep the tempo steady.|Los tres acordes de muchas canciones folk y country en Re. Mantén el tempo firme.
+Troca de acordes Em–C–D|Chord change Em–C–D|Cambio de acordes Em–C–D
+Três acordes abertos com o Em como base. O dedo 2 do Em é guia para o C.|Three open chords with Em as the base. Finger 2 of Em guides you to C.|Tres acordes abiertos con el Em como base. El dedo 2 del Em te guía al C.
+Troca de acordes C–Am–Dm–G|Chord change C–Am–Dm–G|Cambio de acordes C–Am–Dm–G
+A progressão dos anos 50 em quatro acordes abertos. Pense no próximo acorde durante o compasso.|The 1950s progression in four open chords. Think of the next chord during the bar.|La progresión de los años 50 en cuatro acordes abiertos. Piensa en el próximo acorde durante el compás.
+Troca com pestana Bm–A|Barre change Bm–A|Cambio con cejilla Bm–A
+Bm com pestana na casa 2 e A aberto. Solte a pressão do indicador ao trocar.|Barre Bm on fret 2 and open A. Release index-finger pressure as you change.|Bm con cejilla en el traste 2 y A abierto. Suelta la presión del índice al cambiar.
+Troca de acordes G–Em–C–D com rasgueado pop|Chord change G–Em–C–D with pop strumming|Cambio de acordes G–Em–C–D con rasgueo pop
+A sequência pop com o padrão de pausa no tempo 2. Não pare a mão direita na troca.|The pop sequence with the rest-on-beat-2 pattern. Don't stop your right hand during the change.|La secuencia pop con el patrón de pausa en el tiempo 2. No pares la mano derecha en el cambio.
+Troca de acordes D–A–Em–G com rasgueado pop|Chord change D–A–Em–G with pop strumming|Cambio de acordes D–A–Em–G con rasgueo pop
+Outra progressão de pop e folk, agora em Ré. Troque antes do tempo 1.|Another pop and folk progression, now in D. Change before beat 1.|Otra progresión de pop y folk, ahora en Re. Cambia antes del tiempo 1.
+Troca com pestana C · Am · F · G|Barre change C · Am · F · G|Cambio con cejilla C · Am · F · G
+A progressão clássica (I, vi, IV, V) com F em pestana. O F é a troca mais difícil; prepare antes.|The classic progression (I, vi, IV, V) with a barre F. The F is the hardest change; prepare it early.|La progresión clásica (I, vi, IV, V) con F en cejilla. El F es el cambio más difícil; prepáralo antes.
+Troca com pestana Dm · Bb · F · C|Barre change Dm · Bb · F · C|Cambio con cejilla Dm · Bb · F · C
+Dois acordes com pestana seguidos (Bb e F) entre Dm e C. Mantenha o ritmo mesmo se a pestana falhar.|Two barre chords in a row (Bb and F) between Dm and C. Keep the rhythm even if the barre buzzes.|Dos acordes con cejilla seguidos (Bb y F) entre Dm y C. Mantén el ritmo aunque la cejilla falle.
+Troca com pestana F#m · D · A · E|Barre change F#m · D · A · E|Cambio con cejilla F#m · D · A · E
+F#m com pestana na casa 2 e três acordes abertos. Uma progressão comum de pop e rock.|Barre F#m on fret 2 and three open chords. A common pop and rock progression.|F#m con cejilla en el traste 2 y tres acordes abiertos. Una progresión común de pop y rock.
+Troca com pestana Am–F|Barre change Am–F|Cambio con cejilla Am–F
+Primeira troca com pestana: só dois acordes, uma passada por compasso. Prepare o indicador na casa 1 antes do tempo 1 e solte a pressão ao voltar para o Am.|First barre change: just two chords, one strum per bar. Get your index finger ready on fret 1 before beat 1 and release the pressure when going back to Am.|Primer cambio con cejilla: solo dos acordes, una pasada por compás. Prepara el índice en el traste 1 antes del tiempo 1 y suelta la presión al volver al Am.
+Troca de acordes G–C|Chord change G–C|Cambio de acordes G–C
+Uma passada por compasso entre dois acordes abertos. Prepare o próximo acorde antes do tempo 1.|One strum per bar between two open chords. Get the next chord ready before beat 1.|Una pasada por compás entre dos acordes abiertos. Prepara el próximo acorde antes del tiempo 1.
+Troca de acordes D–A|Chord change D–A|Cambio de acordes D–A
+Dois acordes de três dedos que ficam próximos. Troque sem olhar a mão, se puder.|Two three-finger chords that sit close together. Change without looking at your hand if you can.|Dos acordes de tres dedos que quedan cerca. Cambia sin mirar la mano, si puedes.
+Troca de acordes G–D–Em–C|Chord change G–D–Em–C|Cambio de acordes G–D–Em–C
+A sequência mais comum do pop, em quatro acordes abertos, uma passada por compasso.|The most common pop sequence, in four open chords, one strum per bar.|La secuencia más común del pop, en cuatro acordes abiertos, una pasada por compás.
+Troca de acordes A–D–E|Chord change A–D–E|Cambio de acordes A–D–E
+Os três acordes do rock e do blues em Lá. Mantenha o andamento mesmo que o acorde saia imperfeito.|The three chords of rock and blues in A. Keep the tempo even if a chord comes out imperfect.|Los tres acordes del rock y el blues en La. Mantén el tempo aunque el acorde salga imperfecto.
+Troca de acordes Am–Dm–E|Chord change Am–Dm–E|Cambio de acordes Am–Dm–E
+A progressão menor clássica (i, iv, V). O E resolve de volta no Am.|The classic minor progression (i, iv, V). The E resolves back to Am.|La progresión menor clásica (i, iv, V). El E resuelve de vuelta al Am.
+Troca de acordes C–G–Am–Em com rasgueado pop|Chord change C–G–Am–Em with pop strumming|Cambio de acordes C–G–Am–Em con rasgueo pop
+Quatro acordes abertos com o padrão pop (pausa no tempo 2). Troque sem parar a mão direita.|Four open chords with the pop pattern (rest on beat 2). Change chords without stopping your strumming hand.|Cuatro acordes abiertos con el patrón pop (pausa en el tiempo 2). Cambia sin parar la mano derecha.
+Troca com pestana F · Am · Dm · C|Barre change F · Am · Dm · C|Cambio con cejilla F · Am · Dm · C
+O F com pestana entre acordes abertos. Solte a pressão do indicador ao trocar e prepare o dedo antes do tempo 1.|The barre F among open chords. Release index-finger pressure as you change and prepare it before beat 1.|El F con cejilla entre acordes abiertos. Suelta la presión del índice al cambiar y prepáralo antes del tiempo 1.
+Troca com pestana Bm · G · D · A|Barre change Bm · G · D · A|Cambio con cejilla Bm · G · D · A
+Bm com pestana na casa 2 seguido de três acordes abertos. Uma progressão de muitas músicas.|Barre Bm on fret 2 followed by three open chords. A progression from many songs.|Bm con cejilla en el traste 2 seguido de tres acordes abiertos. Una progresión de muchas canciones.
+Troca com pestana Gm · Cm · D|Barre change Gm · Cm · D|Cambio con cejilla Gm · Cm · D
+Dois acordes menores com pestana (formas de Mi e Lá menores) e um aberto. Mantenha o ritmo na troca.|Two barre minor chords (Em and Am shapes) and one open chord. Keep the rhythm through the change.|Dos acordes menores con cejilla (formas de Mi y La menor) y uno abierto. Mantén el ritmo en el cambio.
 Uma passada por compasso, só dois acordes. Troque de acorde antes do próximo tempo 1.|One strum per bar, just two chords. Change chord before the next beat 1.|Una pasada por compás, solo dos acordes. Cambia de acorde antes del próximo tiempo 1.
 Troca de acordes Am–C–G–Em|Chord change Am–C–G–Em|Cambio de acordes Am–C–G–Em
 Uma passada por compasso, agora com quatro acordes. Troque antes do próximo tempo 1.|One strum per bar, now with four chords. Change before the next beat 1.|Una pasada por compás, ahora con cuatro acordes. Cambia antes del próximo tiempo 1.

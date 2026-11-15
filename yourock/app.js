@@ -133,7 +133,10 @@ function fretboardSVG(ex, lefty, label, horiz) {
 }
 function slotLabel(i, sub) { const b = Math.floor(i / sub) + 1, r = i % sub; return sub === 2 ? (r ? '&' : b) : (r === 0 ? b : ['', 'e', '&', 'a'][r]); }
 const CHV = {};   // cache: acorde -> digitação mais simples (mesma da seção Acordes)
+// formas de pestana "de livro" (a busca automática às vezes sugere variantes com corda solta, menos usadas na prática)
+const CHSTD = { F: { f: [1, 3, 3, 2, 1, 1], barre: { fret: 1, from: 0, to: 5 } }, Bb: { f: [-1, 1, 3, 3, 3, 1], barre: { fret: 1, from: 1, to: 5 } }, Bm: { f: [-1, 2, 4, 4, 3, 2], barre: { fret: 2, from: 1, to: 5 } }, 'F#m': { f: [2, 4, 4, 2, 2, 2], barre: { fret: 2, from: 0, to: 5 } }, Gm: { f: [3, 5, 5, 3, 3, 3], barre: { fret: 3, from: 0, to: 5 } }, Cm: { f: [-1, 3, 5, 5, 4, 3], barre: { fret: 3, from: 1, to: 5 } } };
 function chordMini(name) {
+  if (CHSTD[name]) return CHSTD[name];
   if (!(name in CHV)) { const c = parseChord(name); CHV[name] = c ? (findVoicings(c.root, QUAL.find(x => x.k === c.q).iv, c.bass)[0] || null) : null; }
   return CHV[name];
 }
