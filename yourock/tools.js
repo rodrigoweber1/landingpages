@@ -220,7 +220,7 @@ function findVoicings(root, iv, bass) {
       const fr = snd.filter(s => cur[s] > 0); let fingers = 0, barre = null;
       if (fr.length) {
         const mn = Math.min(...fr.map(s => cur[s])), atMn = fr.filter(s => cur[s] === mn);
-        const canBarre = atMn.length >= 2 && !snd.some(s => s >= atMn[0] && s <= atMn[atMn.length - 1] && cur[s] === 0);
+        const canBarre = atMn.length >= 2 && atMn[atMn.length - 1] - atMn[0] >= 3 && !snd.some(s => s >= atMn[0] && s <= atMn[atMn.length - 1] && cur[s] === 0);
         if (canBarre) { barre = { fret: mn, from: atMn[0], to: atMn[atMn.length - 1] }; fingers = 1 + fr.filter(s => cur[s] > mn).length; } else fingers = fr.length;
       }
       if (fingers > 4) return;

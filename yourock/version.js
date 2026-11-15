@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.4.17';
+var APP_VERSION = '1.4.18';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Diagramas de acordes: a faixa de pestana só aparece quando é pestana de verdade (ex.: o D não tem mais faixa entre o A e o F#)', en: 'Chord diagrams: the barre bar only shows for real barres (e.g. D no longer has a bar between A and F#)', es: 'Diagramas de acordes: la franja de cejilla solo aparece en cejillas reales (p. ej. el D ya no tiene franja entre A y F#)' },
   { pt: '27 exercícios novos de troca de acordes: abertos (G–C, D–A, G–D–Em–C, A–D–E, Am–Dm–E, C–G–Am–Em) e com pestana (Am–F no Nível II, F·Am·Dm·C, Bm·G·D·A, Gm·Cm·D)', en: '27 new chord-change exercises: open (G–C, D–A, G–D–Em–C, A–D–E, Am–Dm–E, C–G–Am–Em) and barre (Am–F at Level II, F·Am·Dm·C, Bm·G·D·A, Gm·Cm·D)', es: '27 ejercicios nuevos de cambio de acordes: abiertos (G–C, D–A, G–D–Em–C, A–D–E, Am–Dm–E, C–G–Am–Em) y con cejilla (Am–F en el Nivel II, F·Am·Dm·C, Bm·G·D·A, Gm·Cm·D)' },
   { pt: 'Exercícios de troca de acordes agora são da área Acordes (antes apareciam como Ritmo)', en: 'Chord-change exercises are now in the Chords area (they used to show as Rhythm)', es: 'Los ejercicios de cambio de acordes ahora son del área Acordes (antes aparecían como Ritmo)' },
   { pt: 'Biblioteca: busca corrigida (ignora acentos, aceita várias palavras e funciona no idioma escolhido)', en: 'Library: search fixed (ignores accents, accepts several words and works in the chosen language)', es: 'Biblioteca: búsqueda corregida (ignora acentos, acepta varias palabras y funciona en el idioma elegido)' },
