@@ -366,6 +366,7 @@ let cleanup = () => {};
 function render() {
   cleanup(); cleanup = () => {}; stopRun();
   const h = (location.hash || '#/home').slice(2).split('?')[0], r = routes[h] ? h : 'home';
+  if (r === 'train') TLOPEN = false;   // dropdown de exercícios sempre começa fechado
   if (r === 'home' && !DB.placed && !DB.placeSkip && !DB.sessions.length) { location.hash = '#/quiz'; return; }
   closeTools(); $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navBotHTML(r); const gb = $('#gearBtn'); if (gb) gb.classList.toggle('on', r === 'settings');
   view.innerHTML = ''; routes[r](); window.scrollTo(0, 0);
@@ -468,7 +469,7 @@ function viewTrilha() {
     <div class="row small"><span class="chip">⏱ ${L.session}</span><span class="chip">🎯 precisão ≥ ${L.thr}%</span><span class="chip">✔ ${L.needClean} passadas limpas para subir</span><span class="chip">↑ passo de ${L.step} BPM</span></div>
     ${TL > cur ? `<div class="ins warn" style="margin-top:12px">Este nível é mais avançado que o seu momento. Recomendo dominar antes ${Math.round(UNLOCK_AT * 100)}% do Nível ${LEVELS[TL - 1].roman} (hoje: ${Math.round(100 * prev.pct)}%). Você pode treinar mesmo assim.</div>` : ''}
     <div class="row" style="margin:14px 0"><button class="btn pri" data-act="guided" data-l="${TL}">▶ Sessão guiada (${gs.length} exercícios, ~${gs.length * 4} min)</button><button class="btn" data-act="startToday2">Treino de hoje</button>${DB.routines.map(r => `<button class="btn sm" data-act="playR" data-id="${r.id}">${esc(r.name)}</button>`).join('')}</div>
-    <details class="exdd"${TLOPEN ? ' open' : ''} ontoggle="TLOPEN = this.open"><summary><span>Exercícios do Nível ${L.roman} (${LV_EX[TL].length})</span></summary>
+    <details class="exdd"${TLOPEN ? ' open' : ''} ontoggle="TLOPEN = this.open"><summary><span>Nível ${L.roman} · ${L.name}</span><span class="mut small">${LV_EX[TL].length} exercícios</span></summary>
     <div class="qlist">${LV_EX[TL].map((id, i) => { const e = EXMAP[id], b = DB.best[id], m = isMastered(id), clean = (b && b.clean) || 0;
       return `<div class="qi" style="flex-wrap:wrap"><span style="width:22px;font-size:18px;color:${m ? 'var(--ok)' : b ? 'var(--warn)' : 'var(--mut)'}">${m ? '●' : b ? '◐' : '○'}</span><div style="flex:1;min-width:160px"><b>${i + 1}. ${esc(e.name)}</b> ${pill(e.focus)}<div class="mut small">${esc(e.desc)}</div><div class="meter" style="margin-top:6px;max-width:260px"><b style="width:${Math.min(100, Math.round(100 * clean / e.target))}%;background:${m ? 'var(--ok)' : L.color}"></b></div><div class="small mut">${clean ? clean + ' BPM limpos' : 'não iniciado'} · começar em ${e.bpm} · meta ${e.target} BPM · ${subText(e, e.type === 'rhythm' ? e.sub : LEVELS[e.lvl].sub)}</div></div><button class="btn sm pri" data-act="train1" data-id="${id}">▶</button></div>`; }).join('')}</div></details></div>`;
 }
@@ -559,7 +560,7 @@ const act = {
   vl(d) { VF.lvl = d.k === 'all' ? 'all' : +d.k; viewVault(); },
   train1(d) { setQueue([d.id]); },
   async upd() { toast('Atualizando…'); try { for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); for (const c of await caches.keys()) await caches.delete(c); } catch (e) {} location.reload(); },
-  tl(d) { TL = +d.l; TLOPEN = true; viewTrilha(); const c = $('#lvlDetail'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); },   // mostra o nível escolhido: abre a lista e rola até ela
+  tl(d) { TL = +d.l; viewTrilha(); const c = $('#lvlDetail'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); },   // mostra o nível escolhido: abre a lista e rola até ela
   guided(d) { setQueue(guided(+d.l)); },
   addR(d) { const r = DB.routines.find(x => x.id === DB.active); if (!r) return toast('Crie uma rotina primeiro'); r.items.push(d.id); save(); toast('Adicionado a "' + r.name + '"'); },
   fav(d) { const i = DB.fav.indexOf(d.id); i >= 0 ? DB.fav.splice(i, 1) : DB.fav.push(d.id); save(); vaultList(); },

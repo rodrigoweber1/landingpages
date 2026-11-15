@@ -164,3 +164,5 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 /* menu inferior: rotulos longos (ex.: "Herramientas") cabem dentro do destaque */
 .nav.bottom a>span,.nav.bottom button>span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px;letter-spacing:-.01em}
 .nav.bottom a,.nav.bottom button{padding-left:1px;padding-right:1px}
+
+.exdd>summary>span:first-child{flex:1}
