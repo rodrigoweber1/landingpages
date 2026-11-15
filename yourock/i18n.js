@@ -9,6 +9,10 @@ const LI = { pt: 0, en: 1, es: 2 }[LANG];
 const D_RAW = `
 Hoje|Today|Hoy
 Tema de cores|Color theme|Tema de color
+Nomes|Names|Nombres
+Sustenidos (#)|Sharps (#)|Sostenidos (#)
+Bemóis (b)|Flats (b)|Bemoles (b)
+Só naturais|Naturals only|Solo naturales
 Descubra seu nível|Find your level|Descubre tu nivel
 8 perguntas rápidas, cerca de 2 minutos. Responda com sinceridade: o objetivo é começar no ponto certo, não passar num teste.|8 quick questions, about 2 minutes. Answer honestly: the goal is to start at the right place, not to pass a test.|8 preguntas rápidas, unos 2 minutos. Responde con sinceridad: el objetivo es empezar en el punto correcto, no aprobar un examen.
 Começar|Start|Empezar

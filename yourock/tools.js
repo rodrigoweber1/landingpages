@@ -104,14 +104,17 @@ function notesBoardSVG() {
   return o + '</svg>';
 }
 function notesDraw() {
+  if (NT.show === 'nat' && NT.sel != null && !NAT.has(NT.sel)) NT.sel = null;
   $('#nBoard').innerHTML = notesBoardSVG();
-  $('#nChips').innerHTML = `<span class="chip ${NT.sel == null ? 'on' : ''}" data-act="nsel" data-pc="-1">Todas</span>` + Array.from({ length: 12 }, (_, pc) => `<span class="chip ${NT.sel === pc ? 'on' : ''}" data-act="nsel" data-pc="${pc}">${pcName(pc)}</span>`).join('');
+  $('#nChips').innerHTML = `<span class="chip ${NT.sel == null ? 'on' : ''}" data-act="nsel" data-pc="-1">Todas</span>` + Array.from({ length: 12 }, (_, pc) => pc).filter(pc => NT.show !== 'nat' || NAT.has(pc)).map(pc => `<span class="chip ${NT.sel === pc ? 'on' : ''}" data-act="nsel" data-pc="${pc}">${pcName(pc)}</span>`).join('');
+  const so = S().names === 'solfejo', fl = S().acc === 'b', nat = NT.show === 'nat', on = b => (b ? 'on' : '');
+  $('#nCtl').innerHTML = `<label class="small mut">Nomes</label><span class="chip ${on(!so)}" data-act="nname" data-v="cifra">C D E</span><span class="chip ${on(so)}" data-act="nname" data-v="solfejo">Dó Ré Mi</span>
+    <label class="small mut" style="margin-left:10px">Acidentes</label><span class="chip ${on(!nat && !fl)}" data-act="nacc" data-v="#">Sustenidos (#)</span><span class="chip ${on(!nat && fl)}" data-act="nacc" data-v="b">Bemóis (b)</span><span class="chip ${on(nat)}" data-act="nacc" data-v="nat">Só naturais</span>`;
 }
 function viewNotes() {
   view.innerHTML = `<h1>Notas da Guitarra</h1><div class="mut" style="margin:4px 0 12px">Toque em uma nota para ouvir e ver todas as posições dela no braço.</div>
-  <div class="card"><div class="row" id="nChips"></div>
-    <div class="row" style="margin-top:12px"><label class="small mut">Mostrar</label><select data-tin="nshow" style="width:auto"><option value="all" ${NT.show === 'all' ? 'selected' : ''}>Todas as notas</option><option value="nat" ${NT.show === 'nat' ? 'selected' : ''}>Só naturais (sem #/b)</option></select>
-    <label class="small mut">Casas</label><select data-tin="nfrets" style="width:auto">${[12, 15, 19, 22].map(n => `<option value="${n}" ${NT.frets === n ? 'selected' : ''}>0 a ${n}</option>`).join('')}</select>
+  <div class="card"><div class="row" id="nCtl" style="margin-bottom:12px"></div><div class="row" id="nChips"></div>
+    <div class="row" style="margin-top:12px"><label class="small mut">Casas</label><select data-tin="nfrets" style="width:auto">${[12, 15, 19, 22].map(n => `<option value="${n}" ${NT.frets === n ? 'selected' : ''}>0 a ${n}</option>`).join('')}</select>
     <label class="small mut">Rótulo</label><select data-tin="nlab" style="width:auto"><option value="name" ${NT.lab === 'name' ? 'selected' : ''}>Nome da nota</option><option value="fret" ${NT.lab === 'fret' ? 'selected' : ''}>Número da casa</option></select></div></div>
   <div class="board" id="nBoard" style="overflow-x:auto"></div>
   <div class="grid g2" style="margin-top:14px">
@@ -254,6 +257,8 @@ const toolActs = {
     Metro.taps.push(t); Metro.taps = Metro.taps.slice(-6);
     if (Metro.taps.length >= 2) { const iv = []; for (let i = 1; i < Metro.taps.length; i++) iv.push(Metro.taps[i] - Metro.taps[i - 1]); const avg = iv.reduce((a, b) => a + b, 0) / iv.length; M().bpm = clampN(Math.round(60000 / avg), 30, 240); mUpdate(); save(); }
   },
+  nname(d) { S().names = d.v; save(); viewNotes(); },
+  nacc(d) { if (d.v === 'nat') NT.show = 'nat'; else { NT.show = 'all'; S().acc = d.v; save(); } viewNotes(); },
   nsel(d) { const pc = +d.pc; NT.sel = pc < 0 || NT.sel === pc ? null : pc; notesDraw(); },
   nplay(d) { ensureCtx(); const s = +d.s, f = +d.f, pc = (OPEN[s] + f) % 12; pluck(AC.currentTime, OPEN[s] + f, 1.6); NT.sel = NT.sel === pc && d.sel !== '1' ? NT.sel : pc; notesDraw(); },
   chRoot(d) { CH.root = +d.pc; if (CH.bass != null) CH.bass = null; chordSync(); chordUpdateText(); chordRes(); },
