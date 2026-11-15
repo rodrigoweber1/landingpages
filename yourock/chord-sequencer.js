@@ -270,7 +270,9 @@
     '.cs p{margin:0;font-size:14px;line-height:20px;color:var(--mut)}' +
     '.cs button,.cs select{font-family:inherit;color:inherit}' +
     '.cs-empty{padding:18px 16px;border:1px dashed var(--line);border-radius:16px;text-align:center}' +
-    '.cs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;max-width:520px}' +
+    '.cs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}' +
+    '@media(min-width:760px){.cs-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}' +
+    '@media(min-width:1000px){.cs-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}' +
     '.cs-slot{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 6px 10px;min-width:0;border-radius:var(--cs-radius);background:var(--bg2);border:1px solid var(--line)}' +
     '.cs-slot[aria-pressed="true"]{border:2px solid var(--acc);padding:7px 5px 9px}' +
     '.cs-top{display:flex;align-items:center;justify-content:space-between;width:100%}' +
