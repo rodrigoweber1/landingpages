@@ -134,7 +134,7 @@ function fretboardSVG(ex, lefty, label, horiz) {
 function slotLabel(i, sub) { const b = Math.floor(i / sub) + 1, r = i % sub; return sub === 2 ? (r ? '&' : b) : (r === 0 ? b : ['', 'e', '&', 'a'][r]); }
 const CHV = {};   // cache: acorde -> digitação mais simples (mesma da seção Acordes)
 // formas de pestana "de livro" (a busca automática às vezes sugere variantes com corda solta, menos usadas na prática)
-const CHSTD = { F: { f: [1, 3, 3, 2, 1, 1], barre: { fret: 1, from: 0, to: 5 } }, Bb: { f: [-1, 1, 3, 3, 3, 1], barre: { fret: 1, from: 1, to: 5 } }, Bm: { f: [-1, 2, 4, 4, 3, 2], barre: { fret: 2, from: 1, to: 5 } }, 'F#m': { f: [2, 4, 4, 2, 2, 2], barre: { fret: 2, from: 0, to: 5 } }, Gm: { f: [3, 5, 5, 3, 3, 3], barre: { fret: 3, from: 0, to: 5 } }, Cm: { f: [-1, 3, 5, 5, 4, 3], barre: { fret: 3, from: 1, to: 5 } } };
+const CHSTD = { E5: { f: [0, 2, 2, -1, -1, -1] }, G5: { f: [3, 5, 5, -1, -1, -1] }, A5: { f: [-1, 0, 2, 2, -1, -1] }, C5: { f: [-1, 3, 5, 5, -1, -1] }, D5: { f: [-1, -1, 0, 2, 3, -1] }, F: { f: [1, 3, 3, 2, 1, 1], barre: { fret: 1, from: 0, to: 5 } }, Bb: { f: [-1, 1, 3, 3, 3, 1], barre: { fret: 1, from: 1, to: 5 } }, Bm: { f: [-1, 2, 4, 4, 3, 2], barre: { fret: 2, from: 1, to: 5 } }, 'F#m': { f: [2, 4, 4, 2, 2, 2], barre: { fret: 2, from: 0, to: 5 } }, Gm: { f: [3, 5, 5, 3, 3, 3], barre: { fret: 3, from: 0, to: 5 } }, Cm: { f: [-1, 3, 5, 5, 4, 3], barre: { fret: 3, from: 1, to: 5 } } };
 function chordMini(name) {
   if (CHSTD[name]) return CHSTD[name];
   if (!(name in CHV)) { const c = parseChord(name); CHV[name] = c ? (findVoicings(c.root, QUAL.find(x => x.k === c.q).iv, c.bass)[0] || null) : null; }
@@ -426,13 +426,22 @@ function routinesHTML() {
     ${editR === r.id ? `<div class="qlist" style="margin-top:8px">${r.items.map((id, i) => `<div class="qi"><span style="flex:1">${esc(EXMAP[id].name)}</span><button class="btn sm" data-act="mvR" data-id="${r.id}" data-i="${i}" data-d="-1">↑</button><button class="btn sm" data-act="mvR" data-id="${r.id}" data-i="${i}" data-d="1">↓</button><button class="btn sm danger" data-act="rmR" data-id="${r.id}" data-i="${i}">✕</button></div>`).join('') || '<div class="mut small">Vazia: adicione exercícios na Biblioteca.</div>'}<button class="btn sm" data-act="renR" data-id="${r.id}">Renomear</button></div>` : ''}</div>`).join('');
 }
 const VF = { q: '', focus: 'all', lvl: 'all', fav: false };
+// a área Acordes se divide em três filtros na Biblioteca (não existe mais um filtro só "Acordes")
+const CHKIND = { chOpen: 'Acordes abertos', chBarre: 'Acordes com pestana', chPower: 'Power chords' };
+const CH_BARRE = new Set(['F', 'Bb', 'Bm', 'F#m', 'Gm', 'Cm']);
+function chordKind(e) {
+  if (e.focus !== 'chords') return null;
+  if (/power/i.test(e.id + ' ' + e.name)) return 'chPower';
+  if (/pestana|barre|formas móveis|duas formas/i.test(e.id + ' ' + e.name) || (e.chords || []).some(c => CH_BARRE.has(c))) return 'chBarre';
+  return 'chOpen';
+}
 function viewVault() {
   view.innerHTML = `<div class="row sp"><h1>Biblioteca</h1><span class="mut small" id="vcount"></span></div>
   <div class="card"><input type="search" id="vq" placeholder="Buscar exercício…" value="${esc(VF.q)}">
   <div class="row" style="margin-top:10px" id="vfocus"></div><div class="row" style="margin-top:8px" id="vlvl"></div>
   <div class="row" style="margin-top:10px"><label class="small mut">Adicionar na rotina:</label><select id="vact" style="width:auto">${DB.routines.map(r => `<option value="${r.id}" ${r.id === DB.active ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select></div></div>
   <div id="vlist" class="grid g2"></div>`;
-  const fch = () => $('#vfocus').innerHTML = ['all', ...Object.keys(FOCUS), 'fav'].map(k => `<span class="chip ${(k === 'fav' ? VF.fav : VF.focus === k) ? 'on' : ''}" data-act="vf" data-k="${k}">${k === 'all' ? 'Todos' : k === 'fav' ? '★ Favoritos' : FOCUS[k].n}</span>`).join('');
+  const fch = () => $('#vfocus').innerHTML = ['all', ...Object.keys(FOCUS).flatMap(k => k === 'chords' ? Object.keys(CHKIND) : [k]), 'fav'].map(k => `<span class="chip ${(k === 'fav' ? VF.fav : VF.focus === k) ? 'on' : ''}" data-act="vf" data-k="${k}">${k === 'all' ? 'Todos' : k === 'fav' ? '★ Favoritos' : CHKIND[k] || FOCUS[k].n}</span>`).join('');
   const lch = () => $('#vlvl').innerHTML = ['all', 1, 2, 3, 4].map(k => `<span class="chip ${VF.lvl === k ? 'on' : ''}" data-act="vl" data-k="${k}">${k === 'all' ? 'Todos os níveis' : LVL[k]}</span>`).join('');
   fch(); lch(); vaultList();
   $('#vq').oninput = e => { VF.q = e.target.value; vaultList(); };
@@ -443,7 +452,7 @@ function vaultList() {
   const nrm = x => String(x).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const words = nrm(VF.q).split(/\s+/).filter(Boolean);
   const hay = e => nrm([e.name, e.desc, FOCUS[e.focus].n, LVL[e.lvl], T(e.name), T(e.desc), T(FOCUS[e.focus].n), T(LVL[e.lvl])].join(' '));
-  const l = EX.filter(e => (VF.focus === 'all' || e.focus === VF.focus) && (VF.lvl === 'all' || e.lvl === VF.lvl) && (!VF.fav || DB.fav.includes(e.id)) && (!words.length || (h => words.every(w => h.includes(w)))(hay(e))));
+  const l = EX.filter(e => (VF.focus === 'all' || (CHKIND[VF.focus] ? chordKind(e) === VF.focus : e.focus === VF.focus)) && (VF.lvl === 'all' || e.lvl === VF.lvl) && (!VF.fav || DB.fav.includes(e.id)) && (!words.length || (h => words.every(w => h.includes(w)))(hay(e))));
   $('#vcount').textContent = l.length + ' exercícios';
   $('#vlist').innerHTML = l.map(e => { const b = DB.best[e.id]; return `<div class="card ex" style="margin:0"><div class="meta">${pill(e.focus)}<span class="tag">${LVL[e.lvl]}</span><span class="tag">${e.type === 'rhythm' ? 'ritmo (por ataque)' : e.len + ' notas'}</span></div>
     <h3>${esc(e.name)}</h3><div class="mut small">${esc(e.desc)}</div><div class="small">Sugerido: ${e.bpm}–${e.target} BPM · ${subText(e, e.type === 'rhythm' ? e.sub : LEVELS[e.lvl].sub)}${b && b.clean ? ` · seu melhor limpo: <b style="color:var(--ok)">${b.clean}</b>` : ''}</div>

@@ -115,6 +115,27 @@ Progresso|Progress|Progreso
 Metrônomo|Metronome|Metrónomo
 Notas|Notes|Notas
 Acordes|Chords|Acordes
+Acordes abertos|Open chords|Acordes abiertos
+Acordes com pestana|Barre chords|Acordes con cejilla
+Power chords|Power chords|Power chords
+Power chords: troca E5–A5|Power chords: change E5–A5|Power chords: cambio E5–A5
+Dois power chords com a mesma forma: só o dedo 1 e o dedo 3 se movem juntos, uma corda abaixo. Uma passada por compasso.|Two power chords with the same shape: just fingers 1 and 3 move together, one string lower. One strum per bar.|Dos power chords con la misma forma: solo los dedos 1 y 3 se mueven juntos, una cuerda más abajo. Una pasada por compás.
+Power chords: troca A5–D5|Power chords: change A5–D5|Power chords: cambio A5–D5
+A mesma forma deslizando uma corda. Toque só as duas ou três cordas do acorde, sem encostar nas outras.|The same shape moving one string over. Play only the two or three strings of the chord without touching the others.|La misma forma desplazándose una cuerda. Toca solo las dos o tres cuerdas del acorde sin tocar las otras.
+Power chords: troca A5–D5–E5|Power chords: change A5–D5–E5|Power chords: cambio A5–D5–E5
+Os três acordes do rock em Lá, em power chords. Deslize a forma sem levantar a mão do braço.|The three rock chords in A, as power chords. Slide the shape without lifting your hand from the neck.|Los tres acordes del rock en La, en power chords. Desliza la forma sin levantar la mano del mástil.
+Power chords: troca E5–G5–A5|Power chords: change E5–G5–A5|Power chords: cambio E5–G5–A5
+O riff clássico do rock: E5, G5 e A5. Quatro batidas em cada acorde, só para baixo.|The classic rock riff chords: E5, G5 and A5. Four beats on each chord, downstrokes only.|Los acordes del riff clásico del rock: E5, G5 y A5. Cuatro golpes en cada acorde, solo hacia abajo.
+Power chords: rasgueado rock E5–G5–A5–C5|Power chords: rock strumming E5–G5–A5–C5|Power chords: rasgueo rock E5–G5–A5–C5
+Quatro power chords com um padrão de rock com pausa e batidas para cima. Mantenha a mão direita em movimento contínuo.|Four power chords with a rock pattern with rests and upstrokes. Keep your right hand moving constantly.|Cuatro power chords con un patrón de rock con pausas y golpes hacia arriba. Mantén la mano derecha en movimiento continuo.
+Power chords com palm mute: E5–G5–A5|Power chords with palm mute: E5–G5–A5|Power chords con palm mute: E5–G5–A5
+Colcheias abafadas com a lateral da mão direita perto da ponte, trocando de power chord a cada compasso.|Muted eighth notes with the side of your right hand near the bridge, changing power chord every bar.|Corcheas apagadas con el lateral de la mano derecha cerca del puente, cambiando de power chord cada compás.
+Power chords: galope E5–G5–A5|Power chords: gallop E5–G5–A5|Power chords: galope E5–G5–A5
+O galope do heavy metal trocando de power chord a cada compasso. Palm mute leve e mão direita relaxada.|The heavy metal gallop changing power chord every bar. Light palm mute and a relaxed right hand.|El galope del heavy metal cambiando de power chord cada compás. Palm mute ligero y mano derecha relajada.
+Power chords G5 · C5 · D5 (nota a nota)|Power chords G5 · C5 · D5 (note by note)|Power chords G5 · C5 · D5 (nota por nota)
+Mesma ideia do E5 · A5 · D5, agora com a fundamental na corda Mi grave (G5) e na corda Lá (C5 e D5). Toque cada nota limpa.|The same idea as E5 · A5 · D5, now with the root on the low E string (G5) and on the A string (C5 and D5). Play each note cleanly.|La misma idea que E5 · A5 · D5, ahora con la fundamental en la cuerda Mi grave (G5) y en la cuerda La (C5 y D5). Toca cada nota limpia.
+Power chords E5 · G5 · A5 (nota a nota)|Power chords E5 · G5 · A5 (note by note)|Power chords E5 · G5 · A5 (nota por nota)
+Os três power chords do riff clássico, uma nota de cada vez. Prepare a forma antes de cada acorde.|The three power chords of the classic riff, one note at a time. Prepare the shape before each chord.|Los tres power chords del riff clásico, una nota cada vez. Prepara la forma antes de cada acorde.
 Afinador|Tuner|Afinador
 Ajustes|Settings|Ajustes
 YouRock – treino de guitarra que escuta você|YouRock – guitar practice that listens to you|YouRock – práctica de guitarra que te escucha
