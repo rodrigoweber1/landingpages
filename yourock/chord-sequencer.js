@@ -193,32 +193,32 @@
     pt: {
       title: 'Sequência de prática',
       intro: 'Monte a sua progressão: escolha a nota e o tipo de cada acorde, toque no diagrama para trocar de posição e aperte play.',
-      empty: 'Ainda não há acordes. Toque em «Adicionar acorde».', add: 'Adicionar acorde', full: 'Sequência cheia (8)',
+      empty: 'Ainda não há acordes. Toque em «Adicionar acorde».', emptyAdd: 'Ainda não há acordes. Toque no + de um acorde acima para adicioná-lo.', add: 'Adicionar acorde', full: 'Sequência cheia (8)',
       drag: 'Arraste para mudar a ordem', rem: 'Remover este acorde', root: 'Nota', type: 'Tipo',
       pos: 'Posição', cycle: 'Trocar de posição', fret: 'casa', open: 'Posição aberta', barre: 'Pestana na casa',
       none: 'Sem posições confortáveis', play: 'Tocar', stop: 'Parar', metro: 'Metrônomo', tempo: 'Velocidade',
       slower: 'Mais lento', faster: 'Mais rápido', mute: 'Silenciar os acordes', unmute: 'Ativar os acordes',
-      beats: 'Tempos por acorde: {n} (toque para mudar)'
+      beats: 'Tempos por acorde: {n} (toque para mudar)', chosen: 'Posição escolhida'
     },
     es: {
       title: 'Secuencia de práctica',
       intro: 'Monta tu propia progresión: elige la nota y el tipo de cada acorde, toca el diagrama para cambiar de posición y pulsa play.',
-      empty: 'Todavía no hay acordes. Pulsa «Añadir acorde».', add: 'Añadir acorde', full: 'Secuencia llena (8)',
+      empty: 'Todavía no hay acordes. Pulsa «Añadir acorde».', emptyAdd: 'Todavía no hay acordes. Pulsa el + de un acorde de arriba para añadirlo.', add: 'Añadir acorde', full: 'Secuencia llena (8)',
       drag: 'Arrastra para cambiar el orden', rem: 'Quitar este acorde', root: 'Nota', type: 'Tipo',
       pos: 'Posición', cycle: 'Cambiar de posición', fret: 'traste', open: 'Posición abierta', barre: 'Cejilla en el traste',
       none: 'Sin posiciones cómodas', play: 'Reproducir', stop: 'Parar', metro: 'Metrónomo', tempo: 'Velocidad',
       slower: 'Más lento', faster: 'Más rápido', mute: 'Silenciar los acordes', unmute: 'Activar los acordes',
-      beats: 'Tiempos por acorde: {n} (toca para cambiar)'
+      beats: 'Tiempos por acorde: {n} (toca para cambiar)', chosen: 'Posición elegida'
     },
     en: {
       title: 'Practice sequence',
       intro: 'Build your own progression: pick the note and type of each chord, tap the diagram to change position and hit play.',
-      empty: 'No chords yet. Tap “Add chord”.', add: 'Add chord', full: 'Sequence full (8)',
+      empty: 'No chords yet. Tap “Add chord”.', emptyAdd: 'No chords yet. Tap the + on a chord above to add it.', add: 'Add chord', full: 'Sequence full (8)',
       drag: 'Drag to change the order', rem: 'Remove this chord', root: 'Note', type: 'Type',
       pos: 'Position', cycle: 'Change position', fret: 'fret', open: 'Open position', barre: 'Barre at fret',
       none: 'No comfortable shapes', play: 'Play', stop: 'Stop', metro: 'Metronome', tempo: 'Speed',
       slower: 'Slower', faster: 'Faster', mute: 'Mute the chords', unmute: 'Turn the chords on',
-      beats: 'Beats per chord: {n} (tap to change)'
+      beats: 'Beats per chord: {n} (tap to change)', chosen: 'Chosen position'
     }
   };
   var esc = function (x) { return String(x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
@@ -300,6 +300,15 @@
    * 6. COMPONENTE
    * ===================================================================== */
   var MAX = 8;
+  // posição escolhida fora do sequenciador: { frets:[6] (0 = corda 6, -1 = não toca), barre:{fret,from,to} }
+  function customFrom(c) {
+    if (!c || !Array.isArray(c.frets) || c.frets.length !== 6) return null;
+    var f = c.frets.map(function (x) { x = x | 0; return x < -1 ? -1 : x > 24 ? 24 : x; });
+    var fr = f.filter(function (x) { return x > 0; });
+    if (!fr.length && !f.some(function (x) { return x === 0; })) return null;
+    var b = c.barre && c.barre.fret ? { fret: c.barre.fret | 0, from: c.barre.from | 0, to: c.barre.to | 0 } : null;
+    return { f: f, lo: fr.length ? Math.min.apply(null, fr) : 1, hi: fr.length ? Math.max.apply(null, fr) : 1, barre: b };
+  }
   function mount(target, opts) {
     opts = opts || {};
     var host = typeof target === 'string' ? document.querySelector(target) : target;
@@ -316,14 +325,14 @@
     function save() {
       if (opts.onChange) { try { opts.onChange(api.getState()); } catch (e) {} }
       if (!storeKey) return;
-      try { localStorage.setItem(storeKey, JSON.stringify({ sl: S.sl.map(function (x) { return { r: x.r, q: x.q, v: x.v }; }), bpm: S.bpm, mute: S.mute, beats: S.beats })); } catch (e) {}
+      try { localStorage.setItem(storeKey, JSON.stringify({ sl: S.sl.map(function (x) { return { r: x.r, q: x.q, v: x.v, cv: x.cv ? { f: x.cv.f, barre: x.cv.barre } : null }; }), bpm: S.bpm, mute: S.mute, beats: S.beats })); } catch (e) {}
     }
     function load() {
       if (!storeKey) return;
       try {
         var sv = JSON.parse(localStorage.getItem(storeKey) || 'null');
         if (!sv) return;
-        if (Array.isArray(sv.sl)) S.sl = sv.sl.filter(function (x) { return x && x.r >= 0 && x.r < 12 && Q[x.q]; }).slice(0, MAX).map(function (x) { return { r: x.r | 0, q: x.q, v: Math.max(0, x.v | 0) }; });
+        if (Array.isArray(sv.sl)) S.sl = sv.sl.filter(function (x) { return x && x.r >= 0 && x.r < 12 && Q[x.q]; }).slice(0, MAX).map(function (x) { return { r: x.r | 0, q: x.q, v: Math.max(0, x.v | 0), cv: x.cv ? customFrom({ frets: x.cv.f, barre: x.cv.barre }) : null }; });
         if (sv.bpm >= 40 && sv.bpm <= 200) S.bpm = sv.bpm | 0;
         S.mute = !!sv.mute; S.beats = sv.beats === 2 ? 2 : 4;
       } catch (e) {}
@@ -334,6 +343,7 @@
     function V(i) {
       var sl = S.sl[i], k = sl.r + ':' + sl.q;
       if (sl._vk !== k) { sl._vk = k; sl._vs = voicingsCached(P(i)).voicings; }
+      if (sl.cv) return sl.cv;
       return sl._vs.length ? sl._vs[sl.v % sl._vs.length] : null;
     }
     function diagram(i) {
@@ -342,7 +352,7 @@
       var n = S.sl[i]._vs.length;
       var sub = v.barre ? t.barre + ' ' + v.barre.fret : (v.lo <= 4 && v.f.some(function (f) { return f === 0; }) ? t.open : t.fret + ' ' + v.lo);
       return '<button type="button" class="cs-cyc" data-a="cyc" data-i="' + i + '" aria-label="' + esc(t.cycle) + '">' + neckSvg(v, spell(p)[0].pc) +
-        '<small style="margin-top:6px">' + esc(t.pos + ' ' + ((S.sl[i].v % n) + 1) + '/' + n) + '</small><small>' + esc(sub) + '</small></button>';
+        '<small style="margin-top:6px">' + esc(S.sl[i].cv ? t.chosen : t.pos + ' ' + ((S.sl[i].v % n) + 1) + '/' + n) + '</small><small>' + esc(sub) + '</small></button>';
     }
     function slot(i) {
       var sl = S.sl[i], t = D[lang], on = S.run && S.cur === i;
@@ -369,12 +379,12 @@
     function paint() {
       var t = D[lang];
       var h = '<h2>' + esc(t.title) + '</h2><p>' + esc(t.intro) + '</p>';
-      if (!S.sl.length) h += '<p class="cs-empty">' + esc(t.empty) + '</p>';
+      if (!S.sl.length) h += '<p class="cs-empty">' + esc(opts.addButton === false ? t.emptyAdd : t.empty) + '</p>';
       else {
         h += '<div class="cs-grid">' + S.sl.map(function (x, i) { return slot(i); }).join('') + '</div>';
         h += dock();
       }
-      h += '<button type="button" class="cs-add" data-a="add">+ ' + esc(S.sl.length >= MAX ? t.full : t.add) + '</button>';
+      if (opts.addButton !== false) h += '<button type="button" class="cs-add" data-a="add">+ ' + esc(S.sl.length >= MAX ? t.full : t.add) + '</button>';
       host.innerHTML = h;
     }
     function refresh(i) { var d = host.querySelector('.cs-slot[data-i="' + i + '"] .cs-d'); if (d) d.innerHTML = diagram(i); }
@@ -440,7 +450,7 @@
     host.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('[data-a]'); if (!b || b.tagName === 'SELECT') return;
       var a = b.getAttribute('data-a'), i = +b.getAttribute('data-i');
-      if (a === 'cyc') { S.sl[i].v++; save(); refresh(i); if (!S.run) strum(i, null, 0.55); }
+      if (a === 'cyc') { if (S.sl[i].cv) { S.sl[i].cv = null; S.sl[i].v = 0; } else S.sl[i].v++; save(); refresh(i); if (!S.run) strum(i, null, 0.55); }
       else if (a === 'rem') { S.sl.splice(i, 1); if (S.cur >= S.sl.length) S.cur = 0; if (!S.sl.length) stop(true); save(); paint(); }
       else if (a === 'add') { api.add({ root: 'C', q: 'maj' }); }
       else if (a === 'play') {
@@ -464,7 +474,7 @@
       var el = e.target, a = el && el.getAttribute && el.getAttribute('data-a'); if (a !== 'r' && a !== 'q') return;
       var i = +el.getAttribute('data-i'), sl = S.sl[i];
       if (a === 'r') sl.r = +el.value; else sl.q = el.value;
-      sl.v = 0; save(); refresh(i);
+      sl.v = 0; sl.cv = null; save(); refresh(i);
       if (!S.run) strum(i, null, 0.55);
     });
     // BPM: pulsación larga = repetir, cada vez más rápido
@@ -509,7 +519,7 @@
         if (S.sl.length >= MAX) return false;
         var r = rootIndex(c && c.root);
         if (r < 0 || !Q[c && c.q || 'maj']) return false;
-        S.sl.push({ r: r, q: c.q || 'maj', v: Math.max(0, (c.pos | 0)) });
+        S.sl.push({ r: r, q: c.q || 'maj', v: Math.max(0, (c.pos | 0)), cv: customFrom(c) });
         save(); paint(); return true;
       },
       remove: function (i) { if (S.sl[i]) { S.sl.splice(i, 1); if (!S.sl.length) stop(true); save(); paint(); } },
@@ -520,11 +530,11 @@
       setLang: function (l) { lang = D[l] ? l : 'pt'; paint(); },
       /** { chords:[{root,q,pos}], bpm, beats, mute } — para guardar en tu base de datos */
       getState: function () {
-        return { chords: S.sl.map(function (x) { var r = ROOTS[x.r]; return { root: noteName(r[0], r[1], 'en'), q: x.q, pos: x.v }; }), bpm: S.bpm, beats: S.beats, mute: S.mute };
+        return { chords: S.sl.map(function (x) { var r = ROOTS[x.r]; return { root: noteName(r[0], r[1], 'en'), q: x.q, pos: x.v, frets: x.cv ? x.cv.f : undefined, barre: x.cv ? x.cv.barre : undefined }; }), bpm: S.bpm, beats: S.beats, mute: S.mute };
       },
       setState: function (st) {
         if (!st) return;
-        S.sl = []; (st.chords || []).slice(0, MAX).forEach(function (c) { var r = rootIndex(c.root); if (r >= 0 && Q[c.q]) S.sl.push({ r: r, q: c.q, v: Math.max(0, c.pos | 0) }); });
+        S.sl = []; (st.chords || []).slice(0, MAX).forEach(function (c) { var r = rootIndex(c.root); if (r >= 0 && Q[c.q]) S.sl.push({ r: r, q: c.q, v: Math.max(0, c.pos | 0), cv: customFrom(c) }); });
         if (st.bpm >= 40 && st.bpm <= 200) S.bpm = st.bpm | 0;
         if (st.beats) S.beats = st.beats === 2 ? 2 : 4;
         if (st.mute != null) S.mute = !!st.mute;

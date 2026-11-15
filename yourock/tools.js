@@ -147,7 +147,10 @@ const QUAL = [
   { k: 'aug', n: 'Aumentado', iv: [0, 4, 8], al: ['aug', '+'] },
   { k: '5', n: 'Power chord (quinta)', iv: [0, 7], al: ['5'] },
 ];
-const CH = { root: 0, q: '', bass: null, text: 'C', v: [] };
+const CH = { root: 0, q: '', bass: null, text: 'C', v: [], seq: null };
+const T = s => (typeof tr === 'function' ? tr(s) : s);
+// qualidade do buscador -> tipo do sequenciador
+const SEQ_Q = { '': 'maj', m: 'min', 7: 'd7', maj7: 'maj7', m7: 'm7', mmaj7: 'mmaj7', 6: 'six', m6: 'm6', sus2: 'sus2', sus4: 'sus4', '7sus4': 's74', add9: 'add9', 9: 'd9', m9: 'm9', dim: 'dim', dim7: 'dim7', m7b5: 'm7b5', aug: 'aug', 5: 'p5' };
 const LETTER = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 const IVN = { 0: '1', 2: '9', 3: '♭3', 4: '3', 5: '4', 6: '♭5', 7: '5', 8: '♯5', 9: '6', 10: '♭7', 11: '7' };
 function parsePc(l, a) { return (LETTER[l.toUpperCase()] + (a === '#' ? 1 : a === 'b' ? -1 : 0) + 12) % 12; }
@@ -214,7 +217,7 @@ function chordRes() {
   CH.v = findVoicings(CH.root, q.iv, CH.bass);
   $('#chRes').innerHTML = `<div class="card"><div class="row sp"><div><div class="chtitle">${esc(chordTitle(cm))}</div><div class="mut">${q.n}${CH.bass != null ? ' · baixo em ' + pcName(CH.bass) : ''}</div></div><button class="btn pri" data-act="chPlay" data-i="-1">▶ Ouvir acorde</button></div>
     <div class="row small" style="margin-top:10px"><span class="chip">Notas: <b>${esc(names)}</b></span><span class="chip">Fórmula: <b>${ivs}</b></span></div></div>
-    ${CH.v.length ? `<div class="cgrid">${CH.v.map((v, i) => `<div class="card cv" style="margin:0"><div class="small mut" style="min-height:20px">${v.hasOpen ? 'Posição aberta' : 'Casa ' + v.minF}${v.barre ? ' · pestana' : ''} · ${v.fingers} dedo${v.fingers === 1 ? '' : 's'}</div>${chordSVG(v)}<button class="btn sm" data-act="chPlay" data-i="${i}" style="width:100%">▶ Ouvir</button></div>`).join('')}</div>` : '<div class="card mut">Não encontrei uma digitação simples (até 4 dedos) para esse acorde com essa nota no baixo.</div>'}`;
+    ${CH.v.length ? `<div class="cgrid">${CH.v.map((v, i) => `<div class="card cv" style="margin:0"><div class="small mut" style="min-height:20px">${v.hasOpen ? 'Posição aberta' : 'Casa ' + v.minF}${v.barre ? ' · pestana' : ''} · ${v.fingers} dedo${v.fingers === 1 ? '' : 's'}</div>${chordSVG(v)}<div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn sm" data-act="chPlay" data-i="${i}" style="flex:1" aria-label="${T('Ouvir')}" title="${T('Ouvir')}">▶</button><button class="btn sm" data-act="chAdd" data-i="${i}" style="flex:1" aria-label="${T('Adicionar à sequência')}" title="${T('Adicionar à sequência')}">+</button></div></div>`).join('')}</div>` : '<div class="card mut">Não encontrei uma digitação simples (até 4 dedos) para esse acorde com essa nota no baixo.</div>'}`;
 }
 function chordSync() {
   document.querySelectorAll('#chRoots .chip').forEach(c => c.classList.toggle('on', +c.dataset.pc === CH.root));
@@ -231,9 +234,9 @@ function viewChords() {
   chordSync(); chordRes();
   if (window.ChordSequencer) {
     try {
-      const seq = ChordSequencer.mount('#seq', { lang: LANG, names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); } });
+      const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); } });
       if (DB.chordSeq) seq.setState(DB.chordSeq);
-      cleanup = () => seq.destroy();
+      CH.seq = seq; cleanup = () => { CH.seq = null; seq.destroy(); };
     } catch (e) {}
   }
 }
@@ -270,6 +273,13 @@ const toolActs = {
   nsel(d) { const pc = +d.pc; NT.sel = pc < 0 || NT.sel === pc ? null : pc; notesDraw(); },
   nplay(d) { ensureCtx(); const s = +d.s, f = +d.f, pc = (OPEN[s] + f) % 12; pluck(AC.currentTime, OPEN[s] + f, 1.6); NT.sel = NT.sel === pc && d.sel !== '1' ? NT.sel : pc; notesDraw(); },
   chRoot(d) { CH.root = +d.pc; if (CH.bass != null) CH.bass = null; chordSync(); chordUpdateText(); chordRes(); },
+  chAdd(d) {
+    const seq = CH.seq, v = CH.v[+d.i]; if (!seq || !v) return;
+    const eng = ChordSequencer.engine, LT = [0, 2, 4, 5, 7, 9, 11], q = SEQ_Q[CH.q];
+    const r = eng.roots.find(x => (LT[x[0]] + x[1] + 12) % 12 === CH.root);
+    const ok = seq.add({ root: eng.noteName(r[0], r[1], 'en'), q, frets: v.f, barre: v.barre });
+    toast(ok ? T('Adicionado à sequência') : T('A sequência está cheia (8 acordes)'));
+  },
   chPlay(d) {
     ensureCtx(); const i = +d.i, q = QUAL.find(x => x.k === CH.q); let midis;
     if (i < 0) { const v = CH.v[0]; if (v) midis = v.f.map((f, s) => (f >= 0 ? OPEN[s] + f : null)).filter(x => x != null); else { const r = 48 + CH.root; midis = q.iv.map(x => r + x); } }

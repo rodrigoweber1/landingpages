@@ -9,6 +9,10 @@ const LI = { pt: 0, en: 1, es: 2 }[LANG];
 const D_RAW = `
 Hoje|Today|Hoy
 Tema de cores|Color theme|Tema de color
+Adicionar à sequência|Add to sequence|Añadir a la secuencia
+Adicionado à sequência|Added to the sequence|Añadido a la secuencia
+Adicionado à sequência (sem o baixo)|Added to the sequence (without the bass note)|Añadido a la secuencia (sin el bajo)
+A sequência está cheia (8 acordes)|The sequence is full (8 chords)|La secuencia está llena (8 acordes)
 Nomes|Names|Nombres
 Sustenidos (#)|Sharps (#)|Sostenidos (#)
 Bemóis (b)|Flats (b)|Bemoles (b)
@@ -393,6 +397,7 @@ Não reconheci esse acorde. Exemplos: Am, F#m7, Bb, C7, G/B, Dsus4.|I didn't rec
 Não encontrei uma digitação simples (até 4 dedos) para esse acorde com essa nota no baixo.|I couldn't find a simple fingering (up to 4 fingers) for this chord with that bass note.|No encontré una digitación sencilla (hasta 4 dedos) para este acorde con esa nota en el bajo.
 ▶ Ouvir acorde|▶ Hear chord|▶ Escuchar acorde
 ▶ Ouvir|▶ Hear|▶ Escuchar
+Ouvir|Listen|Escuchar
 Notas:|Notes:|Notas:
 Fórmula:|Formula:|Fórmula:
 Posição aberta|Open position|Posición abierta
