@@ -108,17 +108,12 @@ function recommend(min) {
 let TODAY = null;
 
 // ---------- fretboard ----------
-function fretboardSVG(ex, lefty, label) {
+function fretboardSVG(ex, lefty, label, horiz) {
   const notes = ex.notes, fr = notes.map(n => n[1]);
   const lo = Math.min(...fr), hi = Math.max(...fr);
-  const first = lo <= 1 ? 0 : lo, last = Math.max(hi, first + 5), cols = last - first + 1;
-  if (useVBoard()) {
-    const g = vGeom(first, last, lefty); let o = `<svg viewBox="0 0 ${g.W} ${g.H}" xmlns="http://www.w3.org/2000/svg">` + vNeckBase(first, last, lefty, g); const seen = new Set();
-    notes.forEach(([s, f]) => { const k = s + '_' + f; if (seen.has(k)) return; seen.add(k); const t = label === 'fret' ? String(f) : pcName(OPEN[s] + f);
-      o += `<g class="dot" id="d${k}"><circle cx="${g.X(s)}" cy="${g.Y(f)}" r="17"/><text x="${g.X(s)}" y="${g.Y(f)}" style="font-size:${dotFontV(t)}px">${t}</text></g>`; });
-    return o + '</svg>';
-  }
-  const W = 640, H = 214, mL = 34, mR = 12, cw = (W - mL - mR) / cols, X = f => { const x = mL + (f - first + 0.5) * cw; return lefty ? W - x : x; };
+  const mob = window.matchMedia && matchMedia('(max-width:759px)').matches;   // celular: braço horizontal, só o trecho que importa, com casas largas (bolinhas maiores)
+  const first = lo <= 1 ? 0 : lo, last = Math.max(hi, first + (mob ? 4 : 5)), cols = last - first + 1;
+  const mL = 34, mR = 12, W = mob ? mL + mR + cols * 58 : 640, H = 214, cw = (W - mL - mR) / cols, X = f => { const x = mL + (f - first + 0.5) * cw; return lefty ? W - x : x; };
   const L = k => { const x = mL + k * cw; return lefty ? W - x : x; };
   const Y = s => 28 + (5 - s) * 28;
   let o = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
@@ -511,7 +506,7 @@ function viewSettings() {
   <label class="lbl">Rótulo das bolinhas no braço</label><select data-in="label"><option value="note" ${s.label === 'note' ? 'selected' : ''}>Nome da nota</option><option value="fret" ${s.label === 'fret' ? 'selected' : ''}>Número da casa</option></select>
   <label class="lbl">Nomes das notas</label><select data-in="names"><option value="cifra" ${s.names !== 'solfejo' ? 'selected' : ''}>Cifra (C D E F G A B)</option><option value="solfejo" ${s.names === 'solfejo' ? 'selected' : ''}>Solfejo (Dó Ré Mi Fá Sol Lá Si)</option></select>
   <label class="lbl">Acidentes</label><select data-in="acc"><option value="#" ${s.acc !== 'b' ? 'selected' : ''}>Sustenidos (C#, D#…)</option><option value="b" ${s.acc === 'b' ? 'selected' : ''}>Bemóis (Db, Eb…)</option></select>
-  <label class="lbl"><input type="checkbox" data-in="boardV" ${s.boardV !== false ? 'checked' : ''}> Braço na vertical no celular (bolinhas maiores)</label>
+  <label class="lbl"><input type="checkbox" data-in="boardV" ${s.boardV !== false ? 'checked' : ''}> Braço na vertical no celular, na tela Notas (bolinhas maiores)</label>
   <label class="lbl"><input type="checkbox" data-in="lefty" ${s.lefty ? 'checked' : ''}> Modo canhoto (espelha o braço)</label></div>
   <div class="card"><h2>Sobre</h2><div class="row sp"><div><b>YouRock</b> <span class="mut">v${APP_VERSION}</span><div class="mut small">${APP_DATE}</div></div><button class="btn sm" data-act="upd">Atualizar app</button></div>
   <div class="small" style="margin-top:12px"><b>Novidades</b></div><ul class="small mut" style="margin:6px 0 0;padding-left:18px">${APP_NOTES.map(n => `<li>${esc(n[LANG] || n.pt)}</li>`).join('')}</ul></div>
@@ -555,7 +550,7 @@ const act = {
   guided(d) { setQueue(guided(+d.l)); },
   addR(d) { const r = DB.routines.find(x => x.id === DB.active); if (!r) return toast('Crie uma rotina primeiro'); r.items.push(d.id); save(); toast('Adicionado a "' + r.name + '"'); },
   fav(d) { const i = DB.fav.indexOf(d.id); i >= 0 ? DB.fav.splice(i, 1) : DB.fav.push(d.id); save(); vaultList(); },
-  prev(d) { const el = $('#pv-' + d.id); if (el.innerHTML) { el.innerHTML = ''; return; } const e = EXMAP[d.id]; el.innerHTML = '<div class="board" style="margin-top:8px">' + (e.type === 'notes' ? fretboardSVG(e, S().lefty, S().label) : strumHTML(e)) + '</div>'; },
+  prev(d) { const el = $('#pv-' + d.id); if (el.innerHTML) { el.innerHTML = ''; return; } const e = EXMAP[d.id]; el.innerHTML = '<div class="board" style="margin-top:8px">' + (e.type === 'notes' ? fretboardSVG(e, S().lefty, S().label, true) : strumHTML(e)) + '</div>'; },
   async run() {
     ensureEx(); if (!Sess.ex) return;
     if (Sess.run && !Sess.demo) { stopRun(); micOff(); return; }

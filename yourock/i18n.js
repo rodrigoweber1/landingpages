@@ -9,7 +9,7 @@ const LI = { pt: 0, en: 1, es: 2 }[LANG];
 const D_RAW = `
 Hoje|Today|Hoy
 Tema de cores|Color theme|Tema de color
-Braço na vertical no celular (bolinhas maiores)|Vertical fretboard on phones (bigger dots)|Mástil en vertical en el móvil (puntos más grandes)
+Braço na vertical no celular, na tela Notas (bolinhas maiores)|Vertical fretboard on phones, in the Notes screen (bigger dots)|Mástil en vertical en el móvil, en la pantalla Notas (puntos más grandes)
 Adicionar à sequência|Add to sequence|Añadir a la secuencia
 Adicionado à sequência|Added to the sequence|Añadido a la secuencia
 Adicionado à sequência (sem o baixo)|Added to the sequence (without the bass note)|Añadido a la secuencia (sin el bajo)
