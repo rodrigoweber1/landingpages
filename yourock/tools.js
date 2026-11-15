@@ -23,7 +23,7 @@ function fretMarks(X, y, from, to) {
 // ---- braço na vertical (celular): cordas em colunas, casas descendo, como nos diagramas de acorde ----
 const useVBoard = () => S().boardV !== false && window.matchMedia && matchMedia('(max-width:759px)').matches;
 function vGeom(first, last, lefty) {
-  const W = 340, mL = 40, mR = 36, SP = (W - mL - mR) / 5, FH = 44, base = first === 0 ? 1 : first, nutY = first === 0 ? 70 : 34;
+  const W = 340, mL = 40, mR = 36, SP = (W - mL - mR) / 5, FH = 44, base = first === 0 ? 1 : first, nutY = 34;
   const X = s => mL + (lefty ? 5 - s : s) * SP, Y = f => (f === 0 ? nutY - 24 : nutY + (f - base + 0.5) * FH);
   return { W, H: nutY + (last - base + 1) * FH + 12, X, Y, nutY, base, FH, rows: last - base + 1 };
 }
@@ -43,7 +43,7 @@ const dotFontV = t => (t.length <= 2 ? 13 : t.length === 3 ? 11 : 10);
 function notesBoardVSVG() {
   const N = NT.frets, g = vGeom(0, N, S().lefty);
   let o = `<svg viewBox="0 0 ${g.W} ${g.H}" xmlns="http://www.w3.org/2000/svg">` + vNeckBase(0, N, S().lefty, g);
-  for (let f = 0; f <= N; f++) for (let s = 0; s < 6; s++) {
+  for (let f = 1; f <= N; f++) for (let s = 0; s < 6; s++) {   // sem bolinhas nas cordas soltas: os nomes das cordas estão no topo
     const pc = (OPEN[s] + f) % 12; if (NT.show === 'nat' && !NAT.has(pc)) continue;
     const cls = 'dot' + (NT.sel != null ? (pc === NT.sel ? ' sel' : ' dim') : ''), t = S().label === 'fret' ? String(f) : pcName(pc);
     o += `<g class="${cls}" data-act="nplay" data-s="${s}" data-f="${f}" style="cursor:pointer"><circle cx="${g.X(s)}" cy="${g.Y(f)}" r="17"/><text x="${g.X(s)}" y="${g.Y(f)}" style="font-size:${dotFontV(t)}px">${t}</text></g>`;
@@ -134,8 +134,8 @@ function notesBoardSVG() {
   for (let k = 1; k <= N + 1; k++) o += `<line class="${k === 1 ? 'nut' : 'fret'}" x1="${L(k)}" x2="${L(k)}" y1="${Y(5) - 10}" y2="${Y(0) + 10}"/>`;
   for (let s = 0; s < 6; s++) { o += `<line class="strg" x1="${L(0)}" x2="${L(N + 1)}" y1="${Y(s)}" y2="${Y(s)}" stroke-width="${1 + (5 - s) * 0.45}"/><text class="slab" x="${lefty ? W - 16 : 16}" y="${Y(s)}">${'EADGBe'[s]}</text>`; }
   o += fretMarks(X, Y(0) + 22, 1, N);
-  for (let f = 0; f <= N; f++) o += `<text class="fnum${isMark(f) ? ' mk' : ''}" x="${X(f)}" y="${H - 6}">${f}</text>`;
-  for (let s = 0; s < 6; s++) for (let f = 0; f <= N; f++) {
+  for (let f = 1; f <= N; f++) o += `<text class="fnum${isMark(f) ? ' mk' : ''}" x="${X(f)}" y="${H - 6}">${f}</text>`;
+  for (let s = 0; s < 6; s++) for (let f = 1; f <= N; f++) {   // sem bolinhas nas cordas soltas (casa 0): os nomes das cordas já estão à esquerda
     const pc = (OPEN[s] + f) % 12; if (NT.show === 'nat' && !NAT.has(pc)) continue;
     const cls = 'dot' + (NT.sel != null ? (pc === NT.sel ? ' sel' : ' dim') : ''), t = S().label === 'fret' ? String(f) : pcName(pc);
     o += `<g class="${cls}" data-act="nplay" data-s="${s}" data-f="${f}" style="cursor:pointer"><circle cx="${X(f)}" cy="${Y(s)}" r="13"/><text x="${X(f)}" y="${Y(s)}" style="font-size:${dotFont(t)}px">${t}</text></g>`;
