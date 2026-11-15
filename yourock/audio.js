@@ -56,7 +56,7 @@ function tone(freq, secs) {
 // ---------- microfone ----------
 const Mic = {
   on: false, an: null, buf: null, stream: null, timer: null,
-  hist: [], onsets: [], last: null, lat: 0.09, avg: 0, lastOnset: -1, rms: 0, gate: 0.012, tune: false,
+  hist: [], onsets: [], last: null, lat: 0.09, avg: 0, lastOnset: -1, rms: 0, gate: 0.012, tune: false, r1: 0, r2: 0,
   // abre o microfone de forma tolerante (Safari/iOS costuma dar InvalidStateError): tenta sem restrições, retoma o contexto
   // e, se o contexto estiver ruim, cria outro. O erro leva a etapa em que falhou (e.stage) para diagnóstico.
   async start() {
@@ -101,10 +101,13 @@ const Mic = {
     let s = 0; for (let i = 0; i < this.buf.length; i++) s += this.buf[i] * this.buf[i];
     const rms = Math.sqrt(s / this.buf.length); this.rms = rms;
     const t = AC.currentTime - this.lat;
-    if (rms > 0.015 && rms > 1.8 * this.avg && rms - this.avg > 0.01 && t - this.lastOnset > 0.07) {
+    // ataque = o volume sobe de repente. A regra nova compara com o volume de 40 ms atrás (uma corda ressoando só cai);
+    // a antiga (contra a média) falhava em cordas soltas que ainda soavam quando a palhetada seguinte chegava
+    const rising = rms > 0.008 && rms > 1.35 * Math.max(this.r2, 0.002) + 0.003;
+    if ((rising || (rms > 0.015 && rms > 1.8 * this.avg && rms - this.avg > 0.01)) && t - this.lastOnset > 0.07) {
       this.onsets.push({ t }); this.lastOnset = t;
     }
-    this.avg = this.avg * 0.88 + rms * 0.12;
+    this.avg = this.avg * 0.88 + rms * 0.12; this.r2 = this.r1; this.r1 = rms;
     let det = null;
     if (rms > this.gate) {
       const r = yin(this.buf, AC.sampleRate);

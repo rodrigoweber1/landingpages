@@ -192,9 +192,15 @@ function judge(ev) {
   const ex = Sess.ex;
   if (ex.type === 'notes') {
     const w0 = ev.t - 0.25 * ev.dur, w1 = ev.t + 0.9 * ev.dur;
-    const ok = Mic.hist.some(d => d.t >= w0 && d.t <= w1 && d.midi === ev.exp);
-    if (!ok) return false;
-    if (ex.rep || ev.prev === ev.exp) return Mic.onsets.some(o => o.t >= w0 && o.t <= w1);
+    const win = Mic.hist.filter(d => d.t >= w0 && d.t <= w1);
+    ev.why = null;
+    if (!win.length) { ev.why = { k: 'silence' }; return false; }
+    if (!win.some(d => d.midi === ev.exp)) {   // o que foi ouvido (a nota mais frequente na janela)
+      const c = {}; win.forEach(d => { c[d.midi] = (c[d.midi] || 0) + 1; });
+      ev.why = { k: 'pitch', heard: +Object.keys(c).sort((x, y) => c[y] - c[x])[0] };
+      return false;
+    }
+    if (ex.rep || ev.prev === ev.exp) { const on = Mic.onsets.some(o => o.t >= w0 && o.t <= w1); if (!on) ev.why = { k: 'attack' }; return on; }
     return true;
   }
   const tol = Math.max(0.09, 0.35 * ev.dur); let best = null;
@@ -261,9 +267,17 @@ function showCursor(ev) {
     if (ev.pos === 0) clearBoardStatus();
   }
 }
+const noteTxt = m => pcName(m) + (Math.floor(m / 12) - 1);
+function showWhy(ev) {
+  const w = $('#why'); if (!w || !ev.why) return;
+  w.textContent = ev.why.k === 'silence' ? '✗ ' + T('Não ouvi som nessa nota')
+    : ev.why.k === 'attack' ? '✗ ' + T('Nota certa, mas não detectei uma nova palhetada')
+    : '✗ ' + T('Ouvi') + ' ' + noteTxt(ev.why.heard) + ' ' + T('em vez de') + ' ' + noteTxt(ev.exp);
+}
 function paintResult(ev) {
   // só registra; as cores aparecem de uma vez no fim da passada (nada pisca fora do tempo durante o treino)
   const k = Sess.ex.type === 'notes' ? 'd' + ev.key : 'sl' + ev.pos;
+  if (ev.res === 'miss') showWhy(ev);
   if (ev.res === 'miss') Sess.statusKey[k] = 'miss'; else if (Sess.statusKey[k] !== 'miss') Sess.statusKey[k] = 'hit';
   const el = document.getElementById(k); if (el) { el.classList.remove('hit', 'miss'); el.classList.add(Sess.statusKey[k]); markDot(el, Sess.statusKey[k]); }
 }
@@ -271,7 +285,8 @@ function applyStatus() {
   Object.entries(Sess.statusKey).forEach(([k, v]) => { const el = document.getElementById(k); if (el) { el.classList.remove('hit', 'miss'); el.classList.add(v); markDot(el, v); } });
 }
 function markDot(el, v) { if (!el.classList.contains('dot')) return; const c = el.querySelector('circle'); if (!c) return; let t = el.querySelector('.mk'); if (!t) { t = document.createElementNS('http://www.w3.org/2000/svg', 'text'); t.setAttribute('class', 'mk'); el.appendChild(t); } t.setAttribute('x', +c.getAttribute('cx') + 10); t.setAttribute('y', +c.getAttribute('cy') - 10); t.textContent = v === 'miss' ? '\u2717' : '\u2713'; }
-function clearBoardStatus() { document.querySelectorAll('.dot.hit,.dot.miss,.slot.hit,.slot.miss').forEach(e => e.classList.remove('hit', 'miss')); document.querySelectorAll('.dot .mk').forEach(e => e.remove()); }
+function clearBoardStatus() { { const w = $('#why'); if (w) w.textContent = ''; }
+  document.querySelectorAll('.dot.hit,.dot.miss,.slot.hit,.slot.miss').forEach(e => e.classList.remove('hit', 'miss')); document.querySelectorAll('.dot .mk').forEach(e => e.remove()); }
 function updHud() {
   const g = id => $('#' + id); if (!g('bpm')) return;
   g('bpm').textContent = Sess.bpm;
@@ -411,6 +426,7 @@ function viewTrain() {
   view.innerHTML = `<div class="row sp"><div><div class="meta row">${pill(ex.focus)}<span class="tag">${LVL[ex.lvl]}</span><span class="tag">meta ${ex.target} BPM</span></div><h2 style="margin-top:6px">${esc(ex.name)}</h2><div class="mut small">${esc(ex.desc)}</div><div class="small" id="durInfo" style="margin-top:6px"></div></div>
     <div class="tag">${Sess.qi + 1} / ${Sess.queue.length}</div></div>
   <div class="board" style="margin-top:12px">${ex.type === 'notes' ? fretboardSVG(ex, lefty, S().label) : strumHTML(ex)}<div class="cd" id="cd"></div></div>
+  <div class="small" id="why" style="min-height:18px;margin-top:6px;color:var(--bad)"></div>
   <div class="hud">
     <div class="box"><div class="bpmrow"><button class="btn sm" data-act="bpm" data-d="-5">−5</button><button class="btn sm" data-act="bpm" data-d="-1">−</button><div class="v" id="bpm">${Sess.bpm}</div><button class="btn sm" data-act="bpm" data-d="1">+</button><button class="btn sm" data-act="bpm" data-d="5">+5</button></div><div class="beats"><i id="bt0"></i><i id="bt1"></i><i id="bt2"></i><i id="bt3"></i></div><div class="l" id="bpmL">BPM</div></div>
     <div class="box"><div class="v" id="acc">–</div><div class="l">precisão da passada</div></div>

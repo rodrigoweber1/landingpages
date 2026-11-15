@@ -82,6 +82,10 @@ Refazer o quiz de nível|Retake the level quiz|Repetir el quiz de nivel
 Idioma|Language|Idioma
 Alto contraste|High contrast|Alto contraste
 Biblioteca|Library|Biblioteca
+Não ouvi som nessa nota|I did not hear a sound on this note|No oí sonido en esta nota
+Nota certa, mas não detectei uma nova palhetada|Right note, but no new pick was detected|Nota correcta, pero no detecté una nueva púa
+Ouvi|I heard|Oí
+em vez de|instead of|en vez de
 Duração:|Duration:|Duración:
 cada passada|each pass|cada pasada
 No fim você escolhe: continuar em loop ou concluir.|At the end you choose: keep looping or finish.|Al final eliges: seguir en bucle o terminar.
