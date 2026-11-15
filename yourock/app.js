@@ -462,8 +462,8 @@ function viewTrilha() {
   view.innerHTML = `<h1>Treinar</h1><div class="mut" style="margin:4px 0 14px">Siga a trilha em ordem. Um nível é recomendado como concluído quando você domina ${Math.round(UNLOCK_AT * 100)}% dos exercícios (BPM limpo ≥ ${Math.round(MASTER_AT * 100)}% da meta).</div>
   ${Sess.queue.length && Sess.ex ? `<div class="card row sp" style="margin:0 0 12px"><div><div class="mut small">Exercício em andamento</div><b>${esc(Sess.ex.name)}</b></div><button class="btn pri" data-act="resumeEx">▶ Continuar</button></div>` : ''}
   <div class="grid g4m">${[1, 2, 3, 4].map(l => { const x = LEVELS[l], p = lvlProgress(l);
-    return `<div class="card lvl ${TL === l ? 'on' : ''} ${l > cur ? 'lock' : ''}" data-act="tl" data-l="${l}" style="--c:${x.color}"><div class="roman">${x.roman}</div><b>${x.name}</b><div class="meter" style="margin:8px 0 4px"><b style="width:${Math.round(100 * p.pct)}%;background:${x.color}"></b></div><div class="small mut">${p.mastered}/${p.total} dominados${l === cur ? ' · <b style="color:var(--acc)">você está aqui</b>' : l > cur ? ' · 🔒 recomendado depois' : ' · ✓'}</div></div>`; }).join('')}</div>
-  <div class="card" style="--c:${L.color};border-left:4px solid ${L.color}"><div class="row sp"><h2>Nível ${L.roman} · ${L.name}</h2><span class="tag">${LVL[TL]}</span></div>
+    return `<div class="card lvl ${TL === l ? 'on' : ''} ${l > cur ? 'lock' : ''}" role="button" tabindex="0" aria-pressed="${TL === l}" data-act="tl" data-l="${l}" style="--c:${x.color}"><div class="roman">${x.roman}</div><b>${x.name}</b><div class="meter" style="margin:8px 0 4px"><b style="width:${Math.round(100 * p.pct)}%;background:${x.color}"></b></div><div class="small mut">${p.mastered}/${p.total} dominados${l === cur ? ' · <b style="color:var(--acc)">você está aqui</b>' : l > cur ? ' · 🔒 recomendado depois' : ' · ✓'}</div></div>`; }).join('')}</div>
+  <div class="card" id="lvlDetail" style="--c:${L.color};border-left:4px solid ${L.color};scroll-margin-top:70px"><div class="row sp"><h2>Nível ${L.roman} · ${L.name}</h2><span class="tag">${LVL[TL]}</span></div>
     <p class="mut" style="margin:8px 0">${L.desc}</p>
     <div class="row small"><span class="chip">⏱ ${L.session}</span><span class="chip">🎯 precisão ≥ ${L.thr}%</span><span class="chip">✔ ${L.needClean} passadas limpas para subir</span><span class="chip">↑ passo de ${L.step} BPM</span></div>
     ${TL > cur ? `<div class="ins warn" style="margin-top:12px">Este nível é mais avançado que o seu momento. Recomendo dominar antes ${Math.round(UNLOCK_AT * 100)}% do Nível ${LEVELS[TL - 1].roman} (hoje: ${Math.round(100 * prev.pct)}%). Você pode treinar mesmo assim.</div>` : ''}
@@ -559,7 +559,7 @@ const act = {
   vl(d) { VF.lvl = d.k === 'all' ? 'all' : +d.k; viewVault(); },
   train1(d) { setQueue([d.id]); },
   async upd() { toast('Atualizando…'); try { for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); for (const c of await caches.keys()) await caches.delete(c); } catch (e) {} location.reload(); },
-  tl(d) { TL = +d.l; viewTrilha(); },
+  tl(d) { TL = +d.l; TLOPEN = true; viewTrilha(); const c = $('#lvlDetail'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); },   // mostra o nível escolhido: abre a lista e rola até ela
   guided(d) { setQueue(guided(+d.l)); },
   addR(d) { const r = DB.routines.find(x => x.id === DB.active); if (!r) return toast('Crie uma rotina primeiro'); r.items.push(d.id); save(); toast('Adicionado a "' + r.name + '"'); },
   fav(d) { const i = DB.fav.indexOf(d.id); i >= 0 ? DB.fav.splice(i, 1) : DB.fav.push(d.id); save(); vaultList(); },
@@ -611,6 +611,7 @@ const act = {
 Object.assign(act, toolActs, quizActs);
 act.theme = d => { S().theme = d.k; save(); applyTheme(); document.querySelectorAll('.th').forEach(b => b.classList.toggle('on', b.dataset.k === d.k)); };
 applyTheme();
+document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.lvl[data-act]')) { e.preventDefault(); e.target.click(); } });
 document.addEventListener('click', e => { const a = e.target.closest('[data-act]'); if (a && act[a.dataset.act]) act[a.dataset.act](a.dataset, a); });
 document.addEventListener('input', e => {
   const k = e.target.dataset.in; if (!k) return; const t = e.target;
