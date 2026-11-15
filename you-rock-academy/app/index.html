@@ -23503,6 +23503,7 @@ function labelBack(lang) {
   });
 }
 function route() {
+  const hadState = !!(history.state && typeof history.state.i === 'number');
   trackNav();
   const raw = (location.hash || '').replace(/^#\/?/, '');
   let name = raw.split('?')[0];
@@ -23515,14 +23516,16 @@ function route() {
   saveLast(name, qs);
   const k = name + '?' + qs;
   if (k !== currentKey) {
-    const first = !currentName;
-    toolsMode = (currentName === 'Herramientas' || currentName === 'Avanzada') && TOOLS.indexOf(name) >= 0;
-    // reload / direct link: no previous screen, so remember the hub we came from, or pick it from the screen itself
-    if (first && TOOLS.indexOf(name) >= 0) {
-      let was = ''; try { was = sessionStorage.getItem('guitar.toolsFor') || ''; } catch (e) {}
-      if (was === name || !Object.keys(SEQS).some((m) => inMenu(m, name))) toolsMode = true;
+    // the hub (Herramientas / Nivel 2) a tool was opened from is remembered per history entry,
+    // so reload, back and forward keep the right side menu
+    let hm = {}; try { hm = JSON.parse(sessionStorage.getItem('guitar.hubMode') || '{}'); } catch (e) {}
+    const isTool = TOOLS.indexOf(name) >= 0;
+    if (hadState && Object.prototype.hasOwnProperty.call(hm, navI)) toolsMode = !!hm[navI] && isTool;
+    else {
+      toolsMode = isTool && (currentName === 'Herramientas' || currentName === 'Avanzada' || (toolsMode && TOOLS.indexOf(currentName) >= 0));
+      if (!currentName && isTool && !Object.keys(SEQS).some((m) => inMenu(m, name))) toolsMode = true;
     }
-    try { if (toolsMode) sessionStorage.setItem('guitar.toolsFor', name); else sessionStorage.removeItem('guitar.toolsFor'); } catch (e) {}
+    try { hm[navI] = toolsMode ? 1 : 0; sessionStorage.setItem('guitar.hubMode', JSON.stringify(hm)); } catch (e) {}
     currentKey = k; mount(name, q);
   }
 }
@@ -23709,8 +23712,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '15 nov 2026 · 10:04';
-  var BUILD_ID = '2026-11-15T10:04';
+  var BUILD = '15 nov 2026 · 10:08';
+  var BUILD_ID = '2026-11-15T10:08';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
