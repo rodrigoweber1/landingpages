@@ -238,7 +238,7 @@ function findVoicings(root, iv, bass) {
 function chordSVG(v) {
   const fr = v.f.map((f, s) => (f > 0 ? f : null)).filter(x => x != null), mn = fr.length ? Math.min(...fr) : 1, base = mn > 3 ? mn : 1;
   const X = s => 24 + s * 19, Y = r => 36 + r * 24;
-  let o = `<svg viewBox="0 0 140 176" xmlns="http://www.w3.org/2000/svg">`;
+  let o = `<svg viewBox="2 14 126 148" xmlns="http://www.w3.org/2000/svg">`;
   for (let r = 0; r <= 5; r++) o += `<line class="${r === 0 && base === 1 ? 'nut' : 'fret'}" x1="${X(0)}" x2="${X(5)}" y1="${Y(r)}" y2="${Y(r)}"/>`;
   for (let s = 0; s < 6; s++) o += `<line class="strg" x1="${X(s)}" x2="${X(s)}" y1="${Y(0)}" y2="${Y(5)}" stroke-width="1.2"/>`;
   if (base > 1) o += `<text class="fnum" x="8" y="${Y(0) + 17}" style="font-size:11px;text-anchor:start">${base}ª</text>`;
