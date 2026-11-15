@@ -308,7 +308,7 @@ function micFail(e) {
   if (n === 'NotAllowedError' || n === 'SecurityError') { Mic.denied = true; toast('Microfone bloqueado: libere nas permissões do site e toque no 🎤.'); }
   else if (n === 'NotFoundError' || n === 'OverconstrainedError') toast('Nenhum microfone encontrado. Dá para treinar com autoavaliação.');
   else if (!navigator.mediaDevices) toast('Este navegador não permite microfone aqui (use HTTPS).');
-  else toast('Não consegui ligar o microfone (' + (n || 'erro') + '). Toque no 🎤 para tentar de novo.');
+  else toast('Não consegui ligar o microfone (' + (n || 'erro') + (e && e.stage ? ' · ' + e.stage : '') + '). Toque no 🎤 para tentar de novo.');
 }
 function refreshCtl() {
   const b = $('#btnRun'); if (!b) return;

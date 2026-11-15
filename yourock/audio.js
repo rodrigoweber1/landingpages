@@ -57,14 +57,31 @@ function tone(freq, secs) {
 const Mic = {
   on: false, an: null, buf: null, stream: null, timer: null,
   hist: [], onsets: [], last: null, lat: 0.09, avg: 0, lastOnset: -1, rms: 0, gate: 0.012, tune: false,
+  // abre o microfone de forma tolerante (Safari/iOS costuma dar InvalidStateError): tenta sem restrições, retoma o contexto
+  // e, se o contexto estiver ruim, cria outro. O erro leva a etapa em que falhou (e.stage) para diagnóstico.
   async start() {
     if (this.on) return true;
     ensureCtx();
-    this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-    const src = AC.createMediaStreamSource(this.stream);
-    this.an = AC.createAnalyser(); this.an.fftSize = 2048; this.an.smoothingTimeConstant = 0;
-    this.buf = new Float32Array(this.an.fftSize);
-    src.connect(this.an);
+    const gum = c => navigator.mediaDevices.getUserMedia(c);
+    let stream, stage = 'mic';
+    try {
+      try { stream = await gum({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }); }
+      catch (e) { if (e && (e.name === 'NotAllowedError' || e.name === 'NotFoundError' || e.name === 'SecurityError')) throw e; stream = await gum({ audio: true }); }
+      stage = 'ctx';
+      if (AC.state !== 'running') { try { await AC.resume(); } catch (e) {} }
+      let src;
+      try { src = AC.createMediaStreamSource(stream); }
+      catch (e) { try { await AC.close(); } catch (_) {} AC = null; ensureCtx(); try { await AC.resume(); } catch (_) {} src = AC.createMediaStreamSource(stream); }
+      stage = 'an';
+      this.stream = stream;
+      this.an = AC.createAnalyser(); this.an.fftSize = this.tune ? 4096 : 2048; this.an.smoothingTimeConstant = 0;
+      this.buf = new Float32Array(this.an.fftSize);
+      src.connect(this.an);
+    } catch (e) {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      this.stream = null; try { e.stage = stage; } catch (_) {}
+      throw e;
+    }
     this.hist = []; this.onsets = []; this.on = true;
     this.timer = setInterval(() => this.tick(), 20);
     return true;
