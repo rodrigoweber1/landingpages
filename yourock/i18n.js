@@ -132,7 +132,23 @@ Reiniciar|Restart|Reiniciar
 ■ Parar|■ Stop|■ Parar
 ▶ Iniciar|▶ Start|▶ Iniciar
 ■ Parar demo|■ Stop demo|■ Parar demo
-🔊 Ouvir exemplo|🔊 Hear example|🔊 Escuchar ejemplo
+🔊 Demo|🔊 Demo|🔊 Demo
+Pestana: F segurado, corda por corda|Barre chord: F held, string by string|Cejilla: F sostenido, cuerda por cuerda
+Pestana na casa 1 (forma de Mi). Segure o acorde e toque nota a nota, de baixo para cima e de volta. Se alguma corda abafar, ajuste o dedo da pestana.|Barre on fret 1 (E shape). Hold the chord and pick each note, up and back down. If a string is muted, adjust your barre finger.|Cejilla en el traste 1 (forma de Mi). Mantén el acorde y toca nota a nota, hacia arriba y de vuelta. Si alguna cuerda suena apagada, ajusta el dedo de la cejilla.
+Pestana: Bm segurado, corda por corda|Barre chord: Bm held, string by string|Cejilla: Bm sostenido, cuerda por cuerda
+Pestana na casa 2 (forma de Lá menor). Mesma ideia do F: pressione com a lateral do indicador e deixe cada nota soar inteira.|Barre on fret 2 (A minor shape). Same idea as F: press with the side of your index finger and let every note ring out.|Cejilla en el traste 2 (forma de La menor). La misma idea que con F: presiona con el lateral del índice y deja sonar cada nota.
+Troca F · C rasgueada|Strummed F · C change|Cambio F · C rasgueado
+Quatro batidas em F (pestana) e quatro em C (aberto), alternando. Prepare o indicador antes do tempo 1 de cada acorde.|Four beats of F (barre), four of C (open), alternating. Get your index finger ready before beat 1 of each chord.|Cuatro golpes en F (cejilla) y cuatro en C (abierto), alternando. Prepara el índice antes del tiempo 1 de cada acorde.
+Troca F · Bb · C rasgueada|Strummed F · Bb · C change|Cambio F · Bb · C rasgueado
+Três acordes que aparecem juntos em muitas músicas: F e Bb com pestana, C aberto. A pestana desliza uma casa e a forma muda de Mi para Lá.|Three chords that show up together in many songs: F and Bb with a barre, open C. The barre moves and the shape changes from E to A.|Tres acordes que aparecen juntos en muchas canciones: F y Bb con cejilla, C abierto. La cejilla se desplaza y la forma cambia de Mi a La.
+Formas móveis: forma de Mi em F · G · A|Moveable shapes: E shape on F · G · A|Formas móviles: forma de Mi en F · G · A
+O mesmo desenho de pestana deslizando pelo braço (casas 1, 3 e 5). Quem sabe uma forma sabe todos os acordes maiores.|The same barre shape sliding up the neck (frets 1, 3 and 5). If you know one shape, you know every major chord.|La misma forma de cejilla deslizándose por el mástil (trastes 1, 3 y 5). Quien conoce una forma conoce todos los acordes mayores.
+Formas móveis: forma de Lá em Bb · C · D|Moveable shapes: A shape on Bb · C · D|Formas móviles: forma de La en Bb · C · D
+A forma de Lá com pestana nas casas 1, 3 e 5. A fundamental fica na corda 5 (Lá): é dela que vem o nome do acorde.|The A shape barred on frets 1, 3 and 5. The root sits on string 5 (A) and gives the chord its name.|La forma de La con cejilla en los trastes 1, 3 y 5. La fundamental está en la cuerda 5 (La) y da nombre al acorde.
+Rasgueado pop com pestana (F · Bm)|Pop strum with barre chords (F · Bm)|Rasgueo pop con cejilla (F · Bm)
+Padrão de pop com pausa no tempo 2, alternando F e Bm. Solte um pouco a pressão da pestana entre as batidas para descansar a mão.|A pop pattern with a pause on beat 2, alternating F and Bm. Ease the barre pressure a little between strums to rest your hand.|Un patrón pop con pausa en el tiempo 2, alternando F y Bm. Afloja un poco la presión de la cejilla entre golpes para descansar la mano.
+Progressão com pestana: F · Bb · Gm · C|Barre chord progression: F · Bb · Gm · C|Progresión con cejilla: F · Bb · Gm · C
+Quatro acordes em ciclo, três deles com pestana (Gm usa a forma de Mi menor na casa 3). Troque sem parar o ritmo, mesmo que o acorde saia imperfeito.|Four chords in a loop, three of them barred (Gm uses the E minor shape on fret 3). Change without stopping the rhythm, even if the chord is imperfect.|Cuatro acordes en bucle, tres con cejilla (Gm usa la forma de Mi menor en el traste 3). Cambia sin parar el ritmo, aunque el acorde no salga perfecto.
 Escutando|Listening|Escuchando
 🎤 Ativar microfone|🎤 Enable microphone|🎤 Activar micrófono
 🚀 Auto-velocidade|🚀 Auto speed|🚀 Auto-velocidad

@@ -289,8 +289,8 @@ function updRate() {
 function refreshCtl() {
   const b = $('#btnRun'); if (!b) return;
   b.textContent = Sess.run && !Sess.demo ? '■ Parar' : '▶ Iniciar'; b.classList.toggle('pri', !(Sess.run && !Sess.demo));
-  $('#btnDemo').textContent = Sess.run && Sess.demo ? '■ Parar demo' : '🔊 Ouvir exemplo';
-  $('#btnMic').classList.toggle('on', Mic.on); $('#btnMic').innerHTML = Mic.on ? '<span class="rec"></span> Escutando' : '🎤 Ativar microfone';
+  $('#btnDemo').textContent = Sess.run && Sess.demo ? '■ Parar demo' : '🔊 Demo';
+  $('#btnMic').classList.toggle('on', Mic.on); $('#btnMic').innerHTML = Mic.on ? '<span class="rec"></span>' : '🎤';
   $('#btnSpeed').classList.toggle('on', S().speed);
 }
 function finishEx(next) {
@@ -391,8 +391,8 @@ function viewTrain() {
     <div class="box"><div class="v" id="timer">0:00</div><div class="l">tempo${ex.type === 'rhythm' ? ' · timing <b id="off">–</b>' : ''}</div></div>
   </div>
   <div id="rate" class="row card"><span id="rateInfo">Autoavaliação</span><button class="btn sm" data-act="rate" data-v="1">✓ Limpa</button><button class="btn sm" data-act="rate" data-v="0.5">✗ Com erros</button></div>
-  <div class="row"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnDemo" data-act="demo">🔊 Ouvir exemplo</button><button class="btn" id="btnMic" data-act="mic">🎤 Ativar microfone</button><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button>
-    ${ex.type === 'notes' ? `<select id="subSel" style="width:auto">${[1, 2, 4].map(v => `<option value="${v}">Notas por clique: ${v}${v === LEVELS[ex.lvl].sub ? ' (padrão do nível)' : ''}</option>`).join('')}</select>` : ''}</div>
+  <div class="row"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnDemo" data-act="demo">🔊 Demo</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">🎤</button><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button>
+    ${ex.type === 'notes' ? `<select id="subSel" style="width:auto">${[1, 2, 4].map(v => `<option value="${v}">Notas por clique: ${v}</option>`).join('')}</select>` : ''}</div>
   <div class="row" style="margin-top:10px"><button class="btn" data-act="finish">Concluir e salvar ▸</button><button class="btn ghost" data-act="skip">Pular</button><button class="btn ghost" data-act="restart">Reiniciar</button><span class="mut small">Dica: use fones para o clique do metrônomo não entrar no microfone. Barra de espaço inicia/para.</span></div>
   <h3 style="margin:18px 0 8px">Fila de hoje</h3><div class="qlist">${Sess.queue.map((q, i) => `<div class="qi ${i === Sess.qi ? 'cur' : ''} ${q.done ? 'done' : ''}" data-act="goQ" data-i="${i}" style="cursor:pointer">${q.done ? '✓' : i + 1}. ${esc(EXMAP[q.id].name)}</div>`).join('')}</div>`;
   const ss = $('#subSel'); if (ss) { ss.value = Sess.sub; ss.onchange = e => { stopRun(); Sess.sub = +e.target.value; updHud(); }; }
