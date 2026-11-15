@@ -112,11 +112,13 @@ function fretboardSVG(ex, lefty, label, horiz) {
   const notes = ex.notes, fr = notes.map(n => n[1]);
   const lo = Math.min(...fr), hi = Math.max(...fr);
   const mob = window.matchMedia && matchMedia('(max-width:759px)').matches;   // celular: braço horizontal, só o trecho que importa, com casas largas (bolinhas maiores)
-  const first = lo <= 1 ? 0 : lo, last = Math.max(hi, first + (mob ? 4 : 5)), cols = last - first + 1;
-  const mL = 34, mR = 12, W = mob ? mL + mR + cols * 58 : 640, H = 214, cw = (W - mL - mR) / cols, X = f => { const x = mL + (f - first + 0.5) * cw; return lefty ? W - x : x; };
-  const L = k => { const x = mL + k * cw; return lefty ? W - x : x; };
+  const first = lo <= 1 ? 0 : lo, last = hi === 0 ? 5 : Math.max(hi, first + (mob ? 4 : 5)), cols = last - first + 1;
+  const g0 = first === 0 ? 0.3 : 1, units = cols - 1 + g0;   // a casa 0 (corda solta) não leva nota: fica estreita, só um respiro entre o nome da corda e a pestana
+  const bnd = k => k <= 0 ? 0 : (first === 0 ? k - 1 + g0 : k);
+  const mL = 34, mR = 12, W = mob || hi === 0 ? mL + mR + units * 58 : 640, H = 214, cw = (W - mL - mR) / units, X = f => { const c = f - first, x = mL + (bnd(c) + bnd(c + 1)) / 2 * cw; return lefty ? W - x : x; };
+  const L = k => { const x = mL + bnd(k) * cw; return lefty ? W - x : x; };
   const Y = s => 28 + (5 - s) * 28;
-  let o = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  let o = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"${hi === 0 ? ` style="max-width:${Math.round(W * 1.5)}px"` : ''}>`;
   [3, 5, 7, 9, 12, 15, 17].forEach(f => { if (f >= first && f <= last) { const two = f === 12; (two ? [-14, 14] : [0]).forEach(dy => o += `<circle class="inlay" cx="${X(f)}" cy="${(Y(2) + Y(3)) / 2 + dy * 0}" r="${two ? 6 : 7}" ${two ? `transform="translate(0 ${dy})"` : ''}/>`); } });
   for (let k = 1; k <= cols; k++) o += `<line class="${first === 0 && k === 1 ? 'nut' : 'fret'}" x1="${L(k)}" x2="${L(k)}" y1="${Y(5) - 10}" y2="${Y(0) + 10}"/>`;
   const openS = new Set(notes.filter(n => n[1] === 0).map(n => n[0]));   // corda solta: não desenha bolinha extra, destaca o nome da corda
