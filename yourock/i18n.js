@@ -558,7 +558,6 @@ const RULES = [
   [/^Nível (\w+) \((.+)\): (\d+\/\d+) exercícios dominados\. Faltam (\d+) para liberar o próximo nível\.$/, 'Level $1 ($2): $3 exercises mastered. $4 more to unlock the next level.', 'Nivel $1 ($2): $3 ejercicios dominados. Faltan $4 para desbloquear el siguiente nivel.'],
   [/^Nível (\w+) \((.+)\)$/, 'Level $1 ($2)', 'Nivel $1 ($2)'],
   [/^(\d+) exercícios$/, '$1 exercises', '$1 ejercicios'],
-  [/^a partir do Nível (\w+)$/, 'from Level $1', 'a partir del Nivel $1'],
   [/^Exercícios do Nível (\w+) \((\d+)\)$/, 'Level $1 exercises ($2)', 'Ejercicios del Nivel $1 ($2)'],
   [/^Pergunta (\d+) de (\d+)$/, 'Question $1 of $2', 'Pregunta $1 de $2'],
   [/^Pontuação: (\d+) de (\d+)\. Você pode mudar o nível quando quiser em Ajustes\.$/, 'Score: $1 of $2. You can change your level whenever you want in Settings.', 'Puntuación: $1 de $2. Puedes cambiar el nivel cuando quieras en Ajustes.'],
