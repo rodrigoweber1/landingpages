@@ -8664,7 +8664,7 @@ R.voicings.forEach((v, i) => {
 const sub = v.barre ? t.barreAt + ' ' + v.barre.fret : (v.lo <= 4 && v.f.some((f) => f === 0) ? t.openPos : t.fret + ' ' + v.lo);
 h += '<div style="display: flex; flex-direction: column; gap: 6px; min-width: 0"><button type="button" data-a="play" data-i="' + i + '" aria-label="' + CF_ESC(t.listenAria + ' ' + (i + 1) + ' \u00b7 ' + sub) + '" style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 4px 12px; border: 1px solid #D9D9D9; border-radius: 20px; background: #FFFFFF; color: #121212; font-family: inherit; cursor: pointer; min-width: 0">' +
 this.neck(v, rootPc) +
-'<span style="margin-top: 8px; font-size: 16px; line-height: 20px; font-weight: 700">' + CF_ESC(t.pos) + ' ' + (i + 1) + '</span><span style="font-size: 13px; line-height: 18px; color: #5A5A5A">' + CF_ESC(sub) + '</span><span style="font-size: 13px; line-height: 18px; color: #5A5A5A">\u25b6 ' + CF_ESC(t.listen) + '</span></button><button type="button" data-a="addseq" data-i="' + i + '" style="height: 40px; padding: 0 6px; border: 0; border-radius: 12px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; background: #E31B23; color: #FFFFFF">+ ' + CF_ESC(t.seqAddV) + '</button></div>';
+'<span style="margin-top: 8px; font-size: 16px; line-height: 20px; font-weight: 700">' + CF_ESC(t.pos) + ' ' + (i + 1) + '</span><span style="font-size: 13px; line-height: 18px; color: #5A5A5A">' + CF_ESC(sub) + '</span></button><div style="display: flex; gap: 6px"><button type="button" data-a="play" data-i="' + i + '" aria-label="' + CF_ESC(t.listenAria + ' ' + (i + 1)) + '" title="' + CF_ESC(t.listen) + '" style="flex: 1 1 0; min-width: 0; height: 44px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; cursor: pointer; background: #E9E9E9; color: #121212"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></button><button type="button" data-a="addseq" data-i="' + i + '" aria-label="' + CF_ESC(t.seqAddV) + '" title="' + CF_ESC(t.seqAddV) + '" style="flex: 1 1 0; min-width: 0; height: 44px; padding: 0; border: 0; border-radius: 999px; font-family: inherit; font-size: 24px; line-height: 1; font-weight: 700; cursor: pointer; background: #E31B23; color: #FFFFFF">+</button></div></div>';
 });
 if (R.voicings.length) h += '</div>';
 h += '<p style="margin: 0; font-size: 12px; line-height: 16px; color: #5A5A5A">' + CF_ESC(t.legend) + '</p>';
@@ -8693,14 +8693,14 @@ this.paint();
 this.setChord({ rootL: base.rootL, rootA: base.rootA, q: 'd7' });
 } else if (a === 'addseq' && vs && p.ok) {
 const S = this.SQ, v = +b.getAttribute('data-i'), pc = (CF_LET[p.rootL] + p.rootA + 12) % 12;
-if (S.sl.length >= 8) { b.textContent = CF_D[this.state.lang].seqFull; return; }
+if (S.sl.length >= 8) { b.textContent = '8/8'; setTimeout(() => { if (b.isConnected) b.textContent = '+'; }, 1400); return; }
 let r = this.sqRoots().findIndex((x) => x[0] === p.rootL && x[1] === p.rootA);
 if (r < 0) r = this.sqRoots().findIndex((x) => (CF_LET[x[0]] + x[1] + 12) % 12 === pc);
 S.sl.push({ r, q: p.q, v });
 this.paintSeq();
 this.sqToast();
-b.textContent = '✓ ' + CF_D[this.state.lang].seqDone;
-setTimeout(() => { if (b.isConnected) b.textContent = '+ ' + CF_D[this.state.lang].seqAddV; }, 1400);
+b.textContent = '✓';
+setTimeout(() => { if (b.isConnected) b.textContent = '+'; }, 1400);
 } else if (a === 'play' && vs) {
 this.pluck(vs[+b.getAttribute('data-i')]);
 }
@@ -23764,8 +23764,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '15 nov 2026 · 12:40';
-  var BUILD_ID = '2026-11-15T12:40';
+  var BUILD = '15 nov 2026 · 14:31';
+  var BUILD_ID = '2026-11-15T14:31';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
