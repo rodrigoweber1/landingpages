@@ -140,3 +140,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 
 /* acordes: 3 diagramas lado a lado no celular */
 @media(max-width:759px){.cgrid{grid-template-columns:repeat(3,1fr);gap:8px}.cgrid .cv{padding:8px 6px}.cgrid .cv .small{font-size:10px;line-height:1.25;min-height:26px!important}.cgrid .cv .btn.sm{padding:6px 0;min-height:34px}.cgrid .cv .row{gap:4px!important}}
+
+/* subtítulo da marca: discreto, serifado em itálico com espaçamento; nunca é traduzido */
+.logo .lg{display:flex;flex-direction:column;line-height:1}
+.logo .lsub{margin-top:3px;font:italic 400 11px/1 Georgia,'Times New Roman',serif;letter-spacing:.16em;color:var(--mut);white-space:nowrap}

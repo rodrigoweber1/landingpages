@@ -1,8 +1,9 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.2.4';
+var APP_VERSION = '1.2.5';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
+  { pt: 'Marca com o subtítulo Guitar Tools', en: 'Brand with the Guitar Tools tagline', es: 'Marca con el subtítulo Guitar Tools' },
   { pt: 'Pestana sempre visível nos diagramas e número da casa sem corte (10ª, 12ª)', en: 'Barre always visible in diagrams and fret number no longer clipped (10th, 12th)', es: 'Cejilla siempre visible en los diagramas y número de traste sin recorte (10ª, 12ª)' },
   { pt: 'Rótulo das bolinhas (nota ou casa) vale também para Notas e diagramas de acorde', en: 'Dot labels (note or fret) now apply to Notes and chord diagrams too', es: 'La etiqueta de los puntos (nota o traste) vale también para Notas y diagramas de acorde' },
   { pt: 'Sequência de acordes: até 6 por linha no computador', en: 'Chord sequence: up to 6 per row on desktop', es: 'Secuencia de acordes: hasta 6 por fila en el ordenador' },
