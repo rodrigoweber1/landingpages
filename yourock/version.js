@@ -1,8 +1,9 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.2.7';
+var APP_VERSION = '1.2.8';
 var APP_DATE = '2026-11-15';
 var APP_NOTES = [
+  { pt: 'Teste de nível: quem nunca tocou vai direto ao Nível I, sem as outras perguntas', en: 'Level quiz: if you have never played, you go straight to Level I', es: 'Test de nivel: quien nunca tocó va directo al Nivel I, sin las demás preguntas' },
   { pt: 'Arpejos de acordes passam do Nível I para o Nível II', en: 'Chord arpeggios move from Level I to Level II', es: 'Los arpegios de acordes pasan del Nivel I al Nivel II' },
   { pt: 'Detecção de palhetada melhor em cordas soltas; o app explica o motivo de cada ✗', en: 'Better pick detection on open strings; the app explains each ✗', es: 'Mejor detección de púa en cuerdas al aire; la app explica cada ✗' },
   { pt: 'Marca com o subtítulo Guitar Tools', en: 'Brand with the Guitar Tools tagline', es: 'Marca con el subtítulo Guitar Tools' },

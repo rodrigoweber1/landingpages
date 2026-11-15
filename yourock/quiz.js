@@ -67,7 +67,11 @@ function quizResult() {
 const quizActs = {
   qzStart() { QZ = { i: 0, a: [] }; if (location.hash !== '#/quiz') location.hash = '#/quiz'; else viewQuiz(); },
   qzSkip() { DB.placeSkip = true; save(); location.hash = '#/home'; },
-  qzAns(d) { QZ.a[QZ.i] = +d.v; QZ.i++; viewQuiz(); window.scrollTo(0, 0); },
+  qzAns(d) {
+    QZ.a[QZ.i] = +d.v; QZ.i++;
+    if (QZ.i === 1 && QZ.a[0] === 0) { QZ.a = [0, 0, 0, 0, 0, 0, 0, 3]; QZ.i = QZ_Q.length; }   // nunca tocou: nível I direto, sem as outras perguntas (objetivo = técnica geral)
+    viewQuiz(); window.scrollTo(0, 0);
+  },
   qzBack() { if (QZ.i > 0) QZ.i--; viewQuiz(); },
   qzGo() { setQueue(TODAY.map(p => p.id)); },
   qzHome() { location.hash = '#/home'; },
