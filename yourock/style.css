@@ -57,7 +57,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .board{background:var(--boardbg);border:1px solid var(--line);border-radius:var(--r);padding:8px;position:relative}
 .board svg{width:100%;height:auto;display:block}
 .fret{stroke:var(--fretc);stroke-width:1.5}.nut{stroke:var(--nutc);stroke-width:5}
-.strg{stroke:var(--strc)}.inlay{fill:var(--inlay)}.fnum{fill:var(--lblc);font-size:11px;text-anchor:middle}.slab{fill:var(--lblc);font-size:11px;text-anchor:middle;dominant-baseline:middle}
+.strg{stroke:var(--strc)}.inlay{fill:var(--inlay)}.fnum{fill:var(--lblc);font-size:11px;text-anchor:middle}.fnum.mk{fill:var(--tx);font-weight:700}.fmk{fill:var(--mut)}.slab{fill:var(--lblc);font-size:11px;text-anchor:middle;dominant-baseline:middle}
 .dot circle{fill:var(--dotbg);stroke:var(--dotln);stroke-width:1.5;transition:.12s}
 .dot text{fill:var(--dottx);font-size:11px;font-weight:600;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
 .dot.hit circle{fill:var(--okbg);stroke:var(--ok)}.dot.miss circle{fill:var(--badbg);stroke:var(--bad)}

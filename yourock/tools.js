@@ -12,6 +12,14 @@ function pcName(m, forceCifra) {
   const pc = ((m % 12) + 12) % 12, fl = S().acc === 'b', so = !forceCifra && S().names === 'solfejo';
   return (so ? (fl ? SO_FL : SO_SH) : (fl ? PC_FL : PC_SH))[pc];
 }
+// marcações do braço (casas 3, 5, 7, 9, 12 duplo, 15...) desenhadas abaixo das cordas, junto dos números
+const MARK = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
+const isMark = f => MARK.includes(f);
+function fretMarks(X, y, from, to) {
+  let o = '';
+  MARK.forEach(f => { if (f < from || f > to) return; o += f % 12 === 0 ? `<circle class="fmk" cx="${X(f) - 6}" cy="${y}" r="3.5"/><circle class="fmk" cx="${X(f) + 6}" cy="${y}" r="3.5"/>` : `<circle class="fmk" cx="${X(f)}" cy="${y}" r="3.5"/>`; });
+  return o;
+}
 const dotFont = t => (t.length <= 2 ? 11 : t.length === 3 ? 9 : 8);
 const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -89,13 +97,14 @@ function viewMetro() {
 // ======================================================================
 const NT = { sel: null, show: 'all', frets: 12, lab: 'name' };
 function notesBoardSVG() {
-  const N = NT.frets, W = 1000, H = 215, mL = 44, mR = 10, cw = (W - mL - mR) / (N + 1), lefty = S().lefty;
+  const N = NT.frets, W = 1000, H = 232, mL = 44, mR = 10, cw = (W - mL - mR) / (N + 1), lefty = S().lefty;
   const X = f => { const x = mL + (f + 0.5) * cw; return lefty ? W - x : x; }, L = k => { const x = mL + k * cw; return lefty ? W - x : x; }, Y = s => 28 + (5 - s) * 31;
   let o = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   [3, 5, 7, 9, 12, 15, 17, 19, 21, 24].forEach(f => { if (f > N) return; if (f % 12 === 0) { o += `<circle class="inlay" cx="${X(f)}" cy="${(Y(1) + Y(2)) / 2}" r="6"/><circle class="inlay" cx="${X(f)}" cy="${(Y(3) + Y(4)) / 2}" r="6"/>`; } else o += `<circle class="inlay" cx="${X(f)}" cy="${(Y(2) + Y(3)) / 2}" r="6"/>`; });
   for (let k = 1; k <= N + 1; k++) o += `<line class="${k === 1 ? 'nut' : 'fret'}" x1="${L(k)}" x2="${L(k)}" y1="${Y(5) - 10}" y2="${Y(0) + 10}"/>`;
   for (let s = 0; s < 6; s++) { o += `<line class="strg" x1="${L(0)}" x2="${L(N + 1)}" y1="${Y(s)}" y2="${Y(s)}" stroke-width="${1 + (5 - s) * 0.45}"/><text class="slab" x="${lefty ? W - 16 : 16}" y="${Y(s)}">${'EADGBe'[s]}</text>`; }
-  for (let f = 0; f <= N; f++) o += `<text class="fnum" x="${X(f)}" y="${H - 6}">${f}</text>`;
+  o += fretMarks(X, Y(0) + 22, 1, N);
+  for (let f = 0; f <= N; f++) o += `<text class="fnum${isMark(f) ? ' mk' : ''}" x="${X(f)}" y="${H - 6}">${f}</text>`;
   for (let s = 0; s < 6; s++) for (let f = 0; f <= N; f++) {
     const pc = (OPEN[s] + f) % 12; if (NT.show === 'nat' && !NAT.has(pc)) continue;
     const cls = 'dot' + (NT.sel != null ? (pc === NT.sel ? ' sel' : ' dim') : ''), t = NT.lab === 'fret' ? String(f) : pcName(pc);
