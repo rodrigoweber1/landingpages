@@ -104,7 +104,14 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .nav.bottom button svg{width:22px;height:22px}.nav.bottom button.on{color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,transparent)}
 [data-theme=ardosia] .nav.bottom button{border-radius:999px}[data-theme=ardosia] .nav.bottom button.on{color:var(--tx);background:var(--bg3)}[data-theme=ardosia] .nav.bottom button.on svg{color:var(--acc)}
 .gear{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;color:var(--mut);flex:none}.gear svg{width:22px;height:22px}.gear.on{color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,transparent)}
-@media(min-width:760px){.gear{display:none}}
+@media(min-width:760px){.gear{display:none}.gear.acc{display:flex}}
+.gear .av{font-size:20px;line-height:1}
+.accmsg{margin-top:12px;padding:9px 12px;border-radius:10px;font-size:14px;border:1px solid var(--line)}.accmsg.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}.accmsg.bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent)}
+input[type=email],input[type=password]{background:var(--bg3);border:1px solid var(--line);border-radius:10px;padding:8px 12px;width:100%}
+.pw{display:flex;gap:8px;align-items:center}.pw .btn{flex:none}
+.accLinks{justify-content:space-between;margin-top:14px;font-size:14px;gap:10px;flex-wrap:wrap}.accLinks a{color:var(--acc)}
+.avBig{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:34px;background:var(--bg3);border:2px solid var(--acc);flex:none}
+.avs{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px;margin-top:6px}.avp{font-size:24px;padding:8px 0;border-radius:12px;background:var(--bg3);border:1px solid var(--line)}.avp.on{border-color:var(--acc);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 35%,transparent)}
 #toolsSheet{position:fixed;inset:0;z-index:30}#toolsSheet .tsb{position:absolute;inset:0;background:rgba(0,0,0,.45)}
 #toolsSheet .tsp{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 16px calc(78px + env(safe-area-inset-bottom));background:var(--hdr2);border-top:1px solid var(--line);border-radius:18px 18px 0 0}
 #toolsSheet .tsp a{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 8px;border-radius:14px;background:var(--bg3,rgba(255,255,255,.06));font-size:14px;font-weight:600}

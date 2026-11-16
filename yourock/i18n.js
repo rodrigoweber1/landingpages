@@ -613,6 +613,81 @@ Diminuto com sétima|Diminished seventh|Disminuido con séptima
 Meio-diminuto|Half-diminished|Semidisminuido
 Aumentado|Augmented|Aumentado
 Power chord (quinta)|Power chord (fifth)|Power chord (quinta)
+Conta|Account|Cuenta
+Em breve|Coming soon|Próximamente
+O login ainda não está ativado neste app. Enquanto isso, tudo funciona normalmente e seu progresso fica salvo neste aparelho.|Login is not enabled in this app yet. Meanwhile everything works as usual and your progress is saved on this device.|El inicio de sesión aún no está activado en esta app. Mientras tanto todo funciona con normalidad y tu progreso se guarda en este dispositivo.
+Nova senha|New password|Nueva contraseña
+Crie uma nova senha para a conta|Create a new password for the account|Crea una nueva contraseña para la cuenta
+Repita a nova senha|Repeat the new password|Repite la nueva contraseña
+Salvar nova senha|Save new password|Guardar nueva contraseña
+Recuperar senha|Recover password|Recuperar contraseña
+Criar conta|Create account|Crear cuenta
+Entrar|Sign in|Iniciar sesión
+Informe seu e-mail e enviaremos um link para criar uma nova senha.|Enter your email and we will send you a link to create a new password.|Indica tu correo y te enviaremos un enlace para crear una nueva contraseña.
+Com uma conta, seu progresso (XP, estrelas, rotinas e histórico) acompanha você em qualquer aparelho. O app continua funcionando sem conta.|With an account, your progress (XP, stars, routines and history) follows you on any device. The app keeps working without an account.|Con una cuenta, tu progreso (XP, estrellas, rutinas e historial) te acompaña en cualquier dispositivo. La app sigue funcionando sin cuenta.
+Nome|Name|Nombre
+E-mail|Email|Correo electrónico
+Senha|Password|Contraseña
+Mínimo de 6 caracteres.|At least 6 characters.|Mínimo 6 caracteres.
+Enviar link|Send link|Enviar enlace
+Já tem conta?|Already have an account?|¿Ya tienes cuenta?
+Esqueci a senha|Forgot my password|Olvidé mi contraseña
+Novo por aqui?|New here?|¿Nuevo por aquí?
+Voltar|Back|Volver
+Mostrar senha|Show password|Mostrar contraseña
+Perfil|Profile|Perfil
+treinos|workouts|entrenamientos
+Sincronizar agora|Sync now|Sincronizar ahora
+Editar perfil|Edit profile|Editar perfil
+Avatar|Avatar|Avatar
+Salvar perfil|Save profile|Guardar perfil
+Alterar senha|Change password|Cambiar contraseña
+Sair da conta|Sign out|Cerrar sesión
+Seus dados continuam neste aparelho e na nuvem.|Your data stays on this device and in the cloud.|Tus datos siguen en este dispositivo y en la nube.
+Perfil salvo|Profile saved|Perfil guardado
+Senha alterada|Password changed|Contraseña cambiada
+Você saiu da conta|You signed out|Cerraste sesión
+Progresso sincronizado|Progress synced|Progreso sincronizado
+Sem conexão|No connection|Sin conexión
+Sincronizando…|Syncing…|Sincronizando…
+Sem conexão: seu progresso fica salvo no aparelho e sobe quando voltar.|No connection: your progress is saved on the device and uploads when you are back online.|Sin conexión: tu progreso queda guardado en el dispositivo y se sube al volver.
+Sem conexão. Tente de novo.|No connection. Try again.|Sin conexión. Inténtalo de nuevo.
+E-mail ou senha incorretos.|Wrong email or password.|Correo o contraseña incorrectos.
+Este e-mail já tem conta. Use "Entrar".|This email already has an account. Use "Sign in".|Este correo ya tiene cuenta. Usa "Iniciar sesión".
+Confirme seu e-mail: enviamos um link para a sua caixa de entrada.|Confirm your email: we sent a link to your inbox.|Confirma tu correo: enviamos un enlace a tu bandeja de entrada.
+A senha precisa ter pelo menos 6 caracteres.|The password must have at least 6 characters.|La contraseña debe tener al menos 6 caracteres.
+Muitas tentativas. Aguarde um minuto e tente de novo.|Too many attempts. Wait a minute and try again.|Demasiados intentos. Espera un minuto e inténtalo de nuevo.
+E-mail inválido.|Invalid email.|Correo no válido.
+A nova senha precisa ser diferente da atual.|The new password must be different from the current one.|La nueva contraseña debe ser distinta de la actual.
+Novas contas estão desativadas no momento.|New accounts are disabled at the moment.|Las cuentas nuevas están desactivadas por ahora.
+As senhas não são iguais.|The passwords do not match.|Las contraseñas no coinciden.
+Pronto! Se este e-mail tiver conta, você receberá um link para criar uma nova senha.|Done! If this email has an account, you will receive a link to create a new password.|¡Listo! Si este correo tiene cuenta, recibirás un enlace para crear una nueva contraseña.
+Conta criada! Enviamos um link de confirmação para o seu e-mail. Confirme e depois use "Entrar".|Account created! We sent a confirmation link to your email. Confirm it and then use "Sign in".|¡Cuenta creada! Enviamos un enlace de confirmación a tu correo. Confírmalo y luego usa "Iniciar sesión".
+Lembrete de treino|Practice reminder|Recordatorio de práctica
+Lembrar de treinar todo dia|Remind me to practice every day|Recordarme practicar todos los días
+Horário|Time|Hora
+O lembrete só avisa se você ainda não treinou no dia. A notificação aparece quando o app está aberto ou em segundo plano; com o app fechado, o aviso aparece na tela inicial na próxima vez que você abrir.|The reminder only alerts you if you have not practiced that day. The notification appears while the app is open or in the background; with the app closed, the alert shows on the home screen the next time you open it.|El recordatorio solo avisa si aún no practicaste ese día. La notificación aparece con la app abierta o en segundo plano; con la app cerrada, el aviso aparece en la pantalla de inicio la próxima vez que la abras.
+Hora de treinar!|Time to practice!|¡Hora de practicar!
+Treinar agora|Practice now|Practicar ahora
+Hora de treinar 🎸|Time to practice 🎸|Hora de practicar 🎸
+Sua missão do dia está esperando. Leva poucos minutos.|Your daily mission is waiting. It only takes a few minutes.|Tu misión del día te espera. Lleva pocos minutos.
+Este navegador não suporta notificações. O aviso aparece na tela inicial do app.|This browser does not support notifications. The alert shows on the app home screen.|Este navegador no admite notificaciones. El aviso aparece en la pantalla de inicio de la app.
+Notificações bloqueadas: libere nas permissões do site. Enquanto isso, o aviso aparece na tela inicial.|Notifications blocked: allow them in the site permissions. Meanwhile the alert shows on the home screen.|Notificaciones bloqueadas: permítelas en los permisos del sitio. Mientras tanto el aviso aparece en la pantalla de inicio.
+Trecho|Section|Tramo
+até|to|hasta
+Tudo|All|Todo
+Início do trecho|Section start|Inicio del tramo
+Fim do trecho|Section end|Fin del tramo
+Metrônomo|Metronome|Metrónomo
+Clique durante o exercício|Click during the exercise|Clic durante el ejercicio
+Sempre ligado|Always on|Siempre activado
+Só na contagem inicial|Only during the count-in|Solo en la cuenta inicial
+Mudo (só visual)|Muted (visual only)|Silenciado (solo visual)
+Volume do clique:|Click volume:|Volumen del clic:
+Acentuar o tempo 1 de cada compasso|Accent beat 1 of every bar|Acentuar el tiempo 1 de cada compás
+Escolha início e fim para repetir só uma parte difícil do exercício.|Choose a start and an end to repeat just a hard part of the exercise.|Elige inicio y fin para repetir solo una parte difícil del ejercicio.
+Treinando só o trecho|Practicing only section|Practicando solo el tramo
+em loop. Não conta para o BPM limpo nem para as estrelas.|on loop. It does not count toward clean BPM or stars.|en bucle. No cuenta para el BPM limpio ni para las estrellas.
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });
@@ -712,6 +787,10 @@ const RULES = [
   [/^1 tempo \((.+)\)$/, '1 beat ($1)', '1 tiempo ($1)'],
   [/^(\d+) tempos \((.+)\)$/, '$1 beats ($2)', '$1 tiempos ($2)'],
   [/^0 a (\d+)$/, '0 to $1', '0 a $1'],
+  [/^✓ Sincronizado às (.+)$/, '✓ Synced at $1', '✓ Sincronizado a las $1'],
+  [/^Bem-vindo, (.+)!$/, 'Welcome, $1!', '¡Bienvenido, $1!'],
+  [/^Não foi possível concluir: (.+)$/, 'Could not complete: $1', 'No se pudo completar: $1'],
+  [/^Você ainda não treinou hoje\. Seu lembrete era às (.+)\.$/, 'You have not practiced yet today. Your reminder was set for $1.', 'Aún no practicaste hoy. Tu recordatorio era a las $1.'],
 ];
 const DEF_FOCUS = null;
 

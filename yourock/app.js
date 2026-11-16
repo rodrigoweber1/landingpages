@@ -14,7 +14,7 @@ function loadDB() {
   return fresh();
 }
 let DB = loadDB();
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} };
+const save = () => { DB.uat = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} if (typeof Acct !== 'undefined') Acct.dirty(); };
 const S = () => DB.settings;
 let toastT;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
@@ -200,7 +200,9 @@ function strumHTML(ex) {
 }
 
 // ---------- sessão de treino ----------
-const Sess = { queue: [], qi: 0, ex: null, bpm: 80, sub: 2, run: false, demo: false, passes: [], events: [], ui: -1, cleanStreak: 0, elapsed: 0, lastTick: 0, raf: 0, timer: 0, statusKey: {}, passAcc: null, bestClean: 0, offs: [], loop: false, stopAt: null, ended: false, endT: 0, browse: false };
+const Sess = { queue: [], qi: 0, ex: null, bpm: 80, sub: 2, run: false, demo: false, passes: [], events: [], ui: -1, cleanStreak: 0, elapsed: 0, lastTick: 0, raf: 0, timer: 0, statusKey: {}, passAcc: null, bestClean: 0, offs: [], loop: false, stopAt: null, ended: false, endT: 0, browse: false, secA: 0, secB: null };
+const secRange = () => { const n = Sess.ex.len, a = Math.max(0, Math.min(n - 1, Sess.secA || 0)), b = Math.max(a, Math.min(n - 1, Sess.secB == null ? n - 1 : Sess.secB)); return [a, b, b - a + 1]; };
+const secOn = () => { if (!Sess.ex) return false; const [a, b] = secRange(); return a > 0 || b < Sess.ex.len - 1; };
 const exSecs = () => (+S().exMin || 2) * 60;
 function setQueue(ids, startAt = 0) {
   stopRun(); Sess.queue = ids.map(id => ({ id, done: false })); Sess.qi = startAt; Sess.ex = null; Sess.browse = false;
@@ -213,7 +215,11 @@ function dropPass(pass) {
 function loadEx(i) {
   stopRun(); const q = Sess.queue[i]; if (!q) return; Sess.browse = false; Sess.qi = i; const ex = EXMAP[q.id]; Sess.ex = ex;
   Sess.bpm = (DB.best[ex.id] && DB.best[ex.id].last) || ex.bpm; Sess.sub = ex.type === 'rhythm' ? ex.sub : LEVELS[ex.lvl].sub;
-  Sess.passes = []; Sess.cleanStreak = 0; Sess.elapsed = 0; Sess.bestClean = 0; Sess.offs = []; Sess.passAcc = null; Sess.statusKey = {}; Sess.loop = false; Sess.stopAt = null; Sess.ended = false;
+  Sess.passes = []; Sess.cleanStreak = 0; Sess.elapsed = 0; Sess.bestClean = 0; Sess.offs = []; Sess.passAcc = null; Sess.statusKey = {}; Sess.loop = false; Sess.stopAt = null; Sess.ended = false; Sess.secA = 0; Sess.secB = ex.len - 1;
+}
+function secUI() {
+  const sa = $('#secA'); if (!sa || !Sess.ex) return; const [a, b] = secRange(); sa.value = a; $('#secB').value = b;
+  $('#secInfo').textContent = secOn() ? T('Treinando só o trecho') + ' ' + (a + 1) + '–' + (b + 1) + ' ' + T('em loop. Não conta para o BPM limpo nem para as estrelas.') : T('Escolha início e fim para repetir só uma parte difícil do exercício.');
 }
 function ensureEx() { if (Sess.queue.length && !Sess.ex) loadEx(Sess.qi); }
 function startRun(demo) {
@@ -235,13 +241,13 @@ function schedule() {
   while (Sess.nextT < AC.currentTime + 0.2) {
     const sub = Sess.sub, dur = 60 / Sess.bpm / sub, i = Sess.step, t = Sess.nextT;
     if (Sess.stopAt != null && i - Sess.countSteps >= Sess.stopAt) { if (!Sess.ended) { Sess.ended = true; Sess.endT = t; } Sess.nextT = Infinity; break; }
-    if (i % sub === 0) { click(t, (i / sub) % 4 === 0); Sess.beats.push({ t, n: (i / sub) % 4, ci: i < Sess.countSteps }); }
+    if (i % sub === 0) { const cm = S().clickMode || 'on'; if (cm === 'on' || (cm === 'count' && i < Sess.countSteps)) click(t, S().clickAcc !== false && (i / sub) % 4 === 0, (S().clickVol == null ? 100 : +S().clickVol) / 100); Sess.beats.push({ t, n: (i / sub) % 4, ci: i < Sess.countSteps }); }
     const ni = i - Sess.countSteps;
     if (ni >= 0) {
       if (ni === 0) Sess.playStart = t;
-      const len = ex.len, pos = ni % len, pass = Math.floor(ni / len);
-      const ev = { t, pos, pass, dur, res: null };
-      if (ex.type === 'notes') { ev.exp = midiOf(ex.notes[pos]); ev.prev = midiOf(ex.notes[(pos + len - 1) % len]); ev.key = ex.notes[pos][0] + '_' + ex.notes[pos][1]; if (Sess.demo) pluck(t, ev.exp, dur); }
+      const len = ex.len, [sa, sb, L] = secRange(), pos = sa + ni % L, pass = Math.floor(ni / L);
+      const ev = { t, pos, pass, dur, res: null, last: ni % L === L - 1, first: ni % L === 0 };
+      if (ex.type === 'notes') { ev.exp = midiOf(ex.notes[pos]); ev.prev = midiOf(ex.notes[ni > 0 && ni % L === 0 ? sb : (pos + len - 1) % len]); ev.key = ex.notes[pos][0] + '_' + ex.notes[pos][1]; if (Sess.demo) pluck(t, ev.exp, dur); }
       else ev.exp = ex.pattern[pos] !== '-' ? 1 : null;
       Sess.events.push(ev);
     }
@@ -283,14 +289,14 @@ function frame() {
       if (now < ev.t + 0.9 * ev.dur + 0.06) break;
       ev.res = ev.exp == null ? 'skip' : (judge(ev) ? 'hit' : 'miss');
       if (ev.res !== 'skip') paintResult(ev);
-      if (ev.pos === ex.len - 1) endPass(ev.pass);
+      if (ev.last) endPass(ev.pass);
     }
   } else if (!Sess.demo) {
-    for (const ev of evs) { if (ev.res !== null) continue; if (now < ev.t + ev.dur) break; ev.res = 'unk'; if (ev.pos === ex.len - 1) { Sess.curPass = ev.pass + 1; dropPass(ev.pass); updHud(); showRate(true); break; } }
+    for (const ev of evs) { if (ev.res !== null) continue; if (now < ev.t + ev.dur) break; ev.res = 'unk'; if (ev.last) { Sess.curPass = ev.pass + 1; dropPass(ev.pass); updHud(); showRate(true); break; } }
   }
   const tn = performance.now(); Sess.elapsed += (tn - Sess.lastTick) / 1000; Sess.lastTick = tn; updHud();
   // duração fixa: ao acabar o tempo, termina a passada em andamento e para (a menos que o loop esteja ligado)
-  if (!Sess.loop && !Sess.demo && Sess.stopAt == null && Sess.elapsed >= exSecs()) { const ni = Sess.step - Sess.countSteps, len = ex.len; Sess.stopAt = Math.max(len, Math.ceil(Math.max(ni, 1) / len) * len); }
+  if (!Sess.loop && !Sess.demo && Sess.stopAt == null && Sess.elapsed >= exSecs()) { const ni = Sess.step - Sess.countSteps, len = secRange()[2]; Sess.stopAt = Math.max(len, Math.ceil(Math.max(ni, 1) / len) * len); }
   if (Sess.ended && now > Sess.endT + 0.3 && (!Sess.events.length || now > Sess.endT + 2)) { runDone(); return; }
   Sess.raf = requestAnimationFrame(frame);
 }
@@ -303,6 +309,7 @@ function endPass(pass) {
   applyStatus(); Sess.statusKey = {};
 }
 function passDone(acc) {
+  if (secOn()) { Sess.passAcc = acc; Sess.secPasses = (Sess.secPasses || 0) + 1; Sess.curPass = Sess.passes.length; updHud(); return; }   // treino de trecho: não conta para BPM limpo nem estrelas
   Sess.passes.push({ acc, bpm: Sess.bpm }); Sess.passAcc = acc; Sess.curPass = Sess.passes.length;
   const pp = P(), thr = pp.thr / 100, clean = acc >= thr;
   if (clean) { Sess.cleanStreak++; Sess.bestClean = Math.max(Sess.bestClean, Sess.bpm); } else Sess.cleanStreak = 0;
@@ -319,12 +326,12 @@ function showCursor(ev) {
     document.querySelectorAll('.dot.cur').forEach(e => e.classList.remove('cur'));
     const n = ex.notes[ev.pos], d = $('#d' + n[0] + '_' + n[1]);
     if (d) { void d.getBoundingClientRect(); d.classList.add('cur'); }
-    if (ev.pos === 0) clearBoardStatus();   // resultado da passada anterior some depois de alguns toques
+    if (ev.first) clearBoardStatus();   // resultado da passada anterior some depois de alguns toques
   } else {
     document.querySelectorAll('.slot.cur').forEach(e => e.classList.remove('cur'));
     const s = $('#sl' + ev.pos); if (s) { void s.getBoundingClientRect(); s.classList.add('cur'); }
-    if (ex.chords && ev.pos === 0) { const c = $('#chordNow'); c && (c.textContent = ex.chords[ev.pass % ex.chords.length], chordStripOn(c.textContent)); }
-    if (ev.pos === 0) clearBoardStatus();
+    if (ex.chords && ev.first) { const c = $('#chordNow'); c && (c.textContent = ex.chords[ev.pass % ex.chords.length], chordStripOn(c.textContent)); }
+    if (ev.first) clearBoardStatus();
   }
 }
 const noteTxt = m => pcName(m) + (Math.floor(m / 12) - 1);
@@ -351,7 +358,7 @@ function updHud() {
   const g = id => $('#' + id); if (!g('bpm')) return;
   g('bpm').textContent = Sess.bpm;
   if (g('durInfo') && Sess.ex) {
-    const ps = Sess.ex.len * 60 / Sess.bpm / Sess.sub, nc = P().needClean, fm = x => (x < 90 ? Math.round(x) + ' s' : x < 3600 ? Math.floor(x / 60) + ' min' + (Math.round(x % 60) ? ' ' + Math.round(x % 60) + ' s' : '') : '1 h+');
+    const ps = secRange()[2] * 60 / Sess.bpm / Sess.sub, nc = P().needClean, fm = x => (x < 90 ? Math.round(x) + ' s' : x < 3600 ? Math.floor(x / 60) + ' min' + (Math.round(x % 60) ? ' ' + Math.round(x % 60) + ' s' : '') : '1 h+');
     g('durInfo').textContent = (Sess.loop ? T('🔁 Loop ligado: sem tempo fixo. Toque em Concluir e salvar quando terminar.')
       : `⏱ ${T('Duração:')} ${fm(exSecs())} · ${T('cada passada')} ≈ ${fm(ps)}` + (S().speed ? ` · ${T('Para subir o BPM:')} ${nc} ${T('passadas limpas seguidas')}` : '') + '. ' + T('No fim você escolhe: continuar em loop ou concluir.'));
   }
@@ -376,7 +383,7 @@ function updRate() {
   r.style.display = Mic.on ? 'none' : 'flex';
   r.querySelectorAll('button').forEach(b => { b.disabled = !Sess.rateReady; });
   const i = $('#rateInfo'), ex = Sess.ex;
-  if (i && ex) i.textContent = Sess.rateReady ? 'Como foi a última passada?' : `Autoavaliação: libera ao fim de cada passada (${ex.len} notas ≈ ${Math.round(ex.len * 60 / Sess.bpm / Sess.sub)} s).`;
+  if (i && ex) i.textContent = Sess.rateReady ? 'Como foi a última passada?' : `Autoavaliação: libera ao fim de cada passada (${secRange()[2]} notas ≈ ${Math.round(secRange()[2] * 60 / Sess.bpm / Sess.sub)} s).`;
 }
 // motivo do erro do microfone (antes era uma mensagem genérica); só para de tentar sozinho quando o usuário bloqueou a permissão
 function micFail(e) {
@@ -435,7 +442,7 @@ function navBotHTML(cur) {
     : `<a href="#/${k}" title="${n}" class="${k === cur ? 'on' : ''}"><svg><use href="#${i}"/></svg><span>${n}</span></a>`).join('');
 }
 function closeTools() { const e = $('#toolsSheet'); if (e) e.remove(); }
-const routes = { home: viewHome, vault: viewVault, train: viewTrain, stats: viewStats, metro: viewMetro, notes: viewNotes, chords: viewChords, tuner: viewTuner, settings: viewSettings, quiz: viewQuiz };
+const routes = { home: viewHome, vault: viewVault, train: viewTrain, stats: viewStats, metro: viewMetro, notes: viewNotes, chords: viewChords, tuner: viewTuner, settings: viewSettings, quiz: viewQuiz, account: () => Acct.viewAccount() };
 let cleanup = () => {};
 function render() {
   cleanup(); cleanup = () => {}; stopRun();
@@ -474,7 +481,7 @@ function viewHome() {
     <div class="card kpi"><div class="l">Sequência</div><div class="v">🔥 ${st.streak} <span class="mut" style="font-size:14px">dia${st.streak === 1 ? '' : 's'}</span></div></div>
     <a href="#/train" class="card kpi" style="display:block"><div class="l">Nível atual</div><div class="v" style="color:${LEVELS[curLevel()].color}">${LEVELS[curLevel()].roman} <span class="mut" style="font-size:14px">${LEVELS[curLevel()].name} · ${lvlProgress(curLevel()).mastered}/${lvlProgress(curLevel()).total} dominados</span></div></a>
   </div>
-  ${gameHTML()}
+  ${Reminder.bannerHTML()}${gameHTML()}
   <div class="card">
     <div class="row sp"><div><h2>Treino de hoje</h2><div class="mut small">Escolhido pelos seus pontos fracos e pelo que você não pratica há mais tempo.</div></div>
       <div class="row"><select id="planMin" style="width:auto">${[10, 20, 30, 45, 60].map(m => `<option value="${m}" ${m === S().planMin ? 'selected' : ''}>${m} min</option>`).join('')}</select>
@@ -545,8 +552,16 @@ function viewTrain() {
   <div id="rate" class="row card"><span id="rateInfo">Autoavaliação</span><button class="btn sm" data-act="rate" data-v="1">✓ Limpa</button><button class="btn sm" data-act="rate" data-v="0.5">✗ Com erros</button></div>
   <div class="row"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnDemo" data-act="demo">🔊 Demo</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">🎤</button><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button><button class="btn" id="btnLoop" data-act="loop">🔁 Loop</button>
     ${ex.type === 'notes' ? `<select id="subSel" style="width:auto">${[1, 2, 4].map(v => `<option value="${v}">Notas por clique: ${v}</option>`).join('')}</select>` : ''}</div>
+  <div class="card" style="margin-top:10px"><div class="row" style="gap:8px"><b class="small">🔁 Trecho</b><select id="secA" style="width:auto" aria-label="Início do trecho"></select><span class="mut small">até</span><select id="secB" style="width:auto" aria-label="Fim do trecho"></select><button class="btn sm" data-act="secAll">Tudo</button></div><div class="small mut" id="secInfo" style="margin-top:6px"></div></div>
+  <details class="card" style="margin-top:0"><summary class="small"><b>⚙ Metrônomo</b></summary>
+    <label class="lbl">Clique durante o exercício</label><select data-in="clickMode"><option value="on" ${(S().clickMode || 'on') === 'on' ? 'selected' : ''}>Sempre ligado</option><option value="count" ${S().clickMode === 'count' ? 'selected' : ''}>Só na contagem inicial</option><option value="off" ${S().clickMode === 'off' ? 'selected' : ''}>Mudo (só visual)</option></select>
+    <label class="lbl">Volume do clique: <b id="v-clickVol">${S().clickVol == null ? 100 : S().clickVol}</b>%</label><input type="range" min="10" max="100" step="10" value="${S().clickVol == null ? 100 : S().clickVol}" data-in="clickVol">
+    <label class="lbl"><input type="checkbox" data-in="clickAcc" ${S().clickAcc !== false ? 'checked' : ''}> Acentuar o tempo 1 de cada compasso</label></details>
   <div class="row" style="margin-top:10px"><button class="btn" data-act="finish">Concluir e salvar ▸</button><button class="btn ghost" data-act="skip">Pular</button><button class="btn ghost" data-act="restart">Reiniciar</button><span class="mut small">Dica: use fones para o clique do metrônomo não entrar no microfone. Barra de espaço inicia/para.</span></div>
   <h3 style="margin:18px 0 8px">Fila de hoje</h3><div class="qlist">${Sess.queue.map((q, i) => `<div class="qi ${i === Sess.qi ? 'cur' : ''} ${q.done ? 'done' : ''}" data-act="goQ" data-i="${i}" style="cursor:pointer">${q.done ? '✓' : i + 1}. ${esc(EXMAP[q.id].name)}</div>`).join('')}</div>`;
+  { const sa = $('#secA'), sb = $('#secB'), nm = i => ex.type === 'notes' ? (i + 1) + ' · ' + noteTxt(midiOf(ex.notes[i])) : String(i + 1), opts = Array.from({ length: ex.len }, (_, i) => `<option value="${i}">${nm(i)}</option>`).join('');
+    sa.innerHTML = sb.innerHTML = opts; secUI();
+    sa.onchange = sb.onchange = () => { stopRun(); Sess.secA = +sa.value; Sess.secB = +sb.value; if (Sess.secB < Sess.secA) { if (document.activeElement === sa) Sess.secB = Sess.secA; else Sess.secA = Sess.secB; } secUI(); updHud(); }; }
   const ss = $('#subSel'); if (ss) { ss.value = Sess.sub; ss.onchange = e => { stopRun(); Sess.sub = +e.target.value; updHud(); }; }
   refreshCtl(); updHud(); showRate(false);
   const key =e => { if (e.code === 'Space' && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) { e.preventDefault(); act.run(); } };
@@ -624,6 +639,7 @@ function viewSettings() {
   <label class="lbl">Acidentes</label><select data-in="acc"><option value="#" ${s.acc !== 'b' ? 'selected' : ''}>Sustenidos (C#, D#…)</option><option value="b" ${s.acc === 'b' ? 'selected' : ''}>Bemóis (Db, Eb…)</option></select>
   <label class="lbl"><input type="checkbox" data-in="boardV" ${s.boardV !== false ? 'checked' : ''}> Braço na vertical no celular, na tela Notas (bolinhas maiores)</label>
   <label class="lbl"><input type="checkbox" data-in="lefty" ${s.lefty ? 'checked' : ''}> Modo canhoto (espelha o braço)</label></div>
+  ${Reminder.settingsHTML()}
   <div class="card"><h2>Sobre</h2><div class="row sp"><div><b>YouRock</b> <span class="mut">v${APP_VERSION}</span><div class="mut small">${APP_DATE}</div></div><button class="btn sm" data-act="upd">Atualizar app</button></div>
   ${APP_NOTES.length ? `<div class="small" style="margin-top:12px"><b>Novidades</b></div><ul class="small mut" style="margin:6px 0 0;padding-left:18px">${APP_NOTES.map(n => `<li>${esc(n[LANG] || n.pt)}</li>`).join('')}</ul>` : ''}</div>
   <div class="card"><h2>Teste do microfone</h2><div class="mut small">Ligue, toque uma corda solta e veja: o nível deve passar de ~20%, a nota detectada deve bater com a corda e cada palhetada deve contar um ataque.</div>
@@ -685,6 +701,7 @@ const act = {
   loop() { Sess.loop = !Sess.loop; if (Sess.loop) Sess.stopAt = null; refreshCtl(); updHud(); },
   loopOn() { Sess.loop = true; Sess.stopAt = null; Sess.ended = false; startRun(false); refreshCtl(); updHud(); },
   speed() { S().speed = !S().speed; save(); refreshCtl(); updHud(); },
+  secAll() { Sess.secA = 0; Sess.secB = Sess.ex.len - 1; stopRun(); secUI(); updHud(); },
   bpm(d) { Sess.bpm = Math.max(30, Math.min(240, Sess.bpm + +d.d)); updHud(); },
   rate(d) { if (!Sess.rateReady) return; passDone(+d.v); showRate(false); },
   finish() { finishEx(); },
@@ -709,9 +726,9 @@ const act = {
     DB.sessions = out; DB.best = {}; out.forEach(s => { const b = DB.best[s.ex] || { n: 0, clean: 0 }; b.n++; b.last = s.bpm; b.t = s.t; b.clean = Math.max(b.clean, s.clean); DB.best[s.ex] = b; }); save(); TODAY = null; render(); toast('Dados de exemplo carregados');
   },
   export() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' })); a.download = 'yourock-backup.json'; a.click(); },
-  wipe() { if (!confirm('Apagar todos os seus dados? Isso não pode ser desfeito.')) return; DB = fresh(); save(); TODAY = null; Sess.queue = []; Sess.ex = null; render(); },
+  wipe() { if (!confirm('Apagar todos os seus dados? Isso não pode ser desfeito.')) return; DB = fresh(); save(); Acct.forcePush(); TODAY = null; Sess.queue = []; Sess.ex = null; render(); },
 };
-Object.assign(act, toolActs, quizActs);
+Object.assign(act, toolActs, quizActs, accActs);
 act.theme = d => { S().theme = d.k; save(); applyTheme(); document.querySelectorAll('.th').forEach(b => b.classList.toggle('on', b.dataset.k === d.k)); };
 applyTheme();
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.lvl[data-act]')) { e.preventDefault(); e.target.click(); } });
