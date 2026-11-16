@@ -192,3 +192,15 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
   .vr{display:none}
   .chips .chip{flex:none;white-space:nowrap;padding:7px 12px;font-size:13px}
 }
+
+/* acessibilidade: respeita "reduzir movimento" do sistema */
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.01ms!important;transition-delay:0s!important;scroll-behavior:auto!important}}
+/* alvos de toque de 44px em telas de toque e no celular */
+@media (pointer:coarse),(max-width:759px){
+  .btn,.btn.sm,.cgrid .cv .btn.sm{min-height:44px}
+  .btn.sm{min-width:44px;padding:8px 12px}
+  .chip,.chips .chip{min-height:44px;display:inline-flex;align-items:center;padding:0 14px}
+  .gear{width:44px;height:44px}
+  .nav.bottom a,.nav.bottom button{min-height:48px}
+  .avp{min-height:48px}
+}

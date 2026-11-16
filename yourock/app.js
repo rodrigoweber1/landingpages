@@ -734,7 +734,21 @@ const act = {
 Object.assign(act, toolActs, quizActs, accActs);
 act.theme = d => { S().theme = d.k; save(); applyTheme(); document.querySelectorAll('.th').forEach(b => b.classList.toggle('on', b.dataset.k === d.k)); };
 applyTheme();
-document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.lvl[data-act]')) { e.preventDefault(); e.target.click(); } });
+// teclado: tudo que tem data-act e não é botão/link/campo vira controle focável (Tab) e responde a Enter/Espaço; Esc fecha o menu de Ferramentas
+const KBD_SEL = '[data-act]:not(button):not(a):not(input):not(select):not(textarea):not(.tsb)';
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeTools(); return; }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches(KBD_SEL)) { e.preventDefault(); e.target.click(); }
+});
+function kbdify() {
+  document.querySelectorAll(KBD_SEL).forEach(el => {
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+    if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
+    if (el.classList.contains('chip')) el.setAttribute('aria-pressed', el.classList.contains('on') ? 'true' : 'false');
+  });
+  document.querySelectorAll('.tsb').forEach(el => el.setAttribute('aria-hidden', 'true'));
+}
+{ let kq = 0; new MutationObserver(() => { if (!kq) kq = setTimeout(() => { kq = 0; kbdify(); }, 30); }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }); kbdify(); }
 document.addEventListener('click', e => { const a = e.target.closest('[data-act]'); if (a && act[a.dataset.act]) act[a.dataset.act](a.dataset, a); });
 document.addEventListener('input', e => {
   const k = e.target.dataset.in; if (!k) return; const t = e.target;
