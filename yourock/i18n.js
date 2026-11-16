@@ -691,6 +691,11 @@ em loop. Não conta para o BPM limpo nem para as estrelas.|on loop. It does not 
 Correção: a tela inicial podia ficar em branco ao abrir o app|Fix: the home screen could be blank when opening the app|Corrección: la pantalla de inicio podía quedar en blanco al abrir la app
 Opções do exercício|Exercise options|Opciones del ejercicio
 Nível|Level|Nivel
+Diminuir 5 BPM|Decrease 5 BPM|Disminuir 5 BPM
+Diminuir 1 BPM|Decrease 1 BPM|Disminuir 1 BPM
+Aumentar 1 BPM|Increase 1 BPM|Aumentar 1 BPM
+Aumentar 5 BPM|Increase 5 BPM|Aumentar 5 BPM
+Buscar exercício|Search exercise|Buscar ejercicio
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });

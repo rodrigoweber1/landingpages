@@ -89,7 +89,7 @@ function metroFrame() {
   if (Metro.changed) { Metro.changed = false; mUpdate(); save(); }
   Metro.raf = requestAnimationFrame(metroFrame);
 }
-function mBtn() { const b = $('#mRun'); if (b) { b.textContent = Metro.run ? '■ Parar' : '▶ Iniciar'; b.classList.toggle('pri', !Metro.run); } }
+function mBtn() { const b = $('#mRun'); if (b) { b.innerHTML = Metro.run ? ic('i-stop') + 'Parar' : ic('i-play') + 'Iniciar'; b.classList.toggle('pri', !Metro.run); } }
 function mDots() { const el = $('#mDots'); if (el) el.innerHTML = Array.from({ length: M().beats }, () => '<i></i>').join(''); }
 function mUpdate() {
   const m = M(), g = id => $('#' + id); if (!g('mBpm')) return;
@@ -106,7 +106,7 @@ function viewMetro() {
     <div class="row" style="justify-content:center;margin-top:10px">
       <button class="btn" data-act="mBpm" data-d="-5">−5</button><button class="btn" data-act="mBpm" data-d="-1">−1</button>
       <button class="btn" data-act="mBpm" data-d="1">+1</button><button class="btn" data-act="mBpm" data-d="5">+5</button></div>
-    <div class="row" style="justify-content:center;margin-top:14px"><button class="btn pri" id="mRun" data-act="mToggle" style="min-width:140px">▶ Iniciar</button><button class="btn" data-act="mTap">Tap tempo</button></div>
+    <div class="row" style="justify-content:center;margin-top:14px"><button class="btn pri" id="mRun" data-act="mToggle" style="min-width:140px">${ic('i-play')}Iniciar</button><button class="btn" data-act="mTap">Tap tempo</button></div>
     <div class="mut small" style="margin-top:8px">Barra de espaço inicia/para. Toque em "Tap tempo" no ritmo que quiser para descobrir o BPM.</div>
   </div>
   <div class="card"><div class="grid g3">

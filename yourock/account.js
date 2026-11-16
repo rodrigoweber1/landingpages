@@ -117,7 +117,7 @@ const Acct = (() => {
 
   // ---------- tela ----------
   const val = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
-  const note = () => msg ? `<div class="accmsg ${msg[0]}" role="alert">${esc(msg[1])}</div>` : '';
+  const note = () => msg ? `<div class="accmsg ${msg[0]}">${esc(msg[1])}</div>` : '';
   const setMsg = (k, t) => { msg = t ? [k, t] : null; const e = document.getElementById('accMsg'); if (e) e.innerHTML = note(); };
   function viewAccount() {
     const u = user();
@@ -129,7 +129,7 @@ const Acct = (() => {
       view.innerHTML = `<h1>Nova senha</h1><form class="card" data-form="accNewPass" autocomplete="on"><div class="mut small">Crie uma nova senha para a conta <b>${esc(u.email || '')}</b>.</div>
         <label class="lbl" for="aP1">Nova senha</label><input id="aP1" type="password" autocomplete="new-password" minlength="6" required>
         <label class="lbl" for="aP2">Repita a nova senha</label><input id="aP2" type="password" autocomplete="new-password" minlength="6" required>
-        <div id="accMsg">${note()}</div><div class="row" style="margin-top:12px"><button class="btn pri" type="submit">Salvar nova senha</button></div></form>`;
+        <div id="accMsg" aria-live="polite">${note()}</div><div class="row" style="margin-top:12px"><button class="btn pri" type="submit">Salvar nova senha</button></div></form>`;
       return;
     }
     if (!u) {
@@ -140,7 +140,7 @@ const Acct = (() => {
         ${up ? '<label class="lbl" for="aName">Nome</label><input id="aName" type="text" autocomplete="name" maxlength="40" required>' : ''}
         <label class="lbl" for="aMail">E-mail</label><input id="aMail" type="email" autocomplete="email" inputmode="email" required>
         ${fg ? '' : `<label class="lbl" for="aPass">Senha</label><div class="pw"><input id="aPass" type="password" autocomplete="${up ? 'new-password' : 'current-password'}" minlength="6" required><button type="button" class="btn sm" data-act="accShowPw" aria-label="Mostrar senha">👁</button></div>${up ? '<div class="mut small" style="margin-top:4px">Mínimo de 6 caracteres.</div>' : ''}`}
-        <div id="accMsg">${note()}</div>
+        <div id="accMsg" aria-live="polite">${note()}</div>
         <div class="row" style="margin-top:12px"><button class="btn pri" type="submit" id="accGo">${fg ? 'Enviar link' : up ? 'Criar conta' : 'Entrar'}</button></div>
         <div class="row accLinks">${fg ? '<a href="#/account" data-act="accMode" data-m="in">Voltar</a>' : up ? 'Já tem conta? <a href="#/account" data-act="accMode" data-m="in">Entrar</a>' : '<a href="#/account" data-act="accMode" data-m="forgot">Esqueci a senha</a><span>Novo por aqui? <a href="#/account" data-act="accMode" data-m="up">Criar conta</a></span>'}</div>
       </form>`;
@@ -160,7 +160,7 @@ const Acct = (() => {
       <label class="lbl" for="aP1">Nova senha</label><input id="aP1" type="password" autocomplete="new-password" minlength="6" required>
       <label class="lbl" for="aP2">Repita a nova senha</label><input id="aP2" type="password" autocomplete="new-password" minlength="6" required>
       <div class="row" style="margin-top:12px"><button class="btn" type="submit">Alterar senha</button></div></form>
-    <div id="accMsg">${note()}</div>
+    <div id="accMsg" aria-live="polite">${note()}</div>
     <div class="card"><button class="btn" data-act="accOut">Sair da conta</button><div class="mut small" style="margin-top:6px">Seus dados continuam neste aparelho e na nuvem.</div></div>`;
     paintStatus();
   }

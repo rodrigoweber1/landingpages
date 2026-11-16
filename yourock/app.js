@@ -1,6 +1,7 @@
 'use strict';
 const $ = (s, e = document) => e.querySelector(s);
 const view = $('#view');
+const ic = id => '<svg class="ic" aria-hidden="true" focusable="false"><use href="#' + id + '"/></svg>';
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 // ---------- persistência ----------
@@ -395,9 +396,9 @@ function micFail(e) {
 }
 function refreshCtl() {
   const b = $('#btnRun'); if (!b) return;
-  b.textContent = Sess.run && !Sess.demo ? '■ Parar' : '▶ Iniciar'; b.classList.toggle('pri', !(Sess.run && !Sess.demo));
-  $('#btnDemo').textContent = Sess.run && Sess.demo ? '■ Parar demo' : '🔊 Demo';
-  { const bm = $('#btnMic'); if (bm) { bm.classList.toggle('on', Mic.on); bm.innerHTML = Mic.on ? '<span class="rec"></span>' : '🎤'; } }
+  b.innerHTML = Sess.run && !Sess.demo ? ic('i-stop') + 'Parar' : ic('i-play') + 'Iniciar'; b.classList.toggle('pri', !(Sess.run && !Sess.demo));
+  $('#btnDemo').innerHTML = Sess.run && Sess.demo ? ic('i-stop') + 'Parar demo' : ic('i-vol') + 'Demo';
+  { const bm = $('#btnMic'); if (bm) { bm.classList.toggle('on', Mic.on); bm.innerHTML = Mic.on ? '<span class="rec"></span>' : ic('i-mic'); } }
   $('#btnSpeed').classList.toggle('on', S().speed);
   { const bl = $('#btnLoop'); if (bl) bl.classList.toggle('on', Sess.loop); }
 }
@@ -513,7 +514,7 @@ function chordKind(e) {
 }
 function viewVault() {
   view.innerHTML = `<div class="row sp"><h1>Biblioteca</h1><span class="mut small" id="vcount"></span></div>
-  <div class="card"><input type="search" id="vq" placeholder="Buscar exercício…" value="${esc(VF.q)}">
+  <div class="card"><input type="search" id="vq" aria-label="Buscar exercício" placeholder="Buscar exercício…" value="${esc(VF.q)}">
   <div class="row chips" style="margin-top:10px" id="vfocus"></div>
   <div class="row" style="margin-top:10px"><select id="vlvl" aria-label="Nível" style="width:auto">${['all', 1, 2, 3, 4].map(k => `<option value="${k}" ${VF.lvl === k ? 'selected' : ''}>${k === 'all' ? 'Todos os níveis' : LVL[k]}</option>`).join('')}</select><label class="small mut vr" for="vact">Adicionar na rotina:</label><select id="vact" style="width:auto" aria-label="Adicionar na rotina" title="Adicionar na rotina">${DB.routines.map(r => `<option value="${r.id}" ${r.id === DB.active ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select></div></div>
   <div id="vlist" class="grid g2"></div>`;
@@ -543,18 +544,18 @@ function viewTrain() {
   <div class="board" style="margin-top:12px">${ex.type === 'notes' ? fretboardSVG(ex, lefty, S().label) : strumHTML(ex)}<div class="cd" id="cd"></div></div>
   <div class="small" id="why" style="min-height:18px;margin-top:6px;color:var(--bad)"></div>
   <div class="hud">
-    <div class="box"><div class="bpmrow"><button class="btn sm" data-act="bpm" data-d="-5">−5</button><button class="btn sm" data-act="bpm" data-d="-1">−</button><div class="v" id="bpm">${Sess.bpm}</div><button class="btn sm" data-act="bpm" data-d="1">+</button><button class="btn sm" data-act="bpm" data-d="5">+5</button></div><div class="beats"><i id="bt0"></i><i id="bt1"></i><i id="bt2"></i><i id="bt3"></i></div><div class="l" id="bpmL">BPM</div></div>
+    <div class="box"><div class="bpmrow"><button class="btn sm" data-act="bpm" data-d="-5" aria-label="Diminuir 5 BPM">−5</button><button class="btn sm" data-act="bpm" data-d="-1" aria-label="Diminuir 1 BPM">−</button><div class="v" id="bpm">${Sess.bpm}</div><button class="btn sm" data-act="bpm" data-d="1" aria-label="Aumentar 1 BPM">+</button><button class="btn sm" data-act="bpm" data-d="5" aria-label="Aumentar 5 BPM">+5</button></div><div class="beats"><i id="bt0"></i><i id="bt1"></i><i id="bt2"></i><i id="bt3"></i></div><div class="l" id="bpmL">BPM</div></div>
     <div class="box"><div class="v" id="acc">–</div><div class="l">precisão da passada</div></div>
     <div class="box"><div class="v" id="pass">0</div><div class="l">passadas · limpas seguidas <b id="streak">–</b></div></div>
     <div class="box"><div class="v" id="timer">0:00</div><div class="l">tempo${ex.type === 'rhythm' ? ' · timing <b id="off">–</b>' : ''}</div></div>
   </div>
   <div id="done" class="row card" style="display:none"><span style="flex:1"><b>⏱ Tempo concluído!</b></span><button class="btn pri" data-act="loopOn">🔁 Continuar em loop</button><button class="btn" data-act="finish">Concluir e salvar ▸</button></div>
   <div id="rate" class="row card"><span id="rateInfo">Autoavaliação</span><button class="btn sm" data-act="rate" data-v="1">✓ Limpa</button><button class="btn sm" data-act="rate" data-v="0.5">✗ Com erros</button></div>
-  <div class="row actbar"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">🎤</button><button class="btn" id="btnDemo" data-act="demo">🔊 Demo</button></div>
-  <details class="card opts" id="opts"><summary><b>⚙ Opções do exercício</b></summary>
-  <div class="row" style="margin-top:12px"><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button><button class="btn" id="btnLoop" data-act="loop">🔁 Loop</button>
+  <div class="row actbar"><button class="btn pri" id="btnRun" data-act="run">${ic('i-play')}Iniciar</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">${ic('i-mic')}</button><button class="btn" id="btnDemo" data-act="demo">${ic('i-vol')}Demo</button></div>
+  <details class="card opts" id="opts"><summary><b>${ic('i-sliders')}Opções do exercício</b></summary>
+  <div class="row" style="margin-top:12px"><button class="btn" id="btnSpeed" data-act="speed">${ic('i-bolt')}Auto-velocidade</button><button class="btn" id="btnLoop" data-act="loop">${ic('i-loop')}Loop</button>
     ${ex.type === 'notes' ? `<select id="subSel" style="width:auto">${[1, 2, 4].map(v => `<option value="${v}">Notas por clique: ${v}</option>`).join('')}</select>` : ''}</div>
-  <div class="optsec"><div class="row" style="gap:8px"><b class="small">🎯 Trecho</b><select id="secA" style="width:auto" aria-label="Início do trecho"></select><span class="mut small">até</span><select id="secB" style="width:auto" aria-label="Fim do trecho"></select><button class="btn sm" data-act="secAll">Tudo</button></div><div class="small mut" id="secInfo" style="margin-top:6px"></div></div>
+  <div class="optsec"><div class="row" style="gap:8px"><b class="small">${ic('i-range')}Trecho</b><select id="secA" style="width:auto" aria-label="Início do trecho"></select><span class="mut small">até</span><select id="secB" style="width:auto" aria-label="Fim do trecho"></select><button class="btn sm" data-act="secAll">Tudo</button></div><div class="small mut" id="secInfo" style="margin-top:6px"></div></div>
   <div class="optsec"><b class="small">Metrônomo</b>
     <label class="lbl">Clique durante o exercício</label><select data-in="clickMode"><option value="on" ${(S().clickMode || 'on') === 'on' ? 'selected' : ''}>Sempre ligado</option><option value="count" ${S().clickMode === 'count' ? 'selected' : ''}>Só na contagem inicial</option><option value="off" ${S().clickMode === 'off' ? 'selected' : ''}>Mudo (só visual)</option></select>
     <label class="lbl">Volume do clique: <b id="v-clickVol">${S().clickVol == null ? 100 : S().clickVol}</b>%</label><input type="range" min="10" max="100" step="10" value="${S().clickVol == null ? 100 : S().clickVol}" data-in="clickVol">
@@ -606,7 +607,7 @@ function viewStats() {
 }
 function viewTuner() {
   view.innerHTML = `<h1>Afinador</h1><div class="card" style="margin-top:12px"><div class="tunerbig" id="tn">–</div><div class="mut" style="text-align:center" id="th">Toque uma corda solta</div><div class="needle"><i id="nd" style="left:50%"></i></div><div class="row" style="justify-content:center" id="tc">–</div>
-  <div class="row" style="justify-content:center;margin-top:14px"><button class="btn pri" id="tbtn" data-act="tuner">🎤 Ativar microfone</button></div>
+  <div class="row" style="justify-content:center;margin-top:14px"><button class="btn pri" id="tbtn" data-act="tuner">${ic('i-mic')}Ativar microfone</button></div>
   <div class="row" style="justify-content:center;margin-top:14px"><span class="mut small">Sensibilidade</span><input type="range" id="tsens" min="1" max="5" step="1" value="${S().tunerSens || 3}" data-in="tunerSens" style="width:140px"></div>
   <div class="row" style="justify-content:center;margin-top:14px"><span class="mut small">Tom de referência:</span>${OPEN.map((m, i) => `<button class="btn sm" data-act="ref" data-m="${m}">${'EADGBe'[i]}</button>`).join('')}</div></div>`;
   let raf = 0, buf = [], miss = 0;
@@ -618,7 +619,7 @@ function viewTuner() {
       $('#tn').style.color = Math.abs(c) <= 3 ? 'var(--ok)' : Math.abs(c) <= 10 ? 'var(--warn)' : 'var(--bad)'; $('#tc').textContent = Math.abs(c) <= 3 ? '✓ afinado' : c > 0 ? 'alto demais: afrouxe' : 'baixo demais: aperte'; }
     raf = requestAnimationFrame(window.tunerLoop);
   };
-  if (Mic.on) { $('#tbtn').textContent = '■ Parar'; raf = requestAnimationFrame(window.tunerLoop); }
+  if (Mic.on) { $('#tbtn').innerHTML = ic('i-stop') + 'Parar'; raf = requestAnimationFrame(window.tunerLoop); }
   cleanup = () => { cancelAnimationFrame(raf); Mic.setTune(false); Mic.gate = 0.012; };
 }
 function viewSettings() {
@@ -646,7 +647,7 @@ function viewSettings() {
   <div class="card"><h2>Sobre</h2><div class="row sp"><div><b>YouRock</b> <span class="mut">v${APP_VERSION}</span><div class="mut small">${APP_DATE}</div></div><button class="btn sm" data-act="upd">Atualizar app</button></div>
   ${APP_NOTES.length ? `<div class="small" style="margin-top:12px"><b>Novidades</b></div><ul class="small mut" style="margin:6px 0 0;padding-left:18px">${APP_NOTES.map(n => `<li>${esc(n[LANG] || n.pt)}</li>`).join('')}</ul>` : ''}</div>
   <div class="card"><h2>Teste do microfone</h2><div class="mut small">Ligue, toque uma corda solta e veja: o nível deve passar de ~20%, a nota detectada deve bater com a corda e cada palhetada deve contar um ataque.</div>
-  <div class="row" style="margin:12px 0"><button class="btn pri" id="mtBtn" data-act="mtest">🎤 Ligar teste</button><span class="mut small" id="mtErr"></span></div>
+  <div class="row" style="margin:12px 0"><button class="btn pri" id="mtBtn" data-act="mtest">${ic('i-mic')}Ligar teste</button><span class="mut small" id="mtErr"></span></div>
   <div class="meter" style="height:14px"><b id="mtLvl" style="width:0;background:var(--ok)"></b></div>
   <div class="grid g3" style="margin-top:12px"><div class="card kpi" style="margin:0"><div class="v" id="mtNote">–</div><div class="l">nota detectada</div></div><div class="card kpi" style="margin:0"><div class="v" id="mtHz">–</div><div class="l">frequência</div></div><div class="card kpi" style="margin:0"><div class="v" id="mtOn">0</div><div class="l">ataques (últimos 6 s)</div></div></div>
   <div class="small mut" id="mtTip" style="margin-top:10px"></div></div>`;
@@ -660,7 +661,7 @@ function viewSettings() {
     }
     raf = requestAnimationFrame(loop);
   };
-  if (Mic.on) { $('#mtBtn').textContent = '■ Parar teste'; }
+  if (Mic.on) { $('#mtBtn').innerHTML = ic('i-stop') + 'Parar teste'; }
   raf = requestAnimationFrame(loop); cleanup = () => cancelAnimationFrame(raf);
 }
 
@@ -713,10 +714,10 @@ const act = {
   backTrail() { stopRun(); micOff(); Sess.browse = true; render(); },
   resumeEx() { Sess.browse = false; render(); },
   goQ(d) { loadEx(+d.i); render(); },
-  async tuner() { if (Mic.on) { Mic.stop(); $('#tbtn').textContent = '🎤 Ativar microfone'; return; } try { await Mic.start(); Mic.setTune(true); $('#tbtn').textContent = '■ Parar'; requestAnimationFrame(window.tunerLoop); } catch (e) { toast('Sem acesso ao microfone'); } },
+  async tuner() { if (Mic.on) { Mic.stop(); $('#tbtn').innerHTML = ic('i-mic') + 'Ativar microfone'; return; } try { await Mic.start(); Mic.setTune(true); $('#tbtn').innerHTML = ic('i-stop') + 'Parar'; requestAnimationFrame(window.tunerLoop); } catch (e) { toast('Sem acesso ao microfone'); } },
   async mtest() {
-    if (Mic.on) { Mic.stop(); $('#mtBtn').textContent = '🎤 Ligar teste'; return; }
-    try { await Mic.start(); Mic.onsets = []; $('#mtBtn').textContent = '■ Parar teste'; $('#mtErr').textContent = ''; }
+    if (Mic.on) { Mic.stop(); $('#mtBtn').innerHTML = ic('i-mic') + 'Ligar teste'; return; }
+    try { await Mic.start(); Mic.onsets = []; $('#mtBtn').innerHTML = ic('i-stop') + 'Parar teste'; $('#mtErr').textContent = ''; }
     catch (e) { $('#mtErr').textContent = 'Falhou: ' + (e && e.name === 'NotAllowedError' ? 'permissão negada (libere o microfone no navegador).' : e && e.name === 'NotFoundError' ? 'nenhum microfone encontrado.' : 'use localhost ou HTTPS.'); }
   },
   ref(d) { tone(mtof(+d.m), 2.5); },
