@@ -36,7 +36,8 @@ const Reminder = (() => {
       <div class="mut small" id="remInfo" style="margin-top:8px">O lembrete só avisa se você ainda não treinou no dia. A notificação aparece quando o app está aberto ou em segundo plano; com o app fechado, o aviso aparece na tela inicial na próxima vez que você abrir.</div></div>`;
   }
   document.addEventListener('input', async e => {
-    const k = e.target.dataset && e.target.dataset.in;
+    const k = e.target.dataset && e.target.dataset.in; if (k !== 'rem' && k !== 'remT') return;
+    await new Promise(x => setTimeout(x, 0));   // deixa o app.js gravar o ajuste antes
     if (k === 'rem' && e.target.checked) { const m = await enable(); const i = document.getElementById('remInfo'); if (m && i) i.textContent = m; S().remLast = null; save(); check(); }
     if (k === 'remT') { S().remLast = null; save(); check(); }
   });
