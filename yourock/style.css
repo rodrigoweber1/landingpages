@@ -180,3 +180,15 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 .cstrip{gap:12px}@media(max-width:420px){.cmini{width:42%}}.slots.sm{gap:4px;padding:6px}.slots.sm .slot{padding:5px 0;font-size:15px;border-radius:8px}.slots.sm .slot small{font-size:9px}
 
 .stars{color:var(--warn);letter-spacing:1px;white-space:nowrap}.stars i{color:var(--mut);opacity:.35;font-style:normal}.card .meta .stars{margin-left:2px}
+
+/* tela do exercício: barra de ação fixa e opções recolhidas */
+.opts{margin-top:10px}.opts>summary{cursor:pointer;list-style:none;font-size:14px}.opts>summary::-webkit-details-marker{display:none}
+.opts>summary::after{content:'▾';float:right;color:var(--mut)}.opts[open]>summary::after{content:'▴'}
+.optsec{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.actbar{margin:6px 0}.actbar .pri{flex:1;min-width:120px;padding:12px 16px}
+@media(max-width:759px){
+  .actbar{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));z-index:15;background:var(--hdr2);border:1px solid var(--line);border-radius:16px;padding:8px;margin:10px 0;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+  .chips{flex-wrap:nowrap;overflow-x:auto;margin-left:-16px;margin-right:-16px;padding:0 16px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.chips::-webkit-scrollbar{display:none}
+  .vr{display:none}
+  .chips .chip{flex:none;white-space:nowrap;padding:7px 12px;font-size:13px}
+}

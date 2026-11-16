@@ -514,12 +514,12 @@ function chordKind(e) {
 function viewVault() {
   view.innerHTML = `<div class="row sp"><h1>Biblioteca</h1><span class="mut small" id="vcount"></span></div>
   <div class="card"><input type="search" id="vq" placeholder="Buscar exercício…" value="${esc(VF.q)}">
-  <div class="row" style="margin-top:10px" id="vfocus"></div><div class="row" style="margin-top:8px" id="vlvl"></div>
-  <div class="row" style="margin-top:10px"><label class="small mut">Adicionar na rotina:</label><select id="vact" style="width:auto">${DB.routines.map(r => `<option value="${r.id}" ${r.id === DB.active ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select></div></div>
+  <div class="row chips" style="margin-top:10px" id="vfocus"></div>
+  <div class="row" style="margin-top:10px"><select id="vlvl" aria-label="Nível" style="width:auto">${['all', 1, 2, 3, 4].map(k => `<option value="${k}" ${VF.lvl === k ? 'selected' : ''}>${k === 'all' ? 'Todos os níveis' : LVL[k]}</option>`).join('')}</select><label class="small mut vr" for="vact">Adicionar na rotina:</label><select id="vact" style="width:auto" aria-label="Adicionar na rotina" title="Adicionar na rotina">${DB.routines.map(r => `<option value="${r.id}" ${r.id === DB.active ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select></div></div>
   <div id="vlist" class="grid g2"></div>`;
   const fch = () => $('#vfocus').innerHTML = ['all', ...Object.keys(FOCUS).flatMap(k => k === 'chords' ? Object.keys(CHKIND) : [k]), 'fav'].map(k => `<span class="chip ${(k === 'fav' ? VF.fav : VF.focus === k) ? 'on' : ''}" data-act="vf" data-k="${k}">${k === 'all' ? 'Todos' : k === 'fav' ? '★ Favoritos' : CHKIND[k] || FOCUS[k].n}</span>`).join('');
-  const lch = () => $('#vlvl').innerHTML = ['all', 1, 2, 3, 4].map(k => `<span class="chip ${VF.lvl === k ? 'on' : ''}" data-act="vl" data-k="${k}">${k === 'all' ? 'Todos os níveis' : LVL[k]}</span>`).join('');
-  fch(); lch(); vaultList();
+  fch(); vaultList();
+  $('#vlvl').onchange = e => { VF.lvl = e.target.value === 'all' ? 'all' : +e.target.value; vaultList(); };
   $('#vq').oninput = e => { VF.q = e.target.value; vaultList(); };
   $('#vact').onchange = e => { DB.active = e.target.value; save(); };
 }
@@ -550,19 +550,22 @@ function viewTrain() {
   </div>
   <div id="done" class="row card" style="display:none"><span style="flex:1"><b>⏱ Tempo concluído!</b></span><button class="btn pri" data-act="loopOn">🔁 Continuar em loop</button><button class="btn" data-act="finish">Concluir e salvar ▸</button></div>
   <div id="rate" class="row card"><span id="rateInfo">Autoavaliação</span><button class="btn sm" data-act="rate" data-v="1">✓ Limpa</button><button class="btn sm" data-act="rate" data-v="0.5">✗ Com erros</button></div>
-  <div class="row"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnDemo" data-act="demo">🔊 Demo</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">🎤</button><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button><button class="btn" id="btnLoop" data-act="loop">🔁 Loop</button>
+  <div class="row actbar"><button class="btn pri" id="btnRun" data-act="run">▶ Iniciar</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">🎤</button><button class="btn" id="btnDemo" data-act="demo">🔊 Demo</button></div>
+  <details class="card opts" id="opts"><summary><b>⚙ Opções do exercício</b></summary>
+  <div class="row" style="margin-top:12px"><button class="btn" id="btnSpeed" data-act="speed">🚀 Auto-velocidade</button><button class="btn" id="btnLoop" data-act="loop">🔁 Loop</button>
     ${ex.type === 'notes' ? `<select id="subSel" style="width:auto">${[1, 2, 4].map(v => `<option value="${v}">Notas por clique: ${v}</option>`).join('')}</select>` : ''}</div>
-  <div class="card" style="margin-top:10px"><div class="row" style="gap:8px"><b class="small">🔁 Trecho</b><select id="secA" style="width:auto" aria-label="Início do trecho"></select><span class="mut small">até</span><select id="secB" style="width:auto" aria-label="Fim do trecho"></select><button class="btn sm" data-act="secAll">Tudo</button></div><div class="small mut" id="secInfo" style="margin-top:6px"></div></div>
-  <details class="card" style="margin-top:0"><summary class="small"><b>⚙ Metrônomo</b></summary>
+  <div class="optsec"><div class="row" style="gap:8px"><b class="small">🎯 Trecho</b><select id="secA" style="width:auto" aria-label="Início do trecho"></select><span class="mut small">até</span><select id="secB" style="width:auto" aria-label="Fim do trecho"></select><button class="btn sm" data-act="secAll">Tudo</button></div><div class="small mut" id="secInfo" style="margin-top:6px"></div></div>
+  <div class="optsec"><b class="small">Metrônomo</b>
     <label class="lbl">Clique durante o exercício</label><select data-in="clickMode"><option value="on" ${(S().clickMode || 'on') === 'on' ? 'selected' : ''}>Sempre ligado</option><option value="count" ${S().clickMode === 'count' ? 'selected' : ''}>Só na contagem inicial</option><option value="off" ${S().clickMode === 'off' ? 'selected' : ''}>Mudo (só visual)</option></select>
     <label class="lbl">Volume do clique: <b id="v-clickVol">${S().clickVol == null ? 100 : S().clickVol}</b>%</label><input type="range" min="10" max="100" step="10" value="${S().clickVol == null ? 100 : S().clickVol}" data-in="clickVol">
-    <label class="lbl"><input type="checkbox" data-in="clickAcc" ${S().clickAcc !== false ? 'checked' : ''}> Acentuar o tempo 1 de cada compasso</label></details>
+    <label class="lbl"><input type="checkbox" data-in="clickAcc" ${S().clickAcc !== false ? 'checked' : ''}> Acentuar o tempo 1 de cada compasso</label></div></details>
   <div class="row" style="margin-top:10px"><button class="btn" data-act="finish">Concluir e salvar ▸</button><button class="btn ghost" data-act="skip">Pular</button><button class="btn ghost" data-act="restart">Reiniciar</button><span class="mut small">Dica: use fones para o clique do metrônomo não entrar no microfone. Barra de espaço inicia/para.</span></div>
   <h3 style="margin:18px 0 8px">Fila de hoje</h3><div class="qlist">${Sess.queue.map((q, i) => `<div class="qi ${i === Sess.qi ? 'cur' : ''} ${q.done ? 'done' : ''}" data-act="goQ" data-i="${i}" style="cursor:pointer">${q.done ? '✓' : i + 1}. ${esc(EXMAP[q.id].name)}</div>`).join('')}</div>`;
   { const sa = $('#secA'), sb = $('#secB'), nm = i => ex.type === 'notes' ? (i + 1) + ' · ' + noteTxt(midiOf(ex.notes[i])) : String(i + 1), opts = Array.from({ length: ex.len }, (_, i) => `<option value="${i}">${nm(i)}</option>`).join('');
     sa.innerHTML = sb.innerHTML = opts; secUI();
     sa.onchange = sb.onchange = () => { stopRun(); Sess.secA = +sa.value; Sess.secB = +sb.value; if (Sess.secB < Sess.secA) { if (document.activeElement === sa) Sess.secB = Sess.secA; else Sess.secA = Sess.secB; } secUI(); updHud(); }; }
   const ss = $('#subSel'); if (ss) { ss.value = Sess.sub; ss.onchange = e => { stopRun(); Sess.sub = +e.target.value; updHud(); }; }
+  { const o = $('#opts'); if (o && innerWidth >= 760) o.open = true; }
   refreshCtl(); updHud(); showRate(false);
   const key =e => { if (e.code === 'Space' && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) { e.preventDefault(); act.run(); } };
   addEventListener('keydown', key); cleanup = () => { removeEventListener('keydown', key); stopRun(); if (Mic.on) Mic.stop(); };

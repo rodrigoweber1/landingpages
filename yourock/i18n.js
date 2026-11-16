@@ -689,6 +689,8 @@ Escolha início e fim para repetir só uma parte difícil do exercício.|Choose 
 Treinando só o trecho|Practicing only section|Practicando solo el tramo
 em loop. Não conta para o BPM limpo nem para as estrelas.|on loop. It does not count toward clean BPM or stars.|en bucle. No cuenta para el BPM limpio ni para las estrellas.
 Correção: a tela inicial podia ficar em branco ao abrir o app|Fix: the home screen could be blank when opening the app|Corrección: la pantalla de inicio podía quedar en blanco al abrir la app
+Opções do exercício|Exercise options|Opciones del ejercicio
+Nível|Level|Nivel
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });

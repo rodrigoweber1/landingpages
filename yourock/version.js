@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.6.1';
+var APP_VERSION = '1.6.2';
 var APP_DATE = '2026-11-16';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Tela do exercício mais limpa no celular (barra fixa com Iniciar, opções recolhidas) e Biblioteca com filtros mais compactos', en: 'Cleaner exercise screen on mobile (sticky Start bar, collapsed options) and a more compact Library filter bar', es: 'Pantalla de ejercicio más limpia en el móvil (barra fija con Iniciar, opciones plegadas) y filtros de la Biblioteca más compactos' },
   { pt: 'Correção: a tela inicial podia ficar em branco ao abrir o app', en: 'Fix: the home screen could be blank when opening the app', es: 'Corrección: la pantalla de inicio podía quedar en blanco al abrir la app' },
   { pt: 'Conta (login, perfil e sincronização do progresso), loop de trecho e opções do metrônomo na tela do exercício, lembrete diário de treino e filtro Power chords completo', en: 'Account (login, profile and progress sync), section loop and metronome options on the exercise screen, daily practice reminder and a complete Power chords filter', es: 'Cuenta (inicio de sesión, perfil y sincronización del progreso), bucle de tramo y opciones del metrónomo en la pantalla del ejercicio, recordatorio diario de práctica y filtro Power chords completo' },
   { pt: 'Gamification: estrelas por exercício, XP e ranks, missão do dia, revisão espaçada de exercícios dominados e novas conquistas', en: 'Gamification: stars per exercise, XP and ranks, daily mission, spaced review of mastered exercises and new achievements', es: 'Gamificación: estrellas por ejercicio, XP y rangos, misión del día, repaso espaciado de ejercicios dominados y nuevos logros' },
