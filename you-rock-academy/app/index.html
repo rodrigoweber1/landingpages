@@ -1055,6 +1055,12 @@ body.stage #app .bi-IV{background:#1C2A40!important}
 body.stage #app .bi-V{background:#2C2C2C!important;border-color:#BDB6AA!important}
 body.stage #app :is(.bi-leg,.bi-ck){color:var(--st-ink2,#BDB6AA)!important}
 body.stage #app .bi-done,body.stage #app .bi-link{color:#FF8A8F!important}
+.bs-rows{display:flex;flex-direction:column;gap:6px}
+.bs-row{display:block;width:100%;height:auto}
+.bs-c rect{fill:#E31B23}
+.bs-c text{fill:#FFFFFF;font:800 12px 'Inter',system-ui,sans-serif}
+.bs-c[data-on="true"] rect{fill:#FFC400}
+.bs-c[data-on="true"] text{fill:#121212}
 .cg-leg{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none;font-size:14px;line-height:20px;color:#3A3A3A}
 .cg-leg b{display:inline-block;min-width:18px;color:#E31B23;font-weight:800}
 .cg-steps{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px}
@@ -5875,11 +5881,6 @@ const CG_SH = {
   third: { Db: [null, 8, 6, 6, 6, null], Gb: [null, null, 4, 6, 7, 6], Ab: [null, null, 6, 8, 9, 8], Bbm: [6, 8, 8, 6, 6, 6], Dbmaj7: [null, 4, 6, 5, 6, 4], Cm7: [null, 3, 5, 3, 4, 3], Fsus4: [null, 8, 8, 10, 11, 8], F: [null, null, 7, 5, 6, 5], 'Db/Eb': [null, 6, null, 6, 6, 4] },
   fifth: { Db: [4, null, 6, 6, 6, 4], Gb: [2, 4, 4, 3, 2, 2], Ab: [4, 6, 6, 5, 4, 4], Bbm: [null, 1, 3, 3, 2, 1], Dbmaj7: [null, 4, 6, 5, 6, 4], Cm7: [null, 3, 5, 3, 4, 3], Fsus4: [1, 3, 3, 3, 1, 1], F: [1, 3, 3, 2, 1, 1], 'Db/Eb': [null, 6, null, 6, 6, 4] }
 };
-// bass guitar: [root midi, string (0 = E … 3 = G), fret, octave midi, string, fret] — the octave sits two strings up and two frets higher
-const CG_BASS = {
-  Db: [37, 1, 4, 49, 3, 6], Gb: [30, 0, 2, 42, 2, 4], Ab: [32, 0, 4, 44, 2, 6], Bbm: [34, 1, 1, 46, 3, 3], Dbmaj7: [37, 1, 4, 49, 3, 6],
-  Cm7: [36, 1, 3, 48, 3, 5], Fsus4: [29, 0, 1, 41, 2, 3], F: [29, 0, 1, 41, 2, 3], 'Db/Eb': [39, 1, 6, 51, 3, 8]
-};
 // funk octave on A♭ (guitar 2): strings 6 and 4 (fret 4 and fret 6), one bar of sixteenths: D = accent, u = plain, x = muted ghost
 const CG_OCT = [4, null, 6, null, null, null];
 const CG_PAT = ['D', 'x', 'u', 'x', 'D', 'x', 'u', 'x', 'D', 'x', 'u', 'x', 'D', 'x', 'u', 'x'];
@@ -6084,52 +6085,139 @@ function celebGtr2(root, es) {
   };
 }
 
-// ----- bass: root and octave in eighths, in the rhythm of the chord blocks -----
+// ----- bass: the teacher's score "Celebration · Patrones de bajo" (staff + tab, bar by bar) -----
+// event = [start (in sixteenths, 16 per bar), length, string (0 = E … 3 = G; -1 = rest), fret, tie]; tie = grey note, not played, tied to the one before
+const BS_OPEN = [28, 33, 38, 43]; // sounding MIDI of the bass strings (written an octave higher)
+const BS_LET = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6]; // letter of each pitch class, flat spelling
+const bsA = (s, f) => ({ ev: [[0, 2, s, f], [2, 2, s, f], [4, 2, s, f], [6, 2, s, f], [8, 4, s, f], [12, 4, s, f]], beams: [[0, 1, 2, 3]] });
+const bsB = (s, f) => ({ ev: [[0, 2, s, f], [2, 2, s, f], [4, 2, s, f], [6, 1, s, f], [7, 1, s, f], [8, 8, -1]], beams: [[0, 1], [2, 3, 4]] });
+const BS_C1 = { ev: [[0, 2, -1], [2, 2, 0, 1], [4, 2, 0, 1], [6, 2, 0, 3], [8, 4, 0, 3], [12, 4, 0, 1]], beams: [[1, 2, 3]] };
+const BS_C2 = { ev: [[0, 2, 0, 3], [2, 2, 0, 1], [4, 2, 0, 1, 1], [6, 2, 0, 4], [8, 2, 0, 4, 1], [10, 2, 0, 4], [12, 2, 0, 4], [14, 1, 0, 4], [15, 1, 0, 4]], beams: [[0, 1, 2, 3], [4, 5], [6, 7, 8]] };
+const BS_C4 = { ev: [[0, 3, 0, 3], [3, 1, 0, 1], [4, 2, 0, 1, 1], [6, 2, 0, 4], [8, 2, 0, 4, 1], [10, 2, 0, 4], [12, 2, 0, 4], [14, 1, 0, 4], [15, 1, 0, 4]], beams: [[0, 1], [2, 3], [4, 5], [6, 7, 8]] };
+const BS_SEC = {
+  chorus: [Object.assign({ n: 1 }, BS_C1), Object.assign({ n: 2 }, BS_C2), Object.assign({ n: 3 }, BS_C1), Object.assign({ n: 4 }, BS_C4)],
+  verse: [{ n: 5, multi: 2 }, Object.assign({ n: 7, ch: 'A♭' }, bsA(0, 4)), Object.assign({ n: 8, ch: 'A♭' }, bsB(0, 4))],
+  bridge: [Object.assign({ n: 9, ch: 'D♭maj7' }, bsA(1, 4)), Object.assign({ n: 10, ch: 'Cm7' }, bsB(1, 3)), Object.assign({ n: 11, ch: 'Fsus4' }, bsA(0, 1)), Object.assign({ n: 12, ch: 'F' }, bsB(0, 1)), Object.assign({ n: 13, ch: 'B♭m' }, bsA(1, 1)), Object.assign({ n: 14, ch: 'D♭/E♭' }, bsB(2, 1))]
+};
+function bsRow(bar, bi, first) {
+  const g = 10, yT = 36, yB = yT + 4 * g, Yd = (d) => yB - (d - 18) * (g / 2), W = 360, X0 = 98, SX = 15.4, TY = 100;
+  const tabY = (s) => TY + (3 - s) * g;
+  let h = '<svg class="pt-svg cg-staff bs-row" viewBox="0 0 ' + W + ' 140" role="img" aria-label="' + (bar.multi ? '' : '') + '">';
+  for (let i = 0; i < 5; i++) h += '<line x1="4" y1="' + (yT + i * g) + '" x2="' + (W - 4) + '" y2="' + (yT + i * g) + '" stroke="#8A8A8A" stroke-width="1"/>';
+  for (let i = 0; i < 4; i++) h += '<line x1="4" y1="' + (TY + i * g) + '" x2="' + (W - 4) + '" y2="' + (TY + i * g) + '" stroke="#8A8A8A" stroke-width="1"/>';
+  h += '<line x1="4" y1="' + yT + '" x2="4" y2="' + yB + '" stroke="#8A8A8A" stroke-width="1.4"/><line x1="4" y1="' + TY + '" x2="4" y2="' + (TY + 3 * g) + '" stroke="#8A8A8A" stroke-width="1.4"/>';
+  h += '<line x1="' + (W - 5) + '" y1="' + yT + '" x2="' + (W - 5) + '" y2="' + yB + '" stroke="#8A8A8A" stroke-width="2"/><line x1="' + (W - 5) + '" y1="' + TY + '" x2="' + (W - 5) + '" y2="' + (TY + 3 * g) + '" stroke="#8A8A8A" stroke-width="2"/>';
+  // bass clef: the ball on the F line, the tail, and the two dots
+  const yF = yT + g;
+  h += '<circle class="pt-ink" cx="14" cy="' + yF + '" r="3.4"/><path class="cg-stem" d="M14 ' + (yF - 3) + 'C27 ' + (yF - 3.5) + ' 30 ' + (yF + 6) + ' 25 ' + (yF + 15) + 'C21 ' + (yF + 22) + ' 14 ' + (yF + 27) + ' 8 ' + (yF + 30) + '" fill="none" stroke-width="3" stroke-linecap="round"/><circle class="pt-ink" cx="32" cy="' + (yF - 5) + '" r="1.9"/><circle class="pt-ink" cx="32" cy="' + (yF + 5) + '" r="1.9"/>';
+  // four flats (B♭ E♭ A♭ D♭) and, on the first row, the time signature
+  [20, 23, 19, 22].forEach((d, i) => { h += '<text class="pt-ink" x="' + (40 + i * 8.5) + '" y="' + (Yd(d) + 5.5) + '" font-size="19" font-weight="700">♭</text>'; });
+  if (first) h += '<text class="pt-ink" x="84" y="' + (yT + 18) + '" font-size="20" font-weight="800" text-anchor="middle">4</text><text class="pt-ink" x="84" y="' + (yB - 1) + '" font-size="20" font-weight="800" text-anchor="middle">4</text>';
+  h += '<text class="cg-lab" x="4" y="14" font-size="12" font-style="italic">' + bar.n + '</text>';
+  h += '<text class="pt-ink" x="' + (bar.multi ? 20 : 98) + '" y="16" font-size="14" font-weight="700"></text>';
+  h += '<text class="cg-lab" x="10" y="' + (TY + 9) + '" font-size="12" font-weight="800" transform="rotate(0)">T</text><text class="cg-lab" x="10" y="' + (TY + 19) + '" font-size="12" font-weight="800">A</text><text class="cg-lab" x="10" y="' + (TY + 29) + '" font-size="12" font-weight="800">B</text>';
+  if (bar.multi) {
+    const ym = yT + 2 * g;
+    h += '<rect class="pt-ink" x="110" y="' + (ym - 4) + '" width="220" height="8"/><line class="cg-stem" x1="110" y1="' + (ym - 8) + '" x2="110" y2="' + (ym + 8) + '" stroke-width="1.5"/><line class="cg-stem" x1="330" y1="' + (ym - 8) + '" x2="330" y2="' + (ym + 8) + '" stroke-width="1.5"/>';
+    h += '<text class="pt-ink" x="220" y="' + (yT - 8) + '" font-size="18" font-weight="800" text-anchor="middle">' + bar.multi + '</text>';
+    return h + '</svg>';
+  }
+  if (bar.ch) h += '<text class="pt-ink" x="' + X0 + '" y="18" font-size="14" font-weight="700">' + bar.ch + '</text>';
+  const ev = bar.ev, X = (e) => X0 + e[0] * SX, pos = ev.map((e) => {
+    if (e[2] < 0) return null;
+    const wm = BS_OPEN[e[2]] + e[3] + 12, d = (Math.floor(wm / 12) - 1) * 7 + BS_LET[wm % 12];
+    return { d, y: Yd(d), x: X(e) };
+  });
+  const down = (i) => pos[i].d >= 22;
+  const beamOf = {}; bar.beams.forEach((b, k) => b.forEach((i) => { beamOf[i] = k; }));
+  // the stem tip of every note: beamed notes share one flat beam, single notes get a plain stem
+  const tip = {};
+  bar.beams.forEach((b) => { const dn = down(b[0]); const ys = b.map((i) => pos[i].y); tip[b[0]] = dn ? Math.max.apply(null, ys) + 28 : Math.min.apply(null, ys) - 28; b.forEach((i) => { tip[i] = tip[b[0]]; }); });
+  ev.forEach((e, i) => { if (e[2] >= 0 && tip[i] === undefined) tip[i] = down(i) ? pos[i].y + 28 : pos[i].y - 28; });
+  let notes = '', chips = '', stems = '', beams = '', ties = '';
+  let lastPlayed = -1;
+  ev.forEach((e, i) => {
+    const k = bi + '-' + (e[4] ? lastPlayed : i);
+    if (e[2] < 0) {
+      const cx = X0 + (e[0] + e[1] / 2) * SX - (e[1] > 4 ? 12 : 0);
+      if (e[1] >= 8) h += '<rect class="pt-ink" x="' + (cx - 6) + '" y="' + (yT + 2 * g - 4.5) + '" width="12" height="4.5"/>';
+      else h += '<circle class="pt-ink" cx="' + (cx - 2.5) + '" cy="' + (yT + 2 * g - 2) + '" r="2"/><path class="cg-stem" d="M' + (cx + 3) + ' ' + (yT + 2 * g - 6) + 'Q' + (cx - 1) + ' ' + (yT + 2 * g - 3) + ' ' + (cx - 3) + ' ' + (yT + 2 * g - 2) + 'L' + (cx - 1) + ' ' + (yT + 2 * g + 8) + '" fill="none" stroke-width="1.5" stroke-linecap="round"/>';
+      return;
+    }
+    if (!e[4]) lastPlayed = i;
+    const p = pos[i], dn = down(i), sx = p.x + (dn ? -4.3 : 4.3);
+    notes += '<g class="cg-n bs-ev" data-k="' + k + '"><ellipse class="pt-ink" cx="' + p.x + '" cy="' + p.y + '" rx="4.8" ry="3.5" transform="rotate(-20 ' + p.x + ' ' + p.y + ')"' + (e[4] ? ' opacity="0.4"' : '') + '/>' + (e[1] === 3 ? '<circle class="pt-ink" cx="' + (p.x + 9) + '" cy="' + (p.d % 2 === 0 ? p.y - 3 : p.y) + '" r="1.6"/>' : '') + '</g>';
+    stems += '<line class="cg-stem" x1="' + sx + '" y1="' + (p.y + (dn ? 1 : -1)) + '" x2="' + sx + '" y2="' + tip[i] + '" stroke-width="1.3"/>';
+    if (!e[4]) chips += '<g class="bs-c" data-k="' + k + '"><rect x="' + (p.x - 7) + '" y="' + (tabY(e[2]) - 7) + '" width="14" height="14" rx="4"/><text x="' + p.x + '" y="' + (tabY(e[2]) + 4.5) + '" text-anchor="middle">' + e[3] + '</text></g>';
+    if (e[4]) { const q = pos[i - 1]; ties += '<path class="cg-stem" d="M' + q.x + ' ' + (q.y + (dn ? -6 : 6)) + 'Q' + ((q.x + p.x) / 2) + ' ' + (q.y + (dn ? -13 : 13)) + ' ' + p.x + ' ' + (p.y + (dn ? -6 : 6)) + '" fill="none" stroke-width="1.3"/>'; }
+  });
+  // beams: a flat primary beam per group, a second one for sixteenths (a short stub when the neighbour is not a sixteenth)
+  bar.beams.forEach((b) => {
+    const dn = down(b[0]), t = tip[b[0]], sxf = (i) => pos[i].x + (dn ? -4.3 : 4.3), th = 3.2, s1 = dn ? t - th : t, s2 = dn ? t - th - 5.5 : t + 5.5;
+    beams += '<rect class="pt-ink" x="' + sxf(b[0]) + '" y="' + s1 + '" width="' + (sxf(b[b.length - 1]) - sxf(b[0])) + '" height="' + th + '"/>';
+    b.forEach((i, j) => {
+      if (ev[i][1] !== 1) return;
+      const nx = b[j + 1], pv = b[j - 1];
+      if (nx !== undefined && ev[nx][1] === 1) beams += '<rect class="pt-ink" x="' + sxf(i) + '" y="' + s2 + '" width="' + (sxf(nx) - sxf(i)) + '" height="' + th + '"/>';
+      else if (!(pv !== undefined && ev[pv][1] === 1)) beams += '<rect class="pt-ink" x="' + (sxf(i) - 7) + '" y="' + s2 + '" width="7" height="' + th + '"/>';
+    });
+  });
+  return h + ties + stems + beams + notes + chips + '</svg>';
+}
 function celebBass(root, es) {
   const T = es ? {
-    h: 'Bajo · la línea de la canción', x: 'El bajo toca la tónica de cada acorde y salta a su octava, en corcheas: tónica – octava – tónica – octava. El primer golpe de cada acorde lleva el acento. Es el ritmo típico del disco.',
-    sec: 'Parte', secs: { chorus: 'Estribillo (×2)', verse: 'Estrofa', bridge: 'Puente' }, listen: 'Escuchar', stop: 'Parar', tempo: 'Tempo', slower: 'Más lento', faster: 'Más rápido', bar: 'Compás',
-    pat: 'El patrón de un acorde largo', R: 'T', O: '8ª', map: 'Dónde se toca cada nota (cuerdas del bajo, de la 1ª a la 4ª)', root: 'Tónica', oct: 'Octava', aria: 'Tab de bajo del acorde',
-    note: 'T es la tónica (el nombre del acorde) y 8ª, la misma nota una octava más aguda: dos cuerdas más arriba y dos trastes más allá. Si el acorde dura menos de un pulso, toca solo la tónica. Las cuerdas, de arriba abajo: Sol, Re, La, Mi.'
+    h: 'Bajo · patrones de la canción', x: 'Los patrones de bajo de Celebration, tal como los escribió tu profesor: la partitura en el pentagrama y, justo debajo, la tablatura. Elige la parte y pulsa «Escuchar» para oírla compás a compás.',
+    sec: 'Parte', secs: { chorus: 'Estribillo', verse: 'Estrofas', bridge: 'Puente' }, listen: 'Escuchar', stop: 'Parar', tempo: 'Tempo', slower: 'Más lento', faster: 'Más rápido',
+    note1: 'Las notas en gris son notas que no se tocan, van ligadas a la anterior.',
+    note2: 'En la tablatura, las cuerdas de arriba abajo son Sol, Re, La y Mi. El bajo se escribe una octava más aguda de lo que suena. En las estrofas, los dos primeros compases son silencio.',
+    aria: 'Partitura y tablatura del bajo, compás '
   } : {
-    h: 'Bass · the song’s line', x: 'The bass plays the root of every chord and jumps to its octave, in eighth notes: root – octave – root – octave. The first hit of every chord is accented. It’s the classic disco rhythm.',
-    sec: 'Part', secs: { chorus: 'Chorus (×2)', verse: 'Verse', bridge: 'Bridge' }, listen: 'Listen', stop: 'Stop', tempo: 'Tempo', slower: 'Slower', faster: 'Faster', bar: 'Bar',
-    pat: 'The pattern of a long chord', R: 'R', O: '8va', map: 'Where each note is played (bass strings, 1st to 4th)', root: 'Root', oct: 'Octave', aria: 'Bass tab of the chord',
-    note: 'R is the root (the name of the chord) and 8va the same note an octave higher: two strings up and two frets further. If the chord lasts less than a beat, play only the root. The strings, top to bottom: G, D, A, E.'
+    h: 'Bass · the song’s patterns', x: 'The bass patterns of Celebration, as your teacher wrote them: the score on the staff and, right below, the tab. Pick the part and press “Listen” to hear it bar by bar.',
+    sec: 'Part', secs: { chorus: 'Chorus', verse: 'Verses', bridge: 'Bridge' }, listen: 'Listen', stop: 'Stop', tempo: 'Tempo', slower: 'Slower', faster: 'Faster',
+    note1: 'The grey notes are not played: they are tied to the one before.',
+    note2: 'In the tab, the strings from top to bottom are G, D, A and E. Bass is written an octave higher than it sounds. In the verses, the first two bars are silence.',
+    aria: 'Bass score and tab, bar '
   };
   const st = root._cb = root._cb || { sec: 'chorus', bpm: 100, playing: false };
   const chip = (attr, v, on, label) => '<button type="button" class="ej-chip" ' + attr + '="' + v + '" aria-pressed="' + on + '">' + label + '</button>';
-  const tab = (c) => {
-    const B = CG_BASS[c], nm = ['E', 'A', 'D', 'G'];
-    let s = '<svg class="cg-tab" viewBox="0 0 120 66" role="img" aria-label="' + T.aria + ' ' + cpChord(c) + '">';
-    for (let i = 0; i < 4; i++) s += '<line x1="22" x2="116" y1="' + (10 + i * 14) + '" y2="' + (10 + i * 14) + '" stroke="#8A8A8A" stroke-width="1.2"/><text class="cg-lab" x="8" y="' + (14 + i * 14) + '" font-size="12" text-anchor="middle">' + nm[3 - i] + '</text>';
-    [[1, 2, 'R'], [4, 5, 'O']].forEach((k, j) => {
-      const x = j ? 92 : 46, y = 10 + (3 - B[k[0]]) * 14;
-      s += '<g class="cg-fr"><rect x="' + (x - 10) + '" y="' + (y - 8) + '" width="20" height="16" rx="4"/><text x="' + x + '" y="' + (y + 4.5) + '" text-anchor="middle" font-size="13" font-weight="800">' + B[k[1]] + '</text></g>';
-    });
-    return s + '</svg>';
-  };
   const paint = () => {
-    const S = CP_SECS[st.sec], chords = cgChords(S);
+    const rows = BS_SEC[st.sec].map((b, i) => bsRow(b, i, i === 0).replace('aria-label="', 'aria-label="' + T.aria + b.n)).join('');
     root.innerHTML = '<div class="pt-card cp-card"><h3 class="bt-h3" style="margin:0">' + T.h + '</h3><p class="pt-p">' + T.x + '</p>'
-      + '<b class="ej-h">' + T.sec + '</b><div class="ej-chips">' + Object.keys(CP_SECS).map((k) => chip('data-sec', k, k === st.sec, T.secs[k])).join('') + '</div>'
+      + '<b class="ej-h">' + T.sec + '</b><div class="ej-chips">' + Object.keys(BS_SEC).map((k) => chip('data-sec', k, k === st.sec, T.secs[k])).join('') + '</div>'
       + '<div class="cp-ctl"><button type="button" class="rt-play" data-a="play">▶ ' + T.listen + '</button><span class="cp-tempo">' + T.tempo + '<button type="button" class="bt-bpm" data-b="-5" aria-label="' + T.slower + '">−</button><b>' + st.bpm + ' BPM</b><button type="button" class="bt-bpm" data-b="5" aria-label="' + T.faster + '">+</button></span></div>'
-      + '<b class="ej-h">' + T.pat + '</b><div class="cg-steps" data-a="steps">' + [0, 1, 2, 3, 4, 5, 6, 7].map((i) => '<i class="cg-st' + (i % 4 === 0 ? ' cg-acc' : '') + '" data-i="' + i + '">' + (i % 2 ? T.O : T.R) + '</i>').join('') + '</div>'
-      + cgBars(S, T)
-      + '<b class="ej-h">' + T.map + '</b><div class="cp-map">' + chords.map((c) => '<div class="cp-mc" data-c="' + c + '"><b>' + cpChord(c) + '</b><small>' + T.root + ' ' + CP_NAMES[es ? 'es' : 'en'][CG_BASS[c][0] % 12] + ' · ' + T.oct + '</small>' + tab(c) + '</div>').join('') + '</div>'
-      + '<div class="pt-note"><p class="pt-p">' + T.note + '</p></div></div>';
+      + '<div class="bs-rows">' + rows + '</div>'
+      + '<div class="pt-note"><p class="pt-p">' + T.note1 + '</p><p class="pt-p">' + T.note2 + '</p></div></div>';
   };
-  const show = (c) => root.querySelectorAll('.cp-mc').forEach((e) => e.setAttribute('data-on', String(e.getAttribute('data-c') === c)));
-  const halt = root._halt = () => { cgHalt(root, st, T); root.querySelectorAll('.cg-st[data-on]').forEach((e) => e.removeAttribute('data-on')); };
+  const halt = root._halt = () => {
+    st.playing = false; clearTimeout(root._bsEnd); (root._tm || []).forEach(clearTimeout); root._tm = [];
+    (root._src || []).forEach((s) => { try { s.stop(); } catch (e) {} }); root._src = [];
+    root.querySelectorAll('[data-on]').forEach((e) => { if (e.closest('.bs-rows')) e.removeAttribute('data-on'); });
+    const b = root.querySelector('[data-a="play"]'); if (b) b.textContent = '▶ ' + T.listen;
+  };
+  const light = (k, on) => root.querySelectorAll('.bs-rows [data-k="' + k + '"]').forEach((e) => { if (on) e.setAttribute('data-on', 'true'); else e.removeAttribute('data-on'); });
   const play = () => {
-    halt(); st.playing = true;
-    const ok = cgRun(root, st, T, CP_SECS[st.sec], (ac, e, at, spb) => {
-      const B = CG_BASS[e[0]], n8 = Math.floor(e[2] * 2 + 1e-6);
-      if (n8 < 2) { cgNote(root, ac, B[0], at, e[2] * spb * 0.95, 0.9); return; }
-      for (let k = 0; k < n8; k++) cgNote(root, ac, k % 2 ? B[3] : B[0], at + k * spb / 2, (k === n8 - 1 ? e[2] - k / 2 : 0.5) * spb * 0.9, k === 0 ? 0.95 : 0.7);
-    }, show);
-    if (!ok) { st.playing = false; return; }
+    const ac = pAudio(); if (!ac) return;
+    try { pUnlock(); } catch (e) {}
+    halt(); st.playing = true; root._tm = []; root._src = [];
+    const spb = 60 / st.bpm, u = spb / 4, t0 = ac.currentTime + 0.15;
+    let bars = 0;
+    BS_SEC[st.sec].forEach((b, bi) => {
+      const barAt = t0 + bars * 16 * u;
+      if (b.multi) { bars += b.multi; return; }
+      bars += 1;
+      let last = -1; const dur = {};
+      b.ev.forEach((e, i) => { if (e[2] < 0) return; if (e[4]) dur[last] += e[1]; else { last = i; dur[i] = e[1]; } });
+      b.ev.forEach((e, i) => {
+        if (e[2] < 0 || e[4]) return;
+        const w = barAt + e[0] * u, len = dur[i] * u;
+        const s = pluck(BS_OPEN[e[2]] + e[3], w, e[0] % 4 === 0 ? 0.95 : 0.75);
+        if (s) { try { s.stop(w + len * 0.92); } catch (x) {} root._src.push(s); }
+        const ms = Math.max(0, (w - ac.currentTime) * 1000);
+        root._tm.push(setTimeout(() => { if (!root.isConnected) return; root.querySelectorAll('.bs-rows [data-on]').forEach((x) => x.removeAttribute('data-on')); light(bi + '-' + i, true); }, ms));
+      });
+    });
     root.querySelector('[data-a="play"]').textContent = '■ ' + T.stop;
+    root._bsEnd = setTimeout(() => { if (root.isConnected) halt(); }, (bars * 16 * u + 0.5) * 1000);
   };
   paint();
   root.onclick = (e) => {
@@ -22756,7 +22844,7 @@ function renderSide(name, lang) {
   });
 }
 // in-page links follow the active menu (next button, back arrow)
-const TOOLS = ['OtrasAfinaciones', 'Pulso', 'Braco', 'Biblioteca', 'Oido', 'TeoriaAcordes', 'Buscador', 'CambioAcordes', 'PowerQuiz', 'Cejillas', 'Batidas', 'Acentos', 'RitmoAvanzado', 'Aranha', 'ImproEj', 'Teoria', 'Posiciones', 'Arpegios', 'Modos', 'ModosCurso', 'MenoresAv'];
+const TOOLS = ['OtrasAfinaciones', 'Pulso', 'Braco', 'Biblioteca', 'Oido', 'TeoriaAcordes', 'Buscador', 'CambioAcordes', 'PowerQuiz', 'Cejillas', 'Batidas', 'Acentos', 'RitmoAvanzado', 'Aranha', 'ImproEj', 'Teoria', 'Posiciones', 'Arpegios', 'Modos', 'ModosCurso', 'MenoresAv', 'Sistema32', 'Trucos'];
 const ADV = ['TeoriaAcordes', 'Batidas', 'RitmoAvanzado', 'ImproEj', 'Teoria', 'Posiciones', 'Arpegios', 'Modos', 'ModosCurso', 'MenoresAv'];
 const hubOf = (n) => ADV.indexOf(n) >= 0 ? 'Avanzada' : 'Herramientas';
 let toolsMode = false;
@@ -24913,8 +25001,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '18 nov 2026 · 23:04';
-  var BUILD_ID = '2026-11-18T23:04';
+  var BUILD = '18 nov 2026 · 23:12';
+  var BUILD_ID = '2026-11-18T23:12';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
