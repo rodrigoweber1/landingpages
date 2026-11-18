@@ -984,6 +984,38 @@ body.dark .ls-sg[aria-pressed="true"]{color:#FFFFFF}
 .sm-bars .cp-mc small{display:block;font-size:12px;opacity:.7}
 .sm-bars .cp-mc b{font-size:16px}
 .sm-ch{cursor:pointer}
+.hm-neck{display:block;max-width:420px;margin:0 auto}
+.hm-neck .hm-bd{fill:#F2F2F2}
+.hm-neck .hm-fl{stroke:#BDBDBD;stroke-width:1.5}
+.hm-neck .hm-st{stroke:#8A8A8A}
+.hm-neck .hm-lb{font:500 12px 'Inter',system-ui,sans-serif;fill:#5A5A5A}
+.hm-neck .hm-pt{fill:#D9D9D9}
+.hm-neck .hm-dm{fill:#E31B23}
+.hm-neck .hm-dj{fill:#2F5FA8}
+.hm-neck .hm-tx{font:700 12px 'Inter',system-ui,sans-serif;fill:#FFFFFF;pointer-events:none}
+.hm-neck .hm-ring{fill:none;stroke:#121212;stroke-width:2}
+.hm-neck .hm-n{cursor:pointer;outline:none}
+.hm-neck .hm-n:focus-visible .hm-ring,.hm-neck .hm-n:focus-visible circle{stroke:#E0A800;stroke-width:3}
+.hm-pl{display:flex;flex-wrap:wrap;gap:8px}
+.hm-key{display:flex;flex-wrap:wrap;gap:6px 14px;font:500 13px/18px 'Inter',system-ui,sans-serif;color:#3A3A3A}
+.hm-key span{display:inline-flex;align-items:center;gap:6px}
+.hm-key i{width:16px;height:16px;border-radius:50%;display:inline-block}
+.hm-k1{background:#E31B23}.hm-k2{background:#2F5FA8}.hm-k3{background:linear-gradient(90deg,#E31B23 50%,#2F5FA8 50%)}
+body.dark .hm-neck .hm-bd{fill:#272727}
+body.dark .hm-neck .hm-fl{stroke:#4A4540}
+body.dark .hm-neck .hm-st{stroke:#8F887C}
+body.dark .hm-neck .hm-lb{fill:#BDB6AA}
+body.dark .hm-neck .hm-pt{fill:#3A3631}
+body.dark .hm-neck .hm-tx{fill:#FFFFFF}
+body.dark .hm-neck .hm-ring{stroke:#F2EDE4}
+body.dark .hm-key{color:#BDB6AA}
+body.stage #app .hm-neck .hm-bd{fill:#2E2520!important}
+body.stage #app .hm-neck .hm-fl{stroke:#4A3E36!important}
+body.stage #app .hm-neck .hm-lb{fill:var(--st-ink2,#BDB6AA)!important}
+body.stage #app .hm-neck .hm-pt{fill:#3A2F28!important}
+body.stage #app .hm-neck .hm-dm{fill:var(--st-red,#E31B23)!important}
+body.stage #app .hm-neck .hm-ring{stroke:var(--st-ink,#F4EEE6)!important}
+body.stage #app .hm-key{color:var(--st-ink2,#BDB6AA)!important}
 .cg-leg{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none;font-size:14px;line-height:20px;color:#3A3A3A}
 .cg-leg b{display:inline-block;min-width:18px;color:#E31B23;font-weight:800}
 .cg-steps{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px}
@@ -2068,8 +2100,8 @@ const TPL = {
 };
 
 const ORDER = ["Inicio", "Herramientas", "Avanzada", "Main", "TeoImp", "RiffsFamosos", "Relativo", "EjPua", "QueRitmo", "Subdivision", "ControlesTono", "Partitura", "Braco", "Quiz", "Abiertos", "CambioAcordes", "TeoriaAcordes", "BarreDos", "EntMastil", "Canciones", "Buscador", "PowerChord", "Shapes", "Barre", "PowerQuiz", "Afinacion", "OtrasAfinaciones", "Postura", "ComoPracticar", "Pulso", "Batidas", "Tablatura", "Cifras", "Tecnicas", "Escalas", "Pentatonica", "Progresiones", "Plan", "Teoria", "Caged", "Septimas", "Blues", "Sistema32", "Improvisacion", "Modos", "RitmoAvanzado", "TecnicaPro", "Oido", "Sonido", "Repertorio", "Grabacion", "Posiciones", "Arpegios", "ModosCurso", "MenoresAv", "ImproEj", "Bending", "ArmoniaMov", "Reducida", "Acentos", "ManoDer", "Hotel", "Aranha", "Cancionero", "Can1", "Can2", "Can3", "Can4", "Can5", "Can6", "Can7", "Can8", "Can9", "Estilo", "Ejercicios1"];
-const NAV = {"es": {"mods": [{"title": "Primeros pasos", "steps": [{"label": "Las guitarras y su sonido", "href": "ControlesTono"}, {"label": "Afinación", "href": "Afinacion"}, {"label": "Postura y manos", "href": "Postura"}, {"label": "Cómo practicar", "href": "ComoPracticar"}, {"label": "Sonido y equipo", "href": "Sonido"}]}, {"title": "Leer música", "steps": [{"label": "La partitura", "href": "Partitura"}, {"label": "La Tablatura", "href": "Tablatura"}, {"label": "Cifrado Americano", "href": "Cifras"}, {"label": "Las notas en la guitarra", "href": "Braco"}]}, {"title": "Acompañamiento", "z": 1, "steps": [{"label": "Teoría Imprescindible", "href": "TeoImp"}, {"label": "Los primeros acordes", "href": "Abiertos"}, {"label": "Ritmos de acompañamiento", "href": "Batidas"}, {"label": "Acordes con cejilla (A y E)", "href": "Barre"}, {"label": "Acordes con cejilla (D y C)", "href": "BarreDos"}, {"label": "Buscador de acordes", "href": "Buscador"}, {"label": "Bonus Track: Entendiendo el mástil", "href": "EntMastil"}]}, {"title": "Armonía avanzada", "steps": [{"label": "¿Qué es un power chord?", "href": "PowerChord"}, {"label": "Acordes con séptima", "href": "Septimas"}, {"label": "Otros tipos de acordes", "href": "ArmoniaMov"}, {"label": "Guitarra reducida", "href": "Reducida"}, {"label": "Sistema CAGED", "href": "Caged"}]}, {"title": "Mano derecha", "steps": [{"label": "¿Qué es el ritmo?", "href": "QueRitmo"}, {"label": "La subdivisión", "href": "Subdivision"}, {"label": "Acentuación con la púa", "href": "Acentos"}, {"label": "Ejercicios de púa", "href": "EjPua"}, {"label": "Mano derecha: patrones y palm mute", "href": "ManoDer"}]}, {"title": "Mano izquierda", "steps": [{"label": "¿Qué son las escalas?", "href": "Escalas"}, {"label": "Pentatónica menor", "href": "Pentatonica"}, {"label": "Hammer-on, pull-off, slide y bend", "href": "Tecnicas"}, {"label": "Bendings, slides y vibrato", "href": "Bending"}]}, {"title": "Solo e improvisación", "steps": [{"label": "Blues", "href": "Blues"}, {"label": "El relativo: ¿qué es eso?", "href": "Relativo"}, {"label": "Sistema 3:2", "href": "Sistema32"}, {"label": "Improvisación", "href": "Improvisacion"}, {"label": "Improvisación guiada", "href": "ImproEj"}]}, {"title": "Repertorio y práctica", "steps": [{"label": "Riffs famosos", "href": "RiffsFamosos"}, {"label": "Canciones", "href": "Canciones"}, {"label": "Something", "href": "Something"}, {"label": "Hotel California", "href": "Hotel"}]}, {"title": "Cuaderno de ejercicios", "steps": [{"label": "Plan de práctica", "href": "Plan"}, {"label": "Grabación y autoevaluación", "href": "Grabacion"}, {"label": "Ejercicio 1: Cambios básicos", "href": "Ejercicios1"}, {"label": "La araña", "href": "Aranha"}]}], "course": {"mods": [{"title": "Pentatónica en 5 posiciones", "steps": [{"label": "Pentatónica menor", "href": "Pentatonica"}, {"label": "Escalas en posiciones", "href": "Posiciones?scale=pmin&root=9"}, {"label": "Sistema 3:2", "href": "Sistema32"}]}, {"title": "Escala mayor en 5 posiciones", "steps": [{"label": "Escalas en posiciones", "href": "Posiciones?scale=maj&root=0"}]}, {"title": "Escala menor en 5 posiciones", "steps": [{"label": "Escalas en posiciones", "href": "Posiciones?scale=min&root=9"}]}, {"title": "Arpegios mayores y menores", "steps": [{"label": "Arpegios", "href": "Arpegios"}]}, {"title": "Arpegios de 7ª mayor y menor", "steps": [{"label": "Arpegios", "href": "Arpegios"}, {"label": "Acordes con séptima", "href": "Septimas"}]}, {"title": "Los modos como concepto", "steps": [{"label": "Modos como concepto", "href": "ModosCurso"}, {"label": "Mixolidio y dórico", "href": "Modos"}]}, {"title": "Improvisación I", "steps": [{"label": "Improvisación guiada", "href": "ImproEj"}, {"label": "Improvisar sobre 12 compases", "href": "Improvisacion"}]}, {"title": "Improvisación II", "steps": [{"label": "Improvisación guiada", "href": "ImproEj"}, {"label": "Pentatónica y blues", "href": "Blues"}]}, {"title": "Mano izquierda I: bending y vibrato", "steps": [{"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Técnicas de rock", "href": "Tecnicas"}]}, {"title": "Mano izquierda II: slides y ligados", "steps": [{"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Técnica refinada", "href": "TecnicaPro"}]}, {"title": "Armonía I: cejilla, 7ª y 9ª", "steps": [{"label": "Sistema CAGED", "href": "Caged"}, {"label": "Acordes con cejilla (A y E)", "href": "Barre"}, {"label": "Acordes móviles", "href": "ArmoniaMov"}, {"label": "Acordes con séptima", "href": "Septimas"}]}, {"title": "Armonía II: sus2, sus4 y guitarra reducida", "steps": [{"label": "Acordes móviles", "href": "ArmoniaMov"}, {"label": "Guitarra reducida", "href": "Reducida"}]}, {"title": "Mano derecha I: acentuación y ritmos", "steps": [{"label": "Acentuación con la púa", "href": "Acentos"}, {"label": "La araña", "href": "Aranha"}, {"label": "Ritmo avanzado", "href": "RitmoAvanzado"}, {"label": "Patrones de ritmo", "href": "Batidas"}]}, {"title": "Mano derecha II: arpegios, trémolo y palm-mute", "steps": [{"label": "Arpegios, trémolo y palm-mute", "href": "ManoDer"}, {"label": "Técnicas de rock", "href": "Tecnicas"}]}, {"title": "Avanzado y repertorio", "steps": [{"label": "Menor armónica y melódica", "href": "MenoresAv"}, {"label": "Hotel California", "href": "Hotel"}]}]}, "music": {"mods": [{"title": "Cancionero esencial", "steps": [{"label": "The Sky Is Crying", "href": "Can1"}, {"label": "Tutti Frutti", "href": "Can2"}, {"label": "Fly Me to the Moon", "href": "Can3"}, {"label": "Easy", "href": "Can4"}, {"label": "Celebration", "href": "Can5"}, {"label": "Paint It Black", "href": "Can6"}, {"label": "Three Little Birds", "href": "Can7"}, {"label": "Paranoid", "href": "Can8"}, {"label": "This Is the Life", "href": "Can9"}]}]}}, "en": {"mods": [{"title": "First steps", "steps": [{"label": "Guitars and their sound", "href": "ControlesTono"}, {"label": "Tuning", "href": "Afinacion"}, {"label": "Posture and hands", "href": "Postura"}, {"label": "How to practice", "href": "ComoPracticar"}, {"label": "Sound and gear", "href": "Sonido"}]}, {"title": "Reading music", "steps": [{"label": "Sheet music", "href": "Partitura"}, {"label": "Tablature", "href": "Tablatura"}, {"label": "Chord symbols", "href": "Cifras"}, {"label": "Notes on the guitar", "href": "Braco"}]}, {"title": "Accompaniment", "z": 1, "steps": [{"label": "Must-Know Theory", "href": "TeoImp"}, {"label": "The first chords", "href": "Abiertos"}, {"label": "Accompaniment rhythms", "href": "Batidas"}, {"label": "Barre chords (A and E)", "href": "Barre"}, {"label": "Barre chords (D and C)", "href": "BarreDos"}, {"label": "Chord finder", "href": "Buscador"}, {"label": "Bonus Track: Understanding the neck", "href": "EntMastil"}]}, {"title": "Advanced harmony", "steps": [{"label": "What is a power chord?", "href": "PowerChord"}, {"label": "Seventh chords", "href": "Septimas"}, {"label": "Other chord types", "href": "ArmoniaMov"}, {"label": "Reduced guitar", "href": "Reducida"}, {"label": "CAGED system", "href": "Caged"}]}, {"title": "Right hand", "steps": [{"label": "What is rhythm?", "href": "QueRitmo"}, {"label": "Subdivision", "href": "Subdivision"}, {"label": "Picking accents", "href": "Acentos"}, {"label": "Picking exercises", "href": "EjPua"}, {"label": "Right hand: patterns and palm mute", "href": "ManoDer"}]}, {"title": "Left hand", "steps": [{"label": "What are scales?", "href": "Escalas"}, {"label": "Minor pentatonic", "href": "Pentatonica"}, {"label": "Hammer-on, pull-off, slide and bend", "href": "Tecnicas"}, {"label": "Bends, slides and vibrato", "href": "Bending"}]}, {"title": "Solos and improvisation", "steps": [{"label": "Blues", "href": "Blues"}, {"label": "The relative: what is that?", "href": "Relativo"}, {"label": "3:2 system", "href": "Sistema32"}, {"label": "Improvisation", "href": "Improvisacion"}, {"label": "Guided improvisation", "href": "ImproEj"}]}, {"title": "Repertoire and practice", "steps": [{"label": "Famous riffs", "href": "RiffsFamosos"}, {"label": "Songs", "href": "Canciones"}, {"label": "Something", "href": "Something"}, {"label": "Hotel California", "href": "Hotel"}]}, {"title": "Exercise book", "steps": [{"label": "Practice plan", "href": "Plan"}, {"label": "Recording and self-review", "href": "Grabacion"}, {"label": "Exercise 1: Basic changes", "href": "Ejercicios1"}, {"label": "The spider", "href": "Aranha"}]}], "course": {"mods": [{"title": "Pentatonic in 5 positions", "steps": [{"label": "Minor pentatonic", "href": "Pentatonica"}, {"label": "Scales in positions", "href": "Posiciones?scale=pmin&root=9"}, {"label": "3:2 system", "href": "Sistema32"}]}, {"title": "Major scale in 5 positions", "steps": [{"label": "Scales in positions", "href": "Posiciones?scale=maj&root=0"}]}, {"title": "Minor scale in 5 positions", "steps": [{"label": "Scales in positions", "href": "Posiciones?scale=min&root=9"}]}, {"title": "Major and minor arpeggios", "steps": [{"label": "Arpeggios", "href": "Arpegios"}]}, {"title": "Major and minor 7th arpeggios", "steps": [{"label": "Arpeggios", "href": "Arpegios"}, {"label": "Seventh chords", "href": "Septimas"}]}, {"title": "Modes as a concept", "steps": [{"label": "Modes as a concept", "href": "ModosCurso"}, {"label": "Mixolydian and Dorian", "href": "Modos"}]}, {"title": "Improvisation I", "steps": [{"label": "Guided improvisation", "href": "ImproEj"}, {"label": "Improvising over 12 bars", "href": "Improvisacion"}]}, {"title": "Improvisation II", "steps": [{"label": "Guided improvisation", "href": "ImproEj"}, {"label": "Pentatonic and blues", "href": "Blues"}]}, {"title": "Left hand I: bending and vibrato", "steps": [{"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Rock techniques", "href": "Tecnicas"}]}, {"title": "Left hand II: slides and legato", "steps": [{"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Refined technique", "href": "TecnicaPro"}]}, {"title": "Harmony I: barre, 7th and 9th", "steps": [{"label": "CAGED system", "href": "Caged"}, {"label": "Barre chords (A and E)", "href": "Barre"}, {"label": "Movable chords", "href": "ArmoniaMov"}, {"label": "Seventh chords", "href": "Septimas"}]}, {"title": "Harmony II: sus2, sus4 and reduced guitar", "steps": [{"label": "Movable chords", "href": "ArmoniaMov"}, {"label": "Reduced guitar", "href": "Reducida"}]}, {"title": "Right hand I: accents and rhythms", "steps": [{"label": "Picking accents", "href": "Acentos"}, {"label": "The spider", "href": "Aranha"}, {"label": "Advanced rhythm", "href": "RitmoAvanzado"}, {"label": "Rhythm patterns", "href": "Batidas"}]}, {"title": "Right hand II: arpeggios, tremolo and palm-mute", "steps": [{"label": "Arpeggios, tremolo and palm-mute", "href": "ManoDer"}, {"label": "Rock techniques", "href": "Tecnicas"}]}, {"title": "Advanced and repertoire", "steps": [{"label": "Harmonic and melodic minor", "href": "MenoresAv"}, {"label": "Hotel California", "href": "Hotel"}]}]}, "music": {"mods": [{"title": "Essential songbook", "steps": [{"label": "The Sky Is Crying", "href": "Can1"}, {"label": "Tutti Frutti", "href": "Can2"}, {"label": "Fly Me to the Moon", "href": "Can3"}, {"label": "Easy", "href": "Can4"}, {"label": "Celebration", "href": "Can5"}, {"label": "Paint It Black", "href": "Can6"}, {"label": "Three Little Birds", "href": "Can7"}, {"label": "Paranoid", "href": "Can8"}, {"label": "This Is the Life", "href": "Can9"}]}]}}};
-const SEQS = {"ruta": ["ControlesTono", "Afinacion", "Postura", "ComoPracticar", "Sonido", "Partitura", "Tablatura", "Cifras", "Braco", "TeoImp", "Abiertos", "Batidas", "Barre", "BarreDos", "Buscador", "EntMastil", "PowerChord", "Septimas", "ArmoniaMov", "Reducida", "Caged", "QueRitmo", "Subdivision", "Acentos", "EjPua", "ManoDer", "Escalas", "Pentatonica", "Tecnicas", "Bending", "Blues", "Relativo", "Sistema32", "Improvisacion", "ImproEj", "RiffsFamosos", "Canciones", "Something", "Hotel", "Plan", "Grabacion", "Ejercicios1", "Aranha"], "curso": ["Pentatonica", "Posiciones?scale=pmin&root=9", "Sistema32", "Arpegios", "Septimas", "ModosCurso", "Modos", "ImproEj", "Improvisacion", "Blues", "Bending", "Tecnicas", "TecnicaPro", "Caged", "Barre", "ArmoniaMov", "Reducida", "Acentos", "Aranha", "RitmoAvanzado", "Batidas", "ManoDer", "MenoresAv", "Hotel"], "musica": ["Can1", "Can2", "Can3", "Can4", "Can5", "Can6", "Can7", "Can8", "Can9"]};
+const NAV = {"es": {"mods": [{"title": "Primeros pasos", "steps": [{"label": "Las guitarras y su sonido", "href": "ControlesTono"}, {"label": "Afinación", "href": "Afinacion"}, {"label": "Postura y manos", "href": "Postura"}, {"label": "Cómo practicar", "href": "ComoPracticar"}, {"label": "Sonido y equipo", "href": "Sonido"}]}, {"title": "Leer música", "steps": [{"label": "La partitura", "href": "Partitura"}, {"label": "La Tablatura", "href": "Tablatura"}, {"label": "Cifrado Americano", "href": "Cifras"}, {"label": "Las notas en la guitarra", "href": "Braco"}]}, {"title": "Acompañamiento", "z": 1, "steps": [{"label": "Teoría Imprescindible", "href": "TeoImp"}, {"label": "Los primeros acordes", "href": "Abiertos"}, {"label": "Ritmos de acompañamiento", "href": "Batidas"}, {"label": "Acordes con cejilla (A y E)", "href": "Barre"}, {"label": "Acordes con cejilla (D y C)", "href": "BarreDos"}, {"label": "Buscador de acordes", "href": "Buscador"}, {"label": "Bonus Track: Entendiendo el mástil", "href": "EntMastil"}]}, {"title": "Armonía avanzada", "steps": [{"label": "¿Qué es un power chord?", "href": "PowerChord"}, {"label": "Acordes con séptima", "href": "Septimas"}, {"label": "Otros tipos de acordes", "href": "ArmoniaMov"}, {"label": "Guitarra reducida", "href": "Reducida"}, {"label": "Sistema CAGED", "href": "Caged"}]}, {"title": "Mano derecha", "steps": [{"label": "¿Qué es el ritmo?", "href": "QueRitmo"}, {"label": "La subdivisión", "href": "Subdivision"}, {"label": "Acentuación con la púa", "href": "Acentos"}, {"label": "Ejercicios de púa", "href": "EjPua"}, {"label": "Mano derecha: patrones y palm mute", "href": "ManoDer"}]}, {"title": "Mano izquierda", "steps": [{"label": "¿Qué son las escalas?", "href": "Escalas"}, {"label": "Pentatónica menor", "href": "Pentatonica"}, {"label": "Hammer-on, pull-off, slide y bend", "href": "Tecnicas"}, {"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Hacer música con la pentatónica", "href": "HacerMusica"}]}, {"title": "Solo e improvisación", "steps": [{"label": "Blues", "href": "Blues"}, {"label": "El relativo: ¿qué es eso?", "href": "Relativo"}, {"label": "Sistema 3:2", "href": "Sistema32"}, {"label": "Improvisación", "href": "Improvisacion"}, {"label": "Improvisación guiada", "href": "ImproEj"}]}, {"title": "Repertorio y práctica", "steps": [{"label": "Riffs famosos", "href": "RiffsFamosos"}, {"label": "Canciones", "href": "Canciones"}, {"label": "Something", "href": "Something"}, {"label": "Hotel California", "href": "Hotel"}]}, {"title": "Cuaderno de ejercicios", "steps": [{"label": "Plan de práctica", "href": "Plan"}, {"label": "Grabación y autoevaluación", "href": "Grabacion"}, {"label": "Ejercicio 1: Cambios básicos", "href": "Ejercicios1"}, {"label": "La araña", "href": "Aranha"}]}], "course": {"mods": [{"title": "Pentatónica en 5 posiciones", "steps": [{"label": "Pentatónica menor", "href": "Pentatonica"}, {"label": "Escalas en posiciones", "href": "Posiciones?scale=pmin&root=9"}, {"label": "Sistema 3:2", "href": "Sistema32"}]}, {"title": "Escala mayor en 5 posiciones", "steps": [{"label": "Escalas en posiciones", "href": "Posiciones?scale=maj&root=0"}]}, {"title": "Escala menor en 5 posiciones", "steps": [{"label": "Escalas en posiciones", "href": "Posiciones?scale=min&root=9"}]}, {"title": "Arpegios mayores y menores", "steps": [{"label": "Arpegios", "href": "Arpegios"}]}, {"title": "Arpegios de 7ª mayor y menor", "steps": [{"label": "Arpegios", "href": "Arpegios"}, {"label": "Acordes con séptima", "href": "Septimas"}]}, {"title": "Los modos como concepto", "steps": [{"label": "Modos como concepto", "href": "ModosCurso"}, {"label": "Mixolidio y dórico", "href": "Modos"}]}, {"title": "Improvisación I", "steps": [{"label": "Improvisación guiada", "href": "ImproEj"}, {"label": "Improvisar sobre 12 compases", "href": "Improvisacion"}]}, {"title": "Improvisación II", "steps": [{"label": "Improvisación guiada", "href": "ImproEj"}, {"label": "Pentatónica y blues", "href": "Blues"}]}, {"title": "Mano izquierda I: bending y vibrato", "steps": [{"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Técnicas de rock", "href": "Tecnicas"}]}, {"title": "Mano izquierda II: slides y ligados", "steps": [{"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Técnica refinada", "href": "TecnicaPro"}]}, {"title": "Armonía I: cejilla, 7ª y 9ª", "steps": [{"label": "Sistema CAGED", "href": "Caged"}, {"label": "Acordes con cejilla (A y E)", "href": "Barre"}, {"label": "Acordes móviles", "href": "ArmoniaMov"}, {"label": "Acordes con séptima", "href": "Septimas"}]}, {"title": "Armonía II: sus2, sus4 y guitarra reducida", "steps": [{"label": "Acordes móviles", "href": "ArmoniaMov"}, {"label": "Guitarra reducida", "href": "Reducida"}]}, {"title": "Mano derecha I: acentuación y ritmos", "steps": [{"label": "Acentuación con la púa", "href": "Acentos"}, {"label": "La araña", "href": "Aranha"}, {"label": "Ritmo avanzado", "href": "RitmoAvanzado"}, {"label": "Patrones de ritmo", "href": "Batidas"}]}, {"title": "Mano derecha II: arpegios, trémolo y palm-mute", "steps": [{"label": "Arpegios, trémolo y palm-mute", "href": "ManoDer"}, {"label": "Técnicas de rock", "href": "Tecnicas"}]}, {"title": "Avanzado y repertorio", "steps": [{"label": "Menor armónica y melódica", "href": "MenoresAv"}, {"label": "Hotel California", "href": "Hotel"}]}]}, "music": {"mods": [{"title": "Cancionero esencial", "steps": [{"label": "The Sky Is Crying", "href": "Can1"}, {"label": "Tutti Frutti", "href": "Can2"}, {"label": "Fly Me to the Moon", "href": "Can3"}, {"label": "Easy", "href": "Can4"}, {"label": "Celebration", "href": "Can5"}, {"label": "Paint It Black", "href": "Can6"}, {"label": "Three Little Birds", "href": "Can7"}, {"label": "Paranoid", "href": "Can8"}, {"label": "This Is the Life", "href": "Can9"}]}]}}, "en": {"mods": [{"title": "First steps", "steps": [{"label": "Guitars and their sound", "href": "ControlesTono"}, {"label": "Tuning", "href": "Afinacion"}, {"label": "Posture and hands", "href": "Postura"}, {"label": "How to practice", "href": "ComoPracticar"}, {"label": "Sound and gear", "href": "Sonido"}]}, {"title": "Reading music", "steps": [{"label": "Sheet music", "href": "Partitura"}, {"label": "Tablature", "href": "Tablatura"}, {"label": "Chord symbols", "href": "Cifras"}, {"label": "Notes on the guitar", "href": "Braco"}]}, {"title": "Accompaniment", "z": 1, "steps": [{"label": "Must-Know Theory", "href": "TeoImp"}, {"label": "The first chords", "href": "Abiertos"}, {"label": "Accompaniment rhythms", "href": "Batidas"}, {"label": "Barre chords (A and E)", "href": "Barre"}, {"label": "Barre chords (D and C)", "href": "BarreDos"}, {"label": "Chord finder", "href": "Buscador"}, {"label": "Bonus Track: Understanding the neck", "href": "EntMastil"}]}, {"title": "Advanced harmony", "steps": [{"label": "What is a power chord?", "href": "PowerChord"}, {"label": "Seventh chords", "href": "Septimas"}, {"label": "Other chord types", "href": "ArmoniaMov"}, {"label": "Reduced guitar", "href": "Reducida"}, {"label": "CAGED system", "href": "Caged"}]}, {"title": "Right hand", "steps": [{"label": "What is rhythm?", "href": "QueRitmo"}, {"label": "Subdivision", "href": "Subdivision"}, {"label": "Picking accents", "href": "Acentos"}, {"label": "Picking exercises", "href": "EjPua"}, {"label": "Right hand: patterns and palm mute", "href": "ManoDer"}]}, {"title": "Left hand", "steps": [{"label": "What are scales?", "href": "Escalas"}, {"label": "Minor pentatonic", "href": "Pentatonica"}, {"label": "Hammer-on, pull-off, slide and bend", "href": "Tecnicas"}, {"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Making music with the pentatonic", "href": "HacerMusica"}]}, {"title": "Solos and improvisation", "steps": [{"label": "Blues", "href": "Blues"}, {"label": "The relative: what is that?", "href": "Relativo"}, {"label": "3:2 system", "href": "Sistema32"}, {"label": "Improvisation", "href": "Improvisacion"}, {"label": "Guided improvisation", "href": "ImproEj"}]}, {"title": "Repertoire and practice", "steps": [{"label": "Famous riffs", "href": "RiffsFamosos"}, {"label": "Songs", "href": "Canciones"}, {"label": "Something", "href": "Something"}, {"label": "Hotel California", "href": "Hotel"}]}, {"title": "Exercise book", "steps": [{"label": "Practice plan", "href": "Plan"}, {"label": "Recording and self-review", "href": "Grabacion"}, {"label": "Exercise 1: Basic changes", "href": "Ejercicios1"}, {"label": "The spider", "href": "Aranha"}]}], "course": {"mods": [{"title": "Pentatonic in 5 positions", "steps": [{"label": "Minor pentatonic", "href": "Pentatonica"}, {"label": "Scales in positions", "href": "Posiciones?scale=pmin&root=9"}, {"label": "3:2 system", "href": "Sistema32"}]}, {"title": "Major scale in 5 positions", "steps": [{"label": "Scales in positions", "href": "Posiciones?scale=maj&root=0"}]}, {"title": "Minor scale in 5 positions", "steps": [{"label": "Scales in positions", "href": "Posiciones?scale=min&root=9"}]}, {"title": "Major and minor arpeggios", "steps": [{"label": "Arpeggios", "href": "Arpegios"}]}, {"title": "Major and minor 7th arpeggios", "steps": [{"label": "Arpeggios", "href": "Arpegios"}, {"label": "Seventh chords", "href": "Septimas"}]}, {"title": "Modes as a concept", "steps": [{"label": "Modes as a concept", "href": "ModosCurso"}, {"label": "Mixolydian and Dorian", "href": "Modos"}]}, {"title": "Improvisation I", "steps": [{"label": "Guided improvisation", "href": "ImproEj"}, {"label": "Improvising over 12 bars", "href": "Improvisacion"}]}, {"title": "Improvisation II", "steps": [{"label": "Guided improvisation", "href": "ImproEj"}, {"label": "Pentatonic and blues", "href": "Blues"}]}, {"title": "Left hand I: bending and vibrato", "steps": [{"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Rock techniques", "href": "Tecnicas"}]}, {"title": "Left hand II: slides and legato", "steps": [{"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Refined technique", "href": "TecnicaPro"}]}, {"title": "Harmony I: barre, 7th and 9th", "steps": [{"label": "CAGED system", "href": "Caged"}, {"label": "Barre chords (A and E)", "href": "Barre"}, {"label": "Movable chords", "href": "ArmoniaMov"}, {"label": "Seventh chords", "href": "Septimas"}]}, {"title": "Harmony II: sus2, sus4 and reduced guitar", "steps": [{"label": "Movable chords", "href": "ArmoniaMov"}, {"label": "Reduced guitar", "href": "Reducida"}]}, {"title": "Right hand I: accents and rhythms", "steps": [{"label": "Picking accents", "href": "Acentos"}, {"label": "The spider", "href": "Aranha"}, {"label": "Advanced rhythm", "href": "RitmoAvanzado"}, {"label": "Rhythm patterns", "href": "Batidas"}]}, {"title": "Right hand II: arpeggios, tremolo and palm-mute", "steps": [{"label": "Arpeggios, tremolo and palm-mute", "href": "ManoDer"}, {"label": "Rock techniques", "href": "Tecnicas"}]}, {"title": "Advanced and repertoire", "steps": [{"label": "Harmonic and melodic minor", "href": "MenoresAv"}, {"label": "Hotel California", "href": "Hotel"}]}]}, "music": {"mods": [{"title": "Essential songbook", "steps": [{"label": "The Sky Is Crying", "href": "Can1"}, {"label": "Tutti Frutti", "href": "Can2"}, {"label": "Fly Me to the Moon", "href": "Can3"}, {"label": "Easy", "href": "Can4"}, {"label": "Celebration", "href": "Can5"}, {"label": "Paint It Black", "href": "Can6"}, {"label": "Three Little Birds", "href": "Can7"}, {"label": "Paranoid", "href": "Can8"}, {"label": "This Is the Life", "href": "Can9"}]}]}}};
+const SEQS = {"ruta": ["ControlesTono", "Afinacion", "Postura", "ComoPracticar", "Sonido", "Partitura", "Tablatura", "Cifras", "Braco", "TeoImp", "Abiertos", "Batidas", "Barre", "BarreDos", "Buscador", "EntMastil", "PowerChord", "Septimas", "ArmoniaMov", "Reducida", "Caged", "QueRitmo", "Subdivision", "Acentos", "EjPua", "ManoDer", "Escalas", "Pentatonica", "Tecnicas", "Bending", "HacerMusica", "Blues", "Relativo", "Sistema32", "Improvisacion", "ImproEj", "RiffsFamosos", "Canciones", "Something", "Hotel", "Plan", "Grabacion", "Ejercicios1", "Aranha"], "curso": ["Pentatonica", "Posiciones?scale=pmin&root=9", "Sistema32", "Arpegios", "Septimas", "ModosCurso", "Modos", "ImproEj", "Improvisacion", "Blues", "Bending", "Tecnicas", "TecnicaPro", "Caged", "Barre", "ArmoniaMov", "Reducida", "Acentos", "Aranha", "RitmoAvanzado", "Batidas", "ManoDer", "MenoresAv", "Hotel"], "musica": ["Can1", "Can2", "Can3", "Can4", "Can5", "Can6", "Can7", "Can8", "Can9"]};
 (function () {
 'use strict';
 class DCLogic {
@@ -2492,7 +2524,8 @@ const D = {
         "¿Qué son las escalas?",
         "Pentatónica menor",
         "Hammer-on, pull-off, slide y bend",
-        "Bendings, slides y vibrato"
+        "Bendings, slides y vibrato",
+        "Hacer música con la pentatónica"
       ],
       [
         "Blues",
@@ -2556,7 +2589,8 @@ const D = {
         "Escalas",
         "Pentatonica",
         "Tecnicas",
-        "Bending"
+        "Bending",
+        "HacerMusica"
       ],
       [
         "Blues",
@@ -2657,7 +2691,8 @@ const D = {
         "What are scales?",
         "Minor pentatonic",
         "Hammer-on, pull-off, slide and bend",
-        "Bends, slides and vibrato"
+        "Bends, slides and vibrato",
+        "Making music with the pentatonic"
       ],
       [
         "Blues",
@@ -2721,7 +2756,8 @@ const D = {
         "Escalas",
         "Pentatonica",
         "Tecnicas",
-        "Bending"
+        "Bending",
+        "HacerMusica"
       ],
       [
         "Blues",
@@ -6777,6 +6813,127 @@ C["Something"] = (DCLogic) => {
 };
 TPL['Something'] = TPL.LeadCeleb.replace('Can5.dc.html', 'Main.dc.html').replace('Can5.dc.html', 'Hotel.dc.html');
 // ===== fin Something =====
+// ===== Hacer música con la pentatónica · módulo 6, paso 5 =====
+C["HacerMusica"] = (DCLogic) => {
+  class Component extends DCLogic {
+    constructor(props) {
+      super(props);
+      let lang = 'es';
+      try { const v = localStorage.getItem('guitar.lang'); if (v === 'en' || v === 'es') lang = v; } catch (e) {}
+      this.state = { lang };
+    }
+    componentDidMount() {
+      try { window.addEventListener('storage', (e) => { if (e.key === 'guitar.lang' && (e.newValue === 'es' || e.newValue === 'en')) this.setState({ lang: e.newValue }); }); } catch (e) {}
+    }
+    setLang(l) { this.setState({ lang: l }); try { localStorage.setItem('guitar.lang', l); } catch (e) {} }
+    paint() {
+      if (!this.__render) return;
+      const root = document.getElementById('hm-root');
+      if (!root) return;
+      const es = this.state.lang === 'es';
+      const T = es ? {
+        disc: 'Para entender esta página necesitas conocer de memoria las posiciones 1 y 2 de la pentatónica menor.',
+        h1: 'Dos colores con las mismas notas',
+        p1: 'En el blues y en el rock and roll nace un sonido muy característico: los acordes de la canción suenan mayores (alegres), pero el solo se toca con la pentatónica menor (más oscura). Esa mezcla de «mayor» y «menor» es parte del sabor de la música popular.',
+        p2: 'En la práctica, eso significa que sobre una misma canción puedes alternar la pentatónica menor y la pentatónica mayor del mismo tono. Lo hacen canciones como Easy, The Sky Is Crying, Tutti Frutti y Celebration.',
+        cT: 'Pentatónica menor y mayor de La♭', cX: 'Mismo tono, misma tónica. Solo comparten dos notas (La♭ y Mi♭); el resto cambia, en rojo. La más importante es la tercera: Do♭ (la «nota triste») en la menor y Do (la «nota alegre») en la mayor.',
+        mi: 'La♭ menor', ma: 'La♭ mayor', gr: ['1', '♭3', '4', '5', '♭7'], gr2: ['1', '2', '3', '5', '6'],
+        hT: 'El truco: la misma escala, tres trastes más abajo',
+        hX: 'La pentatónica mayor de La♭ tiene exactamente las mismas notas que la pentatónica menor de Fa (la menor que está tres trastes por debajo de La♭). Dicho de otra forma: no hay que aprender una escala nueva. La posición que ya conoces de Fa menor es La♭ mayor.',
+        lT: 'Escucha la diferencia', lX: 'Pulsa y compara. Ambas empiezan en La♭: la primera suena «de blues», la segunda más dulce.',
+        vT: 'Vídeo: mezclar la pentatónica menor y mayor', vS: 'Aquí irá el vídeo explicativo.',
+        eH: 'Ejemplo: Easy', eX: 'En Easy los solos mezclan frases de La♭ mayor y de La♭ menor para darle un color distinto. Y lo mejor es que las dos viven en la misma zona del mástil: mira los diagramas (trastes 3 al 7).',
+        d1: 'Posición 1 de La♭ menor', d1x: 'La tónica (La♭) está en la 6.ª cuerda, traste 4.',
+        d2: 'Posición 2 de Fa menor (= La♭ mayor)', d2x: 'Mismo lugar del mástil, tonalidad distinta: suena a La♭ mayor.',
+        d3: 'Las dos juntas', d3x: 'Rojo: solo menor. Azul: solo mayor. Mitad y mitad: la nota está en las dos (La♭ y Mi♭, las «notas comunes»). El círculo con anillo es la tónica La♭.',
+        key: ['Solo La♭ menor', 'Solo La♭ mayor', 'En las dos'],
+        tipT: 'Cómo practicarlo', tip: 'Haz un solo de 4 compases sobre un La♭ y alterna: una frase con la menor, otra con la mayor. También puedes mover la mano tres trastes (Fa menor ↔ La♭ menor) para cambiar de color. Termina siempre en una nota de La♭.',
+        play: 'Escuchar', str: 'Cuerda ', fret: 'Traste ', aria: 'Mástil: '
+      } : {
+        disc: 'To follow this page you need to know positions 1 and 2 of the minor pentatonic by heart.',
+        h1: 'Two colours from the same notes',
+        p1: 'In blues and rock and roll a very characteristic sound was born: the chords of the song sound major (bright), but the solo is played with the minor pentatonic (darker). That mix of “major” and “minor” is part of the flavour of popular music.',
+        p2: 'In practice this means that over the same song you can alternate the minor pentatonic and the major pentatonic of the same key. Songs like Easy, The Sky Is Crying, Tutti Frutti and Celebration do exactly that.',
+        cT: 'A♭ minor and major pentatonic', cX: 'Same key, same root. They only share two notes (A♭ and E♭); the rest change, in red. The most important is the third: C♭ (the “sad note”) in the minor and C (the “happy note”) in the major.',
+        mi: 'A♭ minor', ma: 'A♭ major', gr: ['1', '♭3', '4', '5', '♭7'], gr2: ['1', '2', '3', '5', '6'],
+        hT: 'The trick: the same scale, three frets lower',
+        hX: 'The A♭ major pentatonic has exactly the same notes as the F minor pentatonic (the minor three frets below A♭). In other words: you do not need to learn a new scale. The position you already know for F minor is A♭ major.',
+        lT: 'Hear the difference', lX: 'Tap and compare. Both start on A♭: the first sounds “bluesy”, the second sweeter.',
+        vT: 'Video: mixing the minor and major pentatonic', vS: 'The explanatory video will go here.',
+        eH: 'Example: Easy', eX: 'In Easy the solos mix phrases of A♭ major and A♭ minor to give them a different colour. And the best part is that both live in the same area of the neck: look at the diagrams (frets 3 to 7).',
+        d1: 'A♭ minor, position 1', d1x: 'The root (A♭) is on the 6th string, fret 4.',
+        d2: 'F minor, position 2 (= A♭ major)', d2x: 'Same place on the neck, different key: it sounds like A♭ major.',
+        d3: 'Both together', d3x: 'Red: minor only. Blue: major only. Half and half: the note is in both (A♭ and E♭, the “common notes”). The circle with a ring is the root A♭.',
+        key: ['A♭ minor only', 'A♭ major only', 'In both'],
+        tipT: 'How to practise it', tip: 'Play a 4-bar solo over an A♭ chord and alternate: one phrase with the minor, the next with the major. You can also move your hand three frets (F minor ↔ A♭ minor) to change colour. Always finish on an A♭.',
+        play: 'Listen', str: 'String ', fret: 'Fret ', aria: 'Fretboard: '
+      };
+      const NM = es ? ['Do', 'Re♭', 'Re', 'Mi♭', 'Mi', 'Fa', 'Sol♭', 'Sol', 'La♭', 'La', 'Si♭', 'Do♭'] : ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'C♭'];
+      const MINP = { 6: [4, 7], 5: [4, 6], 4: [4, 6], 3: [4, 6], 2: [4, 7], 1: [4, 7] };   // A♭ minor, position 1
+      const MAJP = { 6: [4, 6], 5: [3, 6], 4: [3, 6], 3: [3, 5], 2: [4, 6], 1: [4, 6] };   // F minor, position 2 = A♭ major
+      const midi = (s, f) => LS_GOPEN[6 - s] + f;
+      const mk = (a, b) => { const o = []; for (let s = 6; s >= 1; s--) { const set = {}; (a[s] || []).forEach((f) => { set[f] = set[f] || { s, f, mn: 0, mj: 0 }; set[f].mn = 1; }); (b[s] || []).forEach((f) => { set[f] = set[f] || { s, f, mn: 0, mj: 0 }; set[f].mj = 1; }); Object.keys(set).forEach((k) => o.push(set[k])); } return o; };
+      const SETS = { mi: mk(MINP, {}), ma: mk({}, MAJP), both: mk(MINP, MAJP) };
+      const start = 3, n = 5, FW = 56, X0 = 34, SP = 32, Y = (s) => 22 + (6 - s) * SP;
+      const CX = (f) => X0 + (f - start) * FW + FW / 2;
+      const neck = (id, dots, aria) => {
+        const W = X0 + n * FW, H = 22 + 5 * SP + 22;
+        let h = '<svg class="hm-neck" viewBox="0 0 ' + (W + 6) + ' ' + (H + 22) + '" width="100%" role="img" aria-label="' + aria + '"><rect class="hm-bd" x="' + X0 + '" y="10" width="' + (n * FW) + '" height="' + (H - 12) + '" rx="4"/>';
+        for (let k = 0; k <= n; k++) h += '<line class="hm-fl" x1="' + (X0 + k * FW) + '" y1="10" x2="' + (X0 + k * FW) + '" y2="' + (H - 2) + '"/>';
+        for (let s = 1; s <= 6; s++) h += '<line class="hm-st" x1="' + X0 + '" y1="' + Y(s) + '" x2="' + (X0 + n * FW) + '" y2="' + Y(s) + '" stroke-width="' + (1 + (s - 1) * 0.3) + '"/><text class="hm-lb" x="' + (X0 - 10) + '" y="' + (Y(s) + 4) + '" text-anchor="end">' + s + '</text>';
+        for (let k = 0; k < n; k++) h += '<text class="hm-lb" x="' + (X0 + k * FW + FW / 2) + '" y="' + (H + 14) + '" text-anchor="middle">' + (start + k) + '</text>';
+        h += '<circle class="hm-pt" cx="' + CX(5) + '" cy="' + ((Y(3) + Y(4)) / 2) + '" r="5"/>';
+        dots.forEach((d) => {
+          const x = CX(d.f), y = Y(d.s), pc = midi(d.s, d.f) % 12, tonic = pc === 8, nm = NM[pc];
+          const base = d.mn && d.mj ? '<path class="hm-dm" d="M' + x + ' ' + (y - 15) + 'A15 15 0 0 0 ' + x + ' ' + (y + 15) + 'Z"/><path class="hm-dj" d="M' + x + ' ' + (y - 15) + 'A15 15 0 0 1 ' + x + ' ' + (y + 15) + 'Z"/>' : '<circle class="' + (d.mn ? 'hm-dm' : 'hm-dj') + '" cx="' + x + '" cy="' + y + '" r="15"/>';
+          h += '<g class="hm-n" data-m="' + midi(d.s, d.f) + '" role="button" tabindex="0" aria-label="' + T.str + d.s + ', ' + T.fret + d.f + ', ' + nm + '">' + (tonic ? '<circle class="hm-ring" cx="' + x + '" cy="' + y + '" r="18.5"/>' : '') + base + '<text class="hm-tx" x="' + x + '" y="' + (y + 4.2) + '" text-anchor="middle">' + nm + '</text></g>';
+        });
+        return h + '</svg>';
+      };
+      const upMidi = (a, b) => { const o = {}; a.concat(b).forEach((d) => { o[midi(d.s, d.f)] = 1; }); return Object.keys(o).map(Number).sort((x, y) => x - y); };
+      this._seq = { mi: upMidi(SETS.mi, []), ma: upMidi(SETS.ma, []) };
+      const chip = (nmv, gr, low) => '<span class="ea-chip' + (low ? ' ea-low' : '') + '"><i>' + gr + '</i><b>' + nmv + '</b></span>';
+      const sc = (names, grades, lows) => '<div class="ea-chips">' + names.map((x, i) => chip(x, grades[i], lows.indexOf(i) >= 0)).join('') + '</div>';
+      const miN = [8, 11, 1, 3, 6].map((p) => NM[p]), maN = [8, 10, 0, 3, 5].map((p) => NM[p]);
+      const p = (x) => '<p class="pt-p">' + x + '</p>';
+      const H3 = (x) => '<h2 class="bt-h3">' + x + '</h2>';
+      const legend = '<div class="hm-key"><span><i class="hm-k1"></i>' + T.key[0] + '</span><span><i class="hm-k2"></i>' + T.key[1] + '</span><span><i class="hm-k3"></i>' + T.key[2] + '</span></div>';
+      const fig = (id, title, x, dots, extra) => '<div class="pt-card hm-fig"><b class="ea-h">' + title + '</b>' + neck(id, dots, T.aria + title) + p(x) + (extra || '') + '</div>';
+      root.innerHTML = '<div class="pt-note">' + p('⚠ ' + T.disc) + '</div>'
+        + H3(T.h1) + '<div class="pt-card">' + p(T.p1) + p(T.p2) + '</div>'
+        + '<div class="pt-card"><b class="ea-h">' + T.cT + '</b>'
+        + '<div class="ea-row"><span class="ea-lead">' + T.mi + '</span>' + sc(miN, T.gr, [1, 2, 4]) + '</div>'
+        + '<div class="ea-row"><span class="ea-lead">' + T.ma + '</span>' + sc(maN, T.gr2, [1, 2, 4]) + '</div>' + p(T.cX) + '</div>'
+        + '<div class="pt-note">' + '<b class="ea-h">' + T.hT + '</b>' + p(T.hX) + '</div>'
+        + '<div class="pt-card"><b class="ea-h">' + T.lT + '</b>' + p(T.lX) + '<div class="hm-pl"><button type="button" class="rt-play" data-seq="mi">▶ ' + T.play + ' · ' + T.mi + '</button><button type="button" class="rt-play" data-seq="ma">▶ ' + T.play + ' · ' + T.ma + '</button></div></div>'
+        + '<div class="rt-video"><b>' + T.vT + '</b><div class="rt-vbox" role="img" aria-label="' + T.vT + '"><span class="rt-vplay">▶</span><span>' + T.vS + '</span></div></div>'
+        + H3(T.eH) + '<div class="pt-card">' + p(T.eX) + '</div>'
+        + fig('mi', T.d1, T.d1x, SETS.mi) + fig('ma', T.d2, T.d2x, SETS.ma) + fig('both', T.d3, T.d3x, SETS.both, legend)
+        + '<div class="pt-note"><b class="ea-h">' + T.tipT + '</b>' + p(T.tip) + '</div>';
+      const play = (arr) => {
+        const ac = pAudio(); if (!ac) return; try { pUnlock(); } catch (x) {}
+        const t0 = ac.currentTime + 0.05; arr.forEach((m, i) => pluck(m, t0 + i * 0.3, 0.55));
+      };
+      root.onclick = (e) => {
+        const q = e.target.closest && e.target.closest('[data-seq]');
+        if (q) { play(this._seq[q.getAttribute('data-seq')]); return; }
+        const g = e.target.closest && e.target.closest('.hm-n');
+        if (g) { const ac = pAudio(); if (!ac) return; try { pUnlock(); } catch (x) {} pluck(+g.getAttribute('data-m'), ac.currentTime + 0.02, 0.6); }
+      };
+      root.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { const g = e.target.closest && e.target.closest('.hm-n'); if (g) { e.preventDefault(); g.dispatchEvent(new MouseEvent('click', { bubbles: true })); } } };
+    }
+    renderVals() {
+      const lang = this.state.lang, es = lang === 'es';
+      const T = { langAria: es ? 'Idioma' : 'Language', backAria: es ? 'Volver' : 'Back', title: es ? 'Hacer música con la pentatónica' : 'Making music with the pentatonic', eyebrow: es ? 'Módulo 6' : 'Module 6', intro: es ? 'Mezclar la pentatónica menor y la mayor del mismo tono: el color de Easy, Tutti Frutti, Celebration y The Sky Is Crying.' : 'Mixing the minor and major pentatonic of the same key: the colour of Easy, Tutti Frutti, Celebration and The Sky Is Crying.', cta: es ? 'Siguiente: pentatónica y blues' : 'Next: pentatonic and blues' };
+      setTimeout(() => this.paint(), 0);
+      const langs = ['es', 'en'].map((l) => { const on = lang === l; return { label: l.toUpperCase(), aria: l === 'es' ? 'Español' : 'English', pressed: on, bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#B3121A' : '#3A3A3A', sh: on ? '0 1px 2px 0 rgba(21,21,21,0.08)' : 'none', pick: () => this.setLang(l) }; });
+      return { t: T, langs };
+    }
+  }
+  return Component;
+};
+TPL['HacerMusica'] = TPL.Escalas.replace('id="ea-root"', 'id="hm-root"').replace('Pentatonica.dc.html', 'Blues.dc.html');
+// ===== fin Hacer música =====
 // ===== Biblioteca de lecciones =====
 // level of each module of the main path (0 beginner, 1 intermediate, 2 advanced) and of each song; my own assignment, easy to edit
 const BIB_LVL = [0, 0, 0, 1, 1, 1, 2, 1, 0];
@@ -24492,8 +24649,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '18 nov 2026 · 22:24';
-  var BUILD_ID = '2026-11-18T22:24';
+  var BUILD = '18 nov 2026 · 22:58';
+  var BUILD_ID = '2026-11-18T22:58';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
