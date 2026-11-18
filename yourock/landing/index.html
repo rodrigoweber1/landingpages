@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>YouRock Guitar Tools: practica guitarra con una app que te escucha</title>
+<meta name="description" content="Practica guitarra con una app que escucha lo que tocas, te dice qué nota falló y sube la velocidad cuando lo haces limpio. 152 ejercicios, 4 niveles. Empieza gratis.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="YouRock Guitar Tools: practica guitarra con una app que te escucha">
+<meta property="og:description" content="Te dice qué nota falló y sube la velocidad cuando tocas limpio. 152 ejercicios en 4 niveles. Empieza gratis.">
+<meta property="og:image" content="img/app-train.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+:root{
+  --bg:#000000;--s1:#181818;--s2:#1F1F1F;--s3:#272727;--s4:#313131;
+  --tx:#FFFFFF;--mu:#9B9B9B;--acc:#3DD9B8;--acc-tx:#04231C;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--tx);font-family:'Manrope',system-ui,sans-serif;font-size:16px;line-height:24px;font-weight:400;font-style:normal;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+svg.i{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* text styles */
+.heading-1{font-size:36px;line-height:40px;font-weight:600;text-wrap:balance}
+.heading-2{font-size:30px;line-height:36px;font-weight:600;text-wrap:balance}
+.heading-3{font-size:30px;line-height:36px;font-weight:600;text-wrap:balance}
+.heading-6{font-size:20px;line-height:28px;font-weight:600}
+.title-2{font-size:18px;line-height:28px;font-weight:500}
+.title-3{font-size:16px;line-height:24px;font-weight:500}
+.body-2{font-size:16px;line-height:24px;font-weight:500}
+.body-3{font-size:16px;line-height:24px;font-weight:400;text-wrap:pretty}
+.body-5{font-size:14px;line-height:20px;font-weight:500}
+.body-6{font-size:14px;line-height:20px;font-weight:400}
+.button-md{font-size:16px;line-height:24px;font-weight:600}
+.button-sm{font-size:14px;line-height:20px;font-weight:600}
+.caption-3{font-size:12px;line-height:16px;font-weight:600}
+@media(min-width:768px){
+  .heading-1{font-size:60px;line-height:60px}
+  .heading-2{font-size:48px;line-height:48px}
+  .heading-3{font-size:36px;line-height:40px}
+}
+@media(min-width:1024px){.heading-3{font-size:48px;line-height:48px}}
+.mu{color:var(--mu)}
+.grad{background:linear-gradient(90deg,#FFFFFF,#9B9B9B);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+
+/* layout */
+.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 16px}
+section{padding:64px 0}
+@media(min-width:768px){section{padding:96px 0}.wrap{padding:0 24px}}
+.sec-head{max-width:680px;margin-bottom:40px;display:flex;flex-direction:column;gap:12px}
+.eyebrow{color:var(--acc)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;min-height:44px;border-radius:12px;border:1px solid transparent;cursor:pointer;transition:transform .5s var(--ease),background-color .3s var(--ease),opacity .3s var(--ease);text-align:center}
+.btn-pri{background:var(--acc);color:var(--acc-tx);padding:8px 24px}
+.btn-pri:hover{transform:translateY(-2px);opacity:.92}
+.btn-ghost{background:var(--s2);border-color:var(--s4);color:var(--tx)}
+.btn-ghost:hover{background:var(--s3);transform:translateY(-2px)}
+.btn:active{transform:scale(.98)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:8px}
+.skip{position:absolute;left:16px;top:-80px;background:var(--acc);color:var(--acc-tx);padding:8px 12px;border-radius:8px;z-index:100;transition:transform .5s var(--ease)}
+.skip:focus{transform:translateY(96px)}
+
+/* nav */
+.nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:50;width:calc(100% - 32px);max-width:720px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;background:rgba(24,24,24,.72);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--s4);border-radius:16px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo b{color:var(--acc);font-weight:600}
+.nav-links{display:none;gap:24px}
+.nav-links a{color:var(--mu);transition:color .3s var(--ease)}
+.nav-links a:hover{color:var(--tx)}
+.nav .btn{min-height:44px}
+.nav-end{display:flex;align-items:center;gap:8px}
+.burger{width:44px;height:44px;border-radius:12px;background:var(--s2);border:1px solid var(--s4);cursor:pointer;display:grid;place-items:center;color:var(--tx)}
+.burger .bars span{display:block;width:16px;height:2px;background:currentColor;border-radius:2px;transition:transform .5s var(--ease),opacity .3s var(--ease)}
+.burger .bars{display:flex;flex-direction:column;gap:4px}
+.burger[aria-expanded="true"] .bars span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.burger[aria-expanded="true"] .bars span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] .bars span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.nav-cta{display:none}
+.panel{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.94);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);display:flex;flex-direction:column;justify-content:center;gap:16px;padding:96px 24px 48px;opacity:0;visibility:hidden;transition:opacity .5s var(--ease),visibility .5s}
+.panel.open{opacity:1;visibility:visible}
+.panel a.pl{font-size:30px;line-height:36px;font-weight:600;opacity:0;transform:translateY(24px);transition:transform .5s var(--ease),opacity .5s var(--ease)}
+.panel.open a.pl{opacity:1;transform:none}
+.panel.open a.pl:nth-child(1){transition-delay:60ms}.panel.open a.pl:nth-child(2){transition-delay:120ms}.panel.open a.pl:nth-child(3){transition-delay:180ms}.panel.open a.pl:nth-child(4){transition-delay:240ms}.panel.open a.pl:nth-child(5){transition-delay:300ms}
+@media(min-width:768px){.nav-links{display:flex}.burger,.panel{display:none}.nav-cta{display:inline-flex}}
+
+/* hero */
+.hero{padding-top:112px;padding-bottom:48px}
+.hero-grid{display:grid;gap:40px;align-items:center}
+.hero-copy{display:flex;flex-direction:column;gap:16px;max-width:680px}
+.hero-copy .body-3{font-size:18px;line-height:28px;color:var(--mu);max-width:680px}
+.hero-cta{display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:8px}
+.hero-note{color:var(--mu)}
+.proof{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:16px;padding-top:16px;border-top:1px solid var(--s3)}
+.proof div{display:flex;flex-direction:column}
+.proof b{font-size:24px;line-height:32px;font-weight:600}
+.proof span{color:var(--mu)}
+.phone{background:var(--s1);border:1px solid var(--s4);border-radius:24px;padding:8px;width:100%;max-width:320px;margin:0 auto}
+.phone img{border-radius:16px;width:100%}
+@media(min-width:900px){
+  .hero-grid{grid-template-columns:1.15fr .85fr;gap:48px}
+  .hero{padding-top:144px}
+  .hero-cta{flex-direction:row;align-items:center}
+}
+
+/* problem */
+.two{display:grid;gap:16px}
+@media(min-width:768px){.two{grid-template-columns:1fr 1fr;gap:24px}}
+.card{background:var(--s1);border:1px solid var(--s3);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.card.hl{background:var(--s2);border-color:var(--s4)}
+.card ul{display:flex;flex-direction:column;gap:12px}
+.card li{display:flex;gap:12px;align-items:flex-start}
+.card li svg{margin-top:2px;width:20px;height:20px}
+.bad svg{color:var(--mu)}
+.good svg{color:var(--acc)}
+
+/* benefits */
+.ben{display:grid;gap:16px}
+@media(min-width:768px){.ben{grid-template-columns:repeat(2,1fr);gap:24px}}
+@media(min-width:1024px){.ben{grid-template-columns:repeat(6,1fr)}.ben .card{grid-column:span 2}.ben .card:nth-child(4),.ben .card:nth-child(5){grid-column:span 3}}
+.ico{width:44px;height:44px;border-radius:12px;background:var(--s3);color:var(--acc);display:grid;place-items:center}
+.card .body-6{color:var(--mu)}
+.card:hover{border-color:var(--s4)}
+.card{transition:border-color .3s var(--ease),transform .5s var(--ease)}
+
+/* tagline */
+.tag{padding:96px 0}
+.tag p{max-width:680px;margin:0 auto;text-align:center}
+.tag .w{opacity:.3;transition:opacity .6s var(--ease)}
+.tag .w.on{opacity:1}
+@media(prefers-reduced-motion:reduce){.tag .w{opacity:1;transition:none}}
+.no-js .tag .w,html:not(.js) .tag .w{opacity:1}
+
+/* steps */
+.steps{display:grid;gap:16px;counter-reset:s}
+@media(min-width:768px){.steps{grid-template-columns:repeat(3,1fr);gap:24px}}
+.step .num{width:32px;height:32px;border-radius:9999px;background:var(--acc);color:var(--acc-tx);display:grid;place-items:center}
+.shots{display:grid;gap:16px;margin-top:40px;grid-template-columns:1fr}
+@media(min-width:768px){.shots{grid-template-columns:repeat(3,1fr);gap:24px}}
+.shots .phone{max-width:280px}
+.shots figcaption{margin-top:12px;text-align:center;color:var(--mu)}
+
+/* tools */
+.tools{display:grid;gap:16px}
+@media(min-width:768px){.tools{grid-template-columns:repeat(3,1fr);gap:24px}}
+
+/* author */
+.author{display:grid;gap:16px;background:var(--s1);border:1px solid var(--s3);border-radius:24px;padding:24px}
+@media(min-width:768px){.author{padding:40px;grid-template-columns:1fr auto;align-items:center;gap:40px}}
+
+/* faq */
+.faq{max-width:760px;display:flex;flex-direction:column;gap:12px}
+.faq details{background:var(--s1);border:1px solid var(--s3);border-radius:16px;padding:0 16px;transition:border-color .3s var(--ease)}
+.faq details[open]{border-color:var(--s4);background:var(--s2)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:56px;padding:12px 0}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary svg{transition:transform .5s var(--ease);color:var(--mu)}
+.faq details[open] summary svg{transform:rotate(45deg)}
+.faq details p{padding:0 0 16px;color:var(--mu)}
+
+/* final */
+.final{background:var(--s1);border:1px solid var(--s3);border-radius:24px;padding:40px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px}
+.final .body-3{color:var(--mu);max-width:560px}
+.risk{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 24px;color:var(--mu);margin-top:8px}
+.risk span{display:inline-flex;align-items:center;gap:8px}
+.risk svg{width:20px;height:20px;color:var(--acc)}
+@media(min-width:768px){.final{padding:64px 40px}}
+
+footer{border-top:1px solid var(--s3);padding:40px 0 48px}
+.foot{display:flex;flex-direction:column;gap:16px;color:var(--mu)}
+.foot nav{display:flex;flex-wrap:wrap;gap:8px 24px}
+.foot a{min-height:44px;display:inline-flex;align-items:center;transition:color .3s var(--ease)}
+.foot a:hover{color:var(--tx)}
+@media(min-width:768px){.foot{flex-direction:row;justify-content:space-between;align-items:center}}
+
+/* reveal */
+.js .rv{opacity:0;transform:translateY(32px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.js .rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  .js .rv{transform:none;transition:opacity .4s linear}
+  .btn,.card,.panel a.pl{transition:opacity .3s linear}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<a class="skip body-5" href="#main">Saltar al contenido</a>
+
+<header class="nav" role="banner">
+  <a class="logo title-3" href="#top" aria-label="YouRock Guitar Tools, inicio"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c5 0 8 3.4 8 7.2 0 5-5 10.2-8 11.3C9 20.400 4 15.200 4 10.200 4 6.400 7 3 12 3Z" style="stroke:var(--acc)"/><path d="M9 9.500v4M11 8v7M13 7v9M15 9v5"/></svg><span>You<b>Rock</b></span></a>
+  <nav class="nav-links body-5" aria-label="Principal">
+    <a href="#beneficios">Beneficios</a>
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#herramientas">Herramientas</a>
+    <a href="#faq">Preguntas</a>
+  </nav>
+  <div class="nav-end">
+    <a class="btn btn-pri button-sm nav-cta" data-app href="../index.html">Probar gratis</a>
+    <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="panel"><span class="bars" aria-hidden="true"><span></span><span></span><span></span></span></button>
+  </div>
+</header>
+<div class="panel" id="panel" aria-hidden="true">
+  <a class="pl" href="#beneficios">Beneficios</a>
+  <a class="pl" href="#como-funciona">Cómo funciona</a>
+  <a class="pl" href="#herramientas">Herramientas</a>
+  <a class="pl" href="#faq">Preguntas</a>
+  <a class="pl" data-app href="../index.html" style="color:var(--acc)">Probar gratis</a>
+</div>
+
+<main id="main">
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow caption-3" style="text-transform:uppercase;letter-spacing:.08em">Para guitarristas que practican solos</p>
+      <h1 class="heading-1 grad">Practica guitarra con una app que te escucha y te dice qué nota falló</h1>
+      <p class="body-3">Toca frente al micrófono. La app detecta cada nota, te muestra dónde fallas y sube la velocidad solo cuando tocas limpio.</p>
+      <div class="hero-cta">
+        <a class="btn btn-pri button-md" data-app href="../index.html">Hacer el quiz de nivel (2 min)</a>
+        <span class="hero-note body-6">Gratis, sin tarjeta y sin instalar nada.</span>
+      </div>
+      <div class="proof" aria-label="La app en números">
+        <div><b>152</b><span class="body-6">ejercicios</span></div>
+        <div><b>4</b><span class="body-6">niveles</span></div>
+        <div><b>3</b><span class="body-6">idiomas</span></div>
+      </div>
+    </div>
+    <div class="phone rv"><img src="img/app-train.png" width="780" height="1688" alt="Pantalla de entrenamiento de YouRock: cambio de acordes G a C con diagramas, ritmo y botón Iniciar" fetchpriority="high"></div>
+  </div>
+</section>
+
+<!-- PROBLEMA Y SOLUCION -->
+<section id="problema">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="eyebrow caption-3" style="text-transform:uppercase;letter-spacing:.08em">El problema</p>
+      <h2 class="heading-2">Practicar solo no te dice si lo haces bien</h2>
+    </div>
+    <div class="two">
+      <div class="card bad rv">
+        <h3 class="heading-6">Practicar sin feedback</h3>
+        <ul class="body-3 mu">
+          <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Repites el ejercicio sin saber qué nota sale mal</li>
+          <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Subes el metrónomo por impulso y te acostumbras a los errores</li>
+          <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>No sabes qué estudiar hoy ni si avanzas</li>
+        </ul>
+      </div>
+      <div class="card good hl rv">
+        <h3 class="heading-6">Practicar con YouRock</h3>
+        <ul class="body-3">
+          <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg>La app escucha y marca la nota exacta que falló</li>
+          <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg>La velocidad sube solo después de pasadas limpias</li>
+          <li><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg>Cada día tienes una misión y ves tu progreso</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section id="beneficios">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="eyebrow caption-3" style="text-transform:uppercase;letter-spacing:.08em">Beneficios</p>
+      <h2 class="heading-2">Todo lo que necesitas para mejorar cada sesión</h2>
+    </div>
+    <div class="ben">
+      <article class="card rv">
+        <div class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+        <h3 class="title-2">Sabes qué nota falló</h3>
+        <p class="body-6">El micrófono detecta lo que tocas y marca cada nota correcta o fallida mientras practicas.</p>
+      </article>
+      <article class="card rv">
+        <div class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3L5 13.500h6L10 21l8-10.500h-6z"/></svg></div>
+        <h3 class="title-2">La velocidad sube sola</h3>
+        <p class="body-6">Con tres pasadas limpias seguidas, la app sube el tempo. Si fallas, te mantiene donde estás.</p>
+      </article>
+      <article class="card rv">
+        <div class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div>
+        <h3 class="title-2">152 ejercicios en 4 niveles</h3>
+        <p class="body-6">Acordes, escalas, ritmos y técnica. Un quiz de 2 minutos te lleva al ejercicio correcto.</p>
+      </article>
+      <article class="card rv">
+        <div class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4"/></svg></div>
+        <h3 class="title-2">Repite solo el trecho difícil</h3>
+        <p class="body-6">Marca el compás que te cuesta y tócalo en bucle, con cuenta previa y volumen del click a tu gusto.</p>
+      </article>
+      <article class="card rv">
+        <div class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></div>
+        <h3 class="title-2">Ves tu progreso cada día</h3>
+        <p class="body-6">Racha, meta semanal, misión del día y estadísticas. Practicar se vuelve un hábito que puedes medir.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- TAGLINE -->
+<section class="tag" aria-label="Lema">
+  <div class="wrap">
+    <p class="heading-3" id="tagline">Cada nota que tocas se escucha. Cada error se corrige. Cada día cuenta.</p>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section id="como-funciona">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="eyebrow caption-3" style="text-transform:uppercase;letter-spacing:.08em">Cómo funciona</p>
+      <h2 class="heading-2">De cero a tu primera sesión en tres pasos</h2>
+    </div>
+    <div class="steps">
+      <div class="card step rv"><div class="num button-sm">1</div><h3 class="title-2">Haz el quiz de nivel</h3><p class="body-6">Dos minutos de preguntas y la app te propone el primer ejercicio adecuado.</p></div>
+      <div class="card step rv"><div class="num button-sm">2</div><h3 class="title-2">Toca frente al micrófono</h3><p class="body-6">Pulsa Iniciar y toca con el metrónomo. Cada nota se marca al instante.</p></div>
+      <div class="card step rv"><div class="num button-sm">3</div><h3 class="title-2">Mira cómo avanzas</h3><p class="body-6">Tu racha, tus estrellas y tu nivel se actualizan con cada pasada limpia.</p></div>
+    </div>
+    <div class="shots">
+      <figure class="rv"><div class="phone"><img loading="lazy" src="img/app-home.png" width="780" height="1688" alt="Pantalla de inicio con meta semanal, racha y nivel actual"></div><figcaption class="body-6">Tu día de un vistazo</figcaption></figure>
+      <figure class="rv"><div class="phone"><img loading="lazy" src="img/app-vault.png" width="780" height="1688" alt="Biblioteca de ejercicios organizada por nivel y tipo"></div><figcaption class="body-6">La biblioteca de ejercicios</figcaption></figure>
+      <figure class="rv"><div class="phone"><img loading="lazy" src="img/app-stats.png" width="780" height="1688" alt="Pantalla de progreso con estadísticas de práctica"></div><figcaption class="body-6">Tu progreso en números</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- HERRAMIENTAS -->
+<section id="herramientas">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="eyebrow caption-3" style="text-transform:uppercase;letter-spacing:.08em">Herramientas</p>
+      <h2 class="heading-2">Además de los ejercicios, lo básico de tu estuche</h2>
+    </div>
+    <div class="tools">
+      <article class="card rv"><div class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10M7 7v6M17 7v6M3 17h18"/></svg></div><h3 class="title-2">Afinador</h3><p class="body-6">Afina con el micrófono del móvil, cuerda por cuerda.</p></article>
+      <article class="card rv"><div class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8l-2.500-17h-3zM12 15l5-8"/></svg></div><h3 class="title-2">Metrónomo</h3><p class="body-6">Tempo, compás y acento. También con cuenta previa antes de empezar.</p></article>
+      <article class="card rv"><div class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v18M12 3v18M18 3v18M4 8h16M4 14h16"/></svg></div><h3 class="title-2">Acordes</h3><p class="body-6">Diagramas y secuencias para practicar cambios de acorde.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- AUTOR (prueba social sin testimonios) -->
+<section id="autor">
+  <div class="wrap">
+    <div class="author rv">
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:680px">
+        <h2 class="heading-6">Creada por el autor del curso YOU ROCK</h2>
+        <p class="body-3 mu">YouRock Guitar Tools nació para que los alumnos del curso practiquen con feedback real entre clases. Ahora está abierta para cualquier guitarrista.</p>
+        <!-- {{testimonio}}: añadir testimonios reales cuando existan -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="eyebrow caption-3" style="text-transform:uppercase;letter-spacing:.08em">Preguntas frecuentes</p>
+      <h2 class="heading-2">Lo que suelen preguntar antes de empezar</h2>
+    </div>
+    <div class="faq rv">
+      <details><summary class="title-3">¿Cuánto cuesta?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Entras gratis y lo pruebas. Si te gusta, compras los extras. Precio de los extras: {{precio}}.</p></details>
+      <details><summary class="title-3">¿Necesito instalar algo?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">No. Se abre en el navegador del móvil o del ordenador. Si quieres, puedes añadirla a tu pantalla de inicio como una app.</p></details>
+      <details><summary class="title-3">¿Funciona con guitarra acústica y eléctrica?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Funciona con cualquier guitarra que el micrófono de tu dispositivo pueda escuchar. Practica en un lugar sin mucho ruido para mejores resultados.</p></details>
+      <details><summary class="title-3">¿Cómo sabe qué nota toqué?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Analiza el sonido del micrófono y detecta la altura de cada nota. El audio se procesa en tu dispositivo y no se envía a ningún servidor.</p></details>
+      <details><summary class="title-3">¿Sirve para principiantes?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Sí. Hay 4 niveles y un quiz de 2 minutos que te propone por dónde empezar. Los ejercicios avanzados quedan para cuando los necesites.</p></details>
+      <details><summary class="title-3">¿Puedo usarla sin internet?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Una vez abierta, la app guarda lo necesario en tu dispositivo para seguir practicando sin conexión.</p></details>
+      <details><summary class="title-3">¿Se guarda mi progreso?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Sí, en tu dispositivo. La sincronización entre dispositivos con una cuenta está en preparación.</p></details>
+      <details><summary class="title-3">¿Está en mi idioma?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Está en español, portugués e inglés. Puedes cambiar el idioma en los ajustes.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section id="empezar">
+  <div class="wrap">
+    <div class="final rv">
+      <h2 class="heading-2 grad" style="max-width:680px">Empieza hoy y escucha la diferencia</h2>
+      <p class="body-3">Haz el quiz, toca tu primer ejercicio y mira qué nota fallas. Si te gusta, desbloqueas los extras.</p>
+      <a class="btn btn-pri button-md" data-app href="../index.html">Hacer el quiz de nivel (2 min)</a>
+      <div class="risk body-6">
+        <span><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg>Plan gratuito</span>
+        <span><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg>Sin tarjeta</span>
+        <span><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg>Compras solo si te gusta</span>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot body-6">
+    <span>YouRock Guitar Tools</span>
+    <nav aria-label="Pie de página">
+      <a href="../index.html" data-app>Abrir la app</a>
+      <a href="#">Privacidad</a>
+      <a href="#">Términos</a>
+      <a href="#top">Volver arriba</a>
+    </nav>
+  </div>
+</footer>
+
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"¿Necesito instalar algo?","acceptedAnswer":{"@type":"Answer","text":"No. Se abre en el navegador del móvil o del ordenador. Si quieres, puedes añadirla a tu pantalla de inicio como una app."}},
+{"@type":"Question","name":"¿Funciona con guitarra acústica y eléctrica?","acceptedAnswer":{"@type":"Answer","text":"Funciona con cualquier guitarra que el micrófono de tu dispositivo pueda escuchar."}},
+{"@type":"Question","name":"¿Cómo sabe qué nota toqué?","acceptedAnswer":{"@type":"Answer","text":"Analiza el sonido del micrófono y detecta la altura de cada nota. El audio se procesa en tu dispositivo."}},
+{"@type":"Question","name":"¿Sirve para principiantes?","acceptedAnswer":{"@type":"Answer","text":"Sí. Hay 4 niveles y un quiz de 2 minutos que te propone por dónde empezar."}},
+{"@type":"Question","name":"¿Está en mi idioma?","acceptedAnswer":{"@type":"Answer","text":"Está en español, portugués e inglés."}}]}</script>
+
+<script>
+// Único punto de enlace a la app: cambia aquí si la ruta cambia.
+const APP = '../index.html';
+document.querySelectorAll('[data-app]').forEach(a => a.setAttribute('href', APP));
+
+// menú móvil
+const burger = document.getElementById('burger'), panel = document.getElementById('panel');
+function setMenu(o){
+  burger.setAttribute('aria-expanded', o);
+  burger.setAttribute('aria-label', o ? 'Cerrar menú' : 'Abrir menú');
+  panel.classList.toggle('open', o);
+  panel.setAttribute('aria-hidden', !o);
+  document.body.style.overflow = o ? 'hidden' : '';
+}
+burger.addEventListener('click', () => setMenu(burger.getAttribute('aria-expanded') !== 'true'));
+panel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+
+// reveals
+const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+// tagline palabra por palabra
+const tg = document.getElementById('tagline');
+const words = tg.textContent.trim().split(/\s+/);
+tg.setAttribute('aria-label', tg.textContent.trim());
+tg.innerHTML = words.map(w => '<span class="w" aria-hidden="true">' + w + '</span>').join(' ');
+if (rm) tg.querySelectorAll('.w').forEach(w => w.classList.add('on'));
+else {
+  const wo = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); wo.unobserve(e.target); } }), { rootMargin: '0px 0px -35% 0px', threshold: 0 });
+  tg.querySelectorAll('.w').forEach(w => wo.observe(w));
+}
+</script>
+</body>
+</html>
