@@ -146,7 +146,9 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 @media(min-width:768px){.steps{grid-template-columns:repeat(3,1fr);gap:24px}}
 .step .num{width:32px;height:32px;border-radius:9999px;background:var(--acc);color:var(--acc-tx);display:grid;place-items:center}
 .shots{display:grid;gap:16px;margin-top:40px;grid-template-columns:1fr}
-@media(min-width:768px){.shots{grid-template-columns:repeat(3,1fr);gap:24px}}
+@media(min-width:768px){.shots{grid-template-columns:repeat(2,1fr);gap:24px}}
+@media(min-width:1024px){.shots{grid-template-columns:repeat(4,1fr)}}
+.phone video{display:block;width:100%;height:auto;border-radius:16px;background:var(--s2)}
 .shots .phone{max-width:280px}
 .shots figcaption{margin-top:12px;text-align:center;color:var(--mu)}
 
@@ -235,7 +237,7 @@ footer{border-top:1px solid var(--s3);padding:40px 0 48px}
         <div><b>3</b><span class="body-6">idiomas</span></div>
       </div>
     </div>
-    <div class="phone rv"><img src="img/app-train.png" width="780" height="1688" alt="Pantalla de entrenamiento de YouRock: cambio de acordes G a C con diagramas, ritmo y botón Iniciar" fetchpriority="high"></div>
+    <div class="phone rv"><video class="vid" muted loop playsinline preload="metadata" poster="vid/hero-poster.jpg" width="520" height="1126" aria-label="Pantalla de entrenamiento de YouRock: cambio de acordes G a C con diagramas, ritmo y botón Iniciar"><source src="vid/hero.mp4" type="video/mp4"></video></div>
   </div>
 </section>
 
@@ -324,6 +326,7 @@ footer{border-top:1px solid var(--s3);padding:40px 0 48px}
       <div class="card step rv"><div class="num button-sm">3</div><h3 class="title-2">Mira cómo avanzas</h3><p class="body-6">Tu racha, tus estrellas y tu nivel se actualizan con cada pasada limpia.</p></div>
     </div>
     <div class="shots">
+      <figure class="rv"><div class="phone"><video class="vid" muted loop playsinline preload="none" poster="vid/step2-poster.jpg" width="520" height="1126" aria-label="Escala pentatónica con las notas marcándose en el mástil mientras suena el metrónomo"><source src="vid/step2.mp4" type="video/mp4"></video></div><figcaption class="body-6">Cada nota se marca al tocarla</figcaption></figure>
       <figure class="rv"><div class="phone"><img loading="lazy" src="img/app-home.png" width="780" height="1688" alt="Pantalla de inicio con meta semanal, racha y nivel actual"></div><figcaption class="body-6">Tu día de un vistazo</figcaption></figure>
       <figure class="rv"><div class="phone"><img loading="lazy" src="img/app-vault.png" width="780" height="1688" alt="Biblioteca de ejercicios organizada por nivel y tipo"></div><figcaption class="body-6">La biblioteca de ejercicios</figcaption></figure>
       <figure class="rv"><div class="phone"><img loading="lazy" src="img/app-stats.png" width="780" height="1688" alt="Pantalla de progreso con estadísticas de práctica"></div><figcaption class="body-6">Tu progreso en números</figcaption></figure>
@@ -367,7 +370,7 @@ footer{border-top:1px solid var(--s3);padding:40px 0 48px}
       <h2 class="heading-2">Lo que suelen preguntar antes de empezar</h2>
     </div>
     <div class="faq rv">
-      <details><summary class="title-3">¿Cuánto cuesta?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Entras gratis y lo pruebas. Si te gusta, compras los extras. Precio de los extras: {{precio}}.</p></details>
+      <details><summary class="title-3">¿Cuánto cuesta?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Entras gratis y lo pruebas. Si te gusta, compras los extras. Los extras cuestan 9,90 € al mes o 69,90 € en un solo pago.</p></details>
       <details><summary class="title-3">¿Necesito instalar algo?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">No. Se abre en el navegador del móvil o del ordenador. Si quieres, puedes añadirla a tu pantalla de inicio como una app.</p></details>
       <details><summary class="title-3">¿Funciona con guitarra acústica y eléctrica?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Funciona con cualquier guitarra que el micrófono de tu dispositivo pueda escuchar. Practica en un lugar sin mucho ruido para mejores resultados.</p></details>
       <details><summary class="title-3">¿Cómo sabe qué nota toqué?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Analiza el sonido del micrófono y detecta la altura de cada nota. El audio se procesa en tu dispositivo y no se envía a ningún servidor.</p></details>
@@ -409,6 +412,7 @@ footer{border-top:1px solid var(--s3);padding:40px 0 48px}
 </footer>
 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"¿Cuánto cuesta?","acceptedAnswer":{"@type":"Answer","text":"Entras gratis y lo pruebas. Si te gusta, compras los extras: 9,90 € al mes o 69,90 € en un solo pago."}},
 {"@type":"Question","name":"¿Necesito instalar algo?","acceptedAnswer":{"@type":"Answer","text":"No. Se abre en el navegador del móvil o del ordenador. Si quieres, puedes añadirla a tu pantalla de inicio como una app."}},
 {"@type":"Question","name":"¿Funciona con guitarra acústica y eléctrica?","acceptedAnswer":{"@type":"Answer","text":"Funciona con cualquier guitarra que el micrófono de tu dispositivo pueda escuchar."}},
 {"@type":"Question","name":"¿Cómo sabe qué nota toqué?","acceptedAnswer":{"@type":"Answer","text":"Analiza el sonido del micrófono y detecta la altura de cada nota. El audio se procesa en tu dispositivo."}},
@@ -437,6 +441,12 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(fals
 const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
 document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+// vídeos: solo se reproducen visibles y nunca con "reducir movimiento"
+if (!rm) {
+  const vo = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting) { v.preload = 'auto'; v.play().catch(() => {}); } else v.pause(); }), { threshold: .25 });
+  document.querySelectorAll('video.vid').forEach(v => vo.observe(v));
+}
 
 // tagline palabra por palabra
 const tg = document.getElementById('tagline');
