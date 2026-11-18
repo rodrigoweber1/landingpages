@@ -6094,16 +6094,16 @@ const BS_OPEN = [28, 33, 38, 43]; // sounding MIDI of the bass strings (written 
 const BS_LET = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6]; // letter of each pitch class, flat spelling
 const bsA = (s, f) => ({ ev: [[0, 2, s, f], [2, 2, s, f], [4, 2, s, f], [6, 2, s, f], [8, 4, s, f], [12, 4, s, f]], beams: [[0, 1, 2, 3]] });
 const bsB = (s, f) => ({ ev: [[0, 2, s, f], [2, 2, s, f], [4, 2, s, f], [6, 1, s, f], [7, 1, s, f], [8, 8, -1]], beams: [[0, 1], [2, 3, 4]] });
-const BS_C1 = { ev: [[0, 2, -1], [2, 2, 0, 1], [4, 2, 0, 1], [6, 2, 0, 3], [8, 4, 0, 3], [12, 4, 0, 1]], beams: [[1, 2, 3]] };
-const BS_C2 = { ev: [[0, 2, 0, 3], [2, 2, 0, 1], [4, 2, 0, 1, 1], [6, 2, 0, 4], [8, 2, 0, 4, 1], [10, 2, 0, 4], [12, 2, 0, 4], [14, 1, 0, 4], [15, 1, 0, 4]], beams: [[0, 1, 2, 3], [4, 5], [6, 7, 8]] };
-const BS_C4 = { ev: [[0, 3, 0, 3], [3, 1, 0, 1], [4, 2, 0, 1, 1], [6, 2, 0, 4], [8, 2, 0, 4, 1], [10, 2, 0, 4], [12, 2, 0, 4], [14, 1, 0, 4], [15, 1, 0, 4]], beams: [[0, 1], [2, 3], [4, 5], [6, 7, 8]] };
+const BS_C1 = { ev: [[0, 2, -1], [2, 2, 0, 1], [4, 2, 0, 1], [6, 2, 0, 2], [8, 4, 0, 2], [12, 4, 0, 1]], beams: [[1, 2, 3]] };
+const BS_C2 = { ev: [[0, 2, 0, 2], [2, 2, 0, 1], [4, 2, 0, 1, 1], [6, 2, 0, 4], [8, 2, 0, 4, 1], [10, 2, 0, 4], [12, 2, 0, 4], [14, 1, 0, 4], [15, 1, 0, 4]], beams: [[0, 1, 2, 3], [4, 5], [6, 7, 8]] };
+const BS_C4 = { ev: [[0, 3, 0, 2], [3, 1, 0, 1], [4, 2, 0, 1, 1], [6, 2, 0, 4], [8, 2, 0, 4, 1], [10, 2, 0, 4], [12, 2, 0, 4], [14, 1, 0, 4], [15, 1, 0, 4]], beams: [[0, 1], [2, 3], [4, 5], [6, 7, 8]] };
 const BS_SEC = {
   chorus: [Object.assign({ n: 1 }, BS_C1), Object.assign({ n: 2 }, BS_C2), Object.assign({ n: 3 }, BS_C1), Object.assign({ n: 4 }, BS_C4)],
   verse: [{ n: 5, multi: 2 }, Object.assign({ n: 7, ch: 'A♭' }, bsA(0, 4)), Object.assign({ n: 8, ch: 'A♭' }, bsB(0, 4))],
   bridge: [Object.assign({ n: 9, ch: 'D♭maj7' }, bsA(1, 4)), Object.assign({ n: 10, ch: 'Cm7' }, bsB(1, 3)), Object.assign({ n: 11, ch: 'Fsus4' }, bsA(0, 1)), Object.assign({ n: 12, ch: 'F' }, bsB(0, 1)), Object.assign({ n: 13, ch: 'B♭m' }, bsA(1, 1)), Object.assign({ n: 14, ch: 'D♭/E♭' }, bsB(2, 1))]
 };
 function bsRow(bar, bi, first) {
-  const g = 10, yT = 36, yB = yT + 4 * g, Yd = (d) => yB - (d - 18) * (g / 2), W = 360, X0 = 98, SX = 15.4, TY = 100;
+  const g = 10, yT = 36, yB = yT + 4 * g, Yd = (d) => yB - (d - 18) * (g / 2), W = 360, X0 = 104, SX = 15.2, TY = 100;
   const tabY = (s) => TY + (3 - s) * g;
   let h = '<svg class="pt-svg cg-staff bs-row" viewBox="0 0 ' + W + ' 140" role="img" aria-label="' + (bar.multi ? '' : '') + '">';
   for (let i = 0; i < 5; i++) h += '<line x1="4" y1="' + (yT + i * g) + '" x2="' + (W - 4) + '" y2="' + (yT + i * g) + '" stroke="#8A8A8A" stroke-width="1"/>';
@@ -6113,11 +6113,11 @@ function bsRow(bar, bi, first) {
   // bass clef: the ball on the F line, the tail, and the two dots
   const yF = yT + g;
   h += '<circle class="pt-ink" cx="14" cy="' + yF + '" r="3.4"/><path class="cg-stem" d="M14 ' + (yF - 3) + 'C27 ' + (yF - 3.5) + ' 30 ' + (yF + 6) + ' 25 ' + (yF + 15) + 'C21 ' + (yF + 22) + ' 14 ' + (yF + 27) + ' 8 ' + (yF + 30) + '" fill="none" stroke-width="3" stroke-linecap="round"/><circle class="pt-ink" cx="32" cy="' + (yF - 5) + '" r="1.9"/><circle class="pt-ink" cx="32" cy="' + (yF + 5) + '" r="1.9"/>';
-  // four flats (B♭ E♭ A♭ D♭) and, on the first row, the time signature
-  [20, 23, 19, 22].forEach((d, i) => { h += '<text class="pt-ink" x="' + (40 + i * 8.5) + '" y="' + (Yd(d) + 5.5) + '" font-size="19" font-weight="700">♭</text>'; });
-  if (first) h += '<text class="pt-ink" x="84" y="' + (yT + 18) + '" font-size="20" font-weight="800" text-anchor="middle">4</text><text class="pt-ink" x="84" y="' + (yB - 1) + '" font-size="20" font-weight="800" text-anchor="middle">4</text>';
+  // five flats (B♭ E♭ A♭ D♭ G♭ = D♭ major) and, on the first row, the time signature
+  [20, 23, 19, 22, 18].forEach((d, i) => { h += '<text class="pt-ink" x="' + (40 + i * 8.5) + '" y="' + (Yd(d) + 5.5) + '" font-size="19" font-weight="700">♭</text>'; });
+  if (first) h += '<text class="pt-ink" x="92" y="' + (yT + 18) + '" font-size="20" font-weight="800" text-anchor="middle">4</text><text class="pt-ink" x="92" y="' + (yB - 1) + '" font-size="20" font-weight="800" text-anchor="middle">4</text>';
   h += '<text class="cg-lab" x="4" y="14" font-size="12" font-style="italic">' + bar.n + '</text>';
-  h += '<text class="pt-ink" x="' + (bar.multi ? 20 : 98) + '" y="16" font-size="14" font-weight="700"></text>';
+  h += '<text class="pt-ink" x="' + (bar.multi ? 20 : 104) + '" y="16" font-size="14" font-weight="700"></text>';
   h += '<text class="cg-lab" x="10" y="' + (TY + 9) + '" font-size="12" font-weight="800" transform="rotate(0)">T</text><text class="cg-lab" x="10" y="' + (TY + 19) + '" font-size="12" font-weight="800">A</text><text class="cg-lab" x="10" y="' + (TY + 29) + '" font-size="12" font-weight="800">B</text>';
   if (bar.multi) {
     const ym = yT + 2 * g;
@@ -25004,8 +25004,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '18 nov 2026 · 23:12';
-  var BUILD_ID = '2026-11-18T23:12';
+  var BUILD = '18 nov 2026 · 23:24';
+  var BUILD_ID = '2026-11-18T23:24';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
