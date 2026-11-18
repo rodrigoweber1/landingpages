@@ -149,6 +149,13 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 @media(min-width:768px){.shots{grid-template-columns:repeat(2,1fr);gap:24px}}
 @media(min-width:1024px){.shots{grid-template-columns:repeat(4,1fr)}}
 .phone video{display:block;width:100%;height:auto;border-radius:16px;background:var(--s2);cursor:pointer}
+/* mockup 3D del hero: capas de grosor detrás del móvil */
+.stage{perspective:1400px;width:100%;max-width:340px;margin:0 auto;padding:24px 0}
+.tilt{position:relative;transform-style:preserve-3d;transform:rotateY(var(--ry,-14deg)) rotateX(var(--rx,5deg));transition:transform .5s var(--ease);box-shadow:-24px 32px 48px rgba(0,0,0,.6);will-change:transform}
+.tilt::before,.tilt::after{content:"";position:absolute;inset:-1px;border-radius:24px;border:1px solid var(--s4);pointer-events:none}
+.tilt::before{background:var(--s3);transform:translateZ(-8px)}
+.tilt::after{background:var(--s2);transform:translateZ(-16px)}
+.tilt video,.tilt .vbtn{transform:translateZ(1px)}
 .vwrap{position:relative}
 .vbtn{position:absolute;right:12px;bottom:12px;width:44px;height:44px;border-radius:9999px;border:1px solid var(--s4);background:rgba(24,24,24,.8);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:var(--tx);display:grid;place-items:center;cursor:pointer;transition:transform .5s var(--ease),background-color .3s var(--ease)}
 .vbtn:hover{background:var(--s3);transform:scale(1.05)}
@@ -241,7 +248,7 @@ footer{border-top:1px solid var(--s3);padding:40px 0 48px}
         <div><b>3</b><span class="body-6">idiomas</span></div>
       </div>
     </div>
-    <div class="phone rv"><video class="vid" muted loop playsinline preload="metadata" poster="vid/hero-poster.jpg" width="520" height="1126" aria-label="Pantalla de entrenamiento de YouRock: cambio de acordes G a C con diagramas, ritmo y botón Iniciar"><source src="vid/hero.mp4" type="video/mp4"></video></div>
+    <div class="stage rv" id="stage"><div class="phone tilt" id="tilt"><video class="vid" muted loop playsinline preload="metadata" poster="vid/hero-poster.jpg" width="520" height="1126" aria-label="Pantalla de entrenamiento de YouRock: cambio de acordes G a C con diagramas, ritmo y botón Iniciar"><source src="vid/hero.mp4" type="video/mp4"></video></div></div>
   </div>
 </section>
 
@@ -458,6 +465,24 @@ document.querySelectorAll('video.vid').forEach(v => {
   const toggle = () => { v.preload = 'auto'; v.paused ? v.play().catch(() => {}) : v.pause(); };
   b.addEventListener('click', toggle); v.addEventListener('click', toggle);
 });
+// inclinación 3D del hero: sigue el puntero en pantallas con ratón; fija en táctiles o con "reducir movimiento"
+const tiltEl = document.getElementById('tilt');
+if (tiltEl && !rm && matchMedia('(hover:hover) and (pointer:fine)').matches) {
+  let raf = 0;
+  const heroEl = document.getElementById('top');
+  heroEl.addEventListener('pointermove', e => {
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      const r = heroEl.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      tiltEl.style.setProperty('--ry', (-14 + x * 12).toFixed(1) + 'deg');
+      tiltEl.style.setProperty('--rx', (5 - y * 8).toFixed(1) + 'deg');
+    });
+  });
+  heroEl.addEventListener('pointerleave', () => { tiltEl.style.removeProperty('--ry'); tiltEl.style.removeProperty('--rx'); });
+}
+
 // autoplay solo visible y nunca con "reducir movimiento"; el botón permite reproducir a mano
 if (!rm) {
   const vo = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting) { v.preload = 'auto'; v.play().catch(() => {}); } else v.pause(); }), { threshold: .25 });
