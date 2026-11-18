@@ -970,6 +970,34 @@ body.dark .ls-panel{background:#17120F;border-color:#3A302A;box-shadow:0 -8px 24
 body.dark .ls-seg{background:#272727}
 body.dark .ls-sg{color:#F4EEE6}
 body.dark .ls-sg[aria-pressed="true"]{color:#FFFFFF}
+.cg-staff .cg-x,.cg-staff .cg-stem{stroke:#0F172A}
+.cg-staff .cg-acc{stroke:#E31B23}
+.cg-staff .cg-lab{fill:#5A5A5A}
+.cg-staff .cg-n[data-on="true"] .pt-ink{fill:#E31B23}
+.cg-staff .cg-n[data-on="true"] :is(.cg-x,.cg-stem){stroke:#E31B23}
+.cg-staff .cg-n[data-on="true"] .cg-lab{fill:#E31B23;font-weight:700}
+.cg-leg{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none;font-size:14px;line-height:20px;color:#3A3A3A}
+.cg-leg b{display:inline-block;min-width:18px;color:#E31B23;font-weight:800}
+.cg-steps{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px}
+.cg-st{display:flex;align-items:center;justify-content:center;height:34px;border-radius:6px;background:#F2F2F2;font:700 14px 'Inter',system-ui,sans-serif;font-style:normal}
+.cg-st.cg-acc{background:#121212;color:#FFFFFF}
+.cg-tab{display:block;width:100%;max-width:160px;height:auto}
+.cg-tab .cg-lab{fill:#5A5A5A}
+.cg-tab .cg-fr rect{fill:#E31B23}
+.cg-tab .cg-fr text{fill:#FFFFFF}
+body.dark .cg-staff .cg-x,body.dark .cg-staff .cg-stem{stroke:#F2EDE4}
+body.dark .cg-staff .cg-lab,body.dark .cg-tab .cg-lab{fill:#BDB6AA}
+body.dark .cg-leg{color:#BDB6AA}
+body.dark .cg-st{background:#272727}
+body.dark .cg-st.cg-acc{background:#F2EDE4;color:#0D0B0A}
+body.stage #app .cg-staff .pt-ink{fill:var(--st-ink,#F4EEE6)!important}
+body.stage #app .cg-staff .cg-n[data-on="true"] .pt-ink{fill:var(--st-red,#E31B23)!important}
+body.stage #app .cg-staff :is(.cg-x,.cg-stem){stroke:var(--st-ink,#F4EEE6)!important}
+body.stage #app .cg-staff .cg-n[data-on="true"] :is(.cg-x,.cg-stem){stroke:var(--st-red,#E31B23)!important}
+body.stage #app :is(.cg-staff .cg-lab,.cg-tab .cg-lab){fill:var(--st-ink2,#BDB6AA)!important}
+body.stage #app .cg-leg{color:var(--st-ink2,#BDB6AA)!important}
+body.stage #app .cg-st{background:#2E2520!important;color:var(--st-ink,#F4EEE6)!important}
+body.stage #app .cg-st.cg-acc{background:var(--st-red,#E31B23)!important;color:#fff!important}
 .lsl-ln{padding:0 6px;font-size:15px;line-height:22px;overflow-wrap:anywhere}
 .lsl-cl{margin-top:6px}
 .lsl-sg{display:inline-flex;flex-direction:column;vertical-align:top;max-width:100%}
@@ -5757,6 +5785,296 @@ function celebPiano(root, es) {
     else if (b.getAttribute('data-a') === 'play') { if (st.playing) stop(); else play(); }
   };
 }
+// ===== Celebration (cancionero, canción 5): selector de instrumento · piano, guitarra, guitarra 2 y bajo =====
+// guitar chords for the three positions of D♭ (frets of strings 6 → 1, null = muted); every other chord is placed as close as possible
+const CG_SH = {
+  root: { Db: [9, 11, 11, 10, 9, 9], Gb: [null, 9, 11, 11, 11, 9], Ab: [null, 11, 13, 13, 13, 11], Bbm: [6, 8, 8, 6, 6, 6], Dbmaj7: [9, 11, 10, 10, 9, 9], Cm7: [8, 10, 8, 8, 8, 8], Fsus4: [null, 8, 10, 10, 11, 8], F: [null, 8, 10, 10, 10, 8], 'Db/Eb': [11, null, 11, 10, 9, null] },
+  third: { Db: [null, 8, 6, 6, 6, null], Gb: [null, null, 4, 6, 7, 6], Ab: [null, null, 6, 8, 9, 8], Bbm: [6, 8, 8, 6, 6, 6], Dbmaj7: [null, 4, 6, 5, 6, 4], Cm7: [null, 3, 5, 3, 4, 3], Fsus4: [null, 8, 8, 10, 11, 8], F: [null, null, 7, 5, 6, 5], 'Db/Eb': [null, 6, null, 6, 6, 4] },
+  fifth: { Db: [4, null, 6, 6, 6, 4], Gb: [2, 4, 4, 3, 2, 2], Ab: [4, 6, 6, 5, 4, 4], Bbm: [null, 1, 3, 3, 2, 1], Dbmaj7: [null, 4, 6, 5, 6, 4], Cm7: [null, 3, 5, 3, 4, 3], Fsus4: [1, 3, 3, 3, 1, 1], F: [1, 3, 3, 2, 1, 1], 'Db/Eb': [null, 6, null, 6, 6, 4] }
+};
+// bass guitar: [root midi, string (0 = E … 3 = G), fret, octave midi, string, fret] — the octave sits two strings up and two frets higher
+const CG_BASS = {
+  Db: [37, 1, 4, 49, 3, 6], Gb: [30, 0, 2, 42, 2, 4], Ab: [32, 0, 4, 44, 2, 6], Bbm: [34, 1, 1, 46, 3, 3], Dbmaj7: [37, 1, 4, 49, 3, 6],
+  Cm7: [36, 1, 3, 48, 3, 5], Fsus4: [29, 0, 1, 41, 2, 3], F: [29, 0, 1, 41, 2, 3], 'Db/Eb': [39, 1, 6, 51, 3, 8]
+};
+// funk octave on A♭ (guitar 2): strings 6 and 4 (fret 4 and fret 6), one bar of sixteenths: D = accent, u = plain, x = muted ghost
+const CG_OCT = [4, null, 6, null, null, null];
+const CG_PAT = ['D', 'x', 'u', 'x', 'D', 'x', 'u', 'x', 'D', 'x', 'u', 'x', 'D', 'x', 'u', 'x'];
+const cgFret = (f) => f.map((x) => (x === null ? 'x' : x)).join('-');
+function cgSections() { return CP_SECS; }
+// the bars of a section as blocks on a lane (shared by guitar and bass)
+function cgBars(S, T, withHead) {
+  let h = '<div class="cp-bars">';
+  S.bars.forEach((b, bi) => {
+    h += '<div class="cp-bar"><small>' + T.bar + ' ' + (bi + 1) + (S.reps > 1 && bi === S.bars.length - 1 ? ' · ×' + S.reps : '') + '</small><div class="cp-lane">';
+    for (let q = 1; q < 16; q++) h += '<i class="cp-tick' + (q % 4 === 0 ? ' cp-beat' : '') + '" style="left:' + (q / 16 * 100) + '%"></i>';
+    b.forEach((e, ei) => { h += '<span class="cp-blk' + (e[0] ? '' : ' cp-rest') + '" data-k="' + bi + '-' + ei + '" style="left:' + (e[1] / 4 * 100) + '%;width:' + (e[2] / 4 * 100) + '%">' + (e[0] ? cpChord(e[0]) : '—') + '</span>'; });
+    h += '<i class="cp-head" data-a="head"></i></div></div>';
+  });
+  return h + '</div>';
+}
+function cgChords(S) { const c = []; S.bars.forEach((b) => b.forEach((e) => { if (e[0] && c.indexOf(e[0]) < 0) c.push(e[0]); })); return c; }
+// timer/playhead plumbing shared by the guitar and the bass: runs the section once (with its repeats) and stops by itself
+function cgRun(root, st, T, S, playNote, onBlock) {
+  const ac = pAudio(); if (!ac) return false;
+  try { pUnlock(); } catch (e) {}
+  const spb = 60 / st.bpm, t0 = ac.currentTime + 0.15;
+  root._tm = []; root._src = [];
+  let total = 0;
+  for (let r = 0; r < S.reps; r++) S.bars.forEach((b, bi) => {
+    const barAt = t0 + (r * S.bars.length + bi) * 4 * spb;
+    b.forEach((e, ei) => {
+      if (!e[0]) return;
+      playNote(ac, e, barAt + e[1] * spb, spb);
+      root._tm.push(setTimeout(() => {
+        if (!root.isConnected) return;
+        root.querySelectorAll('.cp-blk').forEach((x) => x.setAttribute('data-on', String(x.getAttribute('data-k') === bi + '-' + ei)));
+        onBlock(e[0]);
+      }, Math.max(0, (barAt + e[1] * spb - ac.currentTime) * 1000)));
+    });
+    total = Math.max(total, (r * S.bars.length + bi + 1) * 4 * spb);
+  });
+  const heads = root.querySelectorAll('[data-a="head"]');
+  root._ti = setInterval(() => {
+    const el = ac.currentTime - t0;
+    if (!root.isConnected || el >= total) return root._halt && root._halt();
+    if (el < 0) return;
+    const bt = el / spb, barN = Math.floor(bt / 4) % S.bars.length;
+    heads.forEach((hd, i) => { hd.style.display = i === barN ? 'block' : 'none'; if (i === barN) hd.style.left = ((bt % 4) / 4 * 100) + '%'; });
+  }, 30);
+  return true;
+}
+function cgHalt(root, st, T) {
+  st.playing = false; clearInterval(root._ti); (root._tm || []).forEach(clearTimeout); root._tm = [];
+  (root._src || []).forEach((s) => { try { s.stop(); } catch (e) {} }); root._src = [];
+  root.querySelectorAll('.cp-blk').forEach((e) => e.setAttribute('data-on', 'false'));
+  root.querySelectorAll('[data-a="head"]').forEach((e) => { e.style.display = 'none'; });
+  const b = root.querySelector('[data-a="play"]'); if (b) b.textContent = '▶ ' + T.listen;
+}
+const cgNote = (root, ac, m, when, len, vol) => { const s = pluck(m, when, vol); if (s) { try { s.stop(when + len); } catch (e) {} root._src.push(s); } };
+
+// ----- guitar: the chords of the part in three positions -----
+function celebGuitar(root, es) {
+  const T = es ? {
+    h: 'Guitarra · acordes', x: 'Los mismos acordes del piano, tocados en la guitarra. Elige la posición: cada una empieza el Re♭ con una nota distinta abajo y el resto de acordes se coloca lo más cerca posible del anterior, así la mano casi no salta. Un golpe hacia abajo por bloque.',
+    sec: 'Parte', secs: { chorus: 'Estribillo (×2)', verse: 'Estrofa', bridge: 'Puente' }, pos: 'Posición',
+    poss: { root: ['1 · desde la tónica', 'Re♭ en el traste 9, con cejilla de Mi'], third: ['2 · desde la 3ª', 'Re♭ en el traste 6, con Fa en el bajo (5ª cuerda, traste 8)'], fifth: ['3 · desde la 5ª', 'Re♭ con La♭ en el bajo (6ª cuerda, traste 4)'] },
+    listen: 'Escuchar', stop: 'Parar', tempo: 'Tempo', slower: 'Más lento', faster: 'Más rápido', bar: 'Compás', map: 'Los acordes de esta parte en la posición elegida', bassN: 'Bajo', fr: 'Trastes (6ª → 1ª)', aria: 'Diagrama de guitarra del acorde',
+    note: 'Un número es el traste, x es una cuerda que no suena. En el estribillo, el Sol♭ y el La♭ entran un poco antes del pulso (anticipación). Para el funk, toca estos acordes solo con las cuatro cuerdas agudas y muy cortos (mira «Guitarra 2»).'
+  } : {
+    h: 'Guitar · chords', x: 'The same chords as the piano, played on the guitar. Pick the position: each one starts the D♭ with a different note at the bottom and every other chord sits as close as possible to the one before, so your hand barely jumps. One down-stroke per block.',
+    sec: 'Part', secs: { chorus: 'Chorus (×2)', verse: 'Verse', bridge: 'Bridge' }, pos: 'Position',
+    poss: { root: ['1 · from the root', 'D♭ at fret 9, E-shape barre'], third: ['2 · from the 3rd', 'D♭ at fret 6, with F in the bass (5th string, fret 8)'], fifth: ['3 · from the 5th', 'D♭ with A♭ in the bass (6th string, fret 4)'] },
+    listen: 'Listen', stop: 'Stop', tempo: 'Tempo', slower: 'Slower', faster: 'Faster', bar: 'Bar', map: 'This part’s chords in the chosen position', bassN: 'Bass', fr: 'Frets (6th → 1st)', aria: 'Guitar diagram of the chord',
+    note: 'A number is the fret, x is a string that does not sound. In the chorus, G♭ and A♭ come in just before the beat (anticipation). For the funk feel, play these chords on the four high strings only and very short (see “Guitar 2”).'
+  };
+  const N = CP_NAMES[es ? 'es' : 'en'];
+  const st = root._cg = root._cg || { sec: 'chorus', pos: 'root', bpm: 100, playing: false };
+  const shape = (c) => CG_SH[st.pos][c];
+  const bassName = (c) => { const f = shape(c); const i = f.findIndex((x) => x !== null); return N[(LS_GOPEN[i] + f[i]) % 12]; };
+  const chip = (attr, v, on, label, sub) => '<button type="button" class="ej-chip" ' + attr + '="' + v + '" aria-pressed="' + on + '">' + label + (sub ? '<small>' + sub + '</small>' : '') + '</button>';
+  const paint = () => {
+    const S = CP_SECS[st.sec], chords = cgChords(S), c0 = chords[0];
+    root.innerHTML = '<div class="pt-card cp-card"><h3 class="bt-h3" style="margin:0">' + T.h + '</h3><p class="pt-p">' + T.x + '</p>'
+      + '<b class="ej-h">' + T.sec + '</b><div class="ej-chips">' + Object.keys(CP_SECS).map((k) => chip('data-sec', k, k === st.sec, T.secs[k])).join('') + '</div>'
+      + '<b class="ej-h">' + T.pos + '</b><div class="ej-chips">' + ['root', 'third', 'fifth'].map((k) => chip('data-pos', k, k === st.pos, T.poss[k][0], T.poss[k][1])).join('') + '</div>'
+      + '<div class="cp-ctl"><button type="button" class="rt-play" data-a="play">▶ ' + T.listen + '</button><span class="cp-tempo">' + T.tempo + '<button type="button" class="bt-bpm" data-b="-5" aria-label="' + T.slower + '">−</button><b>' + st.bpm + ' BPM</b><button type="button" class="bt-bpm" data-b="5" aria-label="' + T.faster + '">+</button></span></div>'
+      + '<div class="cp-now"><b data-a="now">' + cpChord(c0) + '</b><span data-a="hands">' + T.fr + ': ' + cgFret(shape(c0)) + ' — ' + T.bassN + ': ' + bassName(c0) + '</span></div>'
+      + '<div data-a="dia">' + lsGuitarSvg(shape(c0), T.aria) + '</div>' + cgBars(S, T)
+      + '<b class="ej-h">' + T.map + '</b><div class="cp-map">' + chords.map((c) => '<div class="cp-mc" data-c="' + c + '"><b>' + cpChord(c) + '</b><small>' + cgFret(shape(c)) + ' · ' + T.bassN + ' ' + bassName(c) + '</small>' + lsGuitarSvg(shape(c), T.aria + ' ' + cpChord(c)) + '</div>').join('') + '</div>'
+      + '<div class="pt-note"><p class="pt-p">' + T.note + '</p></div></div>';
+  };
+  const show = (c) => {
+    root.querySelector('[data-a="now"]').textContent = cpChord(c);
+    root.querySelector('[data-a="hands"]').textContent = T.fr + ': ' + cgFret(shape(c)) + ' — ' + T.bassN + ': ' + bassName(c);
+    root.querySelector('[data-a="dia"]').innerHTML = lsGuitarSvg(shape(c), T.aria);
+    root.querySelectorAll('.cp-mc').forEach((e) => e.setAttribute('data-on', String(e.getAttribute('data-c') === c)));
+  };
+  const halt = root._halt = () => cgHalt(root, st, T);
+  const play = () => {
+    halt(); st.playing = true;
+    const ok = cgRun(root, st, T, CP_SECS[st.sec], (ac, e, at, spb) => {
+      const fr = shape(e[0]), dur = e[2] * spb * 0.95;
+      const idx = []; fr.forEach((f, i) => { if (f !== null) idx.push(i); });
+      idx.forEach((i, n) => cgNote(root, ac, LS_GOPEN[i] + fr[i], at + n * 0.012, dur, 0.45));
+    }, show);
+    if (!ok) { st.playing = false; return; }
+    root.querySelector('[data-a="play"]').textContent = '■ ' + T.stop;
+  };
+  paint();
+  root.onclick = (e) => {
+    const b = e.target.closest && e.target.closest('button'); if (!b || !root.contains(b)) return;
+    if (b.hasAttribute('data-sec')) { halt(); st.sec = b.getAttribute('data-sec'); paint(); }
+    else if (b.hasAttribute('data-pos')) { halt(); st.pos = b.getAttribute('data-pos'); paint(); }
+    else if (b.hasAttribute('data-b')) { st.bpm = Math.max(50, Math.min(130, st.bpm + +b.getAttribute('data-b'))); const was = st.playing; halt(); paint(); if (was) play(); }
+    else if (b.getAttribute('data-a') === 'play') { if (st.playing) halt(); else play(); }
+  };
+}
+
+// ----- guitar 2: the funk sixteenths on the A♭ octave, written as one bar of music -----
+function cgStaff(pat, es) {
+  const g = 10, yT = 40, yB = yT + 4 * g, Yd = (d) => yB - (d - 2) * (g / 2), W = 360, X0 = 112, SX = 14.6;
+  const dLo = -2, dHi = 5, yLo = Yd(dLo), yHi = Yd(dHi), yStem = yHi - 27;
+  let h = '<svg class="pt-svg cg-staff" viewBox="0 0 ' + W + ' 130" role="img" aria-label="' + (es ? 'Un compás de semicorcheas sobre la octava de La♭' : 'One bar of sixteenth notes on the A♭ octave') + '">';
+  for (let i = 0; i < 5; i++) h += '<line x1="4" y1="' + (yT + i * g) + '" x2="' + (W - 4) + '" y2="' + (yT + i * g) + '" stroke="#8A8A8A" stroke-width="1"/>';
+  h += '<line x1="' + (W - 5) + '" y1="' + yT + '" x2="' + (W - 5) + '" y2="' + yB + '" stroke="#8A8A8A" stroke-width="2"/>';
+  h += '<path class="pt-ink" transform="translate(12 ' + (yB + 1.75) + ') scale(0.0621 -0.0621) translate(-120 0)" d="' + CR_CLEF + '"/>';
+  [6, 9, 7, 10].forEach((d, i) => { h += '<text class="pt-ink" x="' + (40 + i * 9) + '" y="' + (Yd(d) + 5.5) + '" font-size="19" font-weight="700">♭</text>'; });
+  h += '<text class="pt-ink" x="84" y="' + (yT + 18) + '" font-size="21" font-weight="800" text-anchor="middle">4</text><text class="pt-ink" x="84" y="' + (yB - 1) + '" font-size="21" font-weight="800" text-anchor="middle">4</text>';
+  pat.forEach((p, i) => {
+    const x = X0 + i * SX;
+    h += '<g class="cg-n" data-i="' + i + '">';
+    for (let q = 0; q >= dLo; q -= 2) h += '<line x1="' + (x - 8) + '" y1="' + Yd(q) + '" x2="' + (x + 8) + '" y2="' + Yd(q) + '" stroke="#8A8A8A" stroke-width="1.2"/>';
+    h += '<rect x="' + (x - 7) + '" y="20" width="14" height="108" fill="transparent"/>';
+    [yLo, yHi].forEach((y) => {
+      if (p === 'x') h += '<path class="cg-x" d="M' + (x - 3.6) + ' ' + (y - 3.6) + 'l7.2 7.2m0 -7.2l-7.2 7.2" stroke-width="1.8" stroke-linecap="round" fill="none"/>';
+      else h += '<ellipse class="pt-ink" cx="' + x + '" cy="' + y + '" rx="4.6" ry="3.4" transform="rotate(-20 ' + x + ' ' + y + ')"/>';
+    });
+    h += '<line class="cg-stem" x1="' + (x + 4.3) + '" y1="' + (yLo - 1) + '" x2="' + (x + 4.3) + '" y2="' + yStem + '" stroke-width="1.3"/>';
+    if (p === 'D') h += '<path class="cg-acc" d="M' + (x - 3) + ' ' + (yStem - 14) + 'l7 3.5 -7 3.5" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
+    const lab = ['1', 'e', '&', 'a'][i % 4] === '1' ? String(i / 4 + 1) : ['1', 'e', '&', 'a'][i % 4];
+    h += '<text class="cg-lab" x="' + x + '" y="124" font-size="12" text-anchor="middle">' + lab + '</text></g>';
+  });
+  for (let b = 0; b < 4; b++) {
+    const x1 = X0 + b * 4 * SX + 4.3, x2 = X0 + (b * 4 + 3) * SX + 4.3;
+    h += '<rect class="pt-ink" x="' + x1 + '" y="' + yStem + '" width="' + (x2 - x1) + '" height="3.2"/><rect class="pt-ink" x="' + x1 + '" y="' + (yStem + 6) + '" width="' + (x2 - x1) + '" height="3.2"/>';
+  }
+  return h + '</svg>';
+}
+function celebGtr2(root, es) {
+  const T = es ? {
+    h: 'Guitarra 2 · semicorcheas funk', x: 'Es la guitarra que hace el funk del estribillo: dos cuerdas a la vez, siempre la octava de La♭ (6ª cuerda, traste 4, y 4ª cuerda, traste 6; las demás, apagadas). Un compás de semicorcheas: cuatro grupos de cuatro, uno por pulso.',
+    leg: ['Acento: ataque fuerte, en cada pulso', 'Golpe normal, en el «&»', 'Apagado: la mano izquierda afloja y no suena nota, pero la derecha no para'],
+    legN: ['>', '●', '×'], listen: 'Escuchar', stop: 'Parar', tempo: 'Tempo', slower: 'Más lento', faster: 'Más rápido', shape: 'La octava de La♭ en el mástil', shapeAria: 'Diagrama de la octava de La♭ en la guitarra', pat: 'Un compás',
+    note: 'La guitarra se escribe una octava más aguda de lo que suena. Cuenta «1 e & a 2 e & a…»: los acentos caen en los números, el golpe normal en el «&» y los apagados en la «e» y la «a». Toca con la muñeca suelta, siempre abajo-arriba sin parar. Si el patrón de tu profesor difiere, el suyo manda.'
+  } : {
+    h: 'Guitar 2 · funk sixteenths', x: 'This is the guitar that plays the funk in the chorus: two strings at once, always the A♭ octave (6th string, fret 4, and 4th string, fret 6; the others muted). One bar of sixteenth notes: four groups of four, one per beat.',
+    leg: ['Accent: a strong attack on every beat', 'Plain stroke, on the “&”', 'Muted: the fretting hand eases off so no note rings, but the picking hand never stops'],
+    legN: ['>', '●', '×'], listen: 'Listen', stop: 'Stop', tempo: 'Tempo', slower: 'Slower', faster: 'Faster', shape: 'The A♭ octave on the neck', shapeAria: 'Diagram of the A♭ octave on the guitar', pat: 'One bar',
+    note: 'Guitar is written an octave higher than it sounds. Count “1 e & a 2 e & a…”: accents fall on the numbers, the plain stroke on the “&” and the muted ones on the “e” and the “a”. Keep your wrist loose, always down-up without stopping. If your teacher’s pattern differs, theirs wins.'
+  };
+  const st = root._g2 = root._g2 || { bpm: 100, playing: false };
+  const paint = () => {
+    root.innerHTML = '<div class="pt-card cp-card"><h3 class="bt-h3" style="margin:0">' + T.h + '</h3><p class="pt-p">' + T.x + '</p>'
+      + '<div class="cp-ctl"><button type="button" class="rt-play" data-a="play">▶ ' + T.listen + '</button><span class="cp-tempo">' + T.tempo + '<button type="button" class="bt-bpm" data-b="-5" aria-label="' + T.slower + '">−</button><b>' + st.bpm + ' BPM</b><button type="button" class="bt-bpm" data-b="5" aria-label="' + T.faster + '">+</button></span></div>'
+      + '<b class="ej-h">' + T.pat + '</b>' + cgStaff(CG_PAT, es)
+      + '<ul class="cg-leg">' + T.leg.map((l, i) => '<li><b>' + T.legN[i] + '</b> ' + l + '</li>').join('') + '</ul>'
+      + '<b class="ej-h">' + T.shape + '</b>' + lsGuitarSvg(CG_OCT, T.shapeAria)
+      + '<div class="pt-note"><p class="pt-p">' + T.note + '</p></div></div>';
+  };
+  const halt = root._halt = () => {
+    st.playing = false; clearInterval(root._ti); (root._tm || []).forEach(clearTimeout); root._tm = [];
+    (root._src || []).forEach((s) => { try { s.stop(); } catch (e) {} }); root._src = [];
+    root.querySelectorAll('.cg-n[data-on]').forEach((e) => e.removeAttribute('data-on'));
+    const b = root.querySelector('[data-a="play"]'); if (b) b.textContent = '▶ ' + T.listen;
+  };
+  const play = () => {
+    const ac = pAudio(); if (!ac) return;
+    try { pUnlock(); } catch (e) {}
+    halt(); st.playing = true; root._tm = []; root._src = [];
+    root.querySelector('[data-a="play"]').textContent = '■ ' + T.stop;
+    const sx = 60 / st.bpm / 4, M = [LS_GOPEN[0] + CG_OCT[0], LS_GOPEN[2] + CG_OCT[2]];
+    let bar = 0, at = ac.currentTime + 0.15;
+    // schedules a bar at a time, a little ahead of the audio clock, and loops until you stop
+    const tick = () => {
+      if (!root.isConnected) return halt();
+      while (at < ac.currentTime + 0.4) {
+        const t0 = at;
+        CG_PAT.forEach((p, i) => {
+          const w = t0 + i * sx;
+          if (p === 'D') M.forEach((m) => cgNote(root, ac, m, w, sx * 0.85, 0.6));
+          else if (p === 'u') M.forEach((m) => cgNote(root, ac, m, w, sx * 0.7, 0.3));
+          else M.forEach((m) => cgNote(root, ac, m, w, sx * 0.2, 0.06));
+          root._tm.push(setTimeout(() => { if (!root.isConnected) return; root.querySelectorAll('.cg-n').forEach((e) => { if (+e.getAttribute('data-i') === i) e.setAttribute('data-on', 'true'); else e.removeAttribute('data-on'); }); }, Math.max(0, (w - ac.currentTime) * 1000)));
+        });
+        at += 16 * sx; bar++;
+      }
+      root._tm = root._tm.slice(-80); root._src = root._src.slice(-80);
+    };
+    tick(); root._ti = setInterval(tick, 100);
+  };
+  paint();
+  root.onclick = (e) => {
+    const b = e.target.closest && e.target.closest('button'); if (!b || !root.contains(b)) return;
+    if (b.hasAttribute('data-b')) { st.bpm = Math.max(50, Math.min(130, st.bpm + +b.getAttribute('data-b'))); const was = st.playing; halt(); paint(); if (was) play(); }
+    else if (b.getAttribute('data-a') === 'play') { if (st.playing) halt(); else play(); }
+  };
+}
+
+// ----- bass: root and octave in eighths, in the rhythm of the chord blocks -----
+function celebBass(root, es) {
+  const T = es ? {
+    h: 'Bajo · la línea de la canción', x: 'El bajo toca la tónica de cada acorde y salta a su octava, en corcheas: tónica – octava – tónica – octava. El primer golpe de cada acorde lleva el acento. Es el ritmo típico del disco.',
+    sec: 'Parte', secs: { chorus: 'Estribillo (×2)', verse: 'Estrofa', bridge: 'Puente' }, listen: 'Escuchar', stop: 'Parar', tempo: 'Tempo', slower: 'Más lento', faster: 'Más rápido', bar: 'Compás',
+    pat: 'El patrón de un acorde largo', R: 'T', O: '8ª', map: 'Dónde se toca cada nota (cuerdas del bajo, de la 1ª a la 4ª)', root: 'Tónica', oct: 'Octava', aria: 'Tab de bajo del acorde',
+    note: 'T es la tónica (el nombre del acorde) y 8ª, la misma nota una octava más aguda: dos cuerdas más arriba y dos trastes más allá. Si el acorde dura menos de un pulso, toca solo la tónica. Las cuerdas, de arriba abajo: Sol, Re, La, Mi.'
+  } : {
+    h: 'Bass · the song’s line', x: 'The bass plays the root of every chord and jumps to its octave, in eighth notes: root – octave – root – octave. The first hit of every chord is accented. It’s the classic disco rhythm.',
+    sec: 'Part', secs: { chorus: 'Chorus (×2)', verse: 'Verse', bridge: 'Bridge' }, listen: 'Listen', stop: 'Stop', tempo: 'Tempo', slower: 'Slower', faster: 'Faster', bar: 'Bar',
+    pat: 'The pattern of a long chord', R: 'R', O: '8va', map: 'Where each note is played (bass strings, 1st to 4th)', root: 'Root', oct: 'Octave', aria: 'Bass tab of the chord',
+    note: 'R is the root (the name of the chord) and 8va the same note an octave higher: two strings up and two frets further. If the chord lasts less than a beat, play only the root. The strings, top to bottom: G, D, A, E.'
+  };
+  const st = root._cb = root._cb || { sec: 'chorus', bpm: 100, playing: false };
+  const chip = (attr, v, on, label) => '<button type="button" class="ej-chip" ' + attr + '="' + v + '" aria-pressed="' + on + '">' + label + '</button>';
+  const tab = (c) => {
+    const B = CG_BASS[c], nm = ['E', 'A', 'D', 'G'];
+    let s = '<svg class="cg-tab" viewBox="0 0 120 66" role="img" aria-label="' + T.aria + ' ' + cpChord(c) + '">';
+    for (let i = 0; i < 4; i++) s += '<line x1="22" x2="116" y1="' + (10 + i * 14) + '" y2="' + (10 + i * 14) + '" stroke="#8A8A8A" stroke-width="1.2"/><text class="cg-lab" x="8" y="' + (14 + i * 14) + '" font-size="12" text-anchor="middle">' + nm[3 - i] + '</text>';
+    [[1, 2, 'R'], [4, 5, 'O']].forEach((k, j) => {
+      const x = j ? 92 : 46, y = 10 + (3 - B[k[0]]) * 14;
+      s += '<g class="cg-fr"><rect x="' + (x - 10) + '" y="' + (y - 8) + '" width="20" height="16" rx="4"/><text x="' + x + '" y="' + (y + 4.5) + '" text-anchor="middle" font-size="13" font-weight="800">' + B[k[1]] + '</text></g>';
+    });
+    return s + '</svg>';
+  };
+  const paint = () => {
+    const S = CP_SECS[st.sec], chords = cgChords(S);
+    root.innerHTML = '<div class="pt-card cp-card"><h3 class="bt-h3" style="margin:0">' + T.h + '</h3><p class="pt-p">' + T.x + '</p>'
+      + '<b class="ej-h">' + T.sec + '</b><div class="ej-chips">' + Object.keys(CP_SECS).map((k) => chip('data-sec', k, k === st.sec, T.secs[k])).join('') + '</div>'
+      + '<div class="cp-ctl"><button type="button" class="rt-play" data-a="play">▶ ' + T.listen + '</button><span class="cp-tempo">' + T.tempo + '<button type="button" class="bt-bpm" data-b="-5" aria-label="' + T.slower + '">−</button><b>' + st.bpm + ' BPM</b><button type="button" class="bt-bpm" data-b="5" aria-label="' + T.faster + '">+</button></span></div>'
+      + '<b class="ej-h">' + T.pat + '</b><div class="cg-steps" data-a="steps">' + [0, 1, 2, 3, 4, 5, 6, 7].map((i) => '<i class="cg-st' + (i % 4 === 0 ? ' cg-acc' : '') + '" data-i="' + i + '">' + (i % 2 ? T.O : T.R) + '</i>').join('') + '</div>'
+      + cgBars(S, T)
+      + '<b class="ej-h">' + T.map + '</b><div class="cp-map">' + chords.map((c) => '<div class="cp-mc" data-c="' + c + '"><b>' + cpChord(c) + '</b><small>' + T.root + ' ' + CP_NAMES[es ? 'es' : 'en'][CG_BASS[c][0] % 12] + ' · ' + T.oct + '</small>' + tab(c) + '</div>').join('') + '</div>'
+      + '<div class="pt-note"><p class="pt-p">' + T.note + '</p></div></div>';
+  };
+  const show = (c) => root.querySelectorAll('.cp-mc').forEach((e) => e.setAttribute('data-on', String(e.getAttribute('data-c') === c)));
+  const halt = root._halt = () => { cgHalt(root, st, T); root.querySelectorAll('.cg-st[data-on]').forEach((e) => e.removeAttribute('data-on')); };
+  const play = () => {
+    halt(); st.playing = true;
+    const ok = cgRun(root, st, T, CP_SECS[st.sec], (ac, e, at, spb) => {
+      const B = CG_BASS[e[0]], n8 = Math.floor(e[2] * 2 + 1e-6);
+      if (n8 < 2) { cgNote(root, ac, B[0], at, e[2] * spb * 0.95, 0.9); return; }
+      for (let k = 0; k < n8; k++) cgNote(root, ac, k % 2 ? B[3] : B[0], at + k * spb / 2, (k === n8 - 1 ? e[2] - k / 2 : 0.5) * spb * 0.9, k === 0 ? 0.95 : 0.7);
+    }, show);
+    if (!ok) { st.playing = false; return; }
+    root.querySelector('[data-a="play"]').textContent = '■ ' + T.stop;
+  };
+  paint();
+  root.onclick = (e) => {
+    const b = e.target.closest && e.target.closest('button'); if (!b || !root.contains(b)) return;
+    if (b.hasAttribute('data-sec')) { halt(); st.sec = b.getAttribute('data-sec'); paint(); }
+    else if (b.hasAttribute('data-b')) { st.bpm = Math.max(50, Math.min(130, st.bpm + +b.getAttribute('data-b'))); const was = st.playing; halt(); paint(); if (was) play(); }
+    else if (b.getAttribute('data-a') === 'play') { if (st.playing) halt(); else play(); }
+  };
+}
+
+// ----- the selector that sits above the four -----
+function celebHub(root, es) {
+  const names = es ? ['Piano', 'Guitarra', 'Guitarra 2', 'Bajo'] : ['Piano', 'Guitar', 'Guitar 2', 'Bass'], keys = ['piano', 'gtr', 'gtr2', 'bass'];
+  const st = root._hub = root._hub || { inst: 'piano' };
+  const draw = () => {
+    const old = root.querySelector('#ch-host');
+    if (old) { const pb = old.querySelector('[data-a="play"]'); if (pb && /■/.test(pb.textContent)) pb.click(); }
+    root.innerHTML = '<div class="pt-card cp-card"><b class="ej-h">' + (es ? 'Instrumento' : 'Instrument') + '</b><div class="ej-chips" role="group">' + keys.map((k, i) => '<button type="button" class="ej-chip" data-hub="' + k + '" aria-pressed="' + (k === st.inst) + '">' + names[i] + '</button>').join('') + '</div></div><div id="ch-host" style="display:flex;flex-direction:column;gap:12px"></div>';
+    const host = root.querySelector('#ch-host');
+    ({ piano: celebPiano, gtr: celebGuitar, gtr2: celebGtr2, bass: celebBass })[st.inst](host, es);
+    root.querySelector('.ej-chips').onclick = (e) => {
+      const b = e.target.closest && e.target.closest('button'); if (!b) return;
+      st.inst = b.getAttribute('data-hub'); draw();
+    };
+  };
+  draw();
+}
+// ===== fin selector de instrumentos de Celebration =====
 // ===== Lead sheet de Celebration (cancionero, canción 5): letra y acordes para todos; el acorde se abre en el instrumento =====
 // token of a chord: 'Db/F' or 'Gb:g' (g = guitar line, v = horn line), lyric: text or [[text, 'c']] (c = backing vocals)
 const LS_P = (c, l, extra) => Object.assign({ c: c ? c.split(' ') : [], l: l || '' }, extra || {});
@@ -7086,7 +7404,7 @@ function songSheet(n) {
         h += '<p class="pt-foot">' + (es ? 'Tempo y tonalidad aproximados de la grabación original.' : 'Approximate tempo and key of the original recording.') + '</p>';
         root.innerHTML = h;
         const cp = document.getElementById('cp-root');
-        if (cp) celebPiano(cp, es);
+        if (cp) celebHub(cp, es);
       }
       renderVals() {
         const lang = this.state.lang, es = lang === 'es', S = SONG_SHEETS.find((x) => x.n === n);
@@ -24091,8 +24409,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '16 nov 2026 · 19:56';
-  var BUILD_ID = '2026-11-16T19:56';
+  var BUILD = '18 nov 2026 · 22:08';
+  var BUILD_ID = '2026-11-18T22:08';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
