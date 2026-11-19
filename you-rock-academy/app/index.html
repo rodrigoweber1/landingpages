@@ -1061,6 +1061,24 @@ body.stage #app .bi-done,body.stage #app .bi-link{color:#FF8A8F!important}
 .bs-c text{fill:#FFFFFF;font:800 12px 'Inter',system-ui,sans-serif}
 .bs-c[data-on="true"] rect{fill:#FFC400}
 .bs-c[data-on="true"] text{fill:#121212}
+.hm-neck .hm-dh{fill:none;stroke:#2F5FA8;stroke-width:3;stroke-dasharray:4 3}
+.hm-neck .hm-t2{fill:#2F5FA8}
+.hm-neck .hm-arc{stroke:#B3121A}
+body.dark .hm-neck .hm-arc,body.stage .hm-neck .hm-arc{stroke:#FF6B6B}
+body.dark .hm-neck .hm-t2,body.stage .hm-neck .hm-t2{fill:#8FB4F0}
+body.dark .hm-neck .hm-dh,body.stage .hm-neck .hm-dh{stroke:#8FB4F0}
+.bi-prac{display:block;width:100%;margin:12px 0 4px;padding:18px 16px;border:0;border-radius:14px;background:#E31B23;color:#fff;font:800 17px 'Inter',system-ui,sans-serif;cursor:pointer;box-shadow:0 6px 18px rgba(227,27,35,.35);animation:biPulse 2.2s ease-in-out infinite}
+.bi-prac:active{transform:scale(.98)}
+@keyframes biPulse{0%,100%{box-shadow:0 6px 18px rgba(227,27,35,.35)}50%{box-shadow:0 6px 26px rgba(227,27,35,.65)}}
+.bi-prov{font-size:12px;opacity:.7;margin:4px 0 8px}
+.bi-nowbox{margin:8px 0;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.05);font-size:14px;min-height:20px}
+.bi-nowbox[data-deg]:not([data-deg=""]){background:#FFC400;color:#121212}
+.bi-bar{transition:transform .12s,box-shadow .12s}
+.bi-bar[data-on="true"]{background:#FFC400!important;color:#121212!important;transform:scale(1.06);box-shadow:0 0 0 3px #E31B23;position:relative;z-index:1}
+.bi-bar[data-on="true"] *{color:#121212!important}
+.bi-tog{display:block;margin:12px 0 4px;padding:8px 12px;border:1px solid currentColor;border-radius:999px;background:transparent;color:inherit;font:600 13px 'Inter',system-ui,sans-serif;cursor:pointer;opacity:.85}
+.bi-chords[hidden]{display:none}
+.bi-crow{margin-top:10px}
 .cg-leg{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none;font-size:14px;line-height:20px;color:#3A3A3A}
 .cg-leg b{display:inline-block;min-width:18px;color:#E31B23;font-weight:800}
 .cg-steps{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px}
@@ -5881,9 +5899,9 @@ const CG_SH = {
   third: { Db: [null, 8, 6, 6, 6, null], Gb: [null, null, 4, 6, 7, 6], Ab: [null, null, 6, 8, 9, 8], Bbm: [6, 8, 8, 6, 6, 6], Dbmaj7: [null, 4, 6, 5, 6, 4], Cm7: [null, 3, 5, 3, 4, 3], Fsus4: [null, 8, 8, 10, 11, 8], F: [null, null, 7, 5, 6, 5], 'Db/Eb': [null, 6, null, 6, 6, 4] },
   fifth: { Db: [4, null, 6, 6, 6, 4], Gb: [2, 4, 4, 3, 2, 2], Ab: [4, 6, 6, 5, 4, 4], Bbm: [null, 1, 3, 3, 2, 1], Dbmaj7: [null, 4, 6, 5, 6, 4], Cm7: [null, 3, 5, 3, 4, 3], Fsus4: [1, 3, 3, 3, 1, 1], F: [1, 3, 3, 2, 1, 1], 'Db/Eb': [null, 6, null, 6, 6, 4] }
 };
-// funk octave on A♭ (guitar 2): strings 6 and 4 (fret 4 and fret 6), one bar of sixteenths: D = accent, u = plain, x = muted ghost
-const CG_OCT = [4, null, 6, null, null, null];
-const CG_PAT = ['D', 'x', 'u', 'x', 'D', 'x', 'u', 'x', 'D', 'x', 'u', 'x', 'D', 'x', 'u', 'x'];
+// funk octave on A♭ (guitar 2): 4th string fret 6 and 2nd string fret 9, one bar of sixteenths: D = accent, u = plain, x = muted ghost
+const CG_OCT = [null, null, 6, null, 9, null];
+const CG_PAT = ['D', 'D', 'x', 'x', 'D', 'D', 'x', 'D', 'x', 'D', 'x', 'x', 'D', 'D', 'x', 'x'];
 const cgFret = (f) => f.map((x) => (x === null ? 'x' : x)).join('-');
 function cgSections() { return CP_SECS; }
 // the bars of a section as blocks on a lane (shared by guitar and bass)
@@ -5997,19 +6015,19 @@ function celebGuitar(root, es) {
 
 // ----- guitar 2: the funk sixteenths on the A♭ octave, written as one bar of music -----
 function cgStaff(pat, es) {
-  const g = 10, yT = 40, yB = yT + 4 * g, Yd = (d) => yB - (d - 2) * (g / 2), W = 360, X0 = 112, SX = 14.6;
-  const dLo = -2, dHi = 5, yLo = Yd(dLo), yHi = Yd(dHi), yStem = yHi - 27;
-  let h = '<svg class="pt-svg cg-staff" viewBox="0 0 ' + W + ' 130" role="img" aria-label="' + (es ? 'Un compás de semicorcheas sobre la octava de La♭' : 'One bar of sixteenth notes on the A♭ octave') + '">';
+  const g = 10, yT = 58, yB = yT + 4 * g, Yd = (d) => yB - (d - 2) * (g / 2), W = 360, X0 = 112, SX = 14.6;
+  const dLo = 5, dHi = 12, yLo = Yd(dLo), yHi = Yd(dHi), yStem = yHi - 27;
+  let h = '<svg class="pt-svg cg-staff" viewBox="0 0 ' + W + ' 148" role="img" aria-label="' + (es ? 'Un compás de semicorcheas sobre la octava de La♭' : 'One bar of sixteenth notes on the A♭ octave') + '">';
   for (let i = 0; i < 5; i++) h += '<line x1="4" y1="' + (yT + i * g) + '" x2="' + (W - 4) + '" y2="' + (yT + i * g) + '" stroke="#8A8A8A" stroke-width="1"/>';
   h += '<line x1="' + (W - 5) + '" y1="' + yT + '" x2="' + (W - 5) + '" y2="' + yB + '" stroke="#8A8A8A" stroke-width="2"/>';
   h += '<path class="pt-ink" transform="translate(12 ' + (yB + 1.75) + ') scale(0.0621 -0.0621) translate(-120 0)" d="' + CR_CLEF + '"/>';
-  [6, 9, 7, 10].forEach((d, i) => { h += '<text class="pt-ink" x="' + (40 + i * 9) + '" y="' + (Yd(d) + 5.5) + '" font-size="19" font-weight="700">♭</text>'; });
-  h += '<text class="pt-ink" x="84" y="' + (yT + 18) + '" font-size="21" font-weight="800" text-anchor="middle">4</text><text class="pt-ink" x="84" y="' + (yB - 1) + '" font-size="21" font-weight="800" text-anchor="middle">4</text>';
+  [6, 9, 5, 8, 4].forEach((d, i) => { h += '<text class="pt-ink" x="' + (40 + i * 8.5) + '" y="' + (Yd(d) + 5.5) + '" font-size="19" font-weight="700">♭</text>'; });
+  h += '<text class="pt-ink" x="94" y="' + (yT + 18) + '" font-size="21" font-weight="800" text-anchor="middle">4</text><text class="pt-ink" x="94" y="' + (yB - 1) + '" font-size="21" font-weight="800" text-anchor="middle">4</text>';
   pat.forEach((p, i) => {
     const x = X0 + i * SX;
     h += '<g class="cg-n" data-i="' + i + '">';
-    for (let q = 0; q >= dLo; q -= 2) h += '<line x1="' + (x - 8) + '" y1="' + Yd(q) + '" x2="' + (x + 8) + '" y2="' + Yd(q) + '" stroke="#8A8A8A" stroke-width="1.2"/>';
-    h += '<rect x="' + (x - 7) + '" y="20" width="14" height="108" fill="transparent"/>';
+    for (let q = 12; q <= dHi; q += 2) h += '<line x1="' + (x - 8) + '" y1="' + Yd(q) + '" x2="' + (x + 8) + '" y2="' + Yd(q) + '" stroke="#8A8A8A" stroke-width="1.2"/>';
+    h += '<rect x="' + (x - 7) + '" y="0" width="14" height="148" fill="transparent"/>';
     [yLo, yHi].forEach((y) => {
       if (p === 'x') h += '<path class="cg-x" d="M' + (x - 3.6) + ' ' + (y - 3.6) + 'l7.2 7.2m0 -7.2l-7.2 7.2" stroke-width="1.8" stroke-linecap="round" fill="none"/>';
       else h += '<ellipse class="pt-ink" cx="' + x + '" cy="' + y + '" rx="4.6" ry="3.4" transform="rotate(-20 ' + x + ' ' + y + ')"/>';
@@ -6017,7 +6035,7 @@ function cgStaff(pat, es) {
     h += '<line class="cg-stem" x1="' + (x + 4.3) + '" y1="' + (yLo - 1) + '" x2="' + (x + 4.3) + '" y2="' + yStem + '" stroke-width="1.3"/>';
     if (p === 'D') h += '<path class="cg-acc" d="M' + (x - 3) + ' ' + (yStem - 14) + 'l7 3.5 -7 3.5" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
     const lab = ['1', 'e', '&', 'a'][i % 4] === '1' ? String(i / 4 + 1) : ['1', 'e', '&', 'a'][i % 4];
-    h += '<text class="cg-lab" x="' + x + '" y="124" font-size="12" text-anchor="middle">' + lab + '</text></g>';
+    h += '<text class="cg-lab" x="' + x + '" y="142" font-size="12" text-anchor="middle">' + lab + '</text></g>';
   });
   for (let b = 0; b < 4; b++) {
     const x1 = X0 + b * 4 * SX + 4.3, x2 = X0 + (b * 4 + 3) * SX + 4.3;
@@ -6027,15 +6045,15 @@ function cgStaff(pat, es) {
 }
 function celebGtr2(root, es) {
   const T = es ? {
-    h: 'Guitarra 2 · semicorcheas funk', x: 'Es la guitarra que hace el funk del estribillo: dos cuerdas a la vez, siempre la octava de La♭ (6ª cuerda, traste 4, y 4ª cuerda, traste 6; las demás, apagadas). Un compás de semicorcheas: cuatro grupos de cuatro, uno por pulso.',
-    leg: ['Acento: ataque fuerte, en cada pulso', 'Golpe normal, en el «&»', 'Apagado: la mano izquierda afloja y no suena nota, pero la derecha no para'],
-    legN: ['>', '●', '×'], listen: 'Escuchar', stop: 'Parar', tempo: 'Tempo', slower: 'Más lento', faster: 'Más rápido', shape: 'La octava de La♭ en el mástil', shapeAria: 'Diagrama de la octava de La♭ en la guitarra', pat: 'Un compás',
-    note: 'La guitarra se escribe una octava más aguda de lo que suena. Cuenta «1 e & a 2 e & a…»: los acentos caen en los números, el golpe normal en el «&» y los apagados en la «e» y la «a». Toca con la muñeca suelta, siempre abajo-arriba sin parar. Si el patrón de tu profesor difiere, el suyo manda.'
+    h: 'Guitarra 2 · semicorcheas funk', x: 'Es la guitarra que hace el funk del estribillo: dos cuerdas a la vez, siempre la octava de La♭ (4ª cuerda, traste 6, y 2ª cuerda, traste 9; las demás, apagadas). Un compás de semicorcheas: cuatro grupos de cuatro, uno por pulso.',
+    leg: ['Acento: todas las notas de este patrón llevan acento', 'Apagado: la mano izquierda afloja y no suena nota, pero la derecha no para'],
+    legN: ['>', '×'], listen: 'Escuchar', stop: 'Parar', tempo: 'Tempo', slower: 'Más lento', faster: 'Más rápido', shape: 'La octava de La♭ en el mástil', shapeAria: 'Diagrama de la octava de La♭ en la guitarra', pat: 'Un compás',
+    note: 'La guitarra se escribe una octava más aguda de lo que suena. Cuenta «1 e & a, 2 e & a, 3 e & a, 4 e & a». Suenan: el 1 y la «e» del primer pulso; el 2, la «e» y la «a» del segundo; solo la «e» del tercero; y el 4 y la «e» del cuarto. Todas llevan acento. Los demás golpes son apagados (×). Toca con la muñeca suelta, siempre abajo-arriba sin parar.'
   } : {
-    h: 'Guitar 2 · funk sixteenths', x: 'This is the guitar that plays the funk in the chorus: two strings at once, always the A♭ octave (6th string, fret 4, and 4th string, fret 6; the others muted). One bar of sixteenth notes: four groups of four, one per beat.',
-    leg: ['Accent: a strong attack on every beat', 'Plain stroke, on the “&”', 'Muted: the fretting hand eases off so no note rings, but the picking hand never stops'],
-    legN: ['>', '●', '×'], listen: 'Listen', stop: 'Stop', tempo: 'Tempo', slower: 'Slower', faster: 'Faster', shape: 'The A♭ octave on the neck', shapeAria: 'Diagram of the A♭ octave on the guitar', pat: 'One bar',
-    note: 'Guitar is written an octave higher than it sounds. Count “1 e & a 2 e & a…”: accents fall on the numbers, the plain stroke on the “&” and the muted ones on the “e” and the “a”. Keep your wrist loose, always down-up without stopping. If your teacher’s pattern differs, theirs wins.'
+    h: 'Guitar 2 · funk sixteenths', x: 'This is the guitar that plays the funk in the chorus: two strings at once, always the A♭ octave (4th string, fret 6, and 2nd string, fret 9; the others muted). One bar of sixteenth notes: four groups of four, one per beat.',
+    leg: ['Accent: every note in this pattern is accented', 'Muted: the fretting hand eases off so no note rings, but the picking hand never stops'],
+    legN: ['>', '×'], listen: 'Listen', stop: 'Stop', tempo: 'Tempo', slower: 'Slower', faster: 'Faster', shape: 'The A♭ octave on the neck', shapeAria: 'Diagram of the A♭ octave on the guitar', pat: 'One bar',
+    note: 'Guitar is written an octave higher than it sounds. Count “1 e & a, 2 e & a, 3 e & a, 4 e & a”. You play: the 1 and the “e” of the first beat; the 2, the “e” and the “a” of the second; only the “e” of the third; and the 4 and the “e” of the fourth. All of them are accented. The other strokes are muted (×). Keep your wrist loose, always down-up without stopping.'
   };
   const st = root._g2 = root._g2 || { bpm: 100, playing: false };
   const paint = () => {
@@ -6057,7 +6075,7 @@ function celebGtr2(root, es) {
     try { pUnlock(); } catch (e) {}
     halt(); st.playing = true; root._tm = []; root._src = [];
     root.querySelector('[data-a="play"]').textContent = '■ ' + T.stop;
-    const sx = 60 / st.bpm / 4, M = [LS_GOPEN[0] + CG_OCT[0], LS_GOPEN[2] + CG_OCT[2]];
+    const sx = 60 / st.bpm / 4, M = [LS_GOPEN[2] + CG_OCT[2], LS_GOPEN[4] + CG_OCT[4]];
     let bar = 0, at = ac.currentTime + 0.15;
     // schedules a bar at a time, a little ahead of the audio clock, and loops until you stop
     const tick = () => {
@@ -6093,7 +6111,7 @@ const bsA = (s, f) => ({ ev: [[0, 2, s, f], [2, 2, s, f], [4, 2, s, f], [6, 2, s
 const bsB = (s, f) => ({ ev: [[0, 2, s, f], [2, 2, s, f], [4, 2, s, f], [6, 1, s, f], [7, 1, s, f], [8, 8, -1]], beams: [[0, 1], [2, 3, 4]] });
 const BS_C1 = { ev: [[0, 2, -1], [2, 2, 0, 1], [4, 2, 0, 1], [6, 2, 0, 2], [8, 4, 0, 2], [12, 4, 0, 1]], beams: [[1, 2, 3]] };
 const BS_C2 = { ev: [[0, 2, 0, 2], [2, 2, 0, 1], [4, 2, 0, 1, 1], [6, 2, 0, 4], [8, 2, 0, 4, 1], [10, 2, 0, 4], [12, 2, 0, 4], [14, 1, 0, 4], [15, 1, 0, 4]], beams: [[0, 1, 2, 3], [4, 5], [6, 7, 8]] };
-const BS_C4 = { ev: [[0, 3, 0, 2], [3, 1, 0, 1], [4, 2, 0, 1, 1], [6, 2, 0, 4], [8, 2, 0, 4, 1], [10, 2, 0, 4], [12, 2, 0, 4], [14, 1, 0, 4], [15, 1, 0, 4]], beams: [[0, 1], [2, 3], [4, 5], [6, 7, 8]] };
+const BS_C4 = BS_C2; // the teacher: bar 4 is exactly bar 2
 const BS_SEC = {
   chorus: [Object.assign({ n: 1 }, BS_C1), Object.assign({ n: 2 }, BS_C2), Object.assign({ n: 3 }, BS_C1), Object.assign({ n: 4 }, BS_C4)],
   verse: [{ n: 5, multi: 2 }, Object.assign({ n: 7, ch: 'A♭' }, bsA(0, 4)), Object.assign({ n: 8, ch: 'A♭' }, bsB(0, 4))],
@@ -6969,7 +6987,7 @@ C["HacerMusica"] = (DCLogic) => {
         hX: 'La pentatónica mayor de La♭ tiene exactamente las mismas notas que la pentatónica menor de Fa (la menor que está tres trastes por debajo de La♭). Dicho de otra forma: no hay que aprender una escala nueva. La posición que ya conoces de Fa menor es La♭ mayor.',
         lT: 'Escucha la diferencia', lX: 'Pulsa y compara. Ambas empiezan en La♭: la primera suena «de blues», la segunda más dulce.',
         vT: 'Vídeo: mezclar la pentatónica menor y mayor', vS: 'Aquí irá el vídeo explicativo.',
-        eH: 'Ejemplo: Easy', eX: 'En Easy los solos mezclan frases de La♭ mayor y de La♭ menor para darle un color distinto. Y lo mejor es que las dos viven en la misma zona del mástil: mira los diagramas (trastes 3 al 7).',
+        eH: 'Ejemplo: Easy', eX: 'En Easy los solos mezclan frases de La♭ mayor y de La♭ menor para darle un color distinto. Y lo mejor es que las dos viven en la misma zona del mástil: mira los diagramas de arriba (trastes 3 al 7).',
         d1: 'Posición 1 de La♭ menor', d1x: 'La tónica (La♭) está en la 6.ª cuerda, traste 4.',
         d2: 'Posición 2 de Fa menor (= La♭ mayor)', d2x: 'Mismo lugar del mástil, tonalidad distinta: suena a La♭ mayor.',
         d3: 'Las dos juntas', d3x: 'Rojo: solo menor. Azul: solo mayor. Mitad y mitad: la nota está en las dos (La♭ y Mi♭, las «notas comunes»). El círculo con anillo es la tónica La♭.',
@@ -6987,7 +7005,7 @@ C["HacerMusica"] = (DCLogic) => {
         hX: 'The A♭ major pentatonic has exactly the same notes as the F minor pentatonic (the minor three frets below A♭). In other words: you do not need to learn a new scale. The position you already know for F minor is A♭ major.',
         lT: 'Hear the difference', lX: 'Tap and compare. Both start on A♭: the first sounds “bluesy”, the second sweeter.',
         vT: 'Video: mixing the minor and major pentatonic', vS: 'The explanatory video will go here.',
-        eH: 'Example: Easy', eX: 'In Easy the solos mix phrases of A♭ major and A♭ minor to give them a different colour. And the best part is that both live in the same area of the neck: look at the diagrams (frets 3 to 7).',
+        eH: 'Example: Easy', eX: 'In Easy the solos mix phrases of A♭ major and A♭ minor to give them a different colour. And the best part is that both live in the same area of the neck: look at the diagrams above (frets 3 to 7).',
         d1: 'A♭ minor, position 1', d1x: 'The root (A♭) is on the 6th string, fret 4.',
         d2: 'F minor, position 2 (= A♭ major)', d2x: 'Same place on the neck, different key: it sounds like A♭ major.',
         d3: 'Both together', d3x: 'Red: minor only. Blue: major only. Half and half: the note is in both (A♭ and E♭, the “common notes”). The circle with a ring is the root A♭.',
@@ -7001,7 +7019,7 @@ C["HacerMusica"] = (DCLogic) => {
       const midi = (s, f) => LS_GOPEN[6 - s] + f;
       const mk = (a, b) => { const o = []; for (let s = 6; s >= 1; s--) { const set = {}; (a[s] || []).forEach((f) => { set[f] = set[f] || { s, f, mn: 0, mj: 0 }; set[f].mn = 1; }); (b[s] || []).forEach((f) => { set[f] = set[f] || { s, f, mn: 0, mj: 0 }; set[f].mj = 1; }); Object.keys(set).forEach((k) => o.push(set[k])); } return o; };
       const SETS = { mi: mk(MINP, {}), ma: mk({}, MAJP), both: mk(MINP, MAJP) };
-      const start = 3, n = 5, FW = 56, X0 = 34, SP = 32, Y = (s) => 22 + (6 - s) * SP;
+      const start = 3, n = 5, FW = 56, X0 = 34, SP = 32, Y = (s) => 22 + (s - 1) * SP;
       const CX = (f) => X0 + (f - start) * FW + FW / 2;
       const neck = (id, dots, aria) => {
         const W = X0 + n * FW, H = 22 + 5 * SP + 22;
@@ -7027,16 +7045,13 @@ C["HacerMusica"] = (DCLogic) => {
       const legend = '<div class="hm-key"><span><i class="hm-k1"></i>' + T.key[0] + '</span><span><i class="hm-k2"></i>' + T.key[1] + '</span><span><i class="hm-k3"></i>' + T.key[2] + '</span></div>';
       const fig = (id, title, x, dots, extra) => '<div class="pt-card hm-fig"><b class="ea-h">' + title + '</b>' + neck(id, dots, T.aria + title) + p(x) + (extra || '') + '</div>';
       root.innerHTML = '<div class="pt-note">' + p('⚠ ' + T.disc) + '</div>'
+        + fig('mi', T.d1, T.d1x, SETS.mi) + fig('ma', T.d2, T.d2x, SETS.ma) + fig('both', T.d3, T.d3x, SETS.both, legend)
+        + H3(T.eH) + '<div class="pt-card">' + p(T.eX) + '</div>'
         + H3(T.h1) + '<div class="pt-card">' + p(T.p1) + p(T.p2) + '</div>'
-        + '<div class="pt-card"><b class="ea-h">' + T.cT + '</b>'
-        + '<div class="ea-row"><span class="ea-lead">' + T.mi + '</span>' + sc(miN, T.gr, [1, 2, 4]) + '</div>'
-        + '<div class="ea-row"><span class="ea-lead">' + T.ma + '</span>' + sc(maN, T.gr2, [1, 2, 4]) + '</div>' + p(T.cX) + '</div>'
         + '<div class="pt-note">' + '<b class="ea-h">' + T.hT + '</b>' + p(T.hX) + '</div>'
         + '<div class="pt-card"><b class="ea-h">' + T.lT + '</b>' + p(T.lX) + '<div class="hm-pl"><button type="button" class="rt-play" data-seq="mi">▶ ' + T.play + ' · ' + T.mi + '</button><button type="button" class="rt-play" data-seq="ma">▶ ' + T.play + ' · ' + T.ma + '</button></div></div>'
-        + '<div class="rt-video"><b>' + T.vT + '</b><div class="rt-vbox" role="img" aria-label="' + T.vT + '"><span class="rt-vplay">▶</span><span>' + T.vS + '</span></div></div>'
-        + H3(T.eH) + '<div class="pt-card">' + p(T.eX) + '</div>'
-        + fig('mi', T.d1, T.d1x, SETS.mi) + fig('ma', T.d2, T.d2x, SETS.ma) + fig('both', T.d3, T.d3x, SETS.both, legend)
-        + '<div class="pt-note"><b class="ea-h">' + T.tipT + '</b>' + p(T.tip) + '</div>';
+        + '<div class="pt-note"><b class="ea-h">' + T.tipT + '</b>' + p(T.tip) + '</div>'
+        + '<div class="rt-video"><b>' + T.vT + '</b><div class="rt-vbox" role="img" aria-label="' + T.vT + '"><span class="rt-vplay">▶</span><span>' + T.vS + '</span></div></div>';
       const play = (arr) => {
         const ac = pAudio(); if (!ac) return; try { pUnlock(); } catch (x) {}
         const t0 = ac.currentTime + 0.05; arr.forEach((m, i) => pluck(m, t0 + i * 0.3, 0.55));
@@ -7109,48 +7124,53 @@ C["QueImprovisar"] = (DCLogic) => {
         p2: 'Esto genera un problema para la mayoría de guitarristas, porque la primera escala que aprendemos es la escala pentatónica MENOR. ¿Y qué pasa si la canción está en Do mayor? ¿Con qué improviso?',
         p3: 'Para entender esto, necesitas saber lo que es el relativo y cómo se aplica en la guitarra. Atento al vídeo.',
         vT: 'Vídeo: ¿qué es improvisar? El relativo', vS: 'Aquí irá el vídeo explicativo.',
-        dT: 'Cada tono mayor tiene su relativo menor', dX: 'Elige un tono y mira dónde cae la pentatónica menor que sirve para él. Es siempre la misma posición (posición 1) que va moviéndose por el mástil.',
-        rule: 'Para tocar en {M} mayor, utiliza la pentatónica de {m} menor.', shift: 'La tónica de {M} está 3 trastes por encima de la de {m}: la misma posición, movida 3 trastes.',
-        pos: 'Pentatónica de {m} menor · posición 1 · traste {f}',
-        lg: ['Tónica del relativo menor', 'Tónica del tono mayor', 'Otras notas de la posición'], str: 'Cuerda', pairs: 'Los relativos de los tonos naturales', maj: 'mayor', min: 'menor', key: 'Tono'
+        dT: 'Cómo encontrar la pentatónica menor de un tono mayor', dX: 'En la 6.ª cuerda, la tónica del tono mayor está 3 trastes por encima de la tónica de su relativo menor. Toca la posición 1 de la pentatónica menor desde esa nota más grave: es la misma posición, movida por el mástil.',
+        lg: ['Tónica del tono mayor (el de la canción)', 'Tónica del relativo menor (desde aquí tocas la pentatónica)'], maj: 'mayor', min: 'menor', fr: 'traste', arc: '3 trastes', open: 'cuerda al aire',
+        jT: 'Salto en el mástil', jE: 'Del Mi al aire (traste 0) no se pueden bajar 3 trastes. Usa el Mi del traste 12 y baja 3: Do♯ menor está en el traste 9.', jF: 'Del Fa del traste 1 no se pueden bajar 3 trastes. Usa el Fa del traste 13 y baja 3: Re menor está en el traste 10.',
+        str: 'Cuerda', aria: 'Sexta cuerda: ', relT: 'El relativo en el piano', relV: 'Vídeo: el relativo en el piano', relS: 'Aquí irá el vídeo en el que se explica el relativo en el piano.'
       } : {
         h1: 'What is improvising?',
         p1: 'Improvising is not making something up from scratch, with no net and no structure. We start from some defined “rules”. The most important is the key of the song, which tells us which scale or scales we can use.',
         p2: 'This is a problem for most guitarists, because the first scale we learn is the MINOR pentatonic. So what if the song is in C major? What do I improvise with?',
         p3: 'To understand this you need to know what the relative is and how it applies on the guitar. Watch the video.',
         vT: 'Video: what is improvising? The relative', vS: 'The explanatory video will go here.',
-        dT: 'Every major key has its relative minor', dX: 'Pick a key and see where the minor pentatonic that works for it sits. It is always the same position (position 1), travelling along the neck.',
-        rule: 'To play in {M} major, use the {m} minor pentatonic.', shift: 'The root of {M} is 3 frets above the root of {m}: the same position, moved 3 frets.',
-        pos: '{m} minor pentatonic · position 1 · fret {f}',
-        lg: ['Root of the relative minor', 'Root of the major key', 'Other notes of the position'], str: 'String', pairs: 'The relatives of the natural keys', maj: 'major', min: 'minor', key: 'Key'
+        dT: 'How to find the minor pentatonic of a major key', dX: 'On the 6th string, the root of the major key is 3 frets above the root of its relative minor. Play position 1 of the minor pentatonic from that lower note: it is the same position, moved along the neck.',
+        lg: ['Root of the major key (the song’s key)', 'Root of the relative minor (play the pentatonic from here)'], maj: 'major', min: 'minor', fr: 'fret', arc: '3 frets', open: 'open string',
+        jT: 'Jump on the neck', jE: 'From the open E (fret 0) you cannot go down 3 frets. Use the E at fret 12 and go down 3: C♯ minor is at fret 9.', jF: 'From the F at fret 1 you cannot go down 3 frets. Use the F at fret 13 and go down 3: D minor is at fret 10.',
+        str: 'String', aria: '6th string: ', relT: 'The relative on the piano', relV: 'Video: the relative on the piano', relS: 'The video explaining the relative on the piano will go here.'
       };
       const NM = es ? ['Do', 'Do♯', 'Re', 'Re♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'] : ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
-      const MAJ = [0, 2, 4, 5, 7, 9, 11], OPEN = [4, 9, 2, 7, 11, 4];
-      const BOX1 = [[0, 3], [0, 2], [0, 2], [0, 2], [0, 3], [0, 3]];
-      const sel = this._qi = this._qi || 0;
-      const draw = (i) => {
-        const M = MAJ[i], m = (M + 9) % 12; let r = (m - 4 + 12) % 12; if (r === 0) r = 12;
-        const dots = [];
-        BOX1.forEach((a, k) => a.forEach((o) => { const f = r + o, pc = (OPEN[k] + f) % 12; dots.push({ s: 6 - k, f, cls: pc === m ? 'dm' : pc === M ? 'dj' : 'do', nm: NM[pc] }); }));
-        const fill = (x) => x.replace('{M}', NM[M]).replace('{m}', NM[m]).replace('{f}', r);
-        return '<b class="ea-h">' + fill(T.rule) + '</b><p class="pt-p">' + fill(T.shift) + '</p>' + hmNeck(r, dots, fill(T.pos), T.str)
-          + '<p class="pt-p"><b>' + fill(T.pos) + '</b></p>'
-          + '<div class="hm-key"><span><i class="hm-k1"></i>' + T.lg[0] + '</span><span><i class="hm-k2"></i>' + T.lg[1] + '</span><span><i class="hm-k4"></i>' + T.lg[2] + '</span></div>';
+      // 6th string: fret of the major root (fM), of its relative minor (fm); alt = the same root lower down the neck
+      const K = [{ M: 0, fM: 8, fm: 5 }, { M: 2, fM: 10, fm: 7 }, { M: 4, fM: 12, fm: 9, alt: 0, jump: 'jE' }, { M: 5, fM: 13, fm: 10, alt: 1, jump: 'jF' }, { M: 7, fM: 3, fm: 0 }, { M: 9, fM: 5, fm: 2 }, { M: 11, fM: 7, fm: 4 }];
+      const cx = (f) => 36 + (f - 0.5) * 25, X = (f) => (f === 0 ? 20 : cx(f));
+      const six = (k) => {
+        const M = NM[k.M], m = NM[(k.M + 9) % 12];
+        let h = '<svg class="hm-neck" viewBox="0 0 346 84" width="100%" role="img" aria-label="' + T.aria + M + ' ' + T.maj + ' – ' + m + ' ' + T.min + '"><rect class="hm-bd" x="36" y="24" width="300" height="36" rx="4"/>';
+        for (let n = 0; n <= 12; n++) h += '<line class="hm-fl" x1="' + (36 + n * 25) + '" y1="24" x2="' + (36 + n * 25) + '" y2="60" style="stroke-width:' + (n === 0 ? 3 : 1.5) + '"/>';
+        h += '<line class="hm-st" x1="6" y1="42" x2="336" y2="42" stroke-width="2"/>';
+        [0, 3, 5, 7, 9, 12].forEach((n) => { h += '<text class="hm-lb" x="' + X(n) + '" y="78" text-anchor="middle">' + n + '</text>'; });
+        // the arc: three frets up from the minor root to the major root
+        const x1 = X(k.fm), x2 = k.fM > 12 ? 338 : X(k.fM);
+        h += '<path class="hm-arc" d="M' + x1 + ' 27Q' + ((x1 + x2) / 2) + ' -2 ' + x2 + ' 27" fill="none" stroke-width="2"/><text class="hm-lb" x="' + ((x1 + x2) / 2) + '" y="11" text-anchor="middle">' + T.arc + '</text>';
+        if (k.fM > 12) h += '<path class="hm-arc" d="M334 20L341 27 332 31" fill="none" stroke-width="2"/>';
+        const dot = (f, cls, nm) => '<g class="hm-n" data-m="' + (40 + f) + '" role="button" tabindex="0" aria-label="' + T.str + ' 6, ' + T.fr + ' ' + f + ', ' + nm + '"><circle class="hm-' + cls + '" cx="' + X(f) + '" cy="42" r="13"/><text class="hm-tx' + (cls === 'dh' ? ' hm-t2' : '') + '" x="' + X(f) + '" y="46.2" text-anchor="middle">' + nm + '</text></g>';
+        if (k.alt !== undefined) h += dot(k.alt, 'dh', M);
+        if (k.fM <= 12) h += dot(k.fM, 'dj', M);
+        return h + dot(k.fm, 'dm', m) + '</svg>';
       };
-      const chips = MAJ.map((M, i) => '<button type="button" class="ej-chip" data-qk="' + i + '" aria-pressed="' + (i === sel) + '">' + NM[M] + '<small>' + NM[(M + 9) % 12] + 'm</small></button>').join('');
-      const html = '<div class="pt-card"><h2 class="bt-h3" style="margin:0">' + T.h1 + '</h2><p class="pt-p">' + T.p1 + '</p><p class="pt-p">' + T.p2 + '</p><p class="pt-p"><b>' + T.p3 + '</b></p></div>'
+      const lead = T.lg.map((x, i) => '<span><i class="' + (i ? 'hm-k1' : 'hm-k2') + '"></i>' + x + '</span>').join('');
+      const cards = K.map((k) => {
+        const M = NM[k.M], m = NM[(k.M + 9) % 12];
+        const fM = k.alt !== undefined ? k.fM + ' / ' + k.alt : k.fM;
+        const ttl = M + ' ' + T.maj + ' (' + T.fr + ' ' + fM + ') → ' + m + ' ' + T.min + ' (' + T.fr + ' ' + k.fm + (k.fm === 0 ? ', ' + T.open : '') + ')';
+        return '<div class="pt-card hm-fig"><b class="ea-h">' + ttl + '</b>' + six(k) + (k.jump ? '<div class="pt-note"><p class="pt-p"><b>' + T.jT + ':</b> ' + T[k.jump] + '</p></div>' : '') + '</div>';
+      }).join('');
+      root.innerHTML = '<div class="pt-card"><h2 class="bt-h3" style="margin:0">' + T.h1 + '</h2><p class="pt-p">' + T.p1 + '</p><p class="pt-p">' + T.p2 + '</p><p class="pt-p"><b>' + T.p3 + '</b></p></div>'
         + truVideo(T.vT, T.vS)
-        + '<div class="pt-card cp-card"><h2 class="bt-h3" style="margin:0">' + T.dT + '</h2><p class="pt-p">' + T.dX + '</p><b class="ej-h">' + T.key + '</b><div class="ej-chips qi-chips">' + chips + '</div><div class="qi-dia">' + draw(sel) + '</div></div>'
-        + '<h2 class="bt-h3" style="margin:4px 0 0">' + R.title + '</h2><p class="pt-p">' + R.intro + '</p>';
-      root.innerHTML = html;
+        + '<div class="pt-card"><h2 class="bt-h3" style="margin:0">' + T.dT + '</h2><p class="pt-p">' + T.dX + '</p><div class="hm-key">' + lead + '</div></div>'
+        + cards
+        + '<h2 class="bt-h3" style="margin:4px 0 0">' + T.relT + '</h2>' + truVideo(T.relV, T.relS) + '<p class="pt-p">' + R.intro + '</p>';
       root.onclick = (e) => {
-        const c = e.target.closest && e.target.closest('[data-qk]');
-        if (c) {
-          this._qi = +c.getAttribute('data-qk');
-          root.querySelectorAll('[data-qk]').forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
-          root.querySelector('.qi-dia').innerHTML = draw(this._qi);
-          return;
-        }
         const g = e.target.closest && e.target.closest('.hm-n');
         if (g) { const ac = pAudio(); if (!ac) return; try { pUnlock(); } catch (x) {} pluck(+g.getAttribute('data-m'), ac.currentTime + 0.02, 0.6); }
       };
@@ -7169,8 +7189,10 @@ C["QueImprovisar"] = (DCLogic) => {
 TPL['QueImprovisar'] = TPL.Relativo.replace('<div id="rl-root"', '<div id="qi-root" style="display: flex; flex-direction: column; gap: 16px"></div><div id="rl-root"').replace('Pentatonica.dc.html', 'BluesImpro.dc.html');
 
 const BLUES_BARS = [['A', 'I'], ['D', 'IV'], ['A', 'I'], ['A', 'I'], ['D', 'IV'], ['D', 'IV'], ['A', 'I'], ['A', 'I'], ['E', 'V'], ['D', 'IV'], ['A', 'I'], ['E', 'V']];
-const BLUES_SH = { A: [null, 0, 2, 2, 2, 0], D: [null, null, 0, 2, 3, 2], E: [0, 2, 2, 1, 0, 0] };
-const BLUES_BASE_SRC = ''; // the teacher's blues backing track in A: put the audio file's URL here when it arrives
+// chord shapes (frets of strings 6 → 1): open and barre versions
+const BLUES_SH = { A: [null, 0, 2, 2, 2, 0], D: [null, null, 0, 2, 3, 2], E: [0, 2, 2, 1, 0, 0], 'A-5': [5, 7, 7, 6, 5, 5], 'D-5': [null, 5, 7, 7, 7, 5], 'E-7': [null, 7, 9, 9, 9, 7] };
+// the teacher's 12-bar backing track in A: when the audio arrives, put its URL in src, its tempo in bpm and the second where bar 1 starts in offset
+const BLUES_BASE = { src: '', bpm: 80, offset: 0 };
 C["BluesImpro"] = (DCLogic) => {
   class Component extends DCLogic {
     constructor(props) {
@@ -7187,45 +7209,112 @@ C["BluesImpro"] = (DCLogic) => {
       if (!this.__render) return;
       const root = document.getElementById('bi-root');
       if (!root) return;
+      if (root._biStop) root._biStop();
       const es = this.state.lang === 'es';
       const T = es ? {
         iT: 'Tu primera improvisación', iX: 'Vamos a improvisar sobre un blues de 12 compases en La. Es el esqueleto de miles de canciones: tres acordes que se repiten en un orden fijo. Fíjate en el grado de cada acorde (I, IV y V): lo que cambia de un blues a otro es el tono, no el orden.',
         pT: 'La progresión · 12 compases', pX: 'Cada casilla es un compás. A – D – E son los acordes; I – IV – V, el grado que ocupan en el tono de La.',
         deg: [['I', 'La (A)'], ['IV', 'Re (D)'], ['V', 'Mi (E)']], bar: 'Compás',
-        cT: 'Los tres acordes', cX: 'Toca un diagrama para oír el acorde.',
+        prac: 'Practicar con la base', stop: 'Parar', prov: 'Base provisional: la grabación de tu profesor llegará pronto.', now: 'Ahora suena', idle: 'Pulsa «Practicar con la base» y sigue cómo cambia el acorde.',
+        tog: 'Desplegar acordes', tog2: 'Ocultar acordes', oT: 'Cuerdas al aire', bT: 'Con cejilla', cX: 'Toca un diagrama para oír el acorde.', barre: ['La: cejilla en el traste 5', 'Re: cejilla en el traste 5', 'Mi: cejilla en el traste 7'],
         sT: 'Qué tocar', sX: 'Este es un ejercicio para hacer con la pentatónica menor de La, de momento, aunque existen otras opciones que se discutirán en los próximos pasos. Quédate en la posición 1, en el traste 5.',
         tT: 'Dos trucos para empezar', tX: 'De los trucos de improvisación, estos dos son los más básicos. Ponlos en práctica sobre el blues.',
         rT: 'Reto: tu primer solo de blues', rX: 'Grábate tocando 2 vueltas del blues (24 compases) con un solo que aplique la repetición y el silencio.',
-        bT: 'La base de blues en La', bS: 'La base llegará pronto. Cuando esté, podrás reproducirla desde aquí.',
+        baseT: 'La base de blues en La', baseS: 'La base llegará pronto. Cuando esté, podrás reproducirla desde aquí.',
         ck: ['Reproduce la base y toca con la pentatónica menor de La, posición 1.', 'Usa una frase que se repita y deja silencios entre frases.', 'Grábate durante 2 vueltas completas (24 compases) y escúchate.'],
         rec: '¿Cómo grabarte? Lo tienes en el cuaderno de ejercicios.', recL: 'Ver «Grabación»', done: 'Reto completado'
       } : {
         iT: 'Your first improvisation', iX: 'We are going to improvise over a 12-bar blues in A. It is the skeleton of thousands of songs: three chords repeating in a fixed order. Look at the degree of each chord (I, IV and V): what changes from one blues to another is the key, not the order.',
         pT: 'The progression · 12 bars', pX: 'Each box is a bar. A – D – E are the chords; I – IV – V, the degree they hold in the key of A.',
         deg: [['I', 'A'], ['IV', 'D'], ['V', 'E']], bar: 'Bar',
-        cT: 'The three chords', cX: 'Tap a diagram to hear the chord.',
+        prac: 'Practise with the backing track', stop: 'Stop', prov: 'Provisional backing: your teacher’s recording is coming soon.', now: 'Now playing', idle: 'Press “Practise with the backing track” and follow how the chord changes.',
+        tog: 'Show chords', tog2: 'Hide chords', oT: 'Open strings', bT: 'Barre', cX: 'Tap a diagram to hear the chord.', barre: ['A: barre at fret 5', 'D: barre at fret 5', 'E: barre at fret 7'],
         sT: 'What to play', sX: 'For now, this exercise is played with the A minor pentatonic, although there are other options that we will discuss in the next steps. Stay in position 1, at fret 5.',
         tT: 'Two tricks to start with', tX: 'Of all the improvisation tricks, these two are the most basic. Put them into practice over the blues.',
         rT: 'Challenge: your first blues solo', rX: 'Record yourself playing 2 choruses of the blues (24 bars) with a solo that applies repetition and silence.',
-        bT: 'The blues backing track in A', bS: 'The backing track is coming soon. When it is ready you will be able to play it from here.',
+        baseT: 'The blues backing track in A', baseS: 'The backing track is coming soon. When it is ready you will be able to play it from here.',
         ck: ['Play the backing track and play along with the A minor pentatonic, position 1.', 'Use a phrase that repeats and leave silences between phrases.', 'Record 2 full choruses (24 bars) and listen back.'],
         rec: 'How to record yourself? It is in the exercise book.', recL: 'See “Recording”', done: 'Challenge completed'
       };
       let ck = [false, false, false];
       try { const a = JSON.parse(localStorage.getItem('guitar.retoBlues') || 'null'); if (Array.isArray(a) && a.length === 3) ck = a.map((x) => !!x); } catch (e) {}
-      const bars = '<div class="bi-bars">' + BLUES_BARS.map((b, i) => '<div class="bi-bar bi-' + b[1] + '"><small>' + T.bar + ' ' + (i + 1) + '</small><b>' + b[0] + '</b><span>' + b[1] + '</span></div>').join('') + '</div>'
+      const bars = '<div class="bi-bars">' + BLUES_BARS.map((b, i) => '<div class="bi-bar bi-' + b[1] + '" data-bar="' + i + '"><small>' + T.bar + ' ' + (i + 1) + '</small><b>' + b[0] + '</b><span>' + b[1] + '</span></div>').join('') + '</div>'
         + '<div class="bi-leg">' + T.deg.map((d) => '<span><i class="bi-' + d[0] + '"></i><b>' + d[0] + '</b> = ' + d[1] + '</span>').join('') + '</div>';
-      const shapes = '<div class="cp-map">' + ['A', 'D', 'E'].map((c) => '<button type="button" class="cp-mc sm-ch" data-ch="' + c + '" aria-label="' + c + '"><b>' + c + '</b>' + lsGuitarSvg(BLUES_SH[c], c) + '</button>').join('') + '</div>';
-      const base = BLUES_BASE_SRC ? '<audio class="bi-audio" controls preload="none" src="' + BLUES_BASE_SRC + '"></audio>' : '<div class="rt-vbox bi-ph" role="img" aria-label="' + T.bT + '"><span class="rt-vplay">♪</span><span>' + T.bS + '</span></div>';
+      const sh = (id, lab) => '<button type="button" class="cp-mc sm-ch" data-ch="' + id + '" aria-label="' + lab + '"><b>' + lab + '</b>' + lsGuitarSvg(BLUES_SH[id], lab) + '</button>';
+      const chords = '<div class="bi-chords" hidden><p class="pt-p">' + T.cX + '</p>'
+        + ['A', 'D', 'E'].map((c, i) => '<div class="bi-crow"><b class="ej-h">' + c + ' · ' + T.deg[i][0] + '</b><div class="cp-map">' + sh(c, c + ' · ' + T.oT) + sh(['A-5', 'D-5', 'E-7'][i], T.barre[i]) + '</div></div>').join('') + '</div>';
+      const base = BLUES_BASE.src ? '<audio class="bi-audio" controls preload="none" src="' + BLUES_BASE.src + '"></audio>' : '<div class="rt-vbox bi-ph" role="img" aria-label="' + T.baseT + '"><span class="rt-vplay">♪</span><span>' + T.baseS + '</span></div>';
       const checks = T.ck.map((x, i) => '<label class="bi-ck"><input type="checkbox" data-ck="' + i + '"' + (ck[i] ? ' checked' : '') + '><span>' + x + '</span></label>').join('');
       const tr = TRU[es ? 'es' : 'en'];
       root.innerHTML = '<div class="pt-card"><h3 class="bt-h3" style="margin:0">' + T.iT + '</h3><p class="pt-p">' + T.iX + '</p></div>'
-        + '<div class="pt-card cp-card"><h3 class="bt-h3" style="margin:0">' + T.pT + '</h3><p class="pt-p">' + T.pX + '</p>' + bars + '</div>'
-        + '<div class="pt-card cp-card"><h3 class="bt-h3" style="margin:0">' + T.cT + '</h3><p class="pt-p">' + T.cX + '</p>' + shapes + '</div>'
+        + '<div class="pt-card cp-card"><h3 class="bt-h3" style="margin:0">' + T.pT + '</h3><p class="pt-p">' + T.pX + '</p>'
+        + '<button type="button" class="bi-prac" data-a="prac">▶ ' + T.prac + '</button>' + (BLUES_BASE.src ? '' : '<p class="bi-prov">' + T.prov + '</p>')
+        + '<div class="bi-nowbox" data-a="now" aria-live="polite">' + T.idle + '</div>' + bars
+        + '<button type="button" class="bi-tog" data-a="tog" aria-expanded="false">' + T.tog + ' ▾</button>' + chords + '</div>'
         + '<div class="pt-note"><b class="ea-h">' + T.sT + '</b><p class="pt-p">' + T.sX + '</p></div>'
         + '<h2 class="bt-h3" style="margin:4px 0 0">' + T.tT + '</h2><p class="pt-p">' + T.tX + '</p>' + truBlock(tr[0], 1, es) + truBlock(tr[1], 2, es)
-        + '<div class="pt-card bi-reto"><h3 class="bt-h3" style="margin:0">' + T.rT + '</h3><p class="pt-p">' + T.rX + '</p><b class="ea-h">' + T.bT + '</b>' + base + '<div class="bi-cks">' + checks + '</div><p class="bi-done" data-a="done"' + (ck.every(Boolean) ? '' : ' hidden') + '>✓ ' + T.done + '</p><p class="pt-p">' + T.rec + ' <a href="#/Grabacion" class="bi-link">' + T.recL + '</a></p></div>';
+        + '<div class="pt-card bi-reto"><h3 class="bt-h3" style="margin:0">' + T.rT + '</h3><p class="pt-p">' + T.rX + '</p><b class="ea-h">' + T.baseT + '</b>' + base + '<div class="bi-cks">' + checks + '</div><p class="bi-done" data-a="done"' + (ck.every(Boolean) ? '' : ' hidden') + '>✓ ' + T.done + '</p><p class="pt-p">' + T.rec + ' <a href="#/Grabacion" class="bi-link">' + T.recL + '</a></p></div>';
+      // ----- practise with the backing track: audio (the teacher's) or a provisional strummed base, and the bar that is sounding lights up -----
+      const st = root._bi = { playing: false, tm: [], src: [] };
+      const setBar = (i) => {
+        root.querySelectorAll('.bi-bar').forEach((x) => { if (+x.getAttribute('data-bar') === i) x.setAttribute('data-on', 'true'); else x.removeAttribute('data-on'); });
+        const nb = root.querySelector('[data-a="now"]');
+        if (nb) { nb.innerHTML = i < 0 ? T.idle : T.now + ': <b>' + T.bar + ' ' + (i + 1) + ' · ' + BLUES_BARS[i][0] + '</b> <span>' + BLUES_BARS[i][1] + '</span>'; nb.setAttribute('data-deg', i < 0 ? '' : BLUES_BARS[i][1]); }
+      };
+      const stop = root._biStop = () => {
+        st.playing = false; clearInterval(st.iv); clearTimeout(st.to); st.tm.forEach(clearTimeout); st.tm = [];
+        st.src.forEach((s) => { try { s.stop(); } catch (e) {} }); st.src = [];
+        if (st.au) { try { st.au.pause(); } catch (e) {} }
+        setBar(-1);
+        const b = root.querySelector('[data-a="prac"]'); if (b) b.textContent = '▶ ' + T.prac;
+      };
+      const startAudio = () => {
+        const au = st.au = st.au || new Audio(BLUES_BASE.src);
+        const barLen = 240 / BLUES_BASE.bpm;
+        au.currentTime = 0; au.play().catch(() => {});
+        st.iv = setInterval(() => {
+          if (!root.isConnected) return stop();
+          if (au.ended) return stop();
+          const p = (au.currentTime - BLUES_BASE.offset) / barLen;
+          setBar(p < 0 ? -1 : Math.floor(p) % 12);
+        }, 60);
+      };
+      const startSynth = () => {
+        const ac = pAudio(); if (!ac) return stop();
+        const spb = 60 / BLUES_BASE.bpm, root0 = { A: 33, D: 38, E: 40 };
+        let bar = 0, at = ac.currentTime + 0.2;
+        const tick = () => {
+          if (!root.isConnected || !st.playing) return;
+          while (at < ac.currentTime + 0.5) {
+            const c = BLUES_BARS[bar % 12][0], w0 = at, k = bar % 12;
+            for (let b = 0; b < 4; b++) {
+              const s = lsStrum(ac, BLUES_SH[c], w0 + b * spb, spb * 0.9, b % 2 ? 0.3 : 0.42, false, 0);
+              void s;
+            }
+            const bs = pluck(root0[c], w0, 0.8); if (bs) st.src.push(bs);
+            st.tm.push(setTimeout(() => { if (st.playing && root.isConnected) setBar(k); }, Math.max(0, (w0 - ac.currentTime) * 1000)));
+            at += 4 * spb; bar++;
+          }
+          st.tm = st.tm.slice(-30); st.src = st.src.slice(-30);
+        };
+        tick(); st.iv = setInterval(tick, 120);
+      };
       root.onclick = (e) => {
+        const prac = e.target.closest && e.target.closest('[data-a="prac"]');
+        if (prac) {
+          if (st.playing) return stop();
+          try { pUnlock(); } catch (x) {}
+          st.playing = true; prac.textContent = '■ ' + T.stop;
+          if (BLUES_BASE.src) startAudio(); else startSynth();
+          return;
+        }
+        const tg = e.target.closest && e.target.closest('[data-a="tog"]');
+        if (tg) {
+          const box = root.querySelector('.bi-chords'), open = box.hasAttribute('hidden');
+          if (open) box.removeAttribute('hidden'); else box.setAttribute('hidden', '');
+          tg.setAttribute('aria-expanded', String(open)); tg.textContent = (open ? T.tog2 : T.tog) + ' ' + (open ? '▴' : '▾');
+          return;
+        }
         const b = e.target.closest && e.target.closest('[data-ch]'); if (!b) return;
         const fr = BLUES_SH[b.getAttribute('data-ch')], ac = pAudio(); if (!ac || !fr) return;
         try { pUnlock(); } catch (x) {}
@@ -25001,8 +25090,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '18 nov 2026 · 23:24';
-  var BUILD_ID = '2026-11-18T23:24';
+  var BUILD = '19 nov 2026 · 22:57';
+  var BUILD_ID = '2026-11-19T22:57';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
