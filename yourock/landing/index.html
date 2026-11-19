@@ -72,12 +72,14 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 .skip:focus{transform:translateY(96px)}
 
 /* nav */
-.nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:50;width:calc(100% - 32px);max-width:720px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;background:rgba(24,24,24,.72);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--s4);border-radius:16px}
+.nav{position:fixed;top:12px;left:50%;transform:translate(-50%,var(--navy,0));transition:transform .5s var(--ease);z-index:50;width:calc(100% - 32px);max-width:720px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;background:rgba(24,24,24,.72);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--s4);border-radius:16px}
 .logo{display:flex;align-items:center;gap:8px}
 .logo b{color:var(--acc);font-weight:600}
 .nav-links{display:none;gap:24px}
 .nav-links a{color:var(--mu);transition:color .3s var(--ease)}
-.nav-links a:hover{color:var(--tx)}
+.nav-links a:hover,.nav-links a[aria-current="true"]{color:var(--tx)}
+.nav.hide{--navy:-140%}
+.nav.hide:focus-within{--navy:0}
 .nav .btn{min-height:44px}
 .nav-end{display:flex;align-items:center;gap:8px}
 .burger{width:44px;height:44px;border-radius:12px;background:var(--s2);border:1px solid var(--s4);cursor:pointer;display:grid;place-items:center;color:var(--tx)}
@@ -98,6 +100,13 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 .hero{padding-top:112px;padding-bottom:48px}
 .hero-grid{display:grid;gap:40px;align-items:center}
 .hero-copy{display:flex;flex-direction:column;gap:16px;max-width:680px}
+@keyframes hin{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.hero-copy>*{animation:hin .8s var(--ease) both}
+.hero-copy>:nth-child(2){animation-delay:60ms}.hero-copy>:nth-child(3){animation-delay:120ms}.hero-copy>:nth-child(4){animation-delay:180ms}.hero-copy>:nth-child(5){animation-delay:240ms}
+.proof b{font-variant-numeric:tabular-nums}
+.arr{transition:transform .5s var(--ease)}
+.btn-pri:hover .arr{transform:translateX(4px)}
+@media(prefers-reduced-motion:reduce){.hero-copy>*{animation:none}.btn-pri:hover .arr{transform:none}.nav{transition:none}}
 .hero-copy .body-3{font-size:18px;line-height:28px;color:var(--mu);max-width:680px}
 .hero-cta{display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:8px}
 .hero-note{color:var(--mu)}
@@ -151,7 +160,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 .phone video{display:block;width:100%;height:auto;border-radius:16px;background:var(--s2);cursor:pointer}
 /* mockup 3D del hero: capas de grosor detrás del móvil */
 .stage{perspective:1400px;width:100%;max-width:340px;margin:0 auto;padding:24px 0}
-.tilt{position:relative;transform-style:preserve-3d;transform:rotateY(var(--ry,-14deg)) rotateX(var(--rx,5deg));transition:transform .5s var(--ease);box-shadow:-24px 32px 48px rgba(0,0,0,.6);will-change:transform}
+.tilt{position:relative;transform-style:preserve-3d;transform:translateY(var(--ty,0px)) rotateY(var(--ry,-14deg)) rotateX(var(--rx,5deg));transition:transform .5s var(--ease);box-shadow:-24px 32px 48px rgba(0,0,0,.6);will-change:transform}
 .tilt::before,.tilt::after{content:"";position:absolute;inset:-1px;border-radius:24px;border:1px solid var(--s4);pointer-events:none}
 .tilt::before{background:var(--s3);transform:translateZ(-8px)}
 .tilt::after{background:var(--s2);transform:translateZ(-16px)}
@@ -450,8 +459,33 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(fals
 
 // reveals
 const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+// cascada: los hermanos dentro de una misma rejilla entran con 80 ms de diferencia
+document.querySelectorAll('.ben,.steps,.tools,.two,.shots').forEach(g => [...g.children].forEach((c, i) => { if (!rm) c.dataset.d = i * 80; }));
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  const el = e.target, d = +(el.dataset.d || 0);
+  if (d) el.style.transitionDelay = d + 'ms';
+  el.classList.add('in'); io.unobserve(el);
+  if (d) setTimeout(() => { el.style.transitionDelay = ''; }, d + 900);
+}), { threshold: .12 });
 document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+// flecha en los CTA principales
+document.querySelectorAll('.hero-cta .btn-pri,.final .btn-pri').forEach(a => a.insertAdjacentHTML('beforeend', '<svg class="i arr" viewBox="0 0 24 24" aria-hidden="true" style="width:20px;height:20px"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'));
+
+// números del hero: cuentan hasta su valor al aparecer
+if (!rm) {
+  const nums = [...document.querySelectorAll('.proof b')];
+  nums.forEach(n => { n.dataset.n = n.textContent; n.style.minWidth = n.getBoundingClientRect().width + 'px'; });
+  const co = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return; co.unobserve(e.target);
+    const n = e.target, to = +n.dataset.n, t0 = performance.now(), dur = 1200;
+    n.textContent = '0';
+    const step = t => { const k = Math.min(1, (t - t0) / dur), v = k === 1 ? 1 : 1 - Math.pow(2, -10 * k); n.textContent = Math.round(to * v); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }), { threshold: .6 });
+  nums.forEach(n => co.observe(n));
+}
 
 // vídeos: solo se reproducen visibles y nunca con "reducir movimiento"
 const ICON_PLAY = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>';
@@ -466,22 +500,50 @@ document.querySelectorAll('video.vid').forEach(v => {
   b.addEventListener('click', toggle); v.addEventListener('click', toggle);
 });
 // inclinación 3D del hero: sigue el puntero en pantallas con ratón; fija en táctiles o con "reducir movimiento"
-const tiltEl = document.getElementById('tilt');
-if (tiltEl && !rm && matchMedia('(hover:hover) and (pointer:fine)').matches) {
-  let raf = 0;
-  const heroEl = document.getElementById('top');
-  heroEl.addEventListener('pointermove', e => {
-    if (raf) return;
-    raf = requestAnimationFrame(() => {
-      raf = 0;
-      const r = heroEl.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-      tiltEl.style.setProperty('--ry', (-14 + x * 12).toFixed(1) + 'deg');
-      tiltEl.style.setProperty('--rx', (5 - y * 8).toFixed(1) + 'deg');
-    });
-  });
-  heroEl.addEventListener('pointerleave', () => { tiltEl.style.removeProperty('--ry'); tiltEl.style.removeProperty('--rx'); });
+const tiltEl = document.getElementById('tilt'), heroEl = document.getElementById('top'), navEl = document.querySelector('.nav');
+let px = 0, py = 0, prog = 0, lastY = scrollY, ticking = false;
+function paintTilt() {
+  if (!tiltEl) return;
+  tiltEl.style.setProperty('--ry', (-14 * (1 - prog) + px * 12).toFixed(1) + 'deg');
+  tiltEl.style.setProperty('--rx', (5 * (1 - prog) - py * 8).toFixed(1) + 'deg');
+  tiltEl.style.setProperty('--ty', (-32 * prog).toFixed(1) + 'px');
 }
+if (!rm) {
+  // un solo listener de scroll, limitado por requestAnimationFrame: endereza el móvil y oculta el menú al bajar
+  const onScroll = () => {
+    ticking = false;
+    const y = scrollY, h = heroEl.offsetHeight;
+    prog = Math.min(1, Math.max(0, y / (h * .9)));
+    paintTilt();
+    const open = burger.getAttribute('aria-expanded') === 'true';
+    navEl.classList.toggle('hide', !open && y > 120 && y > lastY + 4);
+    if (y < lastY - 4 || y < 120) navEl.classList.remove('hide');
+    lastY = y;
+  };
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  if (tiltEl && matchMedia('(hover:hover) and (pointer:fine)').matches) {
+    let raf = 0;
+    heroEl.addEventListener('pointermove', e => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const r = heroEl.getBoundingClientRect();
+        px = (e.clientX - r.left) / r.width - .5; py = (e.clientY - r.top) / r.height - .5;
+        paintTilt();
+      });
+    });
+    heroEl.addEventListener('pointerleave', () => { px = 0; py = 0; paintTilt(); });
+  }
+}
+
+// sección actual en el menú
+const navLinks = [...document.querySelectorAll('.nav-links a')];
+const so = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  navLinks.forEach(a => { if (a.getAttribute('href') === '#' + e.target.id) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+}), { rootMargin: '-45% 0px -50% 0px' });
+['beneficios', 'como-funciona', 'herramientas', 'faq'].forEach(id => { const s = document.getElementById(id); if (s) so.observe(s); });
+
 
 // autoplay solo visible y nunca con "reducir movimiento"; el botón permite reproducir a mano
 if (!rm) {
