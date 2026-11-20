@@ -981,6 +981,10 @@ body.dark .ls-sg[aria-pressed="true"]{color:#FFFFFF}
 .sm-bars .cp-mc small{display:block;font-size:12px;opacity:.7}
 .sm-bars .cp-mc b{font-size:16px}
 .sm-ch{cursor:pointer}
+.sm-map{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.sm-map .sm-ch{padding:6px 4px;align-items:center;min-width:0}
+.sm-map .sm-ch b{font-size:14px;line-height:18px;text-align:center}
+.sm-map .sm-ch svg{width:100%;max-width:92px;height:auto}
 .hm-neck{display:block;max-width:420px;margin:0 auto}
 .hm-neck .hm-bd{fill:#F2F2F2}
 .hm-neck .hm-fl{stroke:#BDBDBD;stroke-width:1.5}
@@ -6967,7 +6971,7 @@ C["Something"] = (DCLogic) => {
       const bars = (arr) => '<div class="sm-bars">' + arr.map((b, i) => '<div class="cp-mc"><small>' + T.bar + ' ' + (i + 1) + '</small><b>' + b.map(nm).join(' · ') + '</b></div>').join('') + '</div>';
       const H = (t) => '<h3 class="bt-h3" style="margin:0">' + t + '</h3>';
       root.innerHTML = '<div class="pt-card"><p class="pt-p">' + T.card + '</p><div class="cf-grid">' + T.meta.map((m) => '<div class="cf-row"><span>' + m[0] + '</span><b>' + m[1] + '</b></div>').join('') + '</div></div>'
-        + '<div class="pt-card cp-card">' + H(T.chT) + '<p class="pt-p">' + T.chX + '</p><div class="cp-map">' + uniq.map((c) => '<button type="button" class="cp-mc sm-ch" data-ch="' + c + '" aria-label="' + T.hear + nm(c) + '"><b>' + nm(c) + '</b>' + lsGuitarSvg(SM_SH[c], T.aria + nm(c)) + '</button>').join('') + '</div></div>'
+        + '<div class="pt-card cp-card">' + H(T.chT) + '<p class="pt-p">' + T.chX + '</p><div class="cp-map sm-map">' + uniq.map((c) => '<button type="button" class="cp-mc sm-ch" data-ch="' + c + '" aria-label="' + T.hear + nm(c) + '"><b>' + nm(c) + '</b>' + lsGuitarSvg(SM_SH[c], T.aria + nm(c)) + '</button>').join('') + '</div></div>'
         + '<div class="pt-card cp-card">' + H(T.iT) + '<p class="pt-p">' + T.iX + '</p></div>'
         + '<div class="pt-card cp-card">' + H(T.vT) + '<p class="pt-p">' + T.vX + '</p>' + bars(SM_VERSE) + '</div>'
         + '<div class="pt-card cp-card">' + H(T.bT) + '<p class="pt-p">' + T.bX + '</p>' + bars(SM_BRIDGE) + '</div>'
@@ -25227,8 +25231,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '20 nov 2026 · 18:49';
-  var BUILD_ID = '2026-11-20T18:49';
+  var BUILD = '20 nov 2026 · 20:26';
+  var BUILD_ID = '2026-11-20T20:26';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
