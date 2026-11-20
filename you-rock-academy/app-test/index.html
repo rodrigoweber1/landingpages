@@ -24435,9 +24435,10 @@ function nkdPaint() {
 }
 // the screen re-renders on every step: only paint when the host is empty or the language changed
 function nkdEnsure(inst, lang) {
-  const host = document.getElementById('nk-dock'); if (!host) return;
+  if (!inst || !inst.__render) return; // other copies of the screen (not the one on show) have no render hook
   if (NKD.inst !== inst) { if (NKD.run) nkdStop(true); NKD.inst = inst; }
   NKD.lang = lang;
+  const host = document.getElementById('nk-dock'); if (!host) return;
   if (host.__lang !== lang || !host.firstChild) nkdPaint();
 }
 
@@ -25223,8 +25224,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '20 nov 2026 · 17:53';
-  var BUILD_ID = '2026-11-20T17:53';
+  var BUILD = '20 nov 2026 · 17:58';
+  var BUILD_ID = '2026-11-20T17:58';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
