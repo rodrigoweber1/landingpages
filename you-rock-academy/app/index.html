@@ -1559,6 +1559,8 @@ body.stage #app .stg-em .em2-cc{display:flex;flex-direction:column;align-items:c
 body.stage #app .stg-em .em2-cc[aria-pressed="true"]{background:var(--st-floor)!important;border-color:var(--st-amber)!important;box-shadow:inset 0 0 0 1px var(--st-amber),0 0 0 3px rgba(255,196,0,.12)}
 body.stage #app .stg-em .em2-cc[aria-pressed="true"] b{color:var(--st-amber)}
 body.stage #app .stg-em .em2-cc svg{width:96px;max-width:100%;height:auto;display:block;margin-bottom:8px}
+.stg-em .em2-us{display:block;font-size:13px;line-height:16px;font-weight:700;color:var(--st-amber,#B07A00)}
+body.stage #app .stg-em .em2-bar .em2-us{font-size:12px;line-height:14px}
 body.stage #app .stg-em .em2-cc b{font:400 26px/30px var(--st-d);letter-spacing:.01em}
 body.stage #app .stg-em .em2-strip.wide .em2-cc svg{width:124px}
 body.stage #app .stg-em .em2-cc small{font-size:13px;line-height:18px;color:var(--st-mute)}
@@ -4664,6 +4666,8 @@ const EM_SONGS = {
     []
   ]
 };
+// American notation (cifrado americano), one spelling per note like the Spanish names
+const EM_US = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 const EM_OPEN = [4, 9, 2, 7, 11, 4], EM_BASE = [40, 45, 50, 55, 59, 64];
 const EM_OP = {
   '': { 0: [-1, 3, 2, 0, 1, 0], 5: [-1, -1, 3, 2, 1, 1], 2: [-1, -1, 0, 2, 3, 2], 4: [0, 2, 2, 1, 0, 0], 7: [3, 2, 0, 0, 0, 3], 9: [-1, 0, 2, 2, 2, 0] },
@@ -4761,7 +4765,8 @@ const label = S.how === 'power' ? nm + '5' : nm + (r.q === 'm' ? t.minor : (r.q 
 const long = S.how === 'power' ? nm + '5' : nm + (r.q === 'm' ? t.minorW : (r.q === '7' ? '7' : t.mayorW));
 const third = (r.pc + (r.q === 'm' ? 3 : 4)) % 12, fifth = (r.pc + 7) % 12;
 const nl = S.how === 'power' ? [r.pc, fifth] : (r.q === '7' ? [r.pc, third, fifth, (r.pc + 10) % 12] : [r.pc, third, fifth]);
-return { r, sh, label, long, notes: nl.map((p) => t.names[p]).join(' · '), key: r.pc + ':' + r.q };
+const us = EM_US[r.pc] + (S.how === 'power' ? '5' : (r.q === 'm' ? 'm' : (r.q === '7' ? '7' : '')));
+return { r, sh, label, long, us, notes: nl.map((p) => t.names[p]).join(' · '), key: r.pc + ':' + r.q };
 });
 }
 fretTxt(sh) {
@@ -4880,7 +4885,7 @@ const chip = (attr, label, on) => '<button type="button" class="em2-chip" ' + at
 const seg = (aria, items, attr, val) => '<div class="em2-seg" role="group" style="display: flex" aria-label="' + aria + '">' + items.map((x) => '<button type="button" ' + attr + '="' + x[0] + '" aria-pressed="' + (val === x[0]) + '">' + x[1] + '</button>').join('') + '</div>';
 const uq = []; c.forEach((x, i) => { if (!uq.some((u) => u.x.key === x.key)) uq.push({ x, i }); });
 const fbN = uq.filter((u) => u.x.sh.fb).length;
-const isBars = c.length > 6, sg = EM_SONGS[S.mode][S.prog] || [];
+const isBars = c.length > 6, sg = EM_SONGS[S.mode][S.prog] || [], isUS = isBars && this.state.lang === 'es';
 let h = '<span class="em2-eye">' + t.eyebrow + '</span><p class="em2-intro">' + t.intro + '</p>';
 h += '<span class="em2-lab">' + t.key + '</span><div class="em2-row em2-keys stg-plain" role="group" aria-label="' + t.key + '">' + t.names.map((n, i) => chip('data-k="' + i + '"', n, i === S.key)).join('') + '</div>';
 h += '<div style="margin-top:10px">' + seg(t.modeAria, [['maj', t.maj], ['min', t.min]], 'data-mode', S.mode) + '</div>';
@@ -4889,8 +4894,9 @@ h += '<p class="em2-note">' + t.progs[S.mode][S.prog][1] + '</p>';
 h += '<span class="em2-lab">' + t.how + '</span>' + seg(t.how, [['open', t.m_open], ['barre', t.m_barre], ['power', t.m_power]], 'data-h', S.how);
 h += '<p class="em2-note">' + t['h_' + S.how] + '</p>';
 if (S.how === 'open' && fbN > 0 && fbN * 2 >= uq.length) h += '<p class="em2-warn">' + t.warnOpen + '</p>';
-h += '<span class="em2-lab">' + t.chords + '</span><div class="em2-strip' + (uq.length === 4 ? ' wide' : '') + '" style="grid-template-columns:repeat(' + (uq.length === 4 ? 2 : Math.min(uq.length, 3)) + ',minmax(0,1fr))">' + uq.map((u) => '<button type="button" class="em2-cc" data-c="' + u.i + '" aria-pressed="' + (u.x.key === cur.key) + '">' + emSvg(u.x.sh, u.x.r.pc) + '<b>' + u.x.label + '</b><small' + (u.x.sh.fb ? ' class="fbt"' : '') + '>' + this.fretTxt(u.x.sh) + '</small></button>').join('') + '</div>';
-if (isBars) h += '<div class="em2-bars stg-plain" role="group" aria-label="' + t.bars + '">' + c.map((x, i) => '<button type="button" class="em2-bar" data-c="' + i + '" aria-pressed="' + (i === S.cur) + '" aria-label="' + t.bar + (i + 1) + ' ' + x.label + '"><small>' + (i + 1) + '</small>' + x.label + '</button>').join('') + '</div>';
+h += '<span class="em2-lab">' + t.chords + '</span><div class="em2-strip' + (uq.length === 4 ? ' wide' : '') + '" style="grid-template-columns:repeat(' + (uq.length === 4 ? 2 : Math.min(uq.length, 3)) + ',minmax(0,1fr))">' + uq.map((u) => '<button type="button" class="em2-cc" data-c="' + u.i + '" aria-pressed="' + (u.x.key === cur.key) + '">' + emSvg(u.x.sh, u.x.r.pc) + '<b>' + u.x.label + '</b>' + (isUS ? '<span class="em2-us">' + u.x.us + '</span>' : '') + '<small' + (u.x.sh.fb ? ' class="fbt"' : '') + '>' + this.fretTxt(u.x.sh) + '</small></button>').join('') + '</div>';
+if (isBars) h += '<div class="em2-bars stg-plain" role="group" aria-label="' + t.bars + '">' + c.map((x, i) => '<button type="button" class="em2-bar" data-c="' + i + '" aria-pressed="' + (i === S.cur) + '" aria-label="' + t.bar + (i + 1) + ' ' + x.label + '"><small>' + (i + 1) + '</small>' + x.label + (isUS ? '<span class="em2-us">' + x.us + '</span>' : '') + '</button>').join('') + '</div>';
+if (isUS) h += '<p class="em2-note"><b>Cifrado americano:</b> ' + c.map((x) => x.us).join(' | ') + '. La letra es el nombre de la nota (C = Do, D = Re, E = Mi, F = Fa, G = Sol, A = La, B = Si), «b» es bemol y el 7 indica el acorde de séptima.</p>';
 h += '<div class="em2-leg"><span><i style="background:#e31b23"></i>' + t.root + '</span><span><i style="background:#f4ede6"></i>' + t.other + '</span></div>';
 h += '<div class="em2-card" aria-live="polite"><div class="em2-head"><div class="em2-name" id="em2-name">' + cur.long + '</div><span class="em2-notes" id="em2-notes" aria-label="' + t.notes + cur.notes + '">' + cur.notes + '</span></div><p class="em2-how" id="em2-how">' + this.how(cur.sh) + '</p></div>';
 if (sg.length) {
@@ -25221,8 +25227,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '20 nov 2026 · 17:58';
-  var BUILD_ID = '2026-11-20T17:58';
+  var BUILD = '20 nov 2026 · 18:49';
+  var BUILD_ID = '2026-11-20T18:49';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
