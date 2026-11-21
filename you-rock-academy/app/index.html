@@ -3068,7 +3068,7 @@ chipsString: 'Elegir la cuerda', chipsNote: 'Elegir la nota',
 namesAria: 'Nombres de las notas', boardAria: 'Mástil de la guitarra, de la cuerda al aire al traste 12',
 sharps: 'Sostenidos', cta: 'Probar con el quiz',
 ord: (n) => n + 'ª', stringWord: 'cuerda',
-hintString: 'Nota y, entre paréntesis, el número de traste. En color, las notas de los puntos (trastes 3, 5, 7 y 9) en las tres cuerdas graves: las que conviene aprender primero.',
+hintString: 'Nota y, entre paréntesis, el número de traste. En color, las notas de los puntos (trastes 3, 5, 7, 9 y 12) en las tres cuerdas graves: las que conviene aprender primero.',
 hintNote: 'Elige otra nota y compara las posiciones. En color, las que caen sobre los puntos en las tres cuerdas graves: las que conviene aprender primero.',
 onBoard: (nm) => nm + ' en el mástil',
 count: (c) => c + ' posiciones, de la cuerda al aire al traste 12.'
@@ -3084,7 +3084,7 @@ chipsString: 'Choose the string', chipsNote: 'Choose the note',
 namesAria: 'Note names', boardAria: 'Guitar fretboard, from the open string to fret 12',
 sharps: 'Sharps', cta: 'Try the quiz',
 ord: (n) => ['', '1st', '2nd', '3rd', '4th', '5th', '6th'][n], stringWord: 'string',
-hintString: 'Note and, in parentheses, the fret number. In colour, the notes on the dots (frets 3, 5, 7 and 9) on the three lowest strings: the ones worth learning first.',
+hintString: 'Note and, in parentheses, the fret number. In colour, the notes on the dots (frets 3, 5, 7, 9 and 12) on the three lowest strings: the ones worth learning first.',
 hintNote: 'Pick another note and compare the positions. In colour, the ones on the dots on the three lowest strings: the ones worth learning first.',
 onBoard: (nm) => nm + ' on the fretboard',
 count: (c) => c + ' positions, from the open string to fret 12.'
@@ -3144,8 +3144,8 @@ pick: () => this.setState({ note: n })
 }, chipStyle(st.note === n)));
 }
 
-const KC = [['#E31B23', '#FFFFFF', '#E31B23'], ['#FFC400', '#121212', '#E0A800'], ['#FFFFFF', '#121212', '#FFFFFF']];
-const KF = [[3, 5, 7], [3, 5, 7], [3, 5, 7, 9]];
+const KC = [['#E31B23', '#FFFFFF', '#E31B23'], ['#FFC400', '#121212', '#E0A800'], ['#FEFEFE', '#121212', '#F2F2F2']];
+const KF = [[3, 5, 7, 12], [3, 5, 7, 12], [3, 5, 7, 9, 12]];
 const cells = [];
 const seq = [];
 let count = 0;
@@ -25231,8 +25231,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '21 nov 2026 · 16:39';
-  var BUILD_ID = '2026-11-21T16:39';
+  var BUILD = '21 nov 2026 · 16:41';
+  var BUILD_ID = '2026-11-21T16:41';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
