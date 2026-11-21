@@ -1116,6 +1116,14 @@ body.stage #app .cg-st.cg-acc{background:var(--st-red,#E31B23)!important;color:#
 .lsl-cr{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-top:6px;padding:0 6px}
 .lsl-cr .lsl-c{padding-right:0}
 .lsl-bar{color:#8A8A8A;font-weight:400}
+/* barras de compás: una celda por compás con su regla de 4 pulsos */
+.ls-bars{gap:6px 0!important}
+.ls-bar{display:flex;flex-direction:column;align-items:flex-start;flex:0 1 auto;min-width:48px;box-sizing:border-box;padding:0 3px 0 0;border-left:2px solid rgba(138,138,138,.85)}
+.ls-bar:last-of-type{border-right:2px solid rgba(138,138,138,.85)}
+.ls-bar .ls-ch{min-width:0;padding:4px 3px 4px 4px;font-size:15px}
+.ls-bar .lsl-c{display:inline-block;padding:0 0 0 6px;min-height:0;margin-right:4px}
+.ls-rl{display:flex;justify-content:space-between;align-self:stretch;height:7px;margin:2px 0 0 4px;border-bottom:2px solid rgba(138,138,138,.85)}
+.ls-rl i{width:2px;height:7px;background:rgba(138,138,138,.85)}
 .lsl-x{font:600 14px 'Inter',system-ui,sans-serif;color:#5A5A5A}
 .lsl-gap{height:10px}
 .lsl-zl{padding:0 6px}
@@ -3165,7 +3173,7 @@ cells.push({
 label: NAMES[n],
 left: XS[s] - 16,
 top: f === 0 ? 4 : 36 * f + 6,
-bg: active ? (key ? KC[s][0] : (s < 3 ? 'rgba(227, 27, 35, 0.38)' : '#E31B23')) : (nat ? '#FFFFFF' : '#E6E6E6'),
+bg: active ? (key ? KC[s][0] : 'rgba(227, 27, 35, 0.38)') : (nat ? '#FFFFFF' : '#E6E6E6'),
 bd: active ? (key ? KC[s][2] : '#E31B23') : (nat ? '#E6E6E6' : '#D9D9D9'),
 fg: active ? (key ? KC[s][1] : '#FFFFFF') : (nat ? '#8A8A8A' : '#3A3A3A')
 });
@@ -6554,7 +6562,7 @@ function leadCeleb(root, es, st) {
     S.rows.forEach((row) => {
       h += '<div class="ls-row">';
       row.forEach((p) => {
-        h += '<div class="ls-ph">' + (p.c.length ? '<div class="ls-cs">' + p.c.map((c) => chordBtn(c, S.id, S.sec || 'verse')).join('') + '</div>' : '') + (p.l ? '<div class="ls-ls">' + lyric(p.l) + '</div>' : '') + '</div>';
+        h += '<div class="ls-ph">' + (p.c.length ? '<div class="ls-cs ls-bars">' + p.c.map((c) => '<span class="ls-bar">' + chordBtn(c, S.id, S.sec || 'verse') + '<span class="ls-rl" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' + '</span>').join('') + '</div>' : '') + (p.l ? '<div class="ls-ls">' + lyric(p.l) + '</div>' : '') + '</div>';
       });
       h += '</div>';
     });
@@ -6878,6 +6886,11 @@ function leadRender(n, S, es) {
       } else if (L === '') h += '<div class="lsl-gap"></div>';
       else if (L[0] === '>') h += '<p class="ls-note lsl-nt">' + esc(tx(L.slice(1))) + '</p>';
       else if (L[0] === '&') h += '<div class="lsl-ln lsl-bv">' + esc(L.slice(1)) + '</div>';
+      else if (L[0] === '~' && L.indexOf('|') > 0) {
+        const bars = [[]]; let an2 = '';
+        (L.slice(1).match(/\{[^}]*\}|\S+/g) || []).forEach((k) => { if (k === '|') bars.push([]); else if (k[0] === '{') an2 += an(k.slice(1, -1)); else bars[bars.length - 1].push(k); });
+        h += '<div class="lsl-cr ls-bars">' + bars.filter((b) => b.length).map((b) => '<span class="ls-bar">' + b.map((k) => '<span class="lsl-c">' + chd(k) + '</span>').join('') + '<span class="ls-rl" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' + '</span>').join('') + an2 + '</div>';
+      }
       else if (L[0] === '~') {
         h += '<div class="lsl-cr">' + (L.slice(1).match(/\{[^}]*\}|\S+/g) || []).map((k) => k[0] === '{' ? an(k.slice(1, -1)) : k === '|' ? '<span class="lsl-bar">|</span>' : /^\(?[A-GN]/.test(k) ? '<span class="lsl-c">' + chd(k) + '</span>' : '<span class="lsl-x">' + esc(k) + '</span>').join('') + '</div>';
       } else {
@@ -25237,8 +25250,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '21 nov 2026 · 16:46';
-  var BUILD_ID = '2026-11-21T16:46';
+  var BUILD = '21 nov 2026 · 16:51';
+  var BUILD_ID = '2026-11-21T16:51';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
