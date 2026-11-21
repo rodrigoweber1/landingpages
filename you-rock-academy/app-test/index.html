@@ -187,7 +187,7 @@ body.clean .sd-tabs a.on{background:#0F172A;color:#FFFFFF;box-shadow:none}
 body.clean .sd-head a.home{color:#0F172A}
 #fnav{display:none}
 @media (max-width:899px){
-body.clean #fnav{display:flex;position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:min(358px,calc(100% - 24px));box-sizing:border-box;padding:6px;gap:4px;border-radius:999px;background:#FFFFFF;box-shadow:0 6px 24px rgba(0,0,0,.12);z-index:70}
+body.clean #fnav{display:flex;position:fixed;left:50%;-webkit-transform:translate3d(-50%,0,0);transform:translate3d(-50%,0,0);will-change:transform;-webkit-backface-visibility:hidden;backface-visibility:hidden;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(358px,calc(100% - 24px));box-sizing:border-box;padding:6px;gap:4px;border-radius:999px;background:#FFFFFF;box-shadow:0 6px 24px rgba(0,0,0,.12);z-index:70}
 body.clean #fnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:52px;border-radius:999px;color:#475569;font-size:12px;line-height:16px;font-weight:500;font-family:'Inter',system-ui,sans-serif}
 body.clean #fnav a.on{background:#EEF2F7;color:#0F172A}
 body.clean #app{padding-bottom:96px;box-sizing:border-box}
@@ -1372,7 +1372,7 @@ body.stage #sbar .sb-s{color:var(--st-ink2)!important}
 body.stage #sbar .sb-m{color:var(--st-redInk)!important}
 
 /* bottom nav and sidebar */
-body.stage #fnav{background:rgba(23,18,15,.92)!important;box-shadow:0 0 0 1px var(--st-rule),0 10px 30px rgba(0,0,0,.6)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+body.stage #fnav{background:rgba(23,18,15,.97)!important;box-shadow:0 0 0 1px var(--st-rule),0 10px 30px rgba(0,0,0,.6)!important}
 body.stage #fnav a{color:var(--st-mute)!important;font-family:'Archivo Black','Inter',sans-serif!important;font-weight:400!important;font-size:10px!important;letter-spacing:0!important}
 body.stage #fnav a.on{background:var(--st-floor3)!important;color:var(--st-ink)!important}
 /* bottom menu: long labels (Principiante, Herramientas) get room instead of touching the edges */
@@ -22769,6 +22769,9 @@ function fit() {
     if (z > 1.35) z = 1.35;
     if (z < 0.8) z = 0.8;
     mh = vh / z;
+    // the browser bar collapsing while you scroll only changes the height: keep the biggest one so the page does not re-layout mid-scroll
+    if (fit.w === vw && fit.mh) mh = Math.max(fit.mh, mh);
+    fit.w = vw; fit.mh = mh;
   }
   document.documentElement.style.setProperty('--z', String(z));
   document.documentElement.style.setProperty('--mh', Math.ceil(mh) + 'px');
@@ -25234,8 +25237,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '21 nov 2026 · 16:41';
-  var BUILD_ID = '2026-11-21T16:41';
+  var BUILD = '21 nov 2026 · 16:46';
+  var BUILD_ID = '2026-11-21T16:46';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
