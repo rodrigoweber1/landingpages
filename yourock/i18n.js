@@ -711,6 +711,7 @@ Leva 4 segundos. Fique em silêncio e sem fones. Só pedimos de novo se o aparel
 Calibrar|Calibrate|Calibrar
 Aviso para calibrar o microfone (guardado; só repete se o aparelho mudar)|Prompt to calibrate the microphone (saved; repeats only if your device changes)|Aviso para calibrar el micrófono (se guarda; solo se repite si cambia el dispositivo)
 Correção: o microfone não ligava em alguns iPhones (InvalidStateError)|Fix: the microphone would not turn on on some iPhones (InvalidStateError)|Corrección: el micrófono no se encendía en algunos iPhone (InvalidStateError)
+Calibração mostra o motivo real quando o microfone falha|Calibration shows the real reason when the microphone fails|La calibración muestra el motivo real cuando falla el micrófono
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });

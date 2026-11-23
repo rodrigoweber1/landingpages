@@ -733,7 +733,7 @@ const act = {
       const v = await Mic.calibrate(); if (v == null) return toast('Não ouvi os cliques. Aumente o volume e tente de novo.');
       S().latency = Math.round(v * 1000); S().cal = { fp: await Cal.fp(), at: Date.now(), ms: S().latency }; save(); Cal.hide();
       if (location.hash === '#/settings') viewSettings(); toast('Latência: ' + S().latency + ' ms');
-    } catch (e) { toast('Sem acesso ao microfone'); }
+    } catch (e) { micFail(e); }
   },
   calLater() { Cal.hide(true); },
   demoData() {
