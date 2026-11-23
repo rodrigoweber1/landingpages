@@ -764,5 +764,31 @@ document.addEventListener('input', e => {
   if (k === 'tunerSens') Mic.gate = [0.03, 0.02, 0.012, 0.007, 0.004][+t.value - 1];
 });
 
+// aviso de versão nova: compara a versão publicada com a que está aberta (ao abrir, ao voltar para o app e a cada 30 min)
+const Upd = (() => {
+  let shown = false, dismissed = false;
+  const hadSW = 'serviceWorker' in navigator && !!navigator.serviceWorker.controller;
+  function show() {
+    if (shown || dismissed) return; shown = true;
+    const d = document.createElement('div'); d.id = 'updbar'; d.setAttribute('role', 'status');
+    d.innerHTML = '<div class="ut"><b>Nova versão disponível</b><span class="small mut">Atualize para ver as novidades.</span></div><div class="row"><button class="btn pri sm" data-act="updNow">Atualizar</button><button class="btn sm" data-act="updLater">Depois</button></div>';
+    document.body.appendChild(d);
+  }
+  async function check() {
+    if (shown || dismissed || location.protocol === 'file:') return;
+    try {
+      if ('serviceWorker' in navigator) { const r = await navigator.serviceWorker.getRegistration(); r && r.update().catch(() => {}); }
+      const t = await (await fetch('version.js?c=' + Date.now(), { cache: 'no-store' })).text();
+      const m = /APP_VERSION\s*=\s*'([^']+)'/.exec(t);
+      if (m && m[1] !== APP_VERSION) show();
+    } catch (e) {}
+  }
+  setTimeout(check, 4000); setInterval(check, 30 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+  if ('serviceWorker' in navigator && hadSW) navigator.serviceWorker.addEventListener('controllerchange', show);
+  return { dismiss() { dismissed = true; const d = $('#updbar'); d && d.remove(); }, check };
+})();
+act.updNow = () => { if (Sess.run) { toast('Termine ou pare o exercício para atualizar'); return; } act.upd(); };
+act.updLater = () => Upd.dismiss();
 if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
 render();

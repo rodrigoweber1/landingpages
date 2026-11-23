@@ -213,3 +213,10 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 @keyframes strV{0%{stroke:var(--acc);transform:translateY(0)}8%{transform:translateY(-3px)}16%{transform:translateY(3px)}26%{stroke:var(--acc);transform:translateY(-2.4px)}36%{transform:translateY(2.4px)}48%{transform:translateY(-1.6px)}60%{transform:translateY(1.6px)}74%{transform:translateY(-.8px)}88%{transform:translateY(.4px)}100%{transform:translateY(0)}}
 @keyframes strF{0%{stroke:var(--acc)}}
 @media (prefers-reduced-motion:reduce){.strg.vib{animation:strF .6s}}
+
+/* aviso de versão nova (fundo sólido) */
+#updbar{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 72px);z-index:60;background:var(--bg2);border:1px solid var(--acc);border-radius:14px;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;animation:updIn .5s cubic-bezier(.22,1,.36,1)}
+#updbar .ut{display:flex;flex-direction:column;gap:2px;min-width:0}
+@keyframes updIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+@media(min-width:760px){#updbar{left:auto;right:16px;max-width:420px}}
+@media(prefers-reduced-motion:reduce){#updbar{animation:none}}

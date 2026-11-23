@@ -697,6 +697,12 @@ Aumentar 1 BPM|Increase 1 BPM|Aumentar 1 BPM
 Aumentar 5 BPM|Increase 5 BPM|Aumentar 5 BPM
 Buscar exercício|Search exercise|Buscar ejercicio
 A corda da nota da vez vibra no braço dos exercícios de notas|The string of the current note vibrates on the fretboard in note exercises|La cuerda de la nota actual vibra en el mástil de los ejercicios de notas
+Nova versão disponível|New version available|Nueva versión disponible
+Atualize para ver as novidades.|Update to see what's new.|Actualiza para ver las novedades.
+Atualizar|Update|Actualizar
+Depois|Later|Después
+Termine ou pare o exercício para atualizar|Finish or stop the exercise to update|Termina o detén el ejercicio para actualizar
+Aviso de versão nova com botão de atualização|Notice for new versions with an update button|Aviso de versión nueva con botón de actualización
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });
