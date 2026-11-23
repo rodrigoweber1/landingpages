@@ -120,7 +120,9 @@ html body.stage #app .stg-home .stg-h1{font-size:40px!important;line-height:.95!
 #app :is(a,button)[aria-label^="Volver"],#app :is(a,button)[aria-label^="Back"]{flex:none!important;min-width:44px}
 /* search bar: it scrolls away when idle, but stays under the header while you type or results are open (its result panel hangs from it) */
 @media(max-width:480px){#app #sbar{position:relative!important;top:auto!important}#app #sbar.has,#app #sbar:focus-within{position:sticky!important;top:calc(env(safe-area-inset-top) + var(--hdh,56px))!important}#app>div>header .yr-logo{--yr:20px!important}#app>div>header img[style*="height: 60px"]{height:46px!important}}
-#sbar{position:sticky;top:calc(env(safe-area-inset-top) + var(--hdh,56px));z-index:71;background:inherit;margin:0;padding:10px 0 6px;font-family:'Inter',system-ui,sans-serif}
+#sbar{position:sticky;top:calc(env(safe-area-inset-top) + var(--hdh,56px));z-index:69;background:inherit;margin:0;padding:10px 0 6px;font-family:'Inter',system-ui,sans-serif}
+/* with the compact logo bar fixed on top, the sticky search sticks right under it, never behind it or over the bottom menu */
+html body.yr-logohub #app #sbar.has:not(#z),html body.yr-logohub #app #sbar:focus-within:not(#z),html body.yr-always #app #sbar.has:not(#z),html body.yr-always #app #sbar:focus-within:not(#z){top:var(--ymh,56px)!important}
 #sbar::after{content:'';position:absolute;left:0;right:0;bottom:-8px;height:8px;background:linear-gradient(rgba(0,0,0,0.06),transparent);pointer-events:none}
 body.dark #sbar::after{background:linear-gradient(rgba(0,0,0,0.35),transparent)}
 #sbar .sb-f{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:999px;background:#EEF2F7;box-sizing:border-box}
@@ -25250,8 +25252,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '21 nov 2026 · 16:51';
-  var BUILD_ID = '2026-11-21T16:51';
+  var BUILD = '23 nov 2026 · 18:12';
+  var BUILD_ID = '2026-11-23T18:12';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
@@ -25305,6 +25307,7 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
     stamp(home);
     // wide screens: the translucent bar only appears once the page has scrolled past the big logo row
     if (on && home && window.innerWidth >= 900 && (window.pageYOffset || 0) < 90) on = false;
+    try { if (bar && on) document.documentElement.style.setProperty('--ymh', bar.offsetHeight + 'px'); } catch (e) {}
     if (bar) { bar.setAttribute('data-on', on ? 'true' : 'false'); if (!on) bar.setAttribute('aria-hidden', 'true'); else bar.removeAttribute('aria-hidden'); }
   }
   function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
