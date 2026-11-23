@@ -705,6 +705,11 @@ Termine ou pare o exercício para atualizar|Finish or stop the exercise to updat
 Aviso de versão nova com botão de atualização|Notice for new versions with an update button|Aviso de versión nueva con botón de actualización
 Vibração da corda 30% mais suave|String vibration 30% gentler|Vibración de la cuerda un 30% más suave
 Vibração da corda pela metade|String vibration halved|Vibración de la cuerda a la mitad
+Reconhecimento do microfone mais estável (análise fora da thread principal)|More stable microphone recognition (analysis off the main thread)|Reconocimiento del micrófono más estable (análisis fuera del hilo principal)
+Calibrar o microfone|Calibrate the microphone|Calibrar el micrófono
+Leva 4 segundos. Fique em silêncio e sem fones. Só pedimos de novo se o aparelho mudar.|Takes 4 seconds. Stay quiet and without headphones. We only ask again if your device changes.|Dura 4 segundos. Quédate en silencio y sin auriculares. Solo lo pedimos de nuevo si cambia el dispositivo.
+Calibrar|Calibrate|Calibrar
+Aviso para calibrar o microfone (guardado; só repete se o aparelho mudar)|Prompt to calibrate the microphone (saved; repeats only if your device changes)|Aviso para calibrar el micrófono (se guarda; solo se repite si cambia el dispositivo)
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });

@@ -727,7 +727,15 @@ const act = {
     catch (e) { $('#mtErr').textContent = 'Falhou: ' + (e && e.name === 'NotAllowedError' ? 'permissão negada (libere o microfone no navegador).' : e && e.name === 'NotFoundError' ? 'nenhum microfone encontrado.' : 'use localhost ou HTTPS.'); }
   },
   ref(d) { tone(mtof(+d.m), 2.5); },
-  async calib() { toast('Calibrando… fique em silêncio, sem fones'); try { const v = await Mic.calibrate(); if (v == null) return toast('Não ouvi os cliques. Aumente o volume e tente de novo.'); S().latency = Math.round(v * 1000); save(); viewSettings(); toast('Latência: ' + S().latency + ' ms'); } catch (e) { toast('Sem acesso ao microfone'); } },
+  async calib() {
+    toast('Calibrando… fique em silêncio, sem fones');
+    try {
+      const v = await Mic.calibrate(); if (v == null) return toast('Não ouvi os cliques. Aumente o volume e tente de novo.');
+      S().latency = Math.round(v * 1000); S().cal = { fp: await Cal.fp(), at: Date.now(), ms: S().latency }; save(); Cal.hide();
+      if (location.hash === '#/settings') viewSettings(); toast('Latência: ' + S().latency + ' ms');
+    } catch (e) { toast('Sem acesso ao microfone'); }
+  },
+  calLater() { Cal.hide(true); },
   demoData() {
     const now = Date.now(); const ids = EX.map(e => e.id), out = [];
     for (let d = 29; d >= 0; d--) { if (Math.random() < 0.25) continue; const n = 1 + Math.floor(Math.random() * 3);
@@ -764,6 +772,31 @@ document.addEventListener('input', e => {
   if (k === 'tunerSens') Mic.gate = [0.03, 0.02, 0.012, 0.007, 0.004][+t.value - 1];
 });
 
+// aviso de calibração do microfone: pergunta uma vez e guarda o resultado junto com uma "impressão" do aparelho
+// (plataforma, taxa de amostragem e quantidade de entradas/saídas de áudio). Só volta a perguntar se isso mudar
+// (ex.: plugou fones ou trocou de microfone) ou se nunca foi calibrado.
+const Cal = (() => {
+  let dismissed = false, shown = false;
+  async function fp() {
+    let d = '';
+    try { const l = await navigator.mediaDevices.enumerateDevices(); d = ['audioinput', 'audiooutput'].map(k => l.filter(x => x.kind === k).length).join('/'); } catch (e) {}
+    let sr = 0; try { sr = (AC || ensureCtx()).sampleRate; } catch (e) {}
+    return [navigator.platform || '', sr, d].join('|');
+  }
+  async function need() { const c = S().cal; return !c || c.fp !== await fp(); }
+  function hide(later) { if (later) dismissed = true; const b = $('#calbar'); b && b.remove(); shown = false; }
+  async function check() {
+    if (shown || dismissed || Sess.run || location.protocol === 'file:' || !navigator.mediaDevices) return;
+    if (!(await need())) return;
+    shown = true;
+    const d = document.createElement('div'); d.id = 'calbar'; d.className = 'updbar'; d.setAttribute('role', 'status');
+    d.innerHTML = '<div class="ut"><b>Calibrar o microfone</b><span class="small mut">Leva 4 segundos. Fique em silêncio e sem fones. Só pedimos de novo se o aparelho mudar.</span></div><div class="row"><button class="btn pri sm" data-act="calib">Calibrar</button><button class="btn sm" data-act="calLater">Depois</button></div>';
+    document.body.appendChild(d);
+  }
+  setTimeout(check, 2500);
+  try { navigator.mediaDevices.addEventListener('devicechange', () => setTimeout(check, 1500)); } catch (e) {}
+  return { fp, check, hide };
+})();
 // aviso de versão nova: compara a versão publicada com a que está aberta (ao abrir, ao voltar para o app e a cada 30 min)
 const Upd = (() => {
   let shown = false, dismissed = false;

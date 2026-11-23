@@ -55,7 +55,7 @@ function tone(freq, secs) {
 
 // ---------- microfone ----------
 const Mic = {
-  on: false, an: null, buf: null, stream: null, timer: null,
+  on: false, an: null, node: null, wlCtx: null, buf: null, stream: null, timer: null,
   hist: [], onsets: [], last: null, lat: 0.09, avg: 0, lastOnset: -1, rms: 0, gate: 0.012, tune: false, r1: 0, r2: 0,
   // abre o microfone de forma tolerante (Safari/iOS costuma dar InvalidStateError): tenta sem restrições, retoma o contexto
   // e, se o contexto estiver ruim, cria outro. O erro leva a etapa em que falhou (e.stage) para diagnóstico.
@@ -74,33 +74,49 @@ const Mic = {
       catch (e) { try { await AC.close(); } catch (_) {} AC = null; ensureCtx(); try { await AC.resume(); } catch (_) {} src = AC.createMediaStreamSource(stream); }
       stage = 'an';
       this.stream = stream;
-      this.an = AC.createAnalyser(); this.an.fftSize = this.tune ? 4096 : 2048; this.an.smoothingTimeConstant = 0;
-      this.buf = new Float32Array(this.an.fftSize);
-      src.connect(this.an);
+      this.an = null; this.node = null;
+      // caminho preferido: AudioWorklet (análise com o relógio do áudio, sem depender da thread principal);
+      // se o navegador não tiver, cai no AnalyserNode com setInterval
+      try {
+        if (!AC.audioWorklet || typeof AudioWorkletNode === 'undefined') throw new Error('sem worklet');
+        if (this.wlCtx !== AC) { await AC.audioWorklet.addModule('mic-worklet.js'); this.wlCtx = AC; }
+        const nd = new AudioWorkletNode(AC, 'mic-proc', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1] });
+        nd.port.postMessage({ n: this.tune ? 4096 : 2048 });
+        nd.port.onmessage = e => { if (this.on) this.feed(e.data.b, e.data.t); };
+        src.connect(nd); nd.connect(AC.destination); this.node = nd;
+      } catch (e) {
+        this.an = AC.createAnalyser(); this.an.fftSize = this.tune ? 4096 : 2048; this.an.smoothingTimeConstant = 0;
+        this.buf = new Float32Array(this.an.fftSize);
+        src.connect(this.an);
+      }
     } catch (e) {
       if (stream) stream.getTracks().forEach(t => t.stop());
       this.stream = null; try { e.stage = stage; } catch (_) {}
       throw e;
     }
     this.hist = []; this.onsets = []; this.on = true;
-    this.timer = setInterval(() => this.tick(), 20);
+    if (this.an) this.timer = setInterval(() => this.tick(), 20);
     return true;
   },
   // afinador: janela maior (4096 amostras) separa melhor as cordas graves; os exercícios continuam com 2048 (resposta rápida)
   setTune(on) {
-    this.tune = on; if (!this.an) return;
+    this.tune = on;
+    if (this.node) { this.node.port.postMessage({ n: on ? 4096 : 2048 }); return; }
+    if (!this.an) return;
     this.an.fftSize = on ? 4096 : 2048; this.buf = new Float32Array(this.an.fftSize);
   },
   stop() {
     this.on = false; clearInterval(this.timer);
+    if (this.node) { try { this.node.port.onmessage = null; this.node.disconnect(); } catch (e) {} this.node = null; }
     if (this.stream) this.stream.getTracks().forEach(t => t.stop());
     this.stream = null; this.last = null;
   },
-  tick() {
-    this.an.getFloatTimeDomainData(this.buf);
-    let s = 0; for (let i = 0; i < this.buf.length; i++) s += this.buf[i] * this.buf[i];
-    const rms = Math.sqrt(s / this.buf.length); this.rms = rms;
-    const t = AC.currentTime - this.lat;
+  tick() { this.an.getFloatTimeDomainData(this.buf); this.feed(this.buf, AC.currentTime); },
+  // analisa uma janela de amostras que termina no instante tEnd (relógio do AudioContext)
+  feed(buf, tEnd) {
+    let s = 0; for (let i = 0; i < buf.length; i++) s += buf[i] * buf[i];
+    const rms = Math.sqrt(s / buf.length); this.rms = rms;
+    const t = tEnd - this.lat;
     // ataque = o volume sobe de repente. A regra nova compara com o volume de 40 ms atrás (uma corda ressoando só cai);
     // a antiga (contra a média) falhava em cordas soltas que ainda soavam quando a palhetada seguinte chegava
     const rising = rms > 0.008 && rms > 1.35 * Math.max(this.r2, 0.002) + 0.003;
@@ -110,7 +126,7 @@ const Mic = {
     this.avg = this.avg * 0.88 + rms * 0.12; this.r2 = this.r1; this.r1 = rms;
     let det = null;
     if (rms > this.gate) {
-      const r = yin(this.buf, AC.sampleRate);
+      const r = yin(buf, AC.sampleRate);
       if (r && r.conf > (this.tune ? 0.9 : 0.8)) { const m = Math.round(69 + 12 * Math.log2(r.f / 440)); det = { t, midi: m, f: r.f, rms }; }
     }
     this.last = det ? det : (rms > this.gate ? this.last : null);

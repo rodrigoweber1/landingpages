@@ -1,9 +1,11 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.6.8';
+var APP_VERSION = '1.6.9';
 var APP_DATE = '2026-11-23';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Aviso para calibrar o microfone (guardado; só repete se o aparelho mudar)', en: 'Prompt to calibrate the microphone (saved; repeats only if your device changes)', es: 'Aviso para calibrar el micrófono (se guarda; solo se repite si cambia el dispositivo)' },
+  { pt: 'Reconhecimento do microfone mais estável (análise fora da thread principal)', en: 'More stable microphone recognition (analysis off the main thread)', es: 'Reconocimiento del micrófono más estable (análisis fuera del hilo principal)' },
   { pt: 'Vibração da corda pela metade', en: 'String vibration halved', es: 'Vibración de la cuerda a la mitad' },
   { pt: 'Vibração da corda 30% mais suave', en: 'String vibration 30% gentler', es: 'Vibración de la cuerda un 30% más suave' },
   { pt: 'Aviso de versão nova com botão de atualização', en: 'Notice for new versions with an update button', es: 'Aviso de versión nueva con botón de actualización' },
