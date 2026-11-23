@@ -773,15 +773,14 @@ document.addEventListener('input', e => {
 });
 
 // aviso de calibração do microfone: pergunta uma vez e guarda o resultado junto com uma "impressão" do aparelho
-// (plataforma, taxa de amostragem e quantidade de entradas/saídas de áudio). Só volta a perguntar se isso mudar
+// (plataforma e quantidade de entradas/saídas de áudio). Só volta a perguntar se isso mudar
 // (ex.: plugou fones ou trocou de microfone) ou se nunca foi calibrado.
 const Cal = (() => {
   let dismissed = false, shown = false;
   async function fp() {
     let d = '';
     try { const l = await navigator.mediaDevices.enumerateDevices(); d = ['audioinput', 'audiooutput'].map(k => l.filter(x => x.kind === k).length).join('/'); } catch (e) {}
-    let sr = 0; try { sr = (AC || ensureCtx()).sampleRate; } catch (e) {}
-    return [navigator.platform || '', sr, d].join('|');
+    return [navigator.platform || '', d].join('|');
   }
   async function need() { const c = S().cal; return !c || c.fp !== await fp(); }
   function hide(later) { if (later) dismissed = true; const b = $('#calbar'); b && b.remove(); shown = false; }

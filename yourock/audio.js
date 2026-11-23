@@ -65,8 +65,25 @@ const Mic = {
     const gum = c => navigator.mediaDevices.getUserMedia(c);
     let stream, stage = 'mic';
     try {
+      // iOS/Safari às vezes responde InvalidStateError ao pedir o microfone (sessão de áudio ainda "ocupada"):
+      // tenta sem restrições, espera um pouco e tenta de novo; por fim recria o contexto de áudio e tenta mais uma vez
+      const hard = e => e && (e.name === 'NotAllowedError' || e.name === 'NotFoundError' || e.name === 'SecurityError');
+      const wait = ms => new Promise(r => setTimeout(r, ms));
       try { stream = await gum({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }); }
-      catch (e) { if (e && (e.name === 'NotAllowedError' || e.name === 'NotFoundError' || e.name === 'SecurityError')) throw e; stream = await gum({ audio: true }); }
+      catch (e) {
+        if (hard(e)) throw e;
+        try { stream = await gum({ audio: true }); }
+        catch (e2) {
+          if (hard(e2)) throw e2;
+          await wait(400);
+          try { stream = await gum({ audio: true }); }
+          catch (e3) {
+            if (hard(e3)) throw e3;
+            try { await AC.close(); } catch (_) {} AC = null; this.wlCtx = null; ensureCtx(); await wait(300);
+            stream = await gum({ audio: true });
+          }
+        }
+      }
       stage = 'ctx';
       if (AC.state !== 'running') { try { await AC.resume(); } catch (e) {} }
       let src;
@@ -137,12 +154,12 @@ const Mic = {
   },
   // mede a latência aproximada alto-falante -> microfone
   async calibrate() {
-    await this.start(); const old = this.lat; this.lat = 0; this.onsets = [];
+    const was = this.on; await this.start(); const old = this.lat; this.lat = 0; this.onsets = [];
     const base = AC.currentTime + 0.5, times = [0, 0.8, 1.6, 2.4].map(x => base + x);
     times.forEach(t => click(t, true));
     await new Promise(r => setTimeout(r, 3600));
     const ds = times.map(t => { const o = this.onsets.find(o => o.t >= t - 0.02); return o ? o.t - t : null; }).filter(x => x != null && x < 0.5);
-    this.lat = old;
+    this.lat = old; if (!was) this.stop();
     if (!ds.length) return null;
     ds.sort((a, b) => a - b); return ds[ds.length >> 1];
   },
