@@ -72,7 +72,9 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 .skip:focus{transform:translateY(96px)}
 
 /* nav */
-.nav{position:fixed;top:12px;left:50%;transform:translate(-50%,var(--navy,0));transition:transform .5s var(--ease);z-index:50;width:calc(100% - 32px);max-width:720px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;background:rgba(24,24,24,.72);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--s4);border-radius:16px}
+.nav{position:fixed;top:12px;left:50%;transform:translate(-50%,var(--navy,0));transition:transform .5s var(--ease);z-index:50;width:calc(100% - 32px);max-width:720px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;background:var(--s1);border:1px solid var(--s4);border-radius:16px}
+/* en móvil el menú es sólido y se desplaza con la página, sin quedarse fijo sobre el contenido */
+@media(max-width:767px){.nav{position:absolute}}
 .logo{display:flex;align-items:center;gap:8px}
 .logo b{color:var(--acc);font-weight:600}
 .nav-links{display:none;gap:24px}
@@ -390,7 +392,7 @@ footer{border-top:1px solid var(--s3);padding:40px 0 48px}
       <h2 class="heading-2">Lo que suelen preguntar antes de empezar</h2>
     </div>
     <div class="faq rv">
-      <details><summary class="title-3">¿Cuánto cuesta?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Entras gratis y lo pruebas. Si te gusta, compras los extras. Los extras cuestan 9,90 € al mes o 69,90 € en un solo pago.</p></details>
+      <details><summary class="title-3">¿Cuánto cuesta?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Entras gratis y lo pruebas. Si te gusta, compras los extras. Los extras cuestan 9,90 € al mes o 69,90 € en un solo pago por año.</p></details>
       <details><summary class="title-3">¿Necesito instalar algo?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">No. Se abre en el navegador del móvil o del ordenador. Si quieres, puedes añadirla a tu pantalla de inicio como una app.</p></details>
       <details><summary class="title-3">¿Funciona con guitarra acústica y eléctrica?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Funciona con cualquier guitarra que el micrófono de tu dispositivo pueda escuchar. Practica en un lugar sin mucho ruido para mejores resultados.</p></details>
       <details><summary class="title-3">¿Cómo sabe qué nota toqué?<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p class="body-3">Analiza el sonido del micrófono y detecta la altura de cada nota. El audio se procesa en tu dispositivo y no se envía a ningún servidor.</p></details>
@@ -432,7 +434,7 @@ footer{border-top:1px solid var(--s3);padding:40px 0 48px}
 </footer>
 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"¿Cuánto cuesta?","acceptedAnswer":{"@type":"Answer","text":"Entras gratis y lo pruebas. Si te gusta, compras los extras: 9,90 € al mes o 69,90 € en un solo pago."}},
+{"@type":"Question","name":"¿Cuánto cuesta?","acceptedAnswer":{"@type":"Answer","text":"Entras gratis y lo pruebas. Si te gusta, compras los extras: 9,90 € al mes o 69,90 € en un solo pago por año."}},
 {"@type":"Question","name":"¿Necesito instalar algo?","acceptedAnswer":{"@type":"Answer","text":"No. Se abre en el navegador del móvil o del ordenador. Si quieres, puedes añadirla a tu pantalla de inicio como una app."}},
 {"@type":"Question","name":"¿Funciona con guitarra acústica y eléctrica?","acceptedAnswer":{"@type":"Answer","text":"Funciona con cualquier guitarra que el micrófono de tu dispositivo pueda escuchar."}},
 {"@type":"Question","name":"¿Cómo sabe qué nota toqué?","acceptedAnswer":{"@type":"Answer","text":"Analiza el sonido del micrófono y detecta la altura de cada nota. El audio se procesa en tu dispositivo."}},
