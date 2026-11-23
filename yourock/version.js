@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.6.4';
-var APP_DATE = '2026-11-16';
+var APP_VERSION = '1.6.5';
+var APP_DATE = '2026-11-23';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'A corda da nota da vez vibra no braço dos exercícios de notas', en: 'The string of the current note vibrates on the fretboard in note exercises', es: 'La cuerda de la nota actual vibra en el mástil de los ejercicios de notas' },
   { pt: 'Ícones em SVG nos controles do exercício, metrônomo e afinador, textos menores maiores, rótulos de acessibilidade nos botões de BPM e na busca', en: 'SVG icons on the exercise, metronome and tuner controls, larger small text, accessibility labels on the BPM buttons and the search field', es: 'Iconos SVG en los controles del ejercicio, metrónomo y afinador, textos pequeños más grandes, etiquetas de accesibilidad en los botones de BPM y en la búsqueda' },
   { pt: 'Acessibilidade: controles acessíveis pelo teclado, respeito à opção "reduzir movimento" do sistema e botões maiores no celular', en: 'Accessibility: keyboard-accessible controls, support for the system "reduce motion" setting and larger buttons on mobile', es: 'Accesibilidad: controles accesibles con el teclado, respeto a la opción "reducir movimiento" del sistema y botones más grandes en el móvil' },
   { pt: 'Tela do exercício mais limpa no celular (barra fixa com Iniciar, opções recolhidas) e Biblioteca com filtros mais compactos', en: 'Cleaner exercise screen on mobile (sticky Start bar, collapsed options) and a more compact Library filter bar', es: 'Pantalla de ejercicio más limpia en el móvil (barra fija con Iniciar, opciones plegadas) y filtros de la Biblioteca más compactos' },

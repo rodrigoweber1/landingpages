@@ -168,7 +168,7 @@ function fretboardSVG(ex, lefty, label, horiz) {
   [3, 5, 7, 9, 12, 15, 17].forEach(f => { if (f >= first && f <= last) { const two = f === 12; (two ? [-14, 14] : [0]).forEach(dy => o += `<circle class="inlay" cx="${X(f)}" cy="${(Y(2) + Y(3)) / 2 + dy * 0}" r="${two ? 6 : 7}" ${two ? `transform="translate(0 ${dy})"` : ''}/>`); } });
   for (let k = 1; k <= cols; k++) o += `<line class="${first === 0 && k === 1 ? 'nut' : 'fret'}" x1="${L(k)}" x2="${L(k)}" y1="${Y(5) - 10}" y2="${Y(0) + 10}"/>`;
   const openS = new Set(notes.filter(n => n[1] === 0).map(n => n[0]));   // corda solta: não desenha bolinha extra, destaca o nome da corda
-  for (let s = 0; s < 6; s++) { o += `<line class="strg" x1="${L(0)}" x2="${L(cols)}" y1="${Y(s)}" y2="${Y(s)}" stroke-width="${1 + (5 - s) * 0.45}"/>`; if (!openS.has(s)) o += `<text class="slab" x="${lefty ? W - 14 : 14}" y="${Y(s)}">${'EADGBe'[s]}</text>`; }
+  for (let s = 0; s < 6; s++) { o += `<line class="strg" data-s="${s}" x1="${L(0)}" x2="${L(cols)}" y1="${Y(s)}" y2="${Y(s)}" stroke-width="${1 + (5 - s) * 0.45}"/>`; if (!openS.has(s)) o += `<text class="slab" x="${lefty ? W - 14 : 14}" y="${Y(s)}">${'EADGBe'[s]}</text>`; }
   o += fretMarks(X, Y(0) + 22, Math.max(first, 1), last);
   for (let f = first; f <= last; f++) o += `<text class="fnum${isMark(f) ? ' mk' : ''}" x="${X(f)}" y="${H - 6}">${f === 0 ? '' : f}</text>`;
   const seen = new Set();
@@ -320,6 +320,11 @@ function passDone(acc) {
   }
   updHud();
 }
+// a corda da nota da vez vibra e vai assentando (só no braço dos exercícios de notas)
+function vibrateString(s) {
+  const l = document.querySelector('.board .strg[data-s="' + s + '"]'); if (!l) return;
+  l.classList.remove('vib'); void l.getBoundingClientRect(); l.classList.add('vib');
+}
 function showCursor(ev) {
   const ex = Sess.ex, cd = $('#cd'); if (cd) cd.style.display = 'none';   // fim da contagem
   if (ex.type === 'notes') {
@@ -327,6 +332,7 @@ function showCursor(ev) {
     document.querySelectorAll('.dot.cur').forEach(e => e.classList.remove('cur'));
     const n = ex.notes[ev.pos], d = $('#d' + n[0] + '_' + n[1]);
     if (d) { void d.getBoundingClientRect(); d.classList.add('cur'); }
+    vibrateString(n[0]);
     if (ev.first) clearBoardStatus();   // resultado da passada anterior some depois de alguns toques
   } else {
     document.querySelectorAll('.slot.cur').forEach(e => e.classList.remove('cur'));

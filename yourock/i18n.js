@@ -696,6 +696,7 @@ Diminuir 1 BPM|Decrease 1 BPM|Disminuir 1 BPM
 Aumentar 1 BPM|Increase 1 BPM|Aumentar 1 BPM
 Aumentar 5 BPM|Increase 5 BPM|Aumentar 5 BPM
 Buscar exercício|Search exercise|Buscar ejercicio
+A corda da nota da vez vibra no braço dos exercícios de notas|The string of the current note vibrates on the fretboard in note exercises|La cuerda de la nota actual vibra en el mástil de los ejercicios de notas
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });

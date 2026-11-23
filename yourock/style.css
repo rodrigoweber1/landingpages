@@ -207,3 +207,9 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 
 .ic{width:1.15em;height:1.15em;vertical-align:-.2em;margin-right:.45em;flex:none}
 #btnMic .ic{margin-right:0}
+
+/* corda vibrando: só transform e cor; com "reduzir movimento" a corda apenas pisca na cor */
+.strg.vib{transform-box:fill-box;transform-origin:center;animation:strV .9s cubic-bezier(.22,1,.36,1)}
+@keyframes strV{0%{stroke:var(--acc);transform:translateY(0)}8%{transform:translateY(-3px)}16%{transform:translateY(3px)}26%{stroke:var(--acc);transform:translateY(-2.4px)}36%{transform:translateY(2.4px)}48%{transform:translateY(-1.6px)}60%{transform:translateY(1.6px)}74%{transform:translateY(-.8px)}88%{transform:translateY(.4px)}100%{transform:translateY(0)}}
+@keyframes strF{0%{stroke:var(--acc)}}
+@media (prefers-reduced-motion:reduce){.strg.vib{animation:strF .6s}}
