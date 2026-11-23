@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.6.6';
+var APP_VERSION = '1.6.7';
 var APP_DATE = '2026-11-23';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Vibração da corda 30% mais suave', en: 'String vibration 30% gentler', es: 'Vibración de la cuerda un 30% más suave' },
   { pt: 'Aviso de versão nova com botão de atualização', en: 'Notice for new versions with an update button', es: 'Aviso de versión nueva con botón de actualización' },
   { pt: 'A corda da nota da vez vibra no braço dos exercícios de notas', en: 'The string of the current note vibrates on the fretboard in note exercises', es: 'La cuerda de la nota actual vibra en el mástil de los ejercicios de notas' },
   { pt: 'Ícones em SVG nos controles do exercício, metrônomo e afinador, textos menores maiores, rótulos de acessibilidade nos botões de BPM e na busca', en: 'SVG icons on the exercise, metronome and tuner controls, larger small text, accessibility labels on the BPM buttons and the search field', es: 'Iconos SVG en los controles del ejercicio, metrónomo y afinador, textos pequeños más grandes, etiquetas de accesibilidad en los botones de BPM y en la búsqueda' },

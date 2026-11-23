@@ -703,6 +703,7 @@ Atualizar|Update|Actualizar
 Depois|Later|Después
 Termine ou pare o exercício para atualizar|Finish or stop the exercise to update|Termina o detén el ejercicio para actualizar
 Aviso de versão nova com botão de atualização|Notice for new versions with an update button|Aviso de versión nueva con botón de actualización
+Vibração da corda 30% mais suave|String vibration 30% gentler|Vibración de la cuerda un 30% más suave
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });
