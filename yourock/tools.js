@@ -414,7 +414,11 @@ const toolIn = {
   minc(v) { M().inc = clampN(v || 1, 1, 20); }, mevery(v) { M().every = clampN(v || 1, 1, 32); }, mmax(v) { M().max = clampN(v || 40, 40, 240); },
   nshow(v) { NT.show = v; notesDraw(); }, nfrets(v) { NT.frets = v; notesDraw(); }, nlab(v) { S().label = v === 'fret' ? 'fret' : 'note'; save(); notesDraw(); },
   chq(v) { CH.q = v; chordUpdateText(); chordRes(); },
-  chtxt(v) { if (CH.mode === 'seq') { CH.stext = v; seqRes(); return; } CH.text = v; const c = parseChord(v); const err = $('#chErr'); if (!c) { err.textContent = v.trim() ? 'Não reconheci esse acorde. Exemplos: Am, F#m7, Bb, C7, G/B, Dsus4.' : ''; return; } err.textContent = ''; CH.root = c.root; CH.q = c.q; CH.bass = c.bass; chordSync(); chordRes(); },
+  chtxt(v) {
+    if (CH.mode === 'seq') { CH.stext = v; seqRes(); return; }
+    // vários acordes digitados no modo de um acorde só: liga a sequência sozinho
+    if (/\s/.test(v.trim()) && !parseChord(v) && parseSeq(v).chords.length >= 2) { CH.mode = 'seq'; CH.stext = v; chordMode(); toast(T('Modo sequência ligado')); return; }
+    CH.text = v; const c = parseChord(v); const err = $('#chErr'); if (!c) { err.textContent = v.trim() ? 'Não reconheci esse acorde. Exemplos: Am, F#m7, Bb, C7, G/B, Dsus4.' : ''; return; } err.textContent = ''; CH.root = c.root; CH.q = c.q; CH.bass = c.bass; chordSync(); chordRes(); },
 };
 document.addEventListener('input', e => {
   const k = e.target.dataset && e.target.dataset.tin; if (!k || !toolIn[k]) return; const t = e.target;

@@ -743,6 +743,8 @@ aberto|open|abierto
 Tocando a sequência…|Playing the sequence…|Reproduciendo la secuencia…
 A sequência está cheia|The sequence is full|La secuencia está llena
 Acordes: escreva uma sequência de 1 a 6 acordes e veja as posições mais próximas entre si|Chords: type a sequence of 1 to 6 chords and see the shapes closest to each other|Acordes: escribe una secuencia de 1 a 6 acordes y mira las posiciones más cercanas entre sí
+Modo sequência ligado|Sequence mode on|Modo secuencia activado
+Acordes: ao digitar vários acordes no buscador, o modo sequência liga sozinho|Chords: typing several chords in the finder turns sequence mode on by itself|Acordes: al escribir varios acordes en el buscador, el modo secuencia se activa solo
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });
