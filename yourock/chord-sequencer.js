@@ -198,7 +198,7 @@
       pos: 'Posição', cycle: 'Trocar de posição', fret: 'casa', open: 'Posição aberta', barre: 'Pestana na casa',
       none: 'Sem posições confortáveis', play: 'Tocar', stop: 'Parar', metro: 'Metrônomo', tempo: 'Velocidade',
       slower: 'Mais lento', faster: 'Mais rápido', mute: 'Silenciar os acordes', unmute: 'Ativar os acordes',
-      beats: 'Tempos por acorde: {n} (toque para mudar)', chosen: 'Posição escolhida'
+      beats: 'Tempos por acorde: {n} (toque para mudar)', beatsLbl: 'tempos', chosen: 'Posição escolhida'
     },
     es: {
       title: 'Secuencia de práctica',
@@ -208,7 +208,7 @@
       pos: 'Posición', cycle: 'Cambiar de posición', fret: 'traste', open: 'Posición abierta', barre: 'Cejilla en el traste',
       none: 'Sin posiciones cómodas', play: 'Reproducir', stop: 'Parar', metro: 'Metrónomo', tempo: 'Velocidad',
       slower: 'Más lento', faster: 'Más rápido', mute: 'Silenciar los acordes', unmute: 'Activar los acordes',
-      beats: 'Tiempos por acorde: {n} (toca para cambiar)', chosen: 'Posición elegida'
+      beats: 'Tiempos por acorde: {n} (toca para cambiar)', beatsLbl: 'tiempos', chosen: 'Posición elegida'
     },
     en: {
       title: 'Practice sequence',
@@ -218,7 +218,7 @@
       pos: 'Position', cycle: 'Change position', fret: 'fret', open: 'Open position', barre: 'Barre at fret',
       none: 'No comfortable shapes', play: 'Play', stop: 'Stop', metro: 'Metronome', tempo: 'Speed',
       slower: 'Slower', faster: 'Faster', mute: 'Mute the chords', unmute: 'Turn the chords on',
-      beats: 'Beats per chord: {n} (tap to change)', chosen: 'Chosen position'
+      beats: 'Beats per chord: {n} (tap to change)', beatsLbl: 'beats', chosen: 'Chosen position'
     }
   };
   var esc = function (x) { return String(x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
@@ -287,15 +287,15 @@
     '.cs-cyc{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;padding:4px 0 0;border:0;background:transparent;cursor:pointer}' +
     '.cs-cyc small{font-size:13px;line-height:18px;color:var(--mut)}' +
     '.cs-add{align-self:flex-start;height:44px;padding:0 20px;border:0;border-radius:999px;background:var(--acc);color:var(--on);font-size:15px;font-weight:600;cursor:pointer}' +
-    '.cs-dock{position:sticky;bottom:74px;z-index:6;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:6px 8px;border-radius:16px;background:var(--bg2);border:1px solid var(--line)}' +
+    '.cs-dock{position:sticky;bottom:74px;z-index:6;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 14px;width:fit-content;max-width:100%;margin:0 auto;padding:6px 12px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);box-shadow:0 6px 20px rgba(0,0,0,.25)}' +
     '@media(min-width:760px){.cs-dock{bottom:12px}}' +
-    '.cs-row{display:flex;align-items:center;gap:4px}' +
+    '.cs-row{display:flex;align-items:center;gap:4px}.cs-row+.cs-row{padding-left:14px;border-left:1px solid var(--line)}@media(max-width:420px){.cs-dock{flex-wrap:nowrap;gap:6px;padding:6px 8px;width:100%}.cs-row+.cs-row{padding-left:6px}.cs-rb{width:38px}.cs-rb.cs-bt{min-width:44px}.cs-tb{width:38px}.cs-bpm{min-width:44px}}' +
     '.cs-rb{flex:0 0 auto;width:42px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;background:transparent;color:var(--mut);cursor:pointer;font-size:18px;font-weight:700}' +
     '.cs-rb[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc)}' +
     '.cs-rb.cs-play{background:var(--acc);color:var(--on)}' +
-    '.cs-tb{flex:0 0 auto;width:36px;height:44px;padding:0;border:0;border-radius:999px;background:transparent;font-size:22px;line-height:1;font-weight:700;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}' +
-    '.cs-bpm{display:flex;flex-direction:column;align-items:center;min-width:40px}' +
-    '.cs-bpm b{font-size:18px;line-height:20px}.cs-bpm small{font-size:12px;line-height:14px;font-weight:700;letter-spacing:.06em;color:var(--mut)}';
+    '.cs-tb{flex:0 0 auto;width:44px;height:44px;padding:0;border:0;border-radius:999px;background:var(--bg3);font-size:22px;line-height:1;font-weight:700;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}' +
+    '.cs-bpm{display:flex;flex-direction:column;align-items:center;min-width:48px}.cs-rb.cs-bt{width:auto;min-width:46px;padding:0 6px;flex-direction:column;gap:0}.cs-rb.cs-bt b{font-size:18px;line-height:20px;color:var(--tx,inherit)}.cs-rb.cs-bt small{font-size:11px;line-height:12px;font-weight:700;letter-spacing:.04em}' +
+    '.cs-bpm b{font-size:22px;line-height:24px}.cs-bpm small{font-size:12px;line-height:14px;font-weight:700;letter-spacing:.06em;color:var(--mut)}';
   function injectCss() {
     if (document.getElementById('cs-css')) return;
     var s = document.createElement('style'); s.id = 'cs-css'; s.textContent = CSS; document.head.appendChild(s);
@@ -379,7 +379,7 @@
         '<button type="button" class="cs-rb cs-play" data-a="play" aria-pressed="' + S.run + '" aria-label="' + esc(S.run ? t.stop : t.play) + '" title="' + esc(S.run ? t.stop : t.play) + '"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' + ic + '</svg></button>' +
         '<button type="button" class="cs-rb" data-a="mute" aria-pressed="' + S.mute + '" aria-label="' + esc(S.mute ? t.unmute : t.mute) + '" title="' + esc(S.mute ? t.unmute : t.mute) + '">' + svg('<path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/>' + (S.mute ? '<path d="m16 9 5 6m0-6-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>')) + '</button>' +
         '<button type="button" class="cs-rb" data-a="metro" aria-pressed="' + S.metro + '" aria-label="' + esc(t.metro) + '" title="' + esc(t.metro) + '">' + svg('<path d="M9 3h6l4 18H5z"/><path d="M7 16h10"/><path d="M12 16l5-10"/>') + '</button>' +
-        '<button type="button" class="cs-rb" data-a="beats" aria-label="' + esc(t.beats.replace('{n}', nb)) + '" title="' + esc(t.beats.replace('{n}', nb)) + '">' + nb + '</button></div>' +
+        '<button type="button" class="cs-rb cs-bt" data-a="beats" aria-label="' + esc(t.beats.replace('{n}', nb)) + '" title="' + esc(t.beats.replace('{n}', nb)) + '"><b>' + nb + '</b><small>' + esc(t.beatsLbl) + '</small></button></div>' +
         '<div class="cs-row" role="group" aria-label="' + esc(t.tempo) + '"><button type="button" class="cs-tb" data-bpm="-1" aria-label="' + esc(t.slower) + '">−</button>' +
         '<span class="cs-bpm" aria-live="polite"><b data-bpmv>' + S.bpm + '</b><small>BPM</small></span>' +
         '<button type="button" class="cs-tb" data-bpm="1" aria-label="' + esc(t.faster) + '">+</button></div></div>';

@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.8.1';
+var APP_VERSION = '1.8.2';
 var APP_DATE = '2026-11-23';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Barra de reprodução dos acordes mais compacta: BPM junto dos controles e botão de tempos identificado', en: 'More compact chord playback bar: BPM next to the controls and a labeled beats button', es: 'Barra de reproducción de acordes más compacta: BPM junto a los controles y botón de tiempos con etiqueta' },
   { pt: 'Versão para computador: Ajustes em duas colunas e Afinador maior', en: 'Desktop version: Settings in two columns and a larger Tuner', es: 'Versión de escritorio: Ajustes en dos columnas y Afinador más grande' },
   { pt: 'Versão para computador: Treinar, Biblioteca, Progresso, Metrônomo, Notas e Acordes aproveitam a tela larga', en: 'Desktop version: Train, Library, Progress, Metronome, Notes and Chords make use of wide screens', es: 'Versión de escritorio: Entrenar, Biblioteca, Progreso, Metrónomo, Notas y Acordes aprovechan la pantalla ancha' },
   { pt: 'Versão para computador: Hoje e exercício em painel de duas colunas e atalhos de teclado (↑↓ BPM, M microfone, D demo)', en: 'Desktop version: Today and exercise screens as a two-column panel, with keyboard shortcuts (↑↓ BPM, M mic, D demo)', es: 'Versión de escritorio: Hoy y ejercicio en panel de dos columnas y atajos de teclado (↑↓ BPM, M micrófono, D demo)' },

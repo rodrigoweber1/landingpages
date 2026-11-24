@@ -715,6 +715,7 @@ Calibração mostra o motivo real quando o microfone falha|Calibration shows the
 Versão para computador: Hoje e exercício em painel de duas colunas e atalhos de teclado (↑↓ BPM, M microfone, D demo)|Desktop version: Today and exercise screens as a two-column panel, with keyboard shortcuts (↑↓ BPM, M mic, D demo)|Versión de escritorio: Hoy y ejercicio en panel de dos columnas y atajos de teclado (↑↓ BPM, M micrófono, D demo)
 Versão para computador: Treinar, Biblioteca, Progresso, Metrônomo, Notas e Acordes aproveitam a tela larga|Desktop version: Train, Library, Progress, Metronome, Notes and Chords make use of wide screens|Versión de escritorio: Entrenar, Biblioteca, Progreso, Metrónomo, Notas y Acordes aprovechan la pantalla ancha
 Versão para computador: Ajustes em duas colunas e Afinador maior|Desktop version: Settings in two columns and a larger Tuner|Versión de escritorio: Ajustes en dos columnas y Afinador más grande
+Barra de reprodução dos acordes mais compacta: BPM junto dos controles e botão de tempos identificado|More compact chord playback bar: BPM next to the controls and a labeled beats button|Barra de reproducción de acordes más compacta: BPM junto a los controles y botón de tiempos con etiqueta
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });
