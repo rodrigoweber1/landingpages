@@ -713,6 +713,7 @@ Aviso para calibrar o microfone (guardado; só repete se o aparelho mudar)|Promp
 Correção: o microfone não ligava em alguns iPhones (InvalidStateError)|Fix: the microphone would not turn on on some iPhones (InvalidStateError)|Corrección: el micrófono no se encendía en algunos iPhone (InvalidStateError)
 Calibração mostra o motivo real quando o microfone falha|Calibration shows the real reason when the microphone fails|La calibración muestra el motivo real cuando falla el micrófono
 Versão para computador: Hoje e exercício em painel de duas colunas e atalhos de teclado (↑↓ BPM, M microfone, D demo)|Desktop version: Today and exercise screens as a two-column panel, with keyboard shortcuts (↑↓ BPM, M mic, D demo)|Versión de escritorio: Hoy y ejercicio en panel de dos columnas y atajos de teclado (↑↓ BPM, M micrófono, D demo)
+Versão para computador: Treinar, Biblioteca, Progresso, Metrônomo, Notas e Acordes aproveitam a tela larga|Desktop version: Train, Library, Progress, Metronome, Notes and Chords make use of wide screens|Versión de escritorio: Entrenar, Biblioteca, Progreso, Metrónomo, Notas y Acordes aprovechan la pantalla ancha
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });

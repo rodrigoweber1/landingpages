@@ -457,7 +457,7 @@ function render() {
   if (r === 'train') TLOPEN = false;   // dropdown de exercícios sempre começa fechado
   if (r === 'home' && !DB.placed && !DB.placeSkip && !DB.sessions.length) { location.hash = '#/quiz'; return; }
   closeTools(); $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navBotHTML(r); const gb = $('#gearBtn'); if (gb) gb.classList.toggle('on', r === 'settings');
-  view.innerHTML = ''; view.classList.remove('wide'); routes[r](); window.scrollTo(0, 0);
+  view.innerHTML = ''; view.classList.remove('wide', 'wm'); routes[r](); window.scrollTo(0, 0);
 }
 addEventListener('hashchange', render);
 
@@ -521,10 +521,11 @@ function chordKind(e) {
 }
 function viewVault() {
   view.innerHTML = `<div class="row sp"><h1>Biblioteca</h1><span class="mut small" id="vcount"></span></div>
-  <div class="card"><input type="search" id="vq" aria-label="Buscar exercício" placeholder="Buscar exercício…" value="${esc(VF.q)}">
+  <div class="vlay"><aside class="vside"><div class="card"><input type="search" id="vq" aria-label="Buscar exercício" placeholder="Buscar exercício…" value="${esc(VF.q)}">
   <div class="row chips" style="margin-top:10px" id="vfocus"></div>
   <div class="row" style="margin-top:10px"><select id="vlvl" aria-label="Nível" style="width:auto">${['all', 1, 2, 3, 4].map(k => `<option value="${k}" ${VF.lvl === k ? 'selected' : ''}>${k === 'all' ? 'Todos os níveis' : LVL[k]}</option>`).join('')}</select><label class="small mut vr" for="vact">Adicionar na rotina:</label><select id="vact" style="width:auto" aria-label="Adicionar na rotina" title="Adicionar na rotina">${DB.routines.map(r => `<option value="${r.id}" ${r.id === DB.active ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select></div></div>
-  <div id="vlist" class="grid g2"></div>`;
+  </aside><div id="vlist" class="grid g2"></div></div>`;
+  view.classList.add('wide');
   const fch = () => $('#vfocus').innerHTML = ['all', ...Object.keys(FOCUS).flatMap(k => k === 'chords' ? Object.keys(CHKIND) : [k]), 'fav'].map(k => `<span class="chip ${(k === 'fav' ? VF.fav : VF.focus === k) ? 'on' : ''}" data-act="vf" data-k="${k}">${k === 'all' ? 'Todos' : k === 'fav' ? '★ Favoritos' : CHKIND[k] || FOCUS[k].n}</span>`).join('');
   fch(); vaultList();
   $('#vlvl').onchange = e => { VF.lvl = e.target.value === 'all' ? 'all' : +e.target.value; vaultList(); };
@@ -605,20 +606,22 @@ function viewTrilha() {
     <div class="row small"><span class="chip">⏱ ${L.session}</span><span class="chip">🎯 precisão ≥ ${L.thr}%</span><span class="chip">✔ ${L.needClean} passadas limpas para subir</span><span class="chip">↑ passo de ${L.step} BPM</span></div>
     ${TL > cur ? `<div class="ins warn" style="margin-top:12px">Este nível é mais avançado que o seu momento. Recomendo dominar antes ${Math.round(UNLOCK_AT * 100)}% do Nível ${LEVELS[TL - 1].roman} (hoje: ${Math.round(100 * prev.pct)}%). Você pode treinar mesmo assim.</div>` : ''}
     <div class="row" style="margin:14px 0"><button class="btn pri" data-act="guided" data-l="${TL}">▶ Sessão guiada (${gs.length} exercícios, ~${gs.length * 4} min)</button><button class="btn" data-act="startToday2">Treino de hoje</button>${DB.routines.map(r => `<button class="btn sm" data-act="playR" data-id="${r.id}">${esc(r.name)}</button>`).join('')}</div>
-    <details class="exdd"${TLOPEN ? ' open' : ''} ontoggle="TLOPEN = this.open"><summary><span>Nível ${L.roman} · ${L.name}</span><span class="mut small">${LV_EX[TL].length} exercícios</span></summary>
+    <details class="exdd"${TLOPEN || innerWidth >= 1100 ? ' open' : ''} ontoggle="TLOPEN = this.open"><summary><span>Nível ${L.roman} · ${L.name}</span><span class="mut small">${LV_EX[TL].length} exercícios</span></summary>
     <div class="qlist">${LV_EX[TL].map((id, i) => { const e = EXMAP[id], b = DB.best[id], m = isMastered(id), clean = (b && b.clean) || 0;
       return `<div class="qi" style="flex-wrap:wrap"><span style="width:52px;font-size:14px">${starsHTML(id)}</span><div style="flex:1;min-width:160px"><b>${i + 1}. ${esc(e.name)}</b> ${pill(e.focus)}<div class="mut small">${esc(e.desc)}</div><div class="meter" style="margin-top:6px;max-width:260px"><b style="width:${Math.min(100, Math.round(100 * clean / e.target))}%;background:${m ? 'var(--ok)' : L.color}"></b></div><div class="small mut">${clean ? clean + ' BPM limpos' : 'não iniciado'} · começar em ${e.bpm} · meta ${e.target} BPM · ${subText(e, e.type === 'rhythm' ? e.sub : LEVELS[e.lvl].sub)}</div></div><button class="btn sm pri" data-act="train1" data-id="${id}">▶</button></div>`; }).join('')}</div></details></div>`;
+  view.classList.add('wide');
 }
 function viewStats() {
   const st = stats(), mx = Math.max(60, ...st.days.map(d => d.s)), tot = st.total || 1;
-  view.innerHTML = `<h1>Progresso</h1>
-  <div class="grid g4m" style="margin-top:12px"><div class="card kpi"><div class="v">${fmtH(st.total)}</div><div class="l">tempo total</div></div><div class="card kpi"><div class="v">${st.n}</div><div class="l">sessões</div></div><div class="card kpi"><div class="v">🔥 ${st.streak}</div><div class="l">dias seguidos</div></div><div class="card kpi"><div class="v">${st.bestClean || '–'}</div><div class="l">maior BPM limpo</div></div></div>
-  <div class="card"><h2>Últimos 30 dias</h2><div class="bars" style="margin-top:12px">${st.days.map((d, i) => `<i class="${i === 29 ? 'today' : ''}" style="height:${Math.max(2, 100 * d.s / mx)}%" title="${d.k}: ${Math.round(d.s / 60)} min"></i>`).join('')}</div></div>
-  <div class="grid g2"><div class="card"><h2>Foco e precisão</h2>${Object.entries(st.focus).map(([k, f]) => `<div style="margin:10px 0"><div class="row sp small"><span>${pill(k)}</span><span class="mut">${fmtH(f.secs)} · ${f.acc == null ? 'sem dados' : Math.round(f.acc * 100) + '% precisão'}</span></div><div class="meter" style="margin-top:4px"><b style="width:${Math.round(100 * f.secs / tot)}%;background:${FOCUS[k].c}"></b></div></div>`).join('')}</div>
-  <div class="card"><h2>Insights</h2>${insights(st).map(i => `<div class="ins ${i.t}">${esc(i.m)}</div>`).join('')}</div></div>
-  <div class="card"><h2>Evolução por exercício</h2>${Object.entries(DB.best).filter(([id]) => EXMAP[id]).sort((a, b) => b[1].t - a[1].t).map(([id, b]) => { const e = EXMAP[id]; return `<div style="margin:10px 0"><div class="row sp small"><span>${starsHTML(id)} ${esc(e.name)}</span><span class="mut">${b.clean || 0} / ${e.target} BPM limpos · ${b.n}×</span></div><div class="meter" style="margin-top:4px"><b style="width:${Math.min(100, 100 * (b.clean || 0) / e.target)}%"></b></div></div>`; }).join('') || '<div class="mut">Treine para ver a evolução.</div>'}</div>
-  <div class="card"><h2>Conquistas</h2><div class="grid g4m" style="margin-top:10px">${achievements(st).map(a => `<div class="ach ${a.ok ? 'on' : ''}">${a.ok ? '🏆 ' : '🔒 '}${a.n}</div>`).join('')}</div></div>
-  <div class="row"><button class="btn" data-act="demoData">Carregar dados de exemplo</button><button class="btn" data-act="export">Exportar JSON</button><button class="btn danger" data-act="wipe">Apagar tudo</button></div>`;
+  view.innerHTML = `<h1>Progresso</h1><div class="slay">
+  <div class="grid g4m sk" style="margin-top:12px"><div class="card kpi"><div class="v">${fmtH(st.total)}</div><div class="l">tempo total</div></div><div class="card kpi"><div class="v">${st.n}</div><div class="l">sessões</div></div><div class="card kpi"><div class="v">🔥 ${st.streak}</div><div class="l">dias seguidos</div></div><div class="card kpi"><div class="v">${st.bestClean || '–'}</div><div class="l">maior BPM limpo</div></div></div>
+  <div class="card s30"><h2>Últimos 30 dias</h2><div class="bars" style="margin-top:12px">${st.days.map((d, i) => `<i class="${i === 29 ? 'today' : ''}" style="height:${Math.max(2, 100 * d.s / mx)}%" title="${d.k}: ${Math.round(d.s / 60)} min"></i>`).join('')}</div></div>
+  <div class="grid g2 sg"><div class="card sf"><h2>Foco e precisão</h2>${Object.entries(st.focus).map(([k, f]) => `<div style="margin:10px 0"><div class="row sp small"><span>${pill(k)}</span><span class="mut">${fmtH(f.secs)} · ${f.acc == null ? 'sem dados' : Math.round(f.acc * 100) + '% precisão'}</span></div><div class="meter" style="margin-top:4px"><b style="width:${Math.round(100 * f.secs / tot)}%;background:${FOCUS[k].c}"></b></div></div>`).join('')}</div>
+  <div class="card si"><h2>Insights</h2>${insights(st).map(i => `<div class="ins ${i.t}">${esc(i.m)}</div>`).join('')}</div></div>
+  <div class="card sev"><h2>Evolução por exercício</h2>${Object.entries(DB.best).filter(([id]) => EXMAP[id]).sort((a, b) => b[1].t - a[1].t).map(([id, b]) => { const e = EXMAP[id]; return `<div style="margin:10px 0"><div class="row sp small"><span>${starsHTML(id)} ${esc(e.name)}</span><span class="mut">${b.clean || 0} / ${e.target} BPM limpos · ${b.n}×</span></div><div class="meter" style="margin-top:4px"><b style="width:${Math.min(100, 100 * (b.clean || 0) / e.target)}%"></b></div></div>`; }).join('') || '<div class="mut">Treine para ver a evolução.</div>'}</div>
+  <div class="card sa"><h2>Conquistas</h2><div class="grid g4m" style="margin-top:10px">${achievements(st).map(a => `<div class="ach ${a.ok ? 'on' : ''}">${a.ok ? '🏆 ' : '🔒 '}${a.n}</div>`).join('')}</div></div>
+  <div class="row"><button class="btn" data-act="demoData">Carregar dados de exemplo</button><button class="btn" data-act="export">Exportar JSON</button><button class="btn danger" data-act="wipe">Apagar tudo</button></div></div>`;
+  view.classList.add('wide');
 }
 function viewTuner() {
   view.innerHTML = `<h1>Afinador</h1><div class="card" style="margin-top:12px"><div class="tunerbig" id="tn">–</div><div class="mut" style="text-align:center" id="th">Toque uma corda solta</div><div class="needle"><i id="nd" style="left:50%"></i></div><div class="row" style="justify-content:center" id="tc">–</div>

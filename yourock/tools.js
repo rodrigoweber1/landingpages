@@ -96,6 +96,7 @@ function mUpdate() {
   g('mBpm').textContent = m.bpm; g('mTempo').textContent = tempoName(m.bpm); g('mRange').value = m.bpm;
 }
 function viewMetro() {
+  view.classList.add('wide', 'wm');
   const m = M();
   const sel = (id, opts, cur) => `<select data-tin="${id}">${opts.map(([v, t]) => `<option value="${v}" ${+cur === v ? 'selected' : ''}>${t}</option>`).join('')}</select>`;
   view.innerHTML = `<h1>Metrônomo</h1>
@@ -152,6 +153,7 @@ function notesDraw() {
     <label class="small mut" style="margin-left:10px">Acidentes</label><span class="chip ${on(!nat && !fl)}" data-act="nacc" data-v="#">Sustenidos (#)</span><span class="chip ${on(!nat && fl)}" data-act="nacc" data-v="b">Bemóis (b)</span><span class="chip ${on(nat)}" data-act="nacc" data-v="nat">Só naturais</span>`;
 }
 function viewNotes() {
+  view.classList.add('wide');
   view.innerHTML = `<h1>Notas da Guitarra</h1><div class="mut" style="margin:4px 0 12px">Toque em uma nota para ouvir e ver todas as posições dela no braço.</div>
   <div class="card"><div class="row" id="nCtl" style="margin-bottom:12px"></div><div class="row" id="nChips"></div>
     <div class="row" style="margin-top:12px"><label class="small mut">Casas</label><select data-tin="nfrets" style="width:auto">${[12, 15, 19, 22].map(n => `<option value="${n}" ${NT.frets === n ? 'selected' : ''}>0 a ${n}</option>`).join('')}</select>
@@ -267,6 +269,7 @@ function chordSync() {
   const sel = $('#chQ'); if (sel) sel.value = CH.q;
 }
 function viewChords() {
+  view.classList.add('wide');
   view.innerHTML = `<h1>Buscador de Acordes</h1><div class="mut" style="margin:4px 0 12px">Digite o nome (Am, F#m7, Bb, C7, G/B, Dsus4…) ou escolha a nota e o tipo.</div>
   <div class="card"><input type="search" id="chTxt" placeholder="Digite um acorde: Am7, C#dim, G/B…" value="${esc(CH.text)}" data-tin="chtxt">
     <div class="small mut" id="chErr" style="margin-top:6px;min-height:18px"></div>
