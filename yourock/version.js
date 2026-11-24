@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.8.4';
+var APP_VERSION = '1.9.0';
 var APP_DATE = '2026-11-23';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Acordes: escreva uma sequência de 1 a 6 acordes e veja as posições mais próximas entre si', en: 'Chords: type a sequence of 1 to 6 chords and see the shapes closest to each other', es: 'Acordes: escribe una secuencia de 1 a 6 acordes y mira las posiciones más cercanas entre sí' },
   { pt: 'Treinar no computador: ao escolher um nível a tela não rola mais sozinha', en: 'Train on desktop: choosing a level no longer scrolls the page', es: 'Entrenar en escritorio: al elegir un nivel la pantalla ya no se desplaza sola' },
   { pt: 'Acordes: a sequência de prática aceita até 12 acordes no computador e 9 no celular', en: 'Chords: the practice sequence accepts up to 12 chords on desktop and 9 on mobile', es: 'Acordes: la secuencia de práctica admite hasta 12 acordes en escritorio y 9 en móvil' },
   { pt: 'Barra de reprodução dos acordes mais compacta: BPM junto dos controles e botão de tempos identificado', en: 'More compact chord playback bar: BPM next to the controls and a labeled beats button', es: 'Barra de reproducción de acordes más compacta: BPM junto a los controles y botón de tiempos con etiqueta' },

@@ -718,6 +718,31 @@ Versão para computador: Ajustes em duas colunas e Afinador maior|Desktop versio
 Barra de reprodução dos acordes mais compacta: BPM junto dos controles e botão de tempos identificado|More compact chord playback bar: BPM next to the controls and a labeled beats button|Barra de reproducción de acordes más compacta: BPM junto a los controles y botón de tiempos con etiqueta
 Acordes: a sequência de prática aceita até 12 acordes no computador e 9 no celular|Chords: the practice sequence accepts up to 12 chords on desktop and 9 on mobile|Acordes: la secuencia de práctica admite hasta 12 acordes en escritorio y 9 en móvil
 Treinar no computador: ao escolher um nível a tela não rola mais sozinha|Train on desktop: choosing a level no longer scrolls the page|Entrenar en escritorio: al elegir un nivel la pantalla ya no se desplaza sola
+Sequência de acordes|Chord sequence|Secuencia de acordes
+Escreva vários acordes e veja as posições mais próximas entre si|Write several chords and see the shapes closest to each other|Escribe varios acordes y mira las posiciones más cercanas entre sí
+Ligue para escrever até 6 acordes|Turn on to type up to 6 chords|Actívalo para escribir hasta 6 acordes
+Digite de 1 a 6 acordes: Am F C G…|Type 1 to 6 chords: Am F C G…|Escribe de 1 a 6 acordes: Am F C G…
+Não reconheci:|I did not recognize:|No reconocí:
+Máximo de 6 acordes: usei os 6 primeiros.|Maximum of 6 chords: I used the first 6.|Máximo de 6 acordes: usé los 6 primeros.
+Escreva de 1 a 6 acordes separados por espaço, por exemplo: Am F C G. Eu mostro as posições mais próximas entre si, abertas ou com pestana, para a troca ficar mais fácil.|Write 1 to 6 chords separated by spaces, for example: Am F C G. I show the shapes closest to each other, open or barre, so the changes are easier.|Escribe de 1 a 6 acordes separados por espacio, por ejemplo: Am F C G. Muestro las posiciones más cercanas entre sí, abiertas o con cejilla, para que el cambio sea más fácil.
+ponto de partida|starting point|punto de partida
+mesma região|same area|misma zona
+mão sobe|hand moves up|la mano sube
+mão desce|hand moves down|la mano baja
+casa|fret|traste
+casas|frets|trastes
+dedo fica no lugar|finger stays put|dedo se queda en su sitio
+dedos ficam no lugar|fingers stay put|dedos se quedan en su sitio
+Posições escolhidas para a mão andar o mínimo possível entre os acordes.|Shapes chosen so your hand moves as little as possible between chords.|Posiciones elegidas para que la mano se mueva lo mínimo entre los acordes.
+Movimento da mão:|Hand movement:|Movimiento de la mano:
+sem otimizar:|without optimizing:|sin optimizar:
+Ouvir sequência|Play sequence|Escuchar secuencia
+Tudo para a prática|All to practice|Todo a la práctica
+pestana|barre|cejilla
+aberto|open|abierto
+Tocando a sequência…|Playing the sequence…|Reproduciendo la secuencia…
+A sequência está cheia|The sequence is full|La secuencia está llena
+Acordes: escreva uma sequência de 1 a 6 acordes e veja as posições mais próximas entre si|Chords: type a sequence of 1 to 6 chords and see the shapes closest to each other|Acordes: escribe una secuencia de 1 a 6 acordes y mira las posiciones más cercanas entre sí
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });

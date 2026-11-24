@@ -189,7 +189,7 @@ const QUAL = [
   { k: 'aug', n: 'Aumentado', iv: [0, 4, 8], al: ['aug', '+'] },
   { k: '5', n: 'Power chord (quinta)', iv: [0, 7], al: ['5'] },
 ];
-const CH = { root: 0, q: '', bass: null, text: 'C', v: [], seq: null };
+const CH = { root: 0, q: '', bass: null, text: 'C', v: [], seq: null, mode: 'one', stext: 'Am F C G', sv: [] };
 const T = s => (typeof tr === 'function' ? tr(s) : s);
 // qualidade do buscador -> tipo do sequenciador
 const SEQ_Q = { '': 'maj', m: 'min', 7: 'd7', maj7: 'maj7', m7: 'm7', mmaj7: 'mmaj7', 6: 'six', m6: 'm6', sus2: 'sus2', sus4: 'sus4', '7sus4': 's74', add9: 'add9', 9: 'd9', m9: 'm9', dim: 'dim', dim7: 'dim7', m7b5: 'm7b5', aug: 'aug', 5: 'p5' };
@@ -205,7 +205,7 @@ function parseChord(txt) {
 }
 function chordTitle(c) { const q = QUAL.find(x => x.k === c.q); return pcName(c.root, true) + q.k + (c.bass != null ? '/' + pcName(c.bass, true) : ''); }
 
-function findVoicings(root, iv, bass) {
+function findVoicings(root, iv, bass, limit) {
   const set = new Set(iv.map(i => (root + i) % 12)), req = new Set(iv.length >= 4 ? iv.filter(i => i !== 7).map(i => (root + i) % 12) : [...set]);
   const wantBass = bass != null ? bass : root; if (bass != null) { set.add(bass); req.add(bass); }
   const minSound = iv.length === 2 ? 3 : 4, found = new Map();
@@ -235,7 +235,67 @@ function findVoicings(root, iv, bass) {
     const rec = s => { if (s === 6) return check(); for (const f of opts[s]) { cur[s] = f; rec(s + 1); } };
     rec(0);
   }
-  return [...found.values()].sort((a, b) => a.score - b.score).slice(0, 6);
+  return [...found.values()].sort((a, b) => a.score - b.score).slice(0, limit || 6);
+}
+// ---------- sequência de acordes: posições mais próximas entre si ----------
+const SEQ_MAX = 6;
+function parseSeq(txt) {
+  const parts = txt.replace(/[→>|;,]+/g, ' ').split(/\s+/).filter(Boolean), chords = [], bad = [];
+  parts.forEach(p => { const c = parseChord(p); if (c) chords.push(c); else bad.push(p); });
+  return { chords, bad };
+}
+// posição da mão no braço: média das casas apertadas (0 se o acorde só usa cordas soltas)
+const vPos = v => { const f = v.f.filter(x => x > 0); return f.length ? f.reduce((a, b) => a + b, 0) / f.length : 0; };
+// custo de ir de uma posição para outra: deslocar a mão pesa mais; dedos que ficam no mesmo lugar ajudam
+function seqMove(a, b) {
+  let ch = 0, com = 0; for (let s = 0; s < 6; s++) { if (b.f[s] > 0) { if (a.f[s] === b.f[s]) com++; else ch++; } }
+  return Math.abs(vPos(a) - vPos(b)) + 0.3 * ch - 0.4 * com;
+}
+// caminho de menor custo total (programação dinâmica): uma posição por acorde
+function bestPath(cands) {
+  let prev = cands[0].map(v => ({ c: 0.7 * v.score, p: -1 })); const back = [prev];
+  for (let i = 1; i < cands.length; i++) {
+    const cur = cands[i].map(v => { let best = Infinity, bp = 0; cands[i - 1].forEach((u, j) => { const c = prev[j].c + seqMove(u, v); if (c < best) { best = c; bp = j; } }); return { c: best + 0.7 * v.score, p: bp }; });
+    back.push(cur); prev = cur;
+  }
+  let k = 0; prev.forEach((x, j) => { if (x.c < prev[k].c) k = j; });
+  const out = []; for (let i = cands.length - 1; i >= 0; i--) { out[i] = cands[i][k]; k = back[i][k].p; }
+  return out;
+}
+function seqAddOne(root, qk, v) {
+  const seq = CH.seq; if (!seq) return false;
+  const eng = ChordSequencer.engine, LT = [0, 2, 4, 5, 7, 9, 11], r = eng.roots.find(x => (LT[x[0]] + x[1] + 12) % 12 === root);
+  return seq.add({ root: eng.noteName(r[0], r[1], 'en'), q: SEQ_Q[qk], frets: v.f, barre: v.barre });
+}
+function seqRes() {
+  const { chords: all, bad } = parseSeq(CH.stext), chords = all.slice(0, SEQ_MAX), err = $('#chErr'), out = $('#chRes');
+  err.textContent = bad.length ? T('Não reconheci:') + ' ' + bad.join(', ') : all.length > SEQ_MAX ? T('Máximo de 6 acordes: usei os 6 primeiros.') : '';
+  CH.sv = [];
+  if (!chords.length) { out.innerHTML = `<div class="card mut">${T('Escreva de 1 a 6 acordes separados por espaço, por exemplo: Am F C G. Eu mostro as posições mais próximas entre si, abertas ou com pestana, para a troca ficar mais fácil.')}</div>`; return; }
+  const cands = chords.map(c => findVoicings(c.root, QUAL.find(x => x.k === c.q).iv, c.bass, 16));
+  const miss = chords.filter((c, i) => !cands[i].length).map(c => chordTitle(c));
+  const keep = chords.map((c, i) => i).filter(i => cands[i].length);
+  if (!keep.length) { out.innerHTML = `<div class="card mut">${T('Sem posições confortáveis')}: ${esc(miss.join(', '))}</div>`; return; }
+  const cs = keep.map(i => chords[i]), cd = keep.map(i => cands[i]), path = bestPath(cd), naive = cd.map(c => c[0]);
+  const tot = arr => arr.reduce((a, v, i) => a + (i ? Math.abs(vPos(arr[i - 1]) - vPos(v)) : 0), 0), mine = tot(path), base = tot(naive);
+  CH.sv = path.map((v, i) => ({ v, c: cs[i] }));
+  const cap = i => {
+    if (!i) return `<span class="mut small">${T('ponto de partida')}</span>`;
+    const a = path[i - 1], b = path[i], d = Math.round(vPos(b) - vPos(a)), com = b.f.filter((f, s) => f > 0 && a.f[s] === f).length;
+    const mv = Math.abs(d) < 1 ? `<span>${T('mesma região')}</span>` : `<span>${d > 0 ? T('mão sobe') : T('mão desce')}</span> <b>${Math.abs(d)}</b> <span>${Math.abs(d) === 1 ? T('casa') : T('casas')}</span>`;
+    return `<span class="mut small">${mv}${com ? ` · <b>${com}</b> <span>${com === 1 ? T('dedo fica no lugar') : T('dedos ficam no lugar')}</span>` : ''}</span>`;
+  };
+  out.innerHTML = `<div class="card"><div class="row sp"><div><div class="chtitle" style="font-size:26px">${esc(cs.map(chordTitle).join(' → '))}</div>
+    <div class="mut small" style="margin-top:4px">${T('Posições escolhidas para a mão andar o mínimo possível entre os acordes.')}${base - mine >= 1 ? ` <b>${T('Movimento da mão:')} ${mine.toFixed(0)} ${T('casas')}</b> (${T('sem otimizar:')} ${base.toFixed(0)})` : ''}</div></div>
+    <div class="row"><button class="btn pri" data-act="chsPlayAll">▶ ${T('Ouvir sequência')}</button><button class="btn" data-act="chsAddAll">+ ${T('Tudo para a prática')}</button></div></div>
+    ${miss.length ? `<div class="small" style="margin-top:8px;color:var(--warn)">${T('Sem posições confortáveis')}: ${esc(miss.join(', '))}</div>` : ''}</div>
+    <div class="cgrid">${CH.sv.map((x, i) => `<div class="card cv" style="margin:0"><div class="row sp" style="margin-bottom:2px"><b>${i + 1}. ${esc(chordTitle(x.c))}</b><span class="small mut">${x.v.barre ? T('pestana') : x.v.hasOpen ? T('aberto') : ''}</span></div>${chordSVG(x.v)}<div style="min-height:34px;text-align:center">${cap(i)}</div><div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn sm" data-act="chsPlay" data-i="${i}" style="flex:1" aria-label="${T('Ouvir')}" title="${T('Ouvir')}">▶</button><button class="btn sm" data-act="chsAdd" data-i="${i}" style="flex:1" aria-label="${T('Adicionar à sequência')}" title="${T('Adicionar à sequência')}">+</button></div></div>`).join('')}</div>`;
+}
+function chordMode() {
+  const seq = CH.mode === 'seq', b = $('#chMode'); if (b) { b.setAttribute('aria-pressed', seq); b.classList.toggle('pri', seq); }
+  const one = $('#chOne'); if (one) one.style.display = seq ? 'none' : '';
+  const inp = $('#chTxt'); if (inp) { inp.placeholder = seq ? T('Digite de 1 a 6 acordes: Am F C G…') : T('Digite um acorde: Am7, C#dim, G/B…'); inp.value = seq ? CH.stext : CH.text; }
+  if (seq) seqRes(); else { $('#chErr').textContent = ''; chordRes(); }
 }
 function chordSVG(v) {
   const fr = v.f.map((f, s) => (f > 0 ? f : null)).filter(x => x != null), mn = fr.length ? Math.min(...fr) : 1, base = fr.length && Math.max(...fr) > 5 ? mn : 1;   // só 'desce' pelo braço quando o acorde não cabe nas 5 primeiras casas
@@ -271,13 +331,14 @@ function chordSync() {
 function viewChords() {
   view.classList.add('wide');
   view.innerHTML = `<h1>Buscador de Acordes</h1><div class="mut" style="margin:4px 0 12px">Digite o nome (Am, F#m7, Bb, C7, G/B, Dsus4…) ou escolha a nota e o tipo.</div>
-  <div class="card"><input type="search" id="chTxt" placeholder="Digite um acorde: Am7, C#dim, G/B…" value="${esc(CH.text)}" data-tin="chtxt">
+  <div class="card"><div class="row sp" style="margin-bottom:10px"><button type="button" class="btn sm" id="chMode" data-act="chMode" aria-pressed="false" title="Escreva vários acordes e veja as posições mais próximas entre si">Sequência de acordes</button><span class="small mut">Ligue para escrever até 6 acordes</span></div>
+    <input type="search" id="chTxt" placeholder="Digite um acorde: Am7, C#dim, G/B…" value="${esc(CH.text)}" data-tin="chtxt">
     <div class="small mut" id="chErr" style="margin-top:6px;min-height:18px"></div>
-    <div class="row" id="chRoots" style="margin-top:8px">${Array.from({ length: 12 }, (_, pc) => `<span class="chip" data-act="chRoot" data-pc="${pc}">${pcName(pc, true)}</span>`).join('')}</div>
-    <div class="row" style="margin-top:10px"><select id="chQ" data-tin="chq" style="width:auto">${QUAL.map(q => `<option value="${q.k}">${q.n}${q.k ? ' (' + q.k + ')' : ''}</option>`).join('')}</select></div></div>
+    <div id="chOne"><div class="row" id="chRoots" style="margin-top:8px">${Array.from({ length: 12 }, (_, pc) => `<span class="chip" data-act="chRoot" data-pc="${pc}">${pcName(pc, true)}</span>`).join('')}</div>
+    <div class="row" style="margin-top:10px"><select id="chQ" data-tin="chq" style="width:auto">${QUAL.map(q => `<option value="${q.k}">${q.n}${q.k ? ' (' + q.k + ')' : ''}</option>`).join('')}</select></div></div></div>
   <div id="chRes"></div>
   <div id="seq" style="margin-top:26px"></div>`;
-  chordSync(); chordRes();
+  chordSync(); chordRes(); if (CH.mode === 'seq') chordMode();
   if (window.ChordSequencer) {
     try {
       const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, diagram: v => chordSVG(v), names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); } });
@@ -320,11 +381,21 @@ const toolActs = {
   nplay(d) { ensureCtx(); const s = +d.s, f = +d.f, pc = (OPEN[s] + f) % 12; pluck(AC.currentTime, OPEN[s] + f, 1.6); NT.sel = NT.sel === pc && d.sel !== '1' ? NT.sel : pc; notesDraw(); },
   chRoot(d) { CH.root = +d.pc; if (CH.bass != null) CH.bass = null; chordSync(); chordUpdateText(); chordRes(); },
   chAdd(d) {
-    const seq = CH.seq, v = CH.v[+d.i]; if (!seq || !v) return;
-    const eng = ChordSequencer.engine, LT = [0, 2, 4, 5, 7, 9, 11], q = SEQ_Q[CH.q];
-    const r = eng.roots.find(x => (LT[x[0]] + x[1] + 12) % 12 === CH.root);
-    const ok = seq.add({ root: eng.noteName(r[0], r[1], 'en'), q, frets: v.f, barre: v.barre });
-    toast(ok ? T('Adicionado à sequência') : T('A sequência está cheia (8 acordes)'));
+    const v = CH.v[+d.i]; if (!CH.seq || !v) return;
+    toast(seqAddOne(CH.root, CH.q, v) ? T('Adicionado à sequência') : T('A sequência está cheia'));
+  },
+  chMode() { CH.mode = CH.mode === 'seq' ? 'one' : 'seq'; chordMode(); },
+  chsPlay(d) { ensureCtx(); const x = CH.sv[+d.i]; if (!x) return; x.v.f.forEach((f, s) => { if (f >= 0) pluck(AC.currentTime + s * 0.055, OPEN[s] + f, 1.8); }); },
+  chsAdd(d) { const x = CH.sv[+d.i]; if (!CH.seq || !x) return; toast(seqAddOne(x.c.root, x.c.q, x.v) ? T('Adicionado à sequência') : T('A sequência está cheia')); },
+  chsPlayAll() {
+    ensureCtx(); const t0 = AC.currentTime + 0.05;
+    CH.sv.forEach((x, i) => x.v.f.forEach((f, s) => { if (f >= 0) pluck(t0 + i * 1.3 + s * 0.055, OPEN[s] + f, 1.2); }));
+    toast(T('Tocando a sequência…'));
+  },
+  chsAddAll() {
+    if (!CH.seq) return; let n = 0;
+    for (const x of CH.sv) { if (!seqAddOne(x.c.root, x.c.q, x.v)) break; n++; }
+    toast(n === CH.sv.length ? T('Adicionado à sequência') : T('A sequência está cheia'));
   },
   chPlay(d) {
     ensureCtx(); const i = +d.i, q = QUAL.find(x => x.k === CH.q); let midis;
@@ -343,7 +414,7 @@ const toolIn = {
   minc(v) { M().inc = clampN(v || 1, 1, 20); }, mevery(v) { M().every = clampN(v || 1, 1, 32); }, mmax(v) { M().max = clampN(v || 40, 40, 240); },
   nshow(v) { NT.show = v; notesDraw(); }, nfrets(v) { NT.frets = v; notesDraw(); }, nlab(v) { S().label = v === 'fret' ? 'fret' : 'note'; save(); notesDraw(); },
   chq(v) { CH.q = v; chordUpdateText(); chordRes(); },
-  chtxt(v) { CH.text = v; const c = parseChord(v); const err = $('#chErr'); if (!c) { err.textContent = v.trim() ? 'Não reconheci esse acorde. Exemplos: Am, F#m7, Bb, C7, G/B, Dsus4.' : ''; return; } err.textContent = ''; CH.root = c.root; CH.q = c.q; CH.bass = c.bass; chordSync(); chordRes(); },
+  chtxt(v) { if (CH.mode === 'seq') { CH.stext = v; seqRes(); return; } CH.text = v; const c = parseChord(v); const err = $('#chErr'); if (!c) { err.textContent = v.trim() ? 'Não reconheci esse acorde. Exemplos: Am, F#m7, Bb, C7, G/B, Dsus4.' : ''; return; } err.textContent = ''; CH.root = c.root; CH.q = c.q; CH.bass = c.bass; chordSync(); chordRes(); },
 };
 document.addEventListener('input', e => {
   const k = e.target.dataset && e.target.dataset.tin; if (!k || !toolIn[k]) return; const t = e.target;
