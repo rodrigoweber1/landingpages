@@ -264,3 +264,16 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
   main.wm>div:nth-of-type(n+2){grid-column:2}
   main.wm>div:nth-of-type(2){margin-top:0}
 }
+
+/* desktop, fase 3: Ajustes e Afinador */
+@media(min-width:1100px){
+  main.ws{column-count:2;column-gap:22px}
+  main.ws>h1{column-span:all}
+  main.ws>.card{break-inside:avoid;margin-top:12px!important;margin-bottom:0}
+  main.wt>.card{max-width:980px;margin-left:auto;margin-right:auto;padding:36px 40px}
+  main.wt .tunerbig{font-size:170px}
+  main.wt .needle{height:72px;margin:22px 0}
+  main.wt .needle i{width:8px;margin-left:-4px}
+  main.wt .row .btn.sm{min-width:48px;min-height:44px;font-size:16px}
+  main.wt h1{max-width:980px;margin-left:auto;margin-right:auto}
+}

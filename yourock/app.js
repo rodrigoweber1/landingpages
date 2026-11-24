@@ -457,7 +457,7 @@ function render() {
   if (r === 'train') TLOPEN = false;   // dropdown de exercícios sempre começa fechado
   if (r === 'home' && !DB.placed && !DB.placeSkip && !DB.sessions.length) { location.hash = '#/quiz'; return; }
   closeTools(); $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navBotHTML(r); const gb = $('#gearBtn'); if (gb) gb.classList.toggle('on', r === 'settings');
-  view.innerHTML = ''; view.classList.remove('wide', 'wm'); routes[r](); window.scrollTo(0, 0);
+  view.innerHTML = ''; view.classList.remove('wide', 'wm', 'ws', 'wt'); routes[r](); window.scrollTo(0, 0);
 }
 addEventListener('hashchange', render);
 
@@ -624,6 +624,7 @@ function viewStats() {
   view.classList.add('wide');
 }
 function viewTuner() {
+  view.classList.add('wide', 'wt');
   view.innerHTML = `<h1>Afinador</h1><div class="card" style="margin-top:12px"><div class="tunerbig" id="tn">–</div><div class="mut" style="text-align:center" id="th">Toque uma corda solta</div><div class="needle"><i id="nd" style="left:50%"></i></div><div class="row" style="justify-content:center" id="tc">–</div>
   <div class="row" style="justify-content:center;margin-top:14px"><button class="btn pri" id="tbtn" data-act="tuner">${ic('i-mic')}Ativar microfone</button></div>
   <div class="row" style="justify-content:center;margin-top:14px"><span class="mut small">Sensibilidade</span><input type="range" id="tsens" min="1" max="5" step="1" value="${S().tunerSens || 3}" data-in="tunerSens" style="width:140px"></div>
@@ -641,7 +642,7 @@ function viewTuner() {
   cleanup = () => { cancelAnimationFrame(raf); Mic.setTune(false); Mic.gate = 0.012; };
 }
 function viewSettings() {
-  const s = S();
+  const s = S(); view.classList.add('wide', 'ws');
   view.innerHTML = `<h1>Ajustes</h1><div class="card" style="margin-top:12px"><label class="lbl" style="margin-top:0">Tema de cores</label><div class="themes">${themePicker()}</div><label class="lbl">Idioma</label><select id="langSel" aria-label="Idioma">${[['pt', 'Português'], ['en', 'English'], ['es', 'Español']].map(([k, n]) => `<option value="${k}" ${LANG === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div><div class="card">
   <label class="lbl"><input type="checkbox" data-in="mic" ${micEnabled() ? 'checked' : ''}> Ligar o microfone automaticamente ao iniciar o exercício (o botão 🎤 continua disponível para ligar quando quiser)</label>
   <label class="lbl">Meu nível</label><select data-in="level"><option value="auto" ${s.level === 'auto' ? 'selected' : ''}>Automático (pelo seu domínio dos exercícios)</option>${Object.entries(LVL).map(([k, v]) => `<option value="${k}" ${String(s.level) === k ? 'selected' : ''}>${v} · ${LEVELS[k].name}</option>`).join('')}</select>
