@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.6.11';
+var APP_VERSION = '1.7.0';
 var APP_DATE = '2026-11-23';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Versão para computador: Hoje e exercício em painel de duas colunas e atalhos de teclado (↑↓ BPM, M microfone, D demo)', en: 'Desktop version: Today and exercise screens as a two-column panel, with keyboard shortcuts (↑↓ BPM, M mic, D demo)', es: 'Versión de escritorio: Hoy y ejercicio en panel de dos columnas y atajos de teclado (↑↓ BPM, M micrófono, D demo)' },
   { pt: 'Calibração mostra o motivo real quando o microfone falha', en: 'Calibration shows the real reason when the microphone fails', es: 'La calibración muestra el motivo real cuando falla el micrófono' },
   { pt: 'Correção: o microfone não ligava em alguns iPhones (InvalidStateError)', en: 'Fix: the microphone would not turn on on some iPhones (InvalidStateError)', es: 'Corrección: el micrófono no se encendía en algunos iPhone (InvalidStateError)' },
   { pt: 'Aviso para calibrar o microfone (guardado; só repete se o aparelho mudar)', en: 'Prompt to calibrate the microphone (saved; repeats only if your device changes)', es: 'Aviso para calibrar el micrófono (se guarda; solo se repite si cambia el dispositivo)' },

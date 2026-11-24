@@ -164,7 +164,7 @@ function fretboardSVG(ex, lefty, label, horiz) {
   const mL = 34, mR = 12, W = mob || hi === 0 ? mL + mR + units * 58 : 640, H = 214, cw = (W - mL - mR) / units, X = f => { const c = f - first, x = mL + (bnd(c) + bnd(c + 1)) / 2 * cw; return lefty ? W - x : x; };
   const L = k => { const x = mL + bnd(k) * cw; return lefty ? W - x : x; };
   const Y = s => 28 + (5 - s) * 28;
-  let o = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"${hi === 0 ? ` style="max-width:${Math.round(W * 1.5)}px"` : ''}>`;
+  let o = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"${hi === 0 ? ` style="max-width:${Math.round(W * (innerWidth >= 1100 ? 2.2 : 1.5))}px"` : ''}>`;
   [3, 5, 7, 9, 12, 15, 17].forEach(f => { if (f >= first && f <= last) { const two = f === 12; (two ? [-14, 14] : [0]).forEach(dy => o += `<circle class="inlay" cx="${X(f)}" cy="${(Y(2) + Y(3)) / 2 + dy * 0}" r="${two ? 6 : 7}" ${two ? `transform="translate(0 ${dy})"` : ''}/>`); } });
   for (let k = 1; k <= cols; k++) o += `<line class="${first === 0 && k === 1 ? 'nut' : 'fret'}" x1="${L(k)}" x2="${L(k)}" y1="${Y(5) - 10}" y2="${Y(0) + 10}"/>`;
   const openS = new Set(notes.filter(n => n[1] === 0).map(n => n[0]));   // corda solta: não desenha bolinha extra, destaca o nome da corda
@@ -457,7 +457,7 @@ function render() {
   if (r === 'train') TLOPEN = false;   // dropdown de exercícios sempre começa fechado
   if (r === 'home' && !DB.placed && !DB.placeSkip && !DB.sessions.length) { location.hash = '#/quiz'; return; }
   closeTools(); $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navBotHTML(r); const gb = $('#gearBtn'); if (gb) gb.classList.toggle('on', r === 'settings');
-  view.innerHTML = ''; routes[r](); window.scrollTo(0, 0);
+  view.innerHTML = ''; view.classList.remove('wide'); routes[r](); window.scrollTo(0, 0);
 }
 addEventListener('hashchange', render);
 
@@ -482,24 +482,25 @@ function viewHome() {
   const ins = insights(st).slice(0, 3);
   view.innerHTML = `
   <div class="row sp" style="margin:6px 0 14px"><div><h1>Bora treinar 🎸</h1><div class="mut">Treino que escuta você, ajusta a velocidade e mostra onde evoluir.</div></div></div>
-  ${DB.placed ? '' : '<div class="card row sp" style="margin-bottom:12px"><div><b>Descubra seu nível</b><div class="mut small">Um quiz de 2 minutos para começar no exercício certo.</div></div><button class="btn pri" data-act="qzStart">Fazer o quiz</button></div>'}
-  <div class="grid g3">
+  <div class="dsk"><div class="da">${DB.placed ? '' : '<div class="card row sp" style="margin-bottom:12px"><div><b>Descubra seu nível</b><div class="mut small">Um quiz de 2 minutos para começar no exercício certo.</div></div><button class="btn pri" data-act="qzStart">Fazer o quiz</button></div>'}</div>
+  <div class="db"><div class="grid g3 kg">
     <div class="card kpi row"><div class="ring" style="--p:${pct}" data-t="${pct}%"></div><div><div class="l">Meta semanal</div><div class="v" style="font-size:22px">${Math.round(st.week / 60)} / ${S().goal} min</div></div></div>
     <div class="card kpi"><div class="l">Sequência</div><div class="v">🔥 ${st.streak} <span class="mut" style="font-size:14px">dia${st.streak === 1 ? '' : 's'}</span></div></div>
     <a href="#/train" class="card kpi" style="display:block"><div class="l">Nível atual</div><div class="v" style="color:${LEVELS[curLevel()].color}">${LEVELS[curLevel()].roman} <span class="mut" style="font-size:14px">${LEVELS[curLevel()].name} · ${lvlProgress(curLevel()).mastered}/${lvlProgress(curLevel()).total} dominados</span></div></a>
   </div>
-  ${Reminder.bannerHTML()}${gameHTML()}
-  <div class="card">
+  ${Reminder.bannerHTML()}${gameHTML()}</div>
+  <div class="dc"><div class="card">
     <div class="row sp"><div><h2>Treino de hoje</h2><div class="mut small">Escolhido pelos seus pontos fracos e pelo que você não pratica há mais tempo.</div></div>
       <div class="row"><select id="planMin" style="width:auto">${[10, 20, 30, 45, 60].map(m => `<option value="${m}" ${m === S().planMin ? 'selected' : ''}>${m} min</option>`).join('')}</select>
       <button class="btn sm" data-act="regen">↻ Gerar outro</button></div></div>
-    <div class="grid" style="margin-top:12px">${TODAY.map((p, i) => { const e = EXMAP[p.id]; return `<div class="ex card" style="margin:0"><div class="meta">${pill(e.focus)}<b>${i + 1}. ${esc(e.name)}</b><span class="tag">${LVL[e.lvl]} · ${(DB.best[e.id] && DB.best[e.id].last) || e.bpm} BPM</span></div><div><span class="reason">${esc(p.why)}</span></div></div>`; }).join('')}</div>
+    <div class="grid tlist" style="margin-top:12px">${TODAY.map((p, i) => { const e = EXMAP[p.id]; return `<div class="ex card" style="margin:0"><div class="meta">${pill(e.focus)}<b>${i + 1}. ${esc(e.name)}</b><span class="tag">${LVL[e.lvl]} · ${(DB.best[e.id] && DB.best[e.id].last) || e.bpm} BPM</span></div><div><span class="reason">${esc(p.why)}</span></div></div>`; }).join('')}</div>
     <div class="row" style="margin-top:14px"><button class="btn pri" data-act="startToday">▶ Começar treino (${TODAY.length} exercícios)</button><button class="btn" data-act="saveToday">Salvar como rotina</button></div>
   </div>
   <div class="grid g2"><div class="card"><h2>Insights</h2>${ins.map(i => `<div class="ins ${i.t}">${esc(i.m)}</div>`).join('')}<a class="btn sm" href="#/stats" style="display:inline-block;margin-top:6px">Ver progresso completo</a></div>
-  <div class="card"><div class="row sp"><h2>Minhas rotinas</h2><button class="btn sm" data-act="newRoutine">+ Nova</button></div><div id="routines">${routinesHTML()}</div></div></div>
+  <div class="card"><div class="row sp"><h2>Minhas rotinas</h2><button class="btn sm" data-act="newRoutine">+ Nova</button></div><div id="routines">${routinesHTML()}</div></div></div></div></div>
   <div class="mut small" style="text-align:center;margin:18px 0 6px"><a href="#/settings" style="color:inherit;text-decoration:none">YouRock v${APP_VERSION}</a></div>`;
   $('#planMin').onchange = e => { S().planMin = +e.target.value; save(); TODAY = recommend(S().planMin); render(); };
+  view.classList.add('wide');
 }
 let editR = null;
 function routinesHTML() {
@@ -547,9 +548,10 @@ function viewTrain() {
   const lefty = S().lefty;
   view.innerHTML = `<div style="margin-bottom:10px"><button class="btn sm ghost" data-act="backTrail">← Voltar</button></div><div class="row sp"><div><div class="meta row">${pill(ex.focus)}<span class="tag">${LVL[ex.lvl]}</span><span class="tag">meta ${ex.target} BPM</span></div><h2 style="margin-top:6px">${esc(ex.name)}</h2><div class="mut small">${esc(ex.desc)}</div><div class="small" id="durInfo" style="margin-top:6px"></div></div>
     <div class="tag">${Sess.qi + 1} / ${Sess.queue.length}</div></div>
+  <div class="dsk"><div class="da">
   <div class="board" style="margin-top:12px">${ex.type === 'notes' ? fretboardSVG(ex, lefty, S().label) : strumHTML(ex)}<div class="cd" id="cd"></div></div>
-  <div class="small" id="why" style="min-height:18px;margin-top:6px;color:var(--bad)"></div>
-  <div class="hud">
+  <div class="small" id="why" style="min-height:18px;margin-top:6px;color:var(--bad)"></div></div>
+  <div class="db"><div class="hud">
     <div class="box"><div class="bpmrow"><button class="btn sm" data-act="bpm" data-d="-5" aria-label="Diminuir 5 BPM">−5</button><button class="btn sm" data-act="bpm" data-d="-1" aria-label="Diminuir 1 BPM">−</button><div class="v" id="bpm">${Sess.bpm}</div><button class="btn sm" data-act="bpm" data-d="1" aria-label="Aumentar 1 BPM">+</button><button class="btn sm" data-act="bpm" data-d="5" aria-label="Aumentar 5 BPM">+5</button></div><div class="beats"><i id="bt0"></i><i id="bt1"></i><i id="bt2"></i><i id="bt3"></i></div><div class="l" id="bpmL">BPM</div></div>
     <div class="box"><div class="v" id="acc">–</div><div class="l">precisão da passada</div></div>
     <div class="box"><div class="v" id="pass">0</div><div class="l">passadas · limpas seguidas <b id="streak">–</b></div></div>
@@ -557,8 +559,8 @@ function viewTrain() {
   </div>
   <div id="done" class="row card" style="display:none"><span style="flex:1"><b>⏱ Tempo concluído!</b></span><button class="btn pri" data-act="loopOn">🔁 Continuar em loop</button><button class="btn" data-act="finish">Concluir e salvar ▸</button></div>
   <div id="rate" class="row card"><span id="rateInfo">Autoavaliação</span><button class="btn sm" data-act="rate" data-v="1">✓ Limpa</button><button class="btn sm" data-act="rate" data-v="0.5">✗ Com erros</button></div>
-  <div class="row actbar"><button class="btn pri" id="btnRun" data-act="run">${ic('i-play')}Iniciar</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">${ic('i-mic')}</button><button class="btn" id="btnDemo" data-act="demo">${ic('i-vol')}Demo</button></div>
-  <details class="card opts" id="opts"><summary><b>${ic('i-sliders')}Opções do exercício</b></summary>
+  <div class="row actbar"><button class="btn pri" id="btnRun" data-act="run">${ic('i-play')}Iniciar</button><button class="btn" id="btnMic" data-act="mic" title="Ativar microfone" aria-label="Ativar microfone">${ic('i-mic')}</button><button class="btn" id="btnDemo" data-act="demo">${ic('i-vol')}Demo</button></div></div>
+  <div class="dc"><details class="card opts" id="opts"><summary><b>${ic('i-sliders')}Opções do exercício</b></summary>
   <div class="row" style="margin-top:12px"><button class="btn" id="btnSpeed" data-act="speed">${ic('i-bolt')}Auto-velocidade</button><button class="btn" id="btnLoop" data-act="loop">${ic('i-loop')}Loop</button>
     ${ex.type === 'notes' ? `<select id="subSel" style="width:auto">${[1, 2, 4].map(v => `<option value="${v}">Notas por clique: ${v}</option>`).join('')}</select>` : ''}</div>
   <div class="optsec"><div class="row" style="gap:8px"><b class="small">${ic('i-range')}Trecho</b><select id="secA" style="width:auto" aria-label="Início do trecho"></select><span class="mut small">até</span><select id="secB" style="width:auto" aria-label="Fim do trecho"></select><button class="btn sm" data-act="secAll">Tudo</button></div><div class="small mut" id="secInfo" style="margin-top:6px"></div></div>
@@ -567,14 +569,21 @@ function viewTrain() {
     <label class="lbl">Volume do clique: <b id="v-clickVol">${S().clickVol == null ? 100 : S().clickVol}</b>%</label><input type="range" min="10" max="100" step="10" value="${S().clickVol == null ? 100 : S().clickVol}" data-in="clickVol">
     <label class="lbl"><input type="checkbox" data-in="clickAcc" ${S().clickAcc !== false ? 'checked' : ''}> Acentuar o tempo 1 de cada compasso</label></div></details>
   <div class="row" style="margin-top:10px"><button class="btn" data-act="finish">Concluir e salvar ▸</button><button class="btn ghost" data-act="skip">Pular</button><button class="btn ghost" data-act="restart">Reiniciar</button><span class="mut small">Dica: use fones para o clique do metrônomo não entrar no microfone. Barra de espaço inicia/para.</span></div>
-  <h3 style="margin:18px 0 8px">Fila de hoje</h3><div class="qlist">${Sess.queue.map((q, i) => `<div class="qi ${i === Sess.qi ? 'cur' : ''} ${q.done ? 'done' : ''}" data-act="goQ" data-i="${i}" style="cursor:pointer">${q.done ? '✓' : i + 1}. ${esc(EXMAP[q.id].name)}</div>`).join('')}</div>`;
+  <h3 style="margin:18px 0 8px">Fila de hoje</h3><div class="qlist">${Sess.queue.map((q, i) => `<div class="qi ${i === Sess.qi ? 'cur' : ''} ${q.done ? 'done' : ''}" data-act="goQ" data-i="${i}" style="cursor:pointer">${q.done ? '✓' : i + 1}. ${esc(EXMAP[q.id].name)}</div>`).join('')}</div></div></div>`;
+  view.classList.add('wide');
   { const sa = $('#secA'), sb = $('#secB'), nm = i => ex.type === 'notes' ? (i + 1) + ' · ' + noteTxt(midiOf(ex.notes[i])) : String(i + 1), opts = Array.from({ length: ex.len }, (_, i) => `<option value="${i}">${nm(i)}</option>`).join('');
     sa.innerHTML = sb.innerHTML = opts; secUI();
     sa.onchange = sb.onchange = () => { stopRun(); Sess.secA = +sa.value; Sess.secB = +sb.value; if (Sess.secB < Sess.secA) { if (document.activeElement === sa) Sess.secB = Sess.secA; else Sess.secA = Sess.secB; } secUI(); updHud(); }; }
   const ss = $('#subSel'); if (ss) { ss.value = Sess.sub; ss.onchange = e => { stopRun(); Sess.sub = +e.target.value; updHud(); }; }
   { const o = $('#opts'); if (o && innerWidth >= 760) o.open = true; }
   refreshCtl(); updHud(); showRate(false);
-  const key =e => { if (e.code === 'Space' && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) { e.preventDefault(); act.run(); } };
+  const key = e => {
+    if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.code === 'Space') { e.preventDefault(); act.run(); }
+    else if (e.code === 'ArrowUp' || e.code === 'ArrowDown') { e.preventDefault(); act.bpm({ d: (e.code === 'ArrowUp' ? 1 : -1) * (e.shiftKey ? 5 : 1) }); }
+    else if (e.code === 'KeyM') act.mic();
+    else if (e.code === 'KeyD') act.demo();
+  };
   addEventListener('keydown', key); cleanup = () => { removeEventListener('keydown', key); stopRun(); if (Mic.on) Mic.stop(); };
 }
 let TL = null, TLOPEN = false;   // lista de exercícios do nível: recolhida (dropdown) por padrão
