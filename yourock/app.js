@@ -701,7 +701,7 @@ const act = {
   vl(d) { VF.lvl = d.k === 'all' ? 'all' : +d.k; viewVault(); },
   train1(d) { setQueue([d.id]); },
   async upd() { toast('Atualizando…'); try { for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); for (const c of await caches.keys()) await caches.delete(c); } catch (e) {} location.reload(); },
-  tl(d) { TL = +d.l; viewTrilha(); const c = $('#lvlDetail'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); },   // mostra o nível escolhido: abre a lista e rola até ela
+  tl(d) { TL = +d.l; const y = scrollY; viewTrilha(); if (innerWidth >= 760) { scrollTo(0, y); return; } const c = $('#lvlDetail'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); },   // celular: rola até o nível escolhido; computador: a tela fica onde está
   guided(d) { setQueue(guided(+d.l)); },
   addR(d) { const r = DB.routines.find(x => x.id === DB.active); if (!r) return toast('Crie uma rotina primeiro'); r.items.push(d.id); save(); toast('Adicionado a "' + r.name + '"'); },
   fav(d) { const i = DB.fav.indexOf(d.id); i >= 0 ? DB.fav.splice(i, 1) : DB.fav.push(d.id); save(); vaultList(); },

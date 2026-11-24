@@ -304,7 +304,9 @@
   /* =====================================================================
    * 6. COMPONENTE
    * ===================================================================== */
-  var MAX = 8;
+  // limite de acordes na sequência: 12 no computador e 9 no celular (o que está salvo é lido até 12)
+  var MAX = 12;
+  function maxNow() { return window.matchMedia && window.matchMedia('(max-width:759px)').matches ? 9 : MAX; }
   // posição escolhida fora do sequenciador: { frets:[6] (0 = corda 6, -1 = não toca), barre:{fret,from,to} }
   function customFrom(c) {
     if (!c || !Array.isArray(c.frets) || c.frets.length !== 6) return null;
@@ -392,7 +394,7 @@
         h += '<div class="cs-grid">' + S.sl.map(function (x, i) { return slot(i); }).join('') + '</div>';
         h += dock();
       }
-      if (opts.addButton !== false) h += '<button type="button" class="cs-add" data-a="add">+ ' + esc(S.sl.length >= MAX ? t.full : t.add) + '</button>';
+      if (opts.addButton !== false) h += '<button type="button" class="cs-add" data-a="add">+ ' + esc(S.sl.length >= maxNow() ? t.full : t.add) + '</button>';
       host.innerHTML = h;
     }
     function refresh(i) { var d = host.querySelector('.cs-slot[data-i="' + i + '"] .cs-d'); if (d) d.innerHTML = diagram(i); }
@@ -524,7 +526,7 @@
     var api = {
       /** añade un acorde: { root: 'C' | 'F#' | 'Bb' | 'Do' | 'Sol'… , q: 'maj'|'min'|'d7'|…, pos: 0 } → false si está llena o no se entiende */
       add: function (c) {
-        if (S.sl.length >= MAX) return false;
+        if (S.sl.length >= maxNow()) return false;
         var r = rootIndex(c && c.root);
         if (r < 0 || !Q[c && c.q || 'maj']) return false;
         S.sl.push({ r: r, q: c.q || 'maj', v: Math.max(0, (c.pos | 0)), cv: customFrom(c) });
