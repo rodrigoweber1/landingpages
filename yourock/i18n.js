@@ -745,6 +745,12 @@ A sequência está cheia|The sequence is full|La secuencia está llena
 Acordes: escreva uma sequência de 1 a 6 acordes e veja as posições mais próximas entre si|Chords: type a sequence of 1 to 6 chords and see the shapes closest to each other|Acordes: escribe una secuencia de 1 a 6 acordes y mira las posiciones más cercanas entre sí
 Modo sequência ligado|Sequence mode on|Modo secuencia activado
 Acordes: ao digitar vários acordes no buscador, o modo sequência liga sozinho|Chords: typing several chords in the finder turns sequence mode on by itself|Acordes: al escribir varios acordes en el buscador, el modo secuencia se activa solo
+Tipo do acorde|Chord type|Tipo de acorde
+Toque numa nota para adicionar o acorde ao fim da sequência|Tap a note to add the chord to the end of the sequence|Toca una nota para añadir el acorde al final de la secuencia
+Remover último|Remove last|Quitar el último
+Limpar|Clear|Borrar
+A sequência já tem 6 acordes|The sequence already has 6 chords|La secuencia ya tiene 6 acordes
+Acordes: na sequência, escolha o tipo (inclusive suspensos) e toque na nota (com # ou bemol) para montar a lista|Chords: in the sequence, pick the type (including suspended) and tap the note (sharp or flat) to build the list|Acordes: en la secuencia, elige el tipo (incluidos suspendidos) y toca la nota (con # o bemol) para armar la lista
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });

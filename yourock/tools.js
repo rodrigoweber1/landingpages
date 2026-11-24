@@ -286,7 +286,7 @@ function seqRes() {
     return `<span class="mut small">${mv}${com ? ` · <b>${com}</b> <span>${com === 1 ? T('dedo fica no lugar') : T('dedos ficam no lugar')}</span>` : ''}</span>`;
   };
   out.innerHTML = `<div class="card"><div class="row sp"><div><div class="chtitle" style="font-size:26px">${esc(cs.map(chordTitle).join(' → '))}</div>
-    <div class="mut small" style="margin-top:4px">${T('Posições escolhidas para a mão andar o mínimo possível entre os acordes.')}${base - mine >= 1 ? ` <b>${T('Movimento da mão:')} ${mine.toFixed(0)} ${T('casas')}</b> (${T('sem otimizar:')} ${base.toFixed(0)})` : ''}</div></div>
+    <div class="mut small" style="margin-top:4px">${T('Posições escolhidas para a mão andar o mínimo possível entre os acordes.')}${base - mine >= 1 ? ` <b>${T('Movimento da mão:')} ${mine.toFixed(0)} ${T(mine.toFixed(0) === '1' ? 'casa' : 'casas')}</b> (${T('sem otimizar:')} ${base.toFixed(0)})` : ''}</div></div>
     <div class="row"><button class="btn pri" data-act="chsPlayAll">▶ ${T('Ouvir sequência')}</button><button class="btn" data-act="chsAddAll">+ ${T('Tudo para a prática')}</button></div></div>
     ${miss.length ? `<div class="small" style="margin-top:8px;color:var(--warn)">${T('Sem posições confortáveis')}: ${esc(miss.join(', '))}</div>` : ''}</div>
     <div class="cgrid">${CH.sv.map((x, i) => `<div class="card cv" style="margin:0"><div class="row sp" style="margin-bottom:2px"><b>${i + 1}. ${esc(chordTitle(x.c))}</b><span class="small mut">${x.v.barre ? T('pestana') : x.v.hasOpen ? T('aberto') : ''}</span></div>${chordSVG(x.v)}<div style="min-height:34px;text-align:center">${cap(i)}</div><div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn sm" data-act="chsPlay" data-i="${i}" style="flex:1" aria-label="${T('Ouvir')}" title="${T('Ouvir')}">▶</button><button class="btn sm" data-act="chsAdd" data-i="${i}" style="flex:1" aria-label="${T('Adicionar à sequência')}" title="${T('Adicionar à sequência')}">+</button></div></div>`).join('')}</div>`;
@@ -294,6 +294,7 @@ function seqRes() {
 function chordMode() {
   const seq = CH.mode === 'seq', b = $('#chMode'); if (b) { b.setAttribute('aria-pressed', seq); b.classList.toggle('pri', seq); }
   const one = $('#chOne'); if (one) one.style.display = seq ? 'none' : '';
+  const bd = $('#chBuild'); if (bd) bd.style.display = seq ? '' : 'none';
   const inp = $('#chTxt'); if (inp) { inp.placeholder = seq ? T('Digite de 1 a 6 acordes: Am F C G…') : T('Digite um acorde: Am7, C#dim, G/B…'); inp.value = seq ? CH.stext : CH.text; }
   if (seq) seqRes(); else { $('#chErr').textContent = ''; chordRes(); }
 }
@@ -334,6 +335,10 @@ function viewChords() {
   <div class="card"><div class="row sp" style="margin-bottom:10px"><button type="button" class="btn sm" id="chMode" data-act="chMode" aria-pressed="false" title="Escreva vários acordes e veja as posições mais próximas entre si">Sequência de acordes</button><span class="small mut">Ligue para escrever até 6 acordes</span></div>
     <input type="search" id="chTxt" placeholder="Digite um acorde: Am7, C#dim, G/B…" value="${esc(CH.text)}" data-tin="chtxt">
     <div class="small mut" id="chErr" style="margin-top:6px;min-height:18px"></div>
+    <div id="chBuild" style="display:none;margin-top:10px"><div class="row" style="gap:8px"><label class="small mut" for="chsQ">Tipo do acorde</label><select id="chsQ" style="width:auto">${QUAL.map(q => `<option value="${q.k}">${q.n}${q.k ? ' (' + q.k + ')' : ''}</option>`).join('')}</select></div>
+      <div class="small mut" style="margin:8px 0 6px">Toque numa nota para adicionar o acorde ao fim da sequência</div>
+      <div class="row">${Array.from({ length: 12 }, (_, pc) => `<span class="chip" data-act="chsRoot" data-pc="${pc}">${pcName(pc, true)}</span>`).join('')}</div>
+      <div class="row" style="margin-top:10px"><button type="button" class="btn sm" data-act="chsDel">Remover último</button><button type="button" class="btn sm" data-act="chsClr">Limpar</button></div></div>
     <div id="chOne"><div class="row" id="chRoots" style="margin-top:8px">${Array.from({ length: 12 }, (_, pc) => `<span class="chip" data-act="chRoot" data-pc="${pc}">${pcName(pc, true)}</span>`).join('')}</div>
     <div class="row" style="margin-top:10px"><select id="chQ" data-tin="chq" style="width:auto">${QUAL.map(q => `<option value="${q.k}">${q.n}${q.k ? ' (' + q.k + ')' : ''}</option>`).join('')}</select></div></div></div>
   <div id="chRes"></div>
@@ -385,6 +390,13 @@ const toolActs = {
     toast(seqAddOne(CH.root, CH.q, v) ? T('Adicionado à sequência') : T('A sequência está cheia'));
   },
   chMode() { CH.mode = CH.mode === 'seq' ? 'one' : 'seq'; chordMode(); },
+  chsRoot(d) {
+    if (parseSeq(CH.stext).chords.length >= SEQ_MAX) { toast(T('A sequência já tem 6 acordes')); return; }
+    const qk = ($('#chsQ') || {}).value || '';
+    CH.stext = (CH.stext.trim() + ' ' + pcName(+d.pc, true) + qk).trim(); $('#chTxt').value = CH.stext; seqRes();
+  },
+  chsDel() { const p = CH.stext.trim().split(/\s+/); p.pop(); CH.stext = p.join(' '); $('#chTxt').value = CH.stext; seqRes(); },
+  chsClr() { CH.stext = ''; $('#chTxt').value = ''; seqRes(); },
   chsPlay(d) { ensureCtx(); const x = CH.sv[+d.i]; if (!x) return; x.v.f.forEach((f, s) => { if (f >= 0) pluck(AC.currentTime + s * 0.055, OPEN[s] + f, 1.8); }); },
   chsAdd(d) { const x = CH.sv[+d.i]; if (!CH.seq || !x) return; toast(seqAddOne(x.c.root, x.c.q, x.v) ? T('Adicionado à sequência') : T('A sequência está cheia')); },
   chsPlayAll() {
