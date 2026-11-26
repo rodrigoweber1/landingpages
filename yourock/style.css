@@ -328,3 +328,49 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 @media(max-width:359px){html.ios{--tbx:8px}html.ios .nav.bottom a>span,html.ios .nav.bottom button>span{font-size:9px}}
 /* "Reduzir transparência" do iOS: fundo sólido */
 @media(prefers-reduced-transparency:reduce){html.ios .nav.bottom,html.ios #toolsSheet .tsp{background:var(--bg2);-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* abertura do app: "palhetada" (só transform e opacity; roda em CSS enquanto o app carrega) */
+#intro{--eo:cubic-bezier(.23,1,.32,1);--eio:cubic-bezier(.77,0,.175,1);position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);animation:inOut .25s var(--eo) 1.3s forwards;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#intro.out{animation:inSkip .18s ease-out forwards}
+.in-mark{position:relative;width:132px;height:132px;margin-bottom:14px}
+.in-mark svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;fill:none}
+.in-pick{animation:inStrum .8s both}
+.in-edge,.in-echo path{stroke:var(--acc);stroke-width:1.8;stroke-linejoin:round}
+.in-echo{opacity:0;animation:inEcho .6s var(--eo) .46s forwards}
+.in-bars path,.in-ghost path{stroke:var(--tx);stroke-width:1.7;stroke-linecap:round;transform-box:fill-box;transform-origin:center;animation:inString .68s linear calc(.4s + var(--n)*35ms) both}
+.in-ghost path{stroke:var(--acc);animation-name:inGhost}
+.in-name{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.1;color:var(--tx);animation:inRise .42s var(--eo) .56s both}
+.in-name b{color:var(--acc)}
+.in-sub{margin-top:6px;font:italic 400 14px/1 Georgia,'Times New Roman',serif;letter-spacing:.16em;color:var(--mut);animation:inRise .42s var(--eo) .62s both}
+@keyframes inStrum{
+  0%{opacity:0;transform:translate(-14%,-10%) rotate(-24deg) scale(.94);animation-timing-function:cubic-bezier(.23,1,.32,1)}
+  44%{opacity:1;transform:translate(0,0) rotate(-13deg) scale(1);animation-timing-function:cubic-bezier(.77,0,.175,1)}
+  63%{transform:rotate(10deg);animation-timing-function:cubic-bezier(.77,0,.175,1)}
+  81%{transform:rotate(-3.5deg);animation-timing-function:cubic-bezier(.77,0,.175,1)}
+  100%{opacity:1;transform:rotate(0)}}
+/* corda tocada: vai de um lado ao outro com amplitude cada vez menor até parar */
+@keyframes inString{
+  0%{transform:translateX(0) scaleY(.6)}
+  9%{transform:translateX(1.5px) scaleY(1.22)}
+  21%{transform:translateX(-1.25px) scaleY(.86)}
+  34%{transform:translateX(.95px) scaleY(1.13)}
+  47%{transform:translateX(-.68px) scaleY(.93)}
+  60%{transform:translateX(.45px) scaleY(1.06)}
+  73%{transform:translateX(-.26px) scaleY(.97)}
+  86%{transform:translateX(.12px) scaleY(1.01)}
+  100%{transform:translateX(0) scaleY(1)}}
+@keyframes inGhost{
+  0%{opacity:0;transform:translateX(0) scaleY(.6)}
+  9%{opacity:.75;transform:translateX(-1.5px) scaleY(1.22)}
+  21%{opacity:.62;transform:translateX(1.25px) scaleY(.86)}
+  34%{opacity:.48;transform:translateX(-.95px) scaleY(1.13)}
+  47%{opacity:.34;transform:translateX(.68px) scaleY(.93)}
+  60%{opacity:.22;transform:translateX(-.45px) scaleY(1.06)}
+  73%{opacity:.12;transform:translateX(.26px) scaleY(.97)}
+  100%{opacity:0;transform:translateX(0) scaleY(1)}}
+@keyframes inEcho{0%{opacity:.55;transform:scale(1)}100%{opacity:0;transform:scale(1.42)}}
+@keyframes inRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes inOut{to{opacity:0;visibility:hidden}}
+@keyframes inSkip{to{opacity:0;visibility:hidden}}
+/* "reduzir movimento": logo parado por meio segundo e some suavemente */
+@media(prefers-reduced-motion:reduce){#intro{animation-duration:.2s!important;animation-delay:.5s!important}#intro.out{animation-delay:0s!important}}

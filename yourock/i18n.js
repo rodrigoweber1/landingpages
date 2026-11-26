@@ -781,6 +781,7 @@ baixo demais: aperte|too low: tighten|demasiado baja: aprieta
 Afinador: corda por corda com ✓ nas 6, afinações alternativas, calibração do Lá, tom contínuo e sinal de afinado|Tuner: string by string with a ✓ on all 6, alternate tunings, A4 calibration, continuous tone and in tune signal|Afinador: cuerda por cuerda con ✓ en las 6, afinaciones alternativas, calibración del La, tono continuo y señal de afinado
 Notas: no computador, os nomes das cordas ficam mais perto da pestana|Notes: on desktop, the string names sit closer to the nut|Notas: en el ordenador, los nombres de las cuerdas quedan más cerca de la cejuela
 iPhone: nova barra de abas no estilo do iOS, flutuante e translúcida|iPhone: new iOS style tab bar, floating and translucent|iPhone: nueva barra de pestañas al estilo iOS, flotante y translúcida
+Nova abertura animada: a palheta toca e o logo vibra como cordas|New animated opening: the pick strums and the logo vibrates like strings|Nueva apertura animada: la púa rasguea y el logo vibra como cuerdas
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });
