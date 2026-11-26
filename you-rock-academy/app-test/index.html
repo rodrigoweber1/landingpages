@@ -25413,6 +25413,8 @@ html body.stage #app .stg-home .tk-now .tk-b{flex:1;height:5px;border-radius:3px
 html body.stage #app .stg-home .tk-now .tk-b span{display:block;height:100%;background:linear-gradient(90deg,#E31B23,#FFC400)}
 html body.stage #app .stg-home .tk-now .tk-n{font:500 12px/15px 'Inter',system-ui,sans-serif!important;white-space:nowrap;color:#B9B0A6!important;font-variant-numeric:tabular-nums}
 html body.stage #app .stg-home .stg-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important;margin-top:0!important;border-top:0!important}
+/* en el iPhone la cabecera no debe bajar la altura de la muesca: tapaba el buscador */
+html body.stage #app .stg-home>header{top:auto!important}
 @media (min-width:700px){html body.stage #app .stg-home .stg-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media (max-width:899px){
   html body.stage #app .stg-home{padding-left:16px!important;padding-right:16px!important}
@@ -25477,8 +25479,8 @@ html body.stage #app .stg-home .stg-grid{grid-template-columns:minmax(0,1fr)!imp
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '26 nov 2026 · 20:58';
-  var BUILD_ID = '2026-11-26T20:58';
+  var BUILD = '26 nov 2026 · 21:03';
+  var BUILD_ID = '2026-11-26T21:03';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
