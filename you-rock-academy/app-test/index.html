@@ -12359,7 +12359,7 @@ const arrows = counts.map((cn, i) => '<span class="bt-slot" data-i="' + i + '"><
 let h = '<div class="bt-entries" role="group" aria-label="' + T.entriesAria + '">' + c.entries.map((x, i) => '<button type="button" class="bt-entry' + (i === c.idx ? ' on' : '') + '" data-e="' + i + '"><small>' + (i + 1) + '</small>' + x + '</button>').join('') + '<span class="bt-soon">' + T.soon + '</span></div>';
 h += '<article class="bt-art">';
 h += '<div class="bt-head"><span class="pz-e">' + T.entryWord + ' ' + (c.idx + 1) + '</span><h2 class="cr-h" style="margin:0">' + E.name + '</h2>' + p(E.sub) + '</div>';
-h += '<div class="rt-video"><b>' + T.vidT + '</b><div class="rt-vbox" role="img" aria-label="' + T.vidT + '"><span class="rt-vplay">▶</span><span>' + T.vidSoon + '</span></div></div>';
+h += '<div class="rt-video"><b>' + T.vidT + '</b>' + (E.vid ? '<video class="ep-vid bt-vid" src="' + E.vid + '.mp4" poster="' + E.vid + '.jpg" controls playsinline webkit-playsinline preload="metadata" aria-label="' + T.vidT + ': ' + E.name + '"></video>' : '<div class="rt-vbox" role="img" aria-label="' + T.vidT + '"><span class="rt-vplay">▶</span><span>' + T.vidSoon + '</span></div>') + '</div>';
 if (E.strokes) return h + this.buildNew(c, E, T, btn, h3, p) + '</article>';
 h += '<div class="pt-card rt-card" data-card="score"><div class="rt-top"><b>' + E.scoreT + '</b>' + btn('score') + '</div>' + this.bar(eighths, counts, E.chord, true) + p(E.scoreX) + '</div>';
 h += '<div class="pt-card rt-card" data-card="pick"><div class="rt-top"><b>' + E.pickT + '</b>' + btn('pick') + '</div>'
@@ -12393,6 +12393,11 @@ const root = document.getElementById('bt-root');
 if (!root) return;
 this.halt();
 root.innerHTML = this.build(this._cfg);
+const vid = root.querySelector('video.bt-vid'), oldVid = this._vid;
+if (vid && oldVid && oldVid !== vid && oldVid.getAttribute('src') === vid.getAttribute('src')) { oldVid.setAttribute('aria-label', vid.getAttribute('aria-label')); vid.replaceWith(oldVid); }
+// video and app sound never play on top of each other
+const shown = this._vid = root.querySelector('video.bt-vid');
+if (shown) shown.onplay = () => { this.halt(); this.paintBtns(); if (window.yrHush) window.yrHush(); };
 const E5 = [40, 47, 52];
 root.onclick = (e) => {
 const el = e.target.closest && e.target.closest('button');
@@ -12402,6 +12407,7 @@ if (el.hasAttribute('data-alt')) { this.setState({ alt: el.getAttribute('data-al
 if (el.hasAttribute('data-b')) { this.setState({ bpm: Math.max(60, Math.min(180, this.state.bpm + +el.getAttribute('data-b'))) }); return; }
 const id = el.getAttribute('data-p');
 if (!id) return;
+const tv = root.querySelector('video.bt-vid'); if (tv && !tv.paused) tv.pause();
 const card = root.querySelector('[data-card="' + id + '"]');
 const q = (s) => Array.prototype.slice.call(card.querySelectorAll(s));
 const GE = this._cfg.entry;
@@ -12446,7 +12452,7 @@ cta: 'Next'
 
 const CM = [48, 52, 55, 60, 64], CT = [55, 60, 64];
 const NEW_ES = [{
-name: 'Básico', sub: 'El ritmo de acompañamiento más usado en el pop y el folk. En cuatro tiempos la mano no para de moverse, pero hay golpes que se quedan «en el aire».',
+vid: 'videos/ritmo-1-basico', name: 'Básico', sub: 'El ritmo de acompañamiento más usado en el pop y el folk. En cuatro tiempos la mano no para de moverse, pero hay golpes que se quedan «en el aire».',
 meter: '4/4', clicks: 4, spc: 2, full: CM, up: CT,
 counts: ['1', 'y', '2', 'y', '3', 'y', '4', 'y'],
 strokes: [{ s: 0, d: 'D', a: 1 }, { s: 2, d: 'D' }, { s: 3, d: 'U' }, { s: 5, d: 'U' }, { s: 6, d: 'D' }, { s: 7, d: 'U' }],
@@ -25445,8 +25451,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '26 nov 2026 · 14:25';
-  var BUILD_ID = '2026-11-26T14:25';
+  var BUILD = '26 nov 2026 · 14:51';
+  var BUILD_ID = '2026-11-26T14:51';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
