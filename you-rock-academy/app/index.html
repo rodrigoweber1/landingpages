@@ -1937,7 +1937,7 @@ body.stg-live-on #fnav,body.stg-live-on #sbar{visibility:hidden}
 
 body.stage #app .stg-live-btn span{font-family:var(--st-d)!important;font-weight:900!important;color:#FFFFFF!important}
 body.stage #app .stg-root header .bk-r{display:none!important}
-body.stage #app .stg-root>header{grid-template-columns:52px minmax(0,1fr) auto!important}
+body.stage #app .stg-root>header{grid-template-columns:auto minmax(0,1fr) auto!important}
 
 body.stage #app .stg-home>header{border-bottom:0!important;background:transparent!important;position:static!important}
 body.stage #app .stg-home #sbar{position:relative!important;top:auto!important}
@@ -2081,7 +2081,7 @@ body.stage #app :is(h3){font-size:18px!important;line-height:1.1!important}
 body.stage #app>div>main h1{font-size:29px!important;line-height:.95!important}
 
 /* lesson header bar */
-body.stage #app>div>header{background:var(--st-ground)!important;border-bottom:1px solid var(--st-rule)!important;grid-template-columns:52px minmax(0,1fr) auto!important}
+body.stage #app>div>header{background:var(--st-ground)!important;border-bottom:1px solid var(--st-rule)!important;grid-template-columns:auto minmax(0,1fr) auto!important}
 body.stage #app>div>header h1{font-size:17px!important;line-height:1.1!important;font-weight:400!important;text-align:center}
 body.stage #app>div>header a{color:var(--st-ink)!important}
 body.stage #app>div>header img{filter:invert(1)}
@@ -25133,6 +25133,7 @@ function mount(name, q) {
     try { minSvgText(app); } catch (e) {}
     try { tagCards(app); } catch (e) {}
     try { tagSegs(app); } catch (e) {}
+    try { fitTitle(); } catch (e) {}
     for (const k in keep) { const e = document.getElementById(k); if (e) e.scrollTop = keep[k]; }
     if (render.first) { render.first = false; } else { window.scrollTo(0, y); }
   };
@@ -25142,6 +25143,21 @@ function mount(name, q) {
   window.scrollTo(0, 0);
   try { if (inst.componentDidMount) inst.componentDidMount(); } catch (e) {}
 }
+
+// a long title shrinks until it fits in two lines between the arrow with the logo and the ES / EN selector
+function fitTitle() {
+  const h = app.querySelector(':scope > div > header');
+  const t = h && h.querySelector(':scope > h1');
+  if (!t || getComputedStyle(h).display !== 'grid') return;
+  if (t.__fs === undefined) t.__fs = t.style.fontSize;
+  t.style.fontSize = t.__fs;
+  t.style.overflowWrap = 'normal'; // a word that does not fit must show as too wide, not be cut in half
+  const tooBig = () => t.scrollWidth > t.clientWidth + 1 || t.offsetHeight > parseFloat(getComputedStyle(t).lineHeight) * 2 + 2;
+  let fs = parseFloat(getComputedStyle(t).fontSize);
+  while (fs > 12 && tooBig()) { fs -= 0.5; t.style.setProperty('font-size', fs + 'px', 'important'); }
+}
+window.addEventListener('resize', fitTitle);
+if (document.fonts) { document.fonts.ready.then(fitTitle); if (document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', fitTitle); }
 
 let currentKey = null;
 // ---------- back button: return to the screen the user came from ----------
@@ -25451,8 +25467,8 @@ html body #fnav .tb-pill{top:calc(4px + var(--i,0) * 48px);width:48px;height:46p
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '26 nov 2026 · 20:05';
-  var BUILD_ID = '2026-11-26T20:05';
+  var BUILD = '26 nov 2026 · 20:13';
+  var BUILD_ID = '2026-11-26T20:13';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
