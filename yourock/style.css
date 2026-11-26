@@ -380,3 +380,27 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 .ishare{width:26px;height:26px;color:var(--acc);flex:none}
 .inst{margin:10px 0 8px;padding-left:20px}
 .inst li{margin:4px 0}
+
+/* primeira vez: a abertura não some; vira a página inicial, com "Descubra seu nível" abaixo do logo (o espaço já fica reservado, o logo não pula) */
+.in-card{display:none}
+#intro.welcome{animation:none;justify-content:flex-start;overflow-y:auto;padding:calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom))}
+#intro.welcome>*{flex:none}
+#intro.welcome>.in-mark{margin-top:auto}
+#intro.welcome>.in-card{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;max-width:430px;min-height:270px;margin:34px 0 auto}
+.in-card>*{visibility:hidden}
+.in-card p{margin:8px 0 6px;line-height:1.55}
+.in-card .row{flex-direction:column;align-items:stretch;width:100%;max-width:280px;gap:8px}
+.in-card .btn{justify-content:center;min-height:46px}
+#intro.ready .in-card>*{visibility:visible;animation:inRise .5s var(--eo) both}
+#intro.ready .in-card>:nth-child(2){animation-delay:.07s}
+#intro.ready .in-card>:nth-child(3){animation-delay:.14s}
+#intro.welcome.out{animation:inSkip .25s ease-out forwards;pointer-events:none}
+@media(max-height:640px){#intro.welcome>.in-mark{width:92px;height:92px;margin-bottom:8px}#intro.welcome>.in-card{margin-top:18px;min-height:240px}}
+/* celular deitado: logo à esquerda, convite à direita, tudo visível sem rolar */
+@media(orientation:landscape) and (max-height:500px){
+  #intro.welcome{display:grid;grid-template-columns:minmax(0,200px) minmax(0,400px);grid-template-rows:1fr auto auto auto 1fr;justify-content:center;justify-items:center;column-gap:36px}
+  #intro.welcome>.in-mark{grid-area:2/1;margin-top:0}
+  #intro.welcome>.in-name{grid-area:3/1}
+  #intro.welcome>.in-sub{grid-area:4/1}
+  #intro.welcome>.in-card{grid-area:1/2/6/3;align-self:center;min-height:0;margin:0}
+}

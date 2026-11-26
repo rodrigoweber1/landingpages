@@ -38,11 +38,22 @@ function quizPlan(a, L) {
   }
   return plan;
 }
+const quizIntroHTML = () => `<h1>Descubra seu nível</h1>
+      <p class="mut">8 perguntas rápidas, cerca de 2 minutos. Responda com sinceridade: o objetivo é começar no ponto certo, não passar num teste.</p>
+      <div class="row" style="margin-top:14px"><button class="btn pri" data-act="qzStart">Começar</button><button class="btn ghost" data-act="qzSkip">Pular por enquanto</button></div>`;
+// primeira vez: a tela de abertura (classe "welcome", ver index.html) fica aberta e mostra o convite do quiz abaixo do logo
+const welcomeEl = () => document.querySelector('#intro.welcome:not(.out)');
+const behind = on => document.querySelectorAll('header.top, #view, #navBot').forEach(e => { e.inert = on; });
+function quizWelcome() {
+  const i = welcomeEl(); if (!i) return;
+  i.querySelector('.in-card').innerHTML = quizIntroHTML(); behind(true);
+  i.setAttribute('role', 'dialog'); i.setAttribute('aria-modal', 'true'); i.setAttribute('aria-label', 'YouRock');
+  setTimeout(() => i.classList.add('ready'), Math.max(0, 1700 - (performance.now() - i.dataset.t)));   // o texto entra quando o logo já se formou
+}
+function welcomeClose() { const i = welcomeEl(); if (!i) return; i.classList.add('out'); behind(false); }
 function viewQuiz() {
   if (QZ.i < 0) {
-    view.innerHTML = `<div class="card" style="margin-top:12px"><h1>Descubra seu nível</h1>
-      <p class="mut">8 perguntas rápidas, cerca de 2 minutos. Responda com sinceridade: o objetivo é começar no ponto certo, não passar num teste.</p>
-      <div class="row" style="margin-top:14px"><button class="btn pri" data-act="qzStart">Começar</button><button class="btn ghost" data-act="qzSkip">Pular por enquanto</button></div></div>`;
+    view.innerHTML = `<div class="card" style="margin-top:12px">${quizIntroHTML()}</div>`;
     return;
   }
   if (QZ.i >= QZ_Q.length) return quizResult();
@@ -70,8 +81,8 @@ function quizResult() {
     <div class="row" style="margin-top:10px"><button class="btn pri" data-act="qzGo">▶ Começar este treino</button><button class="btn" data-act="qzHome">Usar na tela Hoje</button><button class="btn ghost" data-act="qzStart">Refazer</button></div></div></div>`;
 }
 const quizActs = {
-  qzStart() { QZ = { i: 0, a: [] }; if (location.hash !== '#/quiz') location.hash = '#/quiz'; else viewQuiz(); },
-  qzSkip() { DB.placeSkip = true; save(); location.hash = '#/home'; },
+  qzStart() { welcomeClose(); QZ = { i: 0, a: [] }; if (location.hash !== '#/quiz') location.hash = '#/quiz'; else viewQuiz(); },
+  qzSkip() { welcomeClose(); DB.placeSkip = true; save(); location.hash = '#/home'; },
   qzAns(d) {
     QZ.a[QZ.i] = +d.v; QZ.i++;
     if (QZ.i === 1 && QZ.a[0] === 0) { QZ.a = [0, 0, 0, 0, 0, 0, 0, 3]; QZ.i = QZ_Q.length; }   // nunca tocou: nível I direto, sem as outras perguntas (objetivo = técnica geral)

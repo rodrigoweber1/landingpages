@@ -808,6 +808,7 @@ const Cal = (() => {
   function hide(later) { if (later) dismissed = true; const b = $('#calbar'); b && b.remove(); shown = false; }
   async function check() {
     if (shown || dismissed || Sess.run || location.protocol === 'file:' || !navigator.mediaDevices) return;
+    if (location.hash === '#/quiz' && !DB.placed && !DB.placeSkip) { setTimeout(check, 3000); return; }   // primeira vez: espera o quiz acabar (ou ser pulado) para não cobrir as perguntas
     if (!(await need())) return;
     shown = true;
     const d = document.createElement('div'); d.id = 'calbar'; d.className = 'updbar'; d.setAttribute('role', 'status');
@@ -847,3 +848,4 @@ act.updLater = () => Upd.dismiss();
 act.instOk = () => { S().instOk = true; save(); render(); };
 if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
 render();
+quizWelcome();

@@ -14,15 +14,21 @@ if(/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- abertura: a palheta toca e as 5 barras vibram como cordas (uma vez por sessão; toque ou tecla pula) -->
-<div id="intro" aria-hidden="true" translate="no">
+<!-- abertura: a palheta toca e as 5 barras vibram como cordas (uma vez por sessão; toque ou tecla pula).
+     Na primeira vez (sem nível definido) ela não some: vira a página inicial, com "Descubra seu nível" abaixo do logo -->
+<div id="intro" aria-hidden="true">
   <div class="in-mark"><svg class="in-echo" viewBox="0 0 32 32"><path d="M16 3.5C23.2 3.5 27.2 8.2 27.2 13.4C27.2 20.6 20.2 27.4 16 28.8C11.8 27.4 4.8 20.6 4.8 13.4C4.8 8.2 8.8 3.5 16 3.5Z"/></svg><svg class="in-pick" viewBox="0 0 32 32"><path class="in-edge" d="M16 3.5C23.2 3.5 27.2 8.2 27.2 13.4C27.2 20.6 20.2 27.4 16 28.8C11.8 27.4 4.8 20.6 4.8 13.4C4.8 8.2 8.8 3.5 16 3.5Z"/><g class="in-ghost"><path style="--n:0" d="M10.9 12.8V17.2"/><path style="--n:1" d="M13.5 10.4V19.6"/><path style="--n:2" d="M16 8.5V21.5"/><path style="--n:3" d="M18.5 11V19"/><path style="--n:4" d="M21.1 13V17"/></g><g class="in-bars"><path style="--n:0" d="M10.9 12.8V17.2"/><path style="--n:1" d="M13.5 10.4V19.6"/><path style="--n:2" d="M16 8.5V21.5"/><path style="--n:3" d="M18.5 11V19"/><path style="--n:4" d="M21.1 13V17"/></g></svg></div>
-  <div class="in-name">You<b>Rock</b></div>
-  <div class="in-sub" lang="en">Guitar Tools</div>
+  <div class="in-name" translate="no">You<b>Rock</b></div>
+  <div class="in-sub" lang="en" translate="no">Guitar Tools</div>
+  <div class="in-card"></div>
 </div>
-<script>(function(){var i=document.getElementById('intro');try{if(sessionStorage.getItem('yr.intro')){i.remove();return}sessionStorage.setItem('yr.intro','1')}catch(e){}
-function end(){i.remove();removeEventListener('keydown',skip,true)}function skip(){i.classList.add('out')}
-i.addEventListener('animationend',function(e){if(e.target===i)end()});i.addEventListener('pointerdown',skip);addEventListener('keydown',skip,true);setTimeout(end,6000)})()</script>
+<script>(function(){var i=document.getElementById('intro'),w=false;
+try{var d=JSON.parse(localStorage.getItem('fretforge.v1')||'{}');w=/^(#\/?(home|quiz)?)?$/.test(location.hash)&&!d.placed&&!d.placeSkip&&!(d.sessions&&d.sessions.length)}catch(e){}
+try{if(!w&&sessionStorage.getItem('yr.intro')){i.remove();return}sessionStorage.setItem('yr.intro','1')}catch(e){}
+if(w){i.classList.add('welcome');i.removeAttribute('aria-hidden');i.dataset.t=performance.now()}
+function end(){i.remove();removeEventListener('keydown',skip,true)}function skip(){if(!w)i.classList.add('out')}
+i.addEventListener('animationend',function(e){if(e.target===i)end()});i.addEventListener('pointerdown',skip);addEventListener('keydown',skip,true);
+setTimeout(function(){if(!w||!i.classList.contains('ready'))end()},w?15000:6000)})()</script>
 <header class="top">
   <a class="logo" href="#/home"><svg viewBox="0 0 32 32" width="28" height="28"><use href="#i-logo"/></svg><span class="lg"><span>You<b>Rock</b></span><small class="lsub" translate="no" lang="en">Guitar Tools</small></span></a>
   <nav id="navTop" class="nav"></nav>
