@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.12.0';
+var APP_VERSION = '1.13.0';
 var APP_DATE = '2026-11-26';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'App instalável (ícone no iPhone e guia de instalação), uso sem internet mais seguro e abertura mais longa', en: 'Installable app (iPhone icon and install guide), safer offline use and a longer opening animation', es: 'App instalable (icono en iPhone y guía de instalación), uso sin internet más seguro y animación de apertura más larga' },
   { pt: 'Nova abertura animada: a palheta toca e o logo vibra como cordas', en: 'New animated opening: the pick strums and the logo vibrates like strings', es: 'Nueva apertura animada: la púa rasguea y el logo vibra como cuerdas' },
   { pt: 'iPhone: nova barra de abas no estilo do iOS, flutuante e translúcida', en: 'iPhone: new iOS style tab bar, floating and translucent', es: 'iPhone: nueva barra de pestañas al estilo iOS, flotante y translúcida' },
   { pt: 'Notas: no computador, os nomes das cordas ficam mais perto da pestana', en: 'Notes: on desktop, the string names sit closer to the nut', es: 'Notas: en el ordenador, los nombres de las cuerdas quedan más cerca de la cejuela' },

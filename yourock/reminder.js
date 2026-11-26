@@ -11,7 +11,7 @@ const Reminder = (() => {
   const due = () => on() && passed() && !trained();
   const canNotify = () => 'Notification' in window && Notification.permission === 'granted';
   async function notify() {
-    const tt = typeof tr === 'function' ? tr : x => x, title = tt('Hora de treinar 🎸'), opts = { body: tt('Sua missão do dia está esperando. Leva poucos minutos.'), icon: 'icon.svg', badge: 'icon.svg', tag: 'yourock-daily' };
+    const tt = typeof tr === 'function' ? tr : x => x, title = tt('Hora de treinar 🎸'), opts = { body: tt('Sua missão do dia está esperando. Leva poucos minutos.'), icon: 'icon-192.png', badge: 'icon-192.png', tag: 'yourock-daily' };
     try { const reg = await navigator.serviceWorker.getRegistration(); if (reg) return reg.showNotification(title, opts); } catch (e) {}
     try { new Notification(title, opts); } catch (e) {}
   }

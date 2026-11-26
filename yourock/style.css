@@ -330,18 +330,18 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 @media(prefers-reduced-transparency:reduce){html.ios .nav.bottom,html.ios #toolsSheet .tsp{background:var(--bg2);-webkit-backdrop-filter:none;backdrop-filter:none}}
 
 /* abertura do app: "palhetada" (só transform e opacity; roda em CSS enquanto o app carrega) */
-#intro{--eo:cubic-bezier(.23,1,.32,1);--eio:cubic-bezier(.77,0,.175,1);position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);animation:inOut .25s var(--eo) 1.3s forwards;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#intro{--eo:cubic-bezier(.23,1,.32,1);--eio:cubic-bezier(.77,0,.175,1);position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);animation:inOut .4s var(--eo) 3.1s forwards;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 #intro.out{animation:inSkip .18s ease-out forwards}
 .in-mark{position:relative;width:132px;height:132px;margin-bottom:14px}
 .in-mark svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;fill:none}
-.in-pick{animation:inStrum .8s both}
+.in-pick{animation:inStrum 1.28s both}
 .in-edge,.in-echo path{stroke:var(--acc);stroke-width:1.8;stroke-linejoin:round}
-.in-echo{opacity:0;animation:inEcho .6s var(--eo) .46s forwards}
-.in-bars path,.in-ghost path{stroke:var(--tx);stroke-width:1.7;stroke-linecap:round;transform-box:fill-box;transform-origin:center;animation:inString .68s linear calc(.4s + var(--n)*35ms) both}
+.in-echo{opacity:0;animation:inEcho 1s var(--eo) .74s forwards}
+.in-bars path,.in-ghost path{stroke:var(--tx);stroke-width:1.7;stroke-linecap:round;transform-box:fill-box;transform-origin:center;animation:inString 1.4s linear calc(.64s + var(--n)*55ms) both}
 .in-ghost path{stroke:var(--acc);animation-name:inGhost}
-.in-name{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.1;color:var(--tx);animation:inRise .42s var(--eo) .56s both}
+.in-name{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.1;color:var(--tx);animation:inRise .6s var(--eo) .9s both}
 .in-name b{color:var(--acc)}
-.in-sub{margin-top:6px;font:italic 400 14px/1 Georgia,'Times New Roman',serif;letter-spacing:.16em;color:var(--mut);animation:inRise .42s var(--eo) .62s both}
+.in-sub{margin-top:6px;font:italic 400 14px/1 Georgia,'Times New Roman',serif;letter-spacing:.16em;color:var(--mut);animation:inRise .6s var(--eo) 1.02s both}
 @keyframes inStrum{
   0%{opacity:0;transform:translate(-14%,-10%) rotate(-24deg) scale(.94);animation-timing-function:cubic-bezier(.23,1,.32,1)}
   44%{opacity:1;transform:translate(0,0) rotate(-13deg) scale(1);animation-timing-function:cubic-bezier(.77,0,.175,1)}
@@ -372,5 +372,11 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 @keyframes inRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes inOut{to{opacity:0;visibility:hidden}}
 @keyframes inSkip{to{opacity:0;visibility:hidden}}
-/* "reduzir movimento": logo parado por meio segundo e some suavemente */
-@media(prefers-reduced-motion:reduce){#intro{animation-duration:.2s!important;animation-delay:.5s!important}#intro.out{animation-delay:0s!important}}
+/* "reduzir movimento": logo parado por 1,5 s e some suavemente */
+@media(prefers-reduced-motion:reduce){#intro{animation-duration:.3s!important;animation-delay:1.5s!important}#intro.out{animation-delay:0s!important}}
+
+/* guia de instalação no iPhone */
+.instcard{border-color:var(--acc);margin-bottom:12px}
+.ishare{width:26px;height:26px;color:var(--acc);flex:none}
+.inst{margin:10px 0 8px;padding-left:20px}
+.inst li{margin:4px 0}

@@ -782,6 +782,15 @@ Afinador: corda por corda com ✓ nas 6, afinações alternativas, calibração 
 Notas: no computador, os nomes das cordas ficam mais perto da pestana|Notes: on desktop, the string names sit closer to the nut|Notas: en el ordenador, los nombres de las cuerdas quedan más cerca de la cejuela
 iPhone: nova barra de abas no estilo do iOS, flutuante e translúcida|iPhone: new iOS style tab bar, floating and translucent|iPhone: nueva barra de pestañas al estilo iOS, flotante y translúcida
 Nova abertura animada: a palheta toca e o logo vibra como cordas|New animated opening: the pick strums and the logo vibrates like strings|Nueva apertura animada: la púa rasguea y el logo vibra como cuerdas
+Toque em Compartilhar no Safari (em alguns iPhones, primeiro em •••)|Tap Share in Safari (on some iPhones, tap ••• first)|Toca Compartir en Safari (en algunos iPhone, primero en •••)
+Escolha Adicionar à Tela de Início|Choose Add to Home Screen|Elige Añadir a pantalla de inicio
+Toque em Adicionar|Tap Add|Toca Añadir
+O app instalado pode começar sem o progresso salvo no navegador.|The installed app may start without the progress saved in the browser.|La app instalada puede empezar sin el progreso guardado en el navegador.
+Instale o YouRock na tela de início|Install YouRock on your Home Screen|Instala YouRock en tu pantalla de inicio
+Abre em tela cheia, com ícone próprio, e funciona sem internet.|Opens full screen, with its own icon, and works offline.|Se abre a pantalla completa, con su propio icono, y funciona sin internet.
+Entendi|Got it|Entendido
+Sem conexão: o app continua como está. Atualize quando a internet voltar.|No connection: the app stays as it is. Update when you are back online.|Sin conexión: la app sigue como está. Actualiza cuando vuelva internet.
+App instalável (ícone no iPhone e guia de instalação), uso sem internet mais seguro e abertura mais longa|Installable app (iPhone icon and install guide), safer offline use and a longer opening animation|App instalable (icono en iPhone y guía de instalación), uso sin internet más seguro y animación de apertura más larga
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });
