@@ -752,6 +752,33 @@ Limpar|Clear|Borrar
 A sequência já tem 6 acordes|The sequence already has 6 chords|La secuencia ya tiene 6 acordes
 Acordes: na sequência, escolha o tipo (inclusive suspensos) e toque na nota (com # ou bemol) para montar a lista|Chords: in the sequence, pick the type (including suspended) and tap the note (sharp or flat) to build the list|Acordes: en la secuencia, elige el tipo (incluidos suspendidos) y toca la nota (con # o bemol) para armar la lista
 Acordes: a dica do botão de sequência some quando ele está ligado|Chords: the sequence button hint is hidden while it is on|Acordes: la indicación del botón de secuencia se oculta cuando está activado
+Automático|Automatic|Automático
+Corda por corda|String by string|Cuerda por cuerda
+As 6 cordas estão afinadas ✓|All 6 strings are in tune ✓|Las 6 cuerdas están afinadas ✓
+Ativar microfone|Enable microphone|Activar micrófono
+Parar|Stop|Parar
+Recomeçar|Start over|Reiniciar
+Escuta pausada enquanto o tom toca|Listening is paused while the tone plays|La escucha está en pausa mientras suena el tono
+Afinação|Tuning|Afinación
+Padrão (E A D G B E)|Standard (E A D G B E)|Estándar (E A D G B E)
+Meio tom abaixo (Eb Ab Db Gb Bb Eb)|Half step down (Eb Ab Db Gb Bb Eb)|Medio tono abajo (Eb Ab Db Gb Bb Eb)
+Um tom abaixo (D G C F A D)|Whole step down (D G C F A D)|Un tono abajo (D G C F A D)
+Calibração do Lá|A4 calibration|Calibración del La
+Voltar para 440 Hz|Back to 440 Hz|Volver a 440 Hz
+Tom de referência|Reference tone|Tono de referencia
+Tom contínuo (toque de novo na nota para parar)|Continuous tone (tap the note again to stop)|Tono continuo (toca la nota otra vez para parar)
+Sinal sonoro quando a corda afinar|Sound signal when a string is in tune|Señal sonora cuando la cuerda quede afinada
+Toque a corda selecionada|Play the selected string|Toca la cuerda seleccionada
+✓ afinado|✓ in tune|✓ afinado
+alto demais: afrouxe|too high: loosen|demasiado alta: afloja
+baixo demais: aperte|too low: tighten|demasiado baja: aprieta
+1ª|1st|1ª
+2ª|2nd|2ª
+3ª|3rd|3ª
+4ª|4th|4ª
+5ª|5th|5ª
+6ª|6th|6ª
+Afinador: corda por corda com ✓ nas 6, afinações alternativas, calibração do Lá, tom contínuo e sinal de afinado|Tuner: string by string with a ✓ on all 6, alternate tunings, A4 calibration, continuous tone and in tune signal|Afinador: cuerda por cuerda con ✓ en las 6, afinaciones alternativas, calibración del La, tono continuo y señal de afinado
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });

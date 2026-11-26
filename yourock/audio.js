@@ -1,8 +1,8 @@
 'use strict';
 // ---------- detecção de altura (YIN) ----------
-function yin(buf, sr) {
+function yin(buf, sr, fmin = 70) {
   const half = buf.length >> 1;
-  const minTau = Math.floor(sr / 1200), maxTau = Math.min(half - 2, Math.floor(sr / 70));
+  const minTau = Math.floor(sr / 1200), maxTau = Math.min(half - 2, Math.floor(sr / fmin));
   const d = new Float32Array(maxTau + 2);
   for (let tau = 1; tau <= maxTau + 1; tau++) {
     let s = 0;
@@ -143,7 +143,7 @@ const Mic = {
     this.avg = this.avg * 0.88 + rms * 0.12; this.r2 = this.r1; this.r1 = rms;
     let det = null;
     if (rms > this.gate) {
-      const r = yin(buf, AC.sampleRate);
+      const r = yin(buf, AC.sampleRate, this.tune ? 60 : 70);   // afinador desce até 60 Hz (Drop C: C2 = 65 Hz)
       if (r && r.conf > (this.tune ? 0.9 : 0.8)) { const m = Math.round(69 + 12 * Math.log2(r.f / 440)); det = { t, midi: m, f: r.f, rms }; }
     }
     this.last = det ? det : (rms > this.gate ? this.last : null);

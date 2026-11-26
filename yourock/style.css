@@ -270,10 +270,29 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
   main.ws{column-count:2;column-gap:22px}
   main.ws>h1{column-span:all}
   main.ws>.card{break-inside:avoid;margin-top:12px!important;margin-bottom:0}
-  main.wt>.card{max-width:980px;margin-left:auto;margin-right:auto;padding:36px 40px}
-  main.wt .tunerbig{font-size:170px}
+  main.wt{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);column-gap:22px;align-items:start}
+  main.wt>h1{grid-column:1/-1}
+  main.wt>.card{margin-top:12px;margin-bottom:0}
+  main.wt>.tumain{padding:28px 40px}
+  main.wt .tunerbig{font-size:150px}
   main.wt .needle{height:72px;margin:22px 0}
   main.wt .needle i{width:8px;margin-left:-4px}
-  main.wt .row .btn.sm{min-width:48px;min-height:44px;font-size:16px}
-  main.wt h1{max-width:980px;margin-left:auto;margin-right:auto}
+  main.wt .row .btn.sm{min-height:44px;font-size:15px}
+  main.wt .tus{padding:10px 4px}
+  main.wt .tus b{font-size:28px}
 }
+
+/* afinador: cordas, progresso e opções */
+.tumodes{margin-bottom:14px}
+.tustrs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.tus{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--bg3);border:2px solid var(--line);border-radius:12px;padding:6px 2px;min-height:76px;transition:border-color .2s,background .2s}
+.tus:hover{border-color:var(--acc)}
+.tus small{color:var(--mut);font-size:12px}
+.tus b{font-size:20px;line-height:1.2}
+.tus i{font-style:normal;font-weight:800;color:var(--ok);height:18px;line-height:18px}
+.tus.ok{border-color:var(--ok)}
+.tus.ok b{color:var(--ok)}
+.tus.on{border-color:var(--acc);box-shadow:inset 0 0 0 2px var(--acc)}
+#tuAll{text-align:center}
+.turefs{gap:6px}
+.turefs small{opacity:.7;font-size:11px}

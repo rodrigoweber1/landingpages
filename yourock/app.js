@@ -623,24 +623,6 @@ function viewStats() {
   <div class="row"><button class="btn" data-act="demoData">Carregar dados de exemplo</button><button class="btn" data-act="export">Exportar JSON</button><button class="btn danger" data-act="wipe">Apagar tudo</button></div></div>`;
   view.classList.add('wide');
 }
-function viewTuner() {
-  view.classList.add('wide', 'wt');
-  view.innerHTML = `<h1>Afinador</h1><div class="card" style="margin-top:12px"><div class="tunerbig" id="tn">–</div><div class="mut" style="text-align:center" id="th">Toque uma corda solta</div><div class="needle"><i id="nd" style="left:50%"></i></div><div class="row" style="justify-content:center" id="tc">–</div>
-  <div class="row" style="justify-content:center;margin-top:14px"><button class="btn pri" id="tbtn" data-act="tuner">${ic('i-mic')}Ativar microfone</button></div>
-  <div class="row" style="justify-content:center;margin-top:14px"><span class="mut small">Sensibilidade</span><input type="range" id="tsens" min="1" max="5" step="1" value="${S().tunerSens || 3}" data-in="tunerSens" style="width:140px"></div>
-  <div class="row" style="justify-content:center;margin-top:14px"><span class="mut small">Tom de referência:</span>${OPEN.map((m, i) => `<button class="btn sm" data-act="ref" data-m="${m}">${'EADGBe'[i]}</button>`).join('')}</div></div>`;
-  let raf = 0, buf = [], miss = 0;
-  const GATE = [0.03, 0.02, 0.012, 0.007, 0.004]; Mic.gate = GATE[(S().tunerSens || 3) - 1]; if (Mic.on) Mic.setTune(true);
-  window.tunerLoop = () => {
-    const d = Mic.last;
-    if (!d) { if (++miss > 30) buf = []; } if (d && Mic.on) { miss = 0; if (buf.length && Math.abs(12 * Math.log2(d.f / buf[buf.length - 1])) > 0.7) buf = []; buf.push(d.f); if (buf.length > 9) buf.shift(); const f = [...buf].sort((a, b) => a - b)[buf.length >> 1], m = 69 + 12 * Math.log2(f / 440), r = Math.round(m), c = Math.round((m - r) * 100);
-      $('#tn').textContent = noteName(r); $('#th').textContent = `${f.toFixed(1)} Hz · ${c > 0 ? '+' : ''}${c} cents`; $('#nd').style.left = (50 + Math.max(-50, Math.min(50, c))) + '%';
-      $('#tn').style.color = Math.abs(c) <= 3 ? 'var(--ok)' : Math.abs(c) <= 10 ? 'var(--warn)' : 'var(--bad)'; $('#tc').textContent = Math.abs(c) <= 3 ? '✓ afinado' : c > 0 ? 'alto demais: afrouxe' : 'baixo demais: aperte'; }
-    raf = requestAnimationFrame(window.tunerLoop);
-  };
-  if (Mic.on) { $('#tbtn').innerHTML = ic('i-stop') + 'Parar'; raf = requestAnimationFrame(window.tunerLoop); }
-  cleanup = () => { cancelAnimationFrame(raf); Mic.setTune(false); Mic.gate = 0.012; };
-}
 function viewSettings() {
   const s = S(); view.classList.add('wide', 'ws');
   view.innerHTML = `<h1>Ajustes</h1><div class="card" style="margin-top:12px"><label class="lbl" style="margin-top:0">Tema de cores</label><div class="themes">${themePicker()}</div><label class="lbl">Idioma</label><select id="langSel" aria-label="Idioma">${[['pt', 'Português'], ['en', 'English'], ['es', 'Español']].map(([k, n]) => `<option value="${k}" ${LANG === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div><div class="card">
@@ -733,13 +715,11 @@ const act = {
   backTrail() { stopRun(); micOff(); Sess.browse = true; render(); },
   resumeEx() { Sess.browse = false; render(); },
   goQ(d) { loadEx(+d.i); render(); },
-  async tuner() { if (Mic.on) { Mic.stop(); $('#tbtn').innerHTML = ic('i-mic') + 'Ativar microfone'; return; } try { await Mic.start(); Mic.setTune(true); $('#tbtn').innerHTML = ic('i-stop') + 'Parar'; requestAnimationFrame(window.tunerLoop); } catch (e) { toast('Sem acesso ao microfone'); } },
   async mtest() {
     if (Mic.on) { Mic.stop(); $('#mtBtn').innerHTML = ic('i-mic') + 'Ligar teste'; return; }
     try { await Mic.start(); Mic.onsets = []; $('#mtBtn').innerHTML = ic('i-stop') + 'Parar teste'; $('#mtErr').textContent = ''; }
     catch (e) { $('#mtErr').textContent = 'Falhou: ' + (e && e.name === 'NotAllowedError' ? 'permissão negada (libere o microfone no navegador).' : e && e.name === 'NotFoundError' ? 'nenhum microfone encontrado.' : 'use localhost ou HTTPS.'); }
   },
-  ref(d) { tone(mtof(+d.m), 2.5); },
   async calib() {
     toast('Calibrando… fique em silêncio, sem fones');
     try {
@@ -759,7 +739,7 @@ const act = {
   export() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' })); a.download = 'yourock-backup.json'; a.click(); },
   wipe() { if (!confirm('Apagar todos os seus dados? Isso não pode ser desfeito.')) return; DB = fresh(); save(); Acct.forcePush(); TODAY = null; Sess.queue = []; Sess.ex = null; render(); },
 };
-Object.assign(act, toolActs, quizActs, accActs);
+Object.assign(act, toolActs, quizActs, accActs, tunerActs);
 act.theme = d => { S().theme = d.k; save(); applyTheme(); document.querySelectorAll('.th').forEach(b => b.classList.toggle('on', b.dataset.k === d.k)); };
 applyTheme();
 // teclado: tudo que tem data-act e não é botão/link/campo vira controle focável (Tab) e responde a Enter/Espaço; Esc fecha o menu de Ferramentas
@@ -782,7 +762,7 @@ document.addEventListener('input', e => {
   const k = e.target.dataset.in; if (!k) return; const t = e.target;
   S()[k] = t.type === 'checkbox' ? t.checked : (t.type === 'range' ? +t.value : t.value); save();
   const v = $('#v-' + k); if (v) v.textContent = t.value;
-  if (k === 'tunerSens') Mic.gate = [0.03, 0.02, 0.012, 0.007, 0.004][+t.value - 1];
+  if (k === 'tunerSens') Mic.gate = TU_GATE[+t.value - 1];
 });
 
 // aviso de calibração do microfone: pergunta uma vez e guarda o resultado junto com uma "impressão" do aparelho
