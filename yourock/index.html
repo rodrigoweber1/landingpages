@@ -14,17 +14,22 @@ if(/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- abertura: a palheta toca e as 5 barras vibram como cordas (uma vez por sessão; toque ou tecla pula).
-     Na primeira vez (sem nível definido) ela não some: vira a página inicial, com "Descubra seu nível" abaixo do logo -->
+<!-- abertura: a palheta toca e as 5 barras vibram como cordas. Em toda abertura do app ela vira a página inicial,
+     com "Descubra seu nível" abaixo do logo e a opção de pular -->
 <div id="intro" aria-hidden="true">
   <div class="in-mark"><svg class="in-echo" viewBox="0 0 32 32"><path d="M16 3.5C23.2 3.5 27.2 8.2 27.2 13.4C27.2 20.6 20.2 27.4 16 28.8C11.8 27.4 4.8 20.6 4.8 13.4C4.8 8.2 8.8 3.5 16 3.5Z"/></svg><svg class="in-pick" viewBox="0 0 32 32"><path class="in-edge" d="M16 3.5C23.2 3.5 27.2 8.2 27.2 13.4C27.2 20.6 20.2 27.4 16 28.8C11.8 27.4 4.8 20.6 4.8 13.4C4.8 8.2 8.8 3.5 16 3.5Z"/><g class="in-ghost"><path style="--n:0" d="M10.9 12.8V17.2"/><path style="--n:1" d="M13.5 10.4V19.6"/><path style="--n:2" d="M16 8.5V21.5"/><path style="--n:3" d="M18.5 11V19"/><path style="--n:4" d="M21.1 13V17"/></g><g class="in-bars"><path style="--n:0" d="M10.9 12.8V17.2"/><path style="--n:1" d="M13.5 10.4V19.6"/><path style="--n:2" d="M16 8.5V21.5"/><path style="--n:3" d="M18.5 11V19"/><path style="--n:4" d="M21.1 13V17"/></g></svg></div>
   <div class="in-name" translate="no">You<b>Rock</b></div>
   <div class="in-sub" lang="en" translate="no">Guitar Tools</div>
   <div class="in-card"></div>
 </div>
-<script>(function(){var i=document.getElementById('intro'),w=false;
-try{var d=JSON.parse(localStorage.getItem('fretforge.v1')||'{}');w=/^(#\/?(home|quiz)?)?$/.test(location.hash)&&!d.placed&&!d.placeSkip&&!(d.sessions&&d.sessions.length)}catch(e){}
-try{if(!w&&sessionStorage.getItem('yr.intro')){i.remove();return}sessionStorage.setItem('yr.intro','1')}catch(e){}
+<script>(function(){var i=document.getElementById('intro'),seen=false,d={};
+try{seen=!!sessionStorage.getItem('yr.intro');sessionStorage.setItem('yr.intro','1')}catch(e){}
+try{d=JSON.parse(localStorage.getItem('fretforge.v1')||'{}')||{}}catch(e){}
+// aparece em toda abertura; recarregar na mesma sessão (atualizar, trocar idioma) só repete para quem ainda não respondeu nem pulou.
+// os links de e-mail da conta vão direto, sem o quiz
+var novo=/^(#\/?(home|quiz)?)?$/.test(location.hash)&&!d.placed&&!d.placeSkip&&!(d.sessions&&d.sessions.length);
+var w=!/access_token=|error_description=/.test(location.hash)&&(!seen||novo);
+if(!w&&seen){i.remove();return}
 if(w){i.classList.add('welcome');i.removeAttribute('aria-hidden');i.dataset.t=performance.now()}
 function end(){i.remove();removeEventListener('keydown',skip,true)}function skip(){if(!w)i.classList.add('out')}
 i.addEventListener('animationend',function(e){if(e.target===i)end()});i.addEventListener('pointerdown',skip);addEventListener('keydown',skip,true);

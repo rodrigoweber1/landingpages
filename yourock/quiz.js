@@ -41,7 +41,7 @@ function quizPlan(a, L) {
 const quizIntroHTML = () => `<h1>Descubra seu nível</h1>
       <p class="mut">8 perguntas rápidas, cerca de 2 minutos. Responda com sinceridade: o objetivo é começar no ponto certo, não passar num teste.</p>
       <div class="row" style="margin-top:14px"><button class="btn pri" data-act="qzStart">Começar</button><button class="btn ghost" data-act="qzSkip">Pular por enquanto</button></div>`;
-// primeira vez: a tela de abertura (classe "welcome", ver index.html) fica aberta e mostra o convite do quiz abaixo do logo
+// em toda abertura: a tela do logo (classe "welcome", ver index.html) fica aberta e mostra o convite do quiz, com a opção de pular
 const welcomeEl = () => document.querySelector('#intro.welcome:not(.out)');
 const behind = on => document.querySelectorAll('header.top, #view, #navBot').forEach(e => { e.inert = on; });
 function quizWelcome() {
@@ -82,7 +82,11 @@ function quizResult() {
 }
 const quizActs = {
   qzStart() { welcomeClose(); QZ = { i: 0, a: [] }; if (location.hash !== '#/quiz') location.hash = '#/quiz'; else viewQuiz(); },
-  qzSkip() { welcomeClose(); DB.placeSkip = true; save(); location.hash = '#/home'; },
+  qzSkip() {
+    const abertura = !!welcomeEl(); welcomeClose();
+    if (!DB.placed && !DB.placeSkip) { DB.placeSkip = true; save(); }   // grava só na primeira vez: pular de novo não mexe nos dados (nem na sincronização)
+    if (!abertura || location.hash === '#/quiz') location.hash = '#/home';   // pulando na abertura, a pessoa continua onde estava
+  },
   qzAns(d) {
     QZ.a[QZ.i] = +d.v; QZ.i++;
     if (QZ.i === 1 && QZ.a[0] === 0) { QZ.a = [0, 0, 0, 0, 0, 0, 0, 3]; QZ.i = QZ_Q.length; }   // nunca tocou: nível I direto, sem as outras perguntas (objetivo = técnica geral)
