@@ -295,6 +295,7 @@ function chordMode() {
   const seq = CH.mode === 'seq', b = $('#chMode'); if (b) { b.setAttribute('aria-pressed', seq); b.classList.toggle('pri', seq); }
   const one = $('#chOne'); if (one) one.style.display = seq ? 'none' : '';
   const bd = $('#chBuild'); if (bd) bd.style.display = seq ? '' : 'none';
+  const hint = $('#chHint'); if (hint) hint.style.display = seq ? 'none' : '';
   const inp = $('#chTxt'); if (inp) { inp.placeholder = seq ? T('Digite de 1 a 6 acordes: Am F C G…') : T('Digite um acorde: Am7, C#dim, G/B…'); inp.value = seq ? CH.stext : CH.text; }
   if (seq) seqRes(); else { $('#chErr').textContent = ''; chordRes(); }
 }
@@ -332,7 +333,7 @@ function chordSync() {
 function viewChords() {
   view.classList.add('wide');
   view.innerHTML = `<h1>Buscador de Acordes</h1><div class="mut" style="margin:4px 0 12px">Digite o nome (Am, F#m7, Bb, C7, G/B, Dsus4…) ou escolha a nota e o tipo.</div>
-  <div class="card"><div class="row sp" style="margin-bottom:10px"><button type="button" class="btn sm" id="chMode" data-act="chMode" aria-pressed="false" title="Escreva vários acordes e veja as posições mais próximas entre si">Sequência de acordes</button><span class="small mut">Ligue para escrever até 6 acordes</span></div>
+  <div class="card"><div class="row sp" style="margin-bottom:10px"><button type="button" class="btn sm" id="chMode" data-act="chMode" aria-pressed="false" title="Escreva vários acordes e veja as posições mais próximas entre si">Sequência de acordes</button><span class="small mut" id="chHint">Ligue para escrever até 6 acordes</span></div>
     <input type="search" id="chTxt" placeholder="Digite um acorde: Am7, C#dim, G/B…" value="${esc(CH.text)}" data-tin="chtxt">
     <div class="small mut" id="chErr" style="margin-top:6px;min-height:18px"></div>
     <div id="chBuild" style="display:none;margin-top:10px"><div class="row" style="gap:8px"><label class="small mut" for="chsQ">Tipo do acorde</label><select id="chsQ" style="width:auto">${QUAL.map(q => `<option value="${q.k}">${q.n}${q.k ? ' (' + q.k + ')' : ''}</option>`).join('')}</select></div>

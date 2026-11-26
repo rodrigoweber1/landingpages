@@ -751,6 +751,7 @@ Remover último|Remove last|Quitar el último
 Limpar|Clear|Borrar
 A sequência já tem 6 acordes|The sequence already has 6 chords|La secuencia ya tiene 6 acordes
 Acordes: na sequência, escolha o tipo (inclusive suspensos) e toque na nota (com # ou bemol) para montar a lista|Chords: in the sequence, pick the type (including suspended) and tap the note (sharp or flat) to build the list|Acordes: en la secuencia, elige el tipo (incluidos suspendidos) y toca la nota (con # o bemol) para armar la lista
+Acordes: a dica do botão de sequência some quando ele está ligado|Chords: the sequence button hint is hidden while it is on|Acordes: la indicación del botón de secuencia se oculta cuando está activado
 `;
 const DICT = {};
 D_RAW.trim().split('\n').forEach(l => { const p = l.split('|'); if (p.length >= 3) { const k = p[0]; DICT[k] = [k, p[p.length - 2], p[p.length - 1]]; } });
