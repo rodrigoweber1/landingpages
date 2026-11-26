@@ -23692,7 +23692,7 @@ function attachMarker(name, lang) {
   // only a section marked as new says so, as a word at the end of its second line
   app.querySelectorAll('a').forEach((card) => {
     const line = card.querySelector('.tk-s');
-    if (!line || !/Cancionero/.test(card.getAttribute('href') || '')) return;
+    if (!line || !/Cancionero|Conciertos/.test(card.getAttribute('href') || '')) return;
     const b = document.createElement('span');
     b.className = 'tk-new';
     b.textContent = en ? 'New' : 'Nuevo';
@@ -25555,8 +25555,8 @@ html body.stage #app .cnc .cnc-poster{display:block;width:100%;max-width:520px;h
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '26 nov 2026 · 21:54';
-  var BUILD_ID = '2026-11-26T21:54';
+  var BUILD = '26 nov 2026 · 21:58';
+  var BUILD_ID = '2026-11-26T21:58';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
