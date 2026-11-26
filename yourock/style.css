@@ -296,3 +296,35 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 #tuAll{text-align:center}
 .turefs{gap:6px}
 .turefs small{opacity:.7;font-size:11px}
+
+/* barra de abas no padrão do iPhone (iOS): flutuante, translúcida, ícones preenchidos e destaque que desliza. Só em iPhone/iPod; Android e computador não mudam */
+@media(max-width:759px){
+  html.ios{--tbh:62px;--tbb:max(12px,calc(env(safe-area-inset-bottom,0px) - 13px));--tbx:16px}
+  html.ios body{padding-bottom:calc(var(--tbb) + var(--tbh) + 22px)}
+  html.ios .nav.bottom{left:max(var(--tbx),env(safe-area-inset-left,0px));right:max(var(--tbx),env(safe-area-inset-right,0px));bottom:var(--tbb);height:var(--tbh);max-width:500px;margin:0 auto;padding:4px;gap:0;z-index:31;
+    border:.5px solid color-mix(in srgb,var(--tx) 16%,transparent);border-radius:999px;background:color-mix(in srgb,var(--bg2) 68%,transparent);
+    -webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);
+    box-shadow:0 8px 28px rgba(0,0,0,.3),inset 0 .5px 0 rgba(255,255,255,.14);
+    -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  html.ios .nav.bottom::before{content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/5);border-radius:999px;background:color-mix(in srgb,var(--tx) 11%,transparent);
+    transform:translateX(calc(var(--i,0)*100%));transition:transform .38s cubic-bezier(.32,.72,0,1),opacity .2s}
+  html.ios .nav.bottom.none::before{opacity:0}
+  html.ios .nav.bottom a,html.ios .nav.bottom button{position:relative;justify-content:center;gap:2px;min-height:0;height:100%;padding:0 1px;border-radius:999px;background:transparent;font:inherit;color:color-mix(in srgb,var(--tx) 78%,var(--bg2));
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s cubic-bezier(.32,.72,0,1),color .2s}
+  html.ios .nav.bottom a.on,html.ios .nav.bottom button.on{color:var(--acc);background:transparent}
+  html.ios .nav.bottom a:active,html.ios .nav.bottom button:active{transform:scale(.92)}
+  html.ios .nav.bottom svg{width:25px;height:25px;color:inherit}
+  html.ios .nav.bottom a>span,html.ios .nav.bottom button>span{font-size:10px;line-height:13px;font-weight:600;letter-spacing:0}
+  /* o que fica preso ao rodapé sobe junto com a barra */
+  html.ios .actbar{bottom:calc(var(--tbb) + var(--tbh) + 8px)}
+  html.ios .cs-dock{bottom:calc(var(--tbb) + var(--tbh) + 8px)}
+  html.ios #toast{bottom:calc(var(--tbb) + var(--tbh) + 18px)}
+  /* Ferramentas: menu flutuante acima da barra */
+  html.ios #toolsSheet .tsp{left:var(--tbx);right:var(--tbx);bottom:calc(var(--tbb) + var(--tbh) + 10px);max-width:500px;margin:0 auto;padding:12px;border-radius:30px;
+    border:.5px solid color-mix(in srgb,var(--tx) 16%,transparent);background:color-mix(in srgb,var(--bg2) 76%,transparent);
+    -webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);box-shadow:0 12px 34px rgba(0,0,0,.35)}
+  html.ios #toolsSheet .tsp a{border-radius:20px}
+}
+@media(max-width:359px){html.ios{--tbx:8px}html.ios .nav.bottom a>span,html.ios .nav.bottom button>span{font-size:9px}}
+/* "Reduzir transparência" do iOS: fundo sólido */
+@media(prefers-reduced-transparency:reduce){html.ios .nav.bottom,html.ios #toolsSheet .tsp{background:var(--bg2);-webkit-backdrop-filter:none;backdrop-filter:none}}

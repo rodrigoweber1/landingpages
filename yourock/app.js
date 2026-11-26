@@ -442,11 +442,24 @@ const micEnabled = () => S().mic !== false;   // Ajustes: liga o microfone sozin
 function navHTML(cur) { return NAV.map(([k, n, i]) => `<a href="#/${k}" title="${n}" class="${k === cur ? 'on' : ''}"><svg><use href="#${i}"/></svg><span>${n}</span></a>`).join(''); }
 const TOOLS = [['metro', 'Metrônomo', 'i-metro'], ['notes', 'Notas', 'i-note'], ['chords', 'Acordes', 'i-chord'], ['tuner', 'Afinador', 'i-tuner']];
 const NAVB = [['home', 'Hoje', 'i-home'], ['train', 'Treinar', 'i-play'], ['vault', 'Biblioteca', 'i-vault'], ['tools', 'Ferramentas', 'i-tools'], ['stats', 'Progresso', 'i-stats']];
+const IOS = document.documentElement.classList.contains('ios');   // barra de abas no padrão do iPhone (ver style.css)
 function navBotHTML(cur) {
   const inTools = TOOLS.some(t => t[0] === cur);
   return NAVB.map(([k, n, i]) => k === 'tools'
-    ? `<button type="button" data-act="toolsMenu" class="${inTools ? 'on' : ''}" aria-haspopup="true"><svg><use href="#${i}"/></svg><span>${n}</span></button>`
-    : `<a href="#/${k}" title="${n}" class="${k === cur ? 'on' : ''}"><svg><use href="#${i}"/></svg><span>${n}</span></a>`).join('');
+    ? `<button type="button" data-act="toolsMenu" class="${inTools ? 'on' : ''}" aria-haspopup="true"><svg><use href="#${i}${IOS ? '-f' : ''}"/></svg><span>${n}</span></button>`
+    : `<a href="#/${k}" title="${n}" class="${k === cur ? 'on' : ''}" ${k === cur ? 'aria-current="page"' : ''}><svg><use href="#${i}${IOS ? '-f' : ''}"/></svg><span>${n}</span></a>`).join('');
+}
+// o destaque da barra do iPhone desliza até a aba atual (--i = posição; "none" = tela fora das abas)
+function navMark(cur) {
+  const i = NAVB.findIndex(([k]) => k === cur || (k === 'tools' && TOOLS.some(t => t[0] === cur))), nb = $('#navBot');
+  nb.classList.toggle('none', i < 0); if (i >= 0) nb.style.setProperty('--i', i);
+}
+if (IOS) {
+  document.addEventListener('touchstart', () => {}, { passive: true });   // no Safari, libera o efeito de toque (:active)
+  $('#navBot').addEventListener('click', e => {   // tocar na aba atual leva ao topo, como nos apps do iPhone
+    const a = e.target.closest('a'); if (!a || a.getAttribute('href') !== location.hash) return;
+    closeTools(); scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  });
 }
 function closeTools() { const e = $('#toolsSheet'); if (e) e.remove(); }
 const routes = { home: viewHome, vault: viewVault, train: viewTrain, stats: viewStats, metro: viewMetro, notes: viewNotes, chords: viewChords, tuner: viewTuner, settings: viewSettings, quiz: viewQuiz, account: () => Acct.viewAccount() };
@@ -456,7 +469,7 @@ function render() {
   const h = (location.hash || '#/home').slice(2).split('?')[0], r = routes[h] ? h : 'home';
   if (r === 'train') TLOPEN = false;   // dropdown de exercícios sempre começa fechado
   if (r === 'home' && !DB.placed && !DB.placeSkip && !DB.sessions.length) { location.hash = '#/quiz'; return; }
-  closeTools(); $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navBotHTML(r); const gb = $('#gearBtn'); if (gb) gb.classList.toggle('on', r === 'settings');
+  closeTools(); $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navBotHTML(r); navMark(r); const gb = $('#gearBtn'); if (gb) gb.classList.toggle('on', r === 'settings');
   view.innerHTML = ''; view.classList.remove('wide', 'wm', 'ws', 'wt'); routes[r](); window.scrollTo(0, 0);
 }
 addEventListener('hashchange', render);
