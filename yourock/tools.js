@@ -128,8 +128,10 @@ function viewMetro() {
 // ======================================================================
 const NT = { sel: null, show: 'all', frets: 12, lab: 'name' };
 function notesBoardSVG() {
-  const N = NT.frets, W = 1000, H = 232, mL = 44, mR = 10, cw = (W - mL - mR) / (N + 1), lefty = S().lefty;
-  const X = f => { const x = mL + (f + 0.5) * cw; return lefty ? W - x : x; }, L = k => { const x = mL + k * cw; return lefty ? W - x : x; }, Y = s => 28 + (5 - s) * 31;
+  // no computador a casa 0 (sem bolinhas) vira só um pedaço curto de corda: os nomes ficam perto da pestana; no celular nada muda
+  const wide = window.matchMedia && matchMedia('(min-width:760px)').matches;
+  const N = NT.frets, W = 1000, H = 232, mL = wide ? 30 : 44, mR = 10, cw = wide ? (W - mL - 14 - mR) / N : (W - mL - mR) / (N + 1), c0 = wide ? 14 : cw, lefty = S().lefty;
+  const X = f => { const x = mL + c0 + (f - 0.5) * cw; return lefty ? W - x : x; }, L = k => { const x = mL + (k ? c0 + (k - 1) * cw : 0); return lefty ? W - x : x; }, Y = s => 28 + (5 - s) * 31;
   let o = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   [3, 5, 7, 9, 12, 15, 17, 19, 21, 24].forEach(f => { if (f > N) return; if (f % 12 === 0) { o += `<circle class="inlay" cx="${X(f)}" cy="${(Y(1) + Y(2)) / 2}" r="6"/><circle class="inlay" cx="${X(f)}" cy="${(Y(3) + Y(4)) / 2}" r="6"/>`; } else o += `<circle class="inlay" cx="${X(f)}" cy="${(Y(2) + Y(3)) / 2}" r="6"/>`; });
   for (let k = 1; k <= N + 1; k++) o += `<line class="${k === 1 ? 'nut' : 'fret'}" x1="${L(k)}" x2="${L(k)}" y1="${Y(5) - 10}" y2="${Y(0) + 10}"/>`;

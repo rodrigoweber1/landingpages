@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.10.0';
+var APP_VERSION = '1.10.1';
 var APP_DATE = '2026-11-26';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Notas: no computador, os nomes das cordas ficam mais perto da pestana', en: 'Notes: on desktop, the string names sit closer to the nut', es: 'Notas: en el ordenador, los nombres de las cuerdas quedan más cerca de la cejuela' },
   { pt: 'Afinador: corda por corda com ✓ nas 6, afinações alternativas, calibração do Lá, tom contínuo e sinal de afinado', en: 'Tuner: string by string with a ✓ on all 6, alternate tunings, A4 calibration, continuous tone and in tune signal', es: 'Afinador: cuerda por cuerda con ✓ en las 6, afinaciones alternativas, calibración del La, tono continuo y señal de afinado' },
   { pt: 'Acordes: a dica do botão de sequência some quando ele está ligado', en: 'Chords: the sequence button hint is hidden while it is on', es: 'Acordes: la indicación del botón de secuencia se oculta cuando está activado' },
   { pt: 'Acordes: na sequência, escolha o tipo (inclusive suspensos) e toque na nota (com # ou bemol) para montar a lista', en: 'Chords: in the sequence, pick the type (including suspended) and tap the note (sharp or flat) to build the list', es: 'Acordes: en la secuencia, elige el tipo (incluidos suspendidos) y toca la nota (con # o bemol) para armar la lista' },
