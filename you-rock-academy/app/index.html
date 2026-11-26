@@ -11,12 +11,33 @@
     var Base = window.AudioContext || window.webkitAudioContext;
     if (!Base || Base.__yr) return;
     var list = [];
-    var Tracked = class extends Base { constructor() { super(...arguments); list.push(this); } };
+    // every sound source is remembered too: players schedule notes ahead, and "Stop" has to silence those as well
+    var live = new Set();
+    var keep = function (n) { live.add(n); n.addEventListener('ended', function () { live.delete(n); }); return n; };
+    var Tracked = class extends Base {
+      constructor() { super(...arguments); list.push(this); }
+      createOscillator() { return keep(super.createOscillator()); }
+      createBufferSource() { return keep(super.createBufferSource()); }
+    };
+    var tap = false;
+    var hush = function () { live.forEach(function (n) { try { n.stop(); } catch (e) {} }); live.clear(); };
+    window.yrHush = hush;
+    // for the players' own stop routines: cuts the sound when the person asked for it (a tap), not when a piece just ends
+    window.yrCut = function () { if (tap) hush(); };
+    document.addEventListener('click', function (e) {
+      tap = true; setTimeout(function () { tap = false; }, 0);
+      var b = e.target && e.target.closest && e.target.closest('button,[role="button"]');
+      if (!b) return;
+      var t = (b.textContent || '').trim(), l = b.getAttribute('aria-label') || '', a = b.getAttribute('data-a');
+      if (/^[\u25A0\u275A\u23F8]/.test(t) || a === 'stop' || a === 'pause' || /^(parar|detener|stop|pausa|pause)$/i.test(t || l)) hush();
+    }, true);
+    window.addEventListener('hashchange', hush);
     Tracked.__yr = true;
     window.__yrAC = list;
     window.AudioContext = Tracked;
     if (window.webkitAudioContext) window.webkitAudioContext = Tracked;
   } catch (e) {}
+  if (!window.yrCut) { window.yrCut = window.yrHush = function () {}; }
 })();
 </script>
 <meta name="theme-color" content="#121212">
@@ -700,6 +721,16 @@ body.dark .cf-link{color:#FF6B70}
 .rf-num{flex:none;width:28px;height:28px;border-radius:50%;background:#E31B23;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font:700 13px 'Inter',system-ui,sans-serif}
 .rf-tag{align-self:flex-start;padding:2px 8px;border-radius:6px;background:#E2E8F0;color:#0F172A;font:600 12px 'Inter',system-ui,sans-serif}
 .rf-tab{display:block;width:100%;max-width:520px;height:auto}
+.rf-satw{display:flex;flex-direction:column;gap:6px;color:#0F172A}
+.rf-sat{max-width:560px;overflow:visible}
+.rf-satm{margin:0;font:700 14px/20px 'Inter',system-ui,sans-serif}
+.rf-sat .rf-ts{font:700 19px 'Inter',system-ui,sans-serif;fill:currentColor}
+.rf-sat .rf-tl{font:700 13px 'Inter',system-ui,sans-serif;fill:#8A8A8A}
+.rf-sat .rf-acc{font:700 17px 'Inter',system-ui,sans-serif;fill:#E31B23}
+.rf-sat .rf-fl{font:700 13px 'Inter',system-ui,sans-serif;fill:#E31B23}
+.rf-sat .rf-cnt{font-size:12px;font-family:'Inter',system-ui,sans-serif;fill:#8A8A8A}
+.rf-sat .rf-col.rf-on ellipse.pt-ink,.rf-sat .rf-col.rf-on rect.pt-ink{fill:#E31B23!important}
+body.dark .rf-satw{color:#F2EDE4}
 .rf-line{stroke:#94A3B8;stroke-width:1}
 .rf-sn{font:600 12px 'Inter',system-ui,sans-serif;fill:#64748B}
 .rf-ch{font:700 12px 'Inter',system-ui,sans-serif;fill:#B3121A}
@@ -952,6 +983,18 @@ body.dark .cp-mc[data-on="true"]{background:#3A1E20}
 .ls-ly.ls-c{color:#B3121A;font-weight:700}
 .ls-panel{position:fixed;left:0;right:0;bottom:0;z-index:70;box-sizing:border-box;max-width:720px;max-height:72vh;margin:0 auto;padding:12px 16px calc(16px + env(safe-area-inset-bottom,0px));overflow:auto;display:flex;flex-direction:column;gap:10px;border:1px solid #D9D9D9;border-bottom:0;border-radius:20px 20px 0 0;background:#FFFFFF;box-shadow:0 -8px 24px rgba(0,0,0,0.18)}
 .ls-panel[hidden]{display:none}
+.rp-learn{margin:14px 0 4px;font:400 16px/22px 'Archivo Black','Inter',sans-serif;letter-spacing:.01em;color:inherit}
+.rp-inst{display:flex;flex-direction:column;gap:10px}
+.rp-chips{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.rp-chips .ej-chip{grid-column:span 2;min-width:0;align-items:center;justify-content:center;text-align:center}
+.rp-chips .ej-chip:nth-child(n+4){grid-column:span 3}
+.rp-go{align-self:flex-start;min-height:44px;padding:0;border:0;background:transparent;color:#B3121A;font:700 14px 'Inter',system-ui,sans-serif;cursor:pointer}
+body.dark .rp-go{color:#FF6B70}
+.rp-sheet{display:flex;flex-direction:column;gap:16px}
+.rp-sheet .ls-head .ej-h,.rp-sheet .ls-head .ej-chips{display:none!important}
+.rp-yours{margin-top:8px}
+.rp-soon{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+#cp-root>.cp-card{display:none}
 .ls-open .ls-sheet{padding-bottom:40vh}
 .ls-ph-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .ls-seg{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:#F2F2F2}
@@ -986,6 +1029,21 @@ body.dark .ls-sg[aria-pressed="true"]{color:#FFFFFF}
 .sm-map .sm-ch{padding:6px 4px;align-items:center;min-width:0}
 .sm-map .sm-ch b{font-size:14px;line-height:18px;text-align:center}
 .sm-map .sm-ch svg{width:100%;max-width:92px;height:auto}
+.rl-int{margin:4px 0 0;text-align:center;font:700 15px/22px 'Inter',system-ui,sans-serif;color:#0F172A;word-spacing:8px;font-variant-numeric:tabular-nums}
+.rl-int .rl-st{color:#E31B23}
+body.dark .rl-int{color:#F2EDE4}
+.qi-rel{display:flex;flex-direction:column;gap:10px;color:#0F172A}
+body.dark .qi-rel{color:#F2EDE4}
+.qi-neck{display:block;max-width:560px;width:100%;margin:0 auto;font-family:'Inter',system-ui,sans-serif}
+.qi-neck .qi-num{font-size:12px;fill:#8A8A8A}.qi-neck .qi-num.qi-on{font-weight:700;fill:currentColor}
+.qi-neck .qi-nut{stroke:currentColor}
+.qi-neck .qi-arc{font-size:12px;font-weight:700;fill:currentColor}
+.qi-neck .qi-tg{font-size:13px;font-weight:700;fill:#FEFEFE}.qi-neck .qi-ts{font-size:11px;fill:#FEFEFE}
+.qi-neck .qi-dt{font-size:12px;font-weight:700;fill:#FEFEFE;pointer-events:none}
+.qi-neck .hm-n{cursor:pointer;outline:none}.qi-neck .hm-n:focus-visible circle{stroke:#E0A800;stroke-width:3}
+.qi-cap{margin:0;text-align:center;font:700 16px/22px 'Inter',system-ui,sans-serif}
+.qi-keys{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.qi-keys .ej-chip{min-width:0;padding-left:2px;padding-right:2px;align-items:center;justify-content:center;text-align:center}
 .hm-neck{display:block;max-width:420px;margin:0 auto}
 .hm-neck .hm-bd{fill:#F2F2F2}
 .hm-neck .hm-fl{stroke:#BDBDBD;stroke-width:1.5}
@@ -2158,7 +2216,7 @@ const TPL = {
 "Tablatura": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div><div style=\"display: flex; flex-direction: column; gap: 8px\"><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.s1Text}}<\/p><\/div><div style=\"display: flex; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.s2Title}}<\/h2><svg width=\"342\" height=\"134\" viewBox=\"0 0 342 134\" role=\"img\" aria-label=\"{{t.tab1Aria}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"338\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"338\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"338\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"338\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"338\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"338\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"338\" y1=\"28\" x2=\"338\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"62.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"70\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">0<\/text><rect x=\"142.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"150\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">3<\/text><rect x=\"222.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"230\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5<\/text><\/svg><span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.s2Cap}}<\/span><span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.neckCap}}<\/span><svg viewBox=\"-44 0 364 170\" width=\"100%\" role=\"img\" aria-label=\"{{t.neck2Aria}}\" style=\"display: block; max-width: 520px\"><rect x=\"34\" y=\"13\" width=\"280\" height=\"132\" rx=\"4\" fill=\"#F2F2F2\"/><circle cx=\"174.0\" cy=\"79\" r=\"6\" fill=\"#D9D9D9\"/><circle cx=\"286.0\" cy=\"79\" r=\"6\" fill=\"#D9D9D9\"/><line x1=\"90\" y1=\"13\" x2=\"90\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"146\" y1=\"13\" x2=\"146\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"202\" y1=\"13\" x2=\"202\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"258\" y1=\"13\" x2=\"258\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"314\" y1=\"13\" x2=\"314\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"34\" y1=\"13\" x2=\"34\" y2=\"145\" stroke=\"#121212\" stroke-width=\"5\"/><line x1=\"34\" y1=\"24\" x2=\"314\" y2=\"24\" stroke=\"#8A8A8A\" stroke-width=\"1.0\"/><text x=\"-8\" y=\"28\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">1ª · e<\/text><line x1=\"34\" y1=\"46\" x2=\"314\" y2=\"46\" stroke=\"#8A8A8A\" stroke-width=\"1.25\"/><text x=\"-8\" y=\"50\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">2ª · B<\/text><line x1=\"34\" y1=\"68\" x2=\"314\" y2=\"68\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><text x=\"-8\" y=\"72\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">3ª · G<\/text><line x1=\"34\" y1=\"90\" x2=\"314\" y2=\"90\" stroke=\"#8A8A8A\" stroke-width=\"1.75\"/><text x=\"-8\" y=\"94\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">4ª · D<\/text><line x1=\"34\" y1=\"112\" x2=\"314\" y2=\"112\" stroke=\"#8A8A8A\" stroke-width=\"2.0\"/><text x=\"-8\" y=\"116\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">5ª · A<\/text><line x1=\"34\" y1=\"134\" x2=\"314\" y2=\"134\" stroke=\"#8A8A8A\" stroke-width=\"2.25\"/><text x=\"-8\" y=\"138\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">6ª · E<\/text><text x=\"62.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">1<\/text><text x=\"118.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">2<\/text><text x=\"174.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">3<\/text><text x=\"230.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">4<\/text><text x=\"286.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">5<\/text><circle cx=\"14\" cy=\"134\" r=\"10\" fill=\"#FFFFFF\" stroke=\"#E31B23\" stroke-width=\"2\"/><text x=\"14\" y=\"138.5\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#B3121A\">1<\/text><circle cx=\"174.0\" cy=\"134\" r=\"11\" fill=\"#E31B23\" stroke=\"#E31B23\" stroke-width=\"2\"/><text x=\"174.0\" y=\"138.5\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#FFFFFF\">2<\/text><circle cx=\"286.0\" cy=\"134\" r=\"11\" fill=\"#E31B23\" stroke=\"#E31B23\" stroke-width=\"2\"/><text x=\"286.0\" y=\"138.5\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#FFFFFF\">3<\/text><\/svg><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.s2Text}}<\/p><\/div><div style=\"display: flex; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.s3Title}}<\/h2><svg width=\"342\" height=\"156\" viewBox=\"0 0 342 156\" role=\"img\" aria-label=\"{{t.tab2Aria}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"338\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"338\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"338\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"338\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"338\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"338\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"338\" y1=\"28\" x2=\"338\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"102.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"110\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#E31B23\" font-family=\"Inter, sans-serif\">0<\/text><rect x=\"102.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"110\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#E31B23\" font-family=\"Inter, sans-serif\">2<\/text><rect x=\"102.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"110\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#E31B23\" font-family=\"Inter, sans-serif\">2<\/text><rect x=\"222.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"230\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">3<\/text><rect x=\"222.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"230\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5<\/text><rect x=\"222.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"230\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5<\/text><text x=\"110\" y=\"148\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"700\" fill=\"#E31B23\" font-family=\"Inter, sans-serif\">{{t.chordA}}<\/text><text x=\"230\" y=\"148\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"700\" fill=\"#121212\" font-family=\"Inter, sans-serif\">{{t.chordB}}<\/text><\/svg><span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.s3Cap}}<\/span><span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.neckCap}}<\/span><svg viewBox=\"-44 0 364 170\" width=\"100%\" role=\"img\" aria-label=\"{{t.neck3Aria}}\" style=\"display: block; max-width: 520px\"><rect x=\"34\" y=\"13\" width=\"280\" height=\"132\" rx=\"4\" fill=\"#F2F2F2\"/><circle cx=\"174.0\" cy=\"79\" r=\"6\" fill=\"#D9D9D9\"/><circle cx=\"286.0\" cy=\"79\" r=\"6\" fill=\"#D9D9D9\"/><line x1=\"90\" y1=\"13\" x2=\"90\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"146\" y1=\"13\" x2=\"146\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"202\" y1=\"13\" x2=\"202\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"258\" y1=\"13\" x2=\"258\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"314\" y1=\"13\" x2=\"314\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><line x1=\"34\" y1=\"13\" x2=\"34\" y2=\"145\" stroke=\"#121212\" stroke-width=\"5\"/><line x1=\"34\" y1=\"24\" x2=\"314\" y2=\"24\" stroke=\"#8A8A8A\" stroke-width=\"1.0\"/><text x=\"-8\" y=\"28\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">1ª · e<\/text><line x1=\"34\" y1=\"46\" x2=\"314\" y2=\"46\" stroke=\"#8A8A8A\" stroke-width=\"1.25\"/><text x=\"-8\" y=\"50\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">2ª · B<\/text><line x1=\"34\" y1=\"68\" x2=\"314\" y2=\"68\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><text x=\"-8\" y=\"72\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">3ª · G<\/text><line x1=\"34\" y1=\"90\" x2=\"314\" y2=\"90\" stroke=\"#8A8A8A\" stroke-width=\"1.75\"/><text x=\"-8\" y=\"94\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">4ª · D<\/text><line x1=\"34\" y1=\"112\" x2=\"314\" y2=\"112\" stroke=\"#8A8A8A\" stroke-width=\"2.0\"/><text x=\"-8\" y=\"116\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">5ª · A<\/text><line x1=\"34\" y1=\"134\" x2=\"314\" y2=\"134\" stroke=\"#8A8A8A\" stroke-width=\"2.25\"/><text x=\"-8\" y=\"138\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">6ª · E<\/text><text x=\"62.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">1<\/text><text x=\"118.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">2<\/text><text x=\"174.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">3<\/text><text x=\"230.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">4<\/text><text x=\"286.0\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">5<\/text><circle cx=\"14\" cy=\"134\" r=\"10\" fill=\"#FFFFFF\" stroke=\"#E31B23\" stroke-width=\"2\"/><text x=\"14\" y=\"138.5\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#B3121A\">1<\/text><circle cx=\"118.0\" cy=\"112\" r=\"11\" fill=\"#E31B23\" stroke=\"#E31B23\" stroke-width=\"2\"/><text x=\"118.0\" y=\"116.5\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#FFFFFF\">1<\/text><circle cx=\"118.0\" cy=\"90\" r=\"11\" fill=\"#E31B23\" stroke=\"#E31B23\" stroke-width=\"2\"/><text x=\"118.0\" y=\"94.5\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#FFFFFF\">1<\/text><circle cx=\"174.0\" cy=\"134\" r=\"11\" fill=\"#121212\" stroke=\"#121212\" stroke-width=\"2\"/><text x=\"174.0\" y=\"138.5\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#FFFFFF\">2<\/text><circle cx=\"286.0\" cy=\"112\" r=\"11\" fill=\"#121212\" stroke=\"#121212\" stroke-width=\"2\"/><text x=\"286.0\" y=\"116.5\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#FFFFFF\">2<\/text><circle cx=\"286.0\" cy=\"90\" r=\"11\" fill=\"#121212\" stroke=\"#121212\" stroke-width=\"2\"/><text x=\"286.0\" y=\"94.5\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#FFFFFF\">2<\/text><\/svg><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.s3Text}}<\/p><\/div><div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.s4Title}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.s4Text}}<\/p><\/div><a class=\"cta\" href=\"Cifras.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "Cifras": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p><p class=\"key-info ki-short\"><span class=\"ki-tag\">★ {{t.introTag}}<\/span>{{t.introKey}}<\/p>\n<\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.mapTitle}}<\/h2>\n<div style=\"display: flex; gap: 4px\">\n<sc-for list=\"{{letters}}\" as=\"x\" hint-placeholder-count=\"7\">\n<div style=\"flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 8px 0; border-radius: 6px; background: #FFF1CC\">\n<span style=\"font-size: 16px; line-height: 24px; font-weight: 700; color: #121212\">{{x.l}}<\/span>\n<span style=\"font-size: 12px; line-height: 16px; color: #3A3A3A\">{{x.n}}<\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.mapText}}<\/p>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.rowsTitle}}<\/h2>\n<div style=\"display: flex; flex-direction: column\">\n<sc-for list=\"{{rows}}\" as=\"r\" hint-placeholder-count=\"9\">\n<div style=\"display: flex; align-items: center; gap: 12px; min-height: 56px; border-top: 1px solid #E6E6E6\">\n<span style=\"width: 72px; flex: none; font-size: 18px; line-height: 24px; font-weight: 700; color: #B3121A\">{{r.sym}}<\/span>\n<span style=\"flex-grow: 1; min-width: 0; display: flex; flex-direction: column\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 500; color: #121212\">{{r.name}}<\/span><span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{r.notes}}<\/span><\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<\/div>\n\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.chartTitle}}<\/h2>\n<div style=\"display: flex; align-items: stretch; border: 1px solid #D9D9D9; border-radius: 8px; background: #FAFAFA\">\n<sc-for list=\"{{bars}}\" as=\"b\" hint-placeholder-count=\"4\">\n<div style=\"flex: 1; min-width: 0; height: 56px; display: flex; align-items: center; justify-content: center; border-left: {{b.bl}}; font-size: 18px; line-height: 24px; font-weight: 700; color: #121212\">{{b.c}}<\/div>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.chartText}}<\/p>\n<\/div>\n<a class=\"cta\" href=\"Tecnicas.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "Tecnicas": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div><div style=\"display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid #D9D9D9; border-radius: 8px\"><div style=\"display: flex; align-items: center; gap: 12px\"><span style=\"min-width: 40px; height: 40px; box-sizing: border-box; padding: 0 8px; border-radius: 6px; background: #FFF1CC; color: #B3121A; font-size: 16px; line-height: 40px; font-weight: 700; text-align: center\">h<\/span><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.n1}}<\/h2><\/div><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.d1}}<\/p><svg width=\"310\" height=\"134\" viewBox=\"0 0 310 134\" role=\"img\" aria-label=\"{{t.aria1}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"306\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"306\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"306\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"306\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"306\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"306\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"306\" y1=\"28\" x2=\"306\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"85.5\" y=\"38\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"100\" y=\"50\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5h7<\/text><rect x=\"195.5\" y=\"38\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"210\" y=\"50\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5h7<\/text><\/svg><div class=\"ti-vid\" role=\"img\" aria-label=\"{{t.vidAria}}\" style=\"width: 100%; box-sizing: border-box; aspect-ratio: 16 / 9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; border: 2px dashed #BDBDBD; border-radius: 8px; background: #F2F2F2; text-align: center\"><span style=\"width: 52px; height: 52px; border-radius: 250px; background: #E31B23; display: flex; align-items: center; justify-content: center\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#FFFFFF\" aria-hidden=\"true\"><path d=\"M8 5v14l11-7z\"><\/path><\/svg><\/span><span style=\"font-size: 14px; line-height: 20px; font-weight: 500; color: #3A3A3A\">{{t.vidSoon}}<\/span><\/div><\/div><div style=\"display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid #D9D9D9; border-radius: 8px\"><div style=\"display: flex; align-items: center; gap: 12px\"><span style=\"min-width: 40px; height: 40px; box-sizing: border-box; padding: 0 8px; border-radius: 6px; background: #FFF1CC; color: #B3121A; font-size: 16px; line-height: 40px; font-weight: 700; text-align: center\">p<\/span><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.n2}}<\/h2><\/div><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.d2}}<\/p><svg width=\"310\" height=\"134\" viewBox=\"0 0 310 134\" role=\"img\" aria-label=\"{{t.aria2}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"306\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"306\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"306\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"306\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"306\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"306\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"306\" y1=\"28\" x2=\"306\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"85.5\" y=\"38\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"100\" y=\"50\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">7p5<\/text><rect x=\"195.5\" y=\"38\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"210\" y=\"50\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">7p5<\/text><\/svg><div class=\"ti-vid\" role=\"img\" aria-label=\"{{t.vidAria}}\" style=\"width: 100%; box-sizing: border-box; aspect-ratio: 16 / 9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; border: 2px dashed #BDBDBD; border-radius: 8px; background: #F2F2F2; text-align: center\"><span style=\"width: 52px; height: 52px; border-radius: 250px; background: #E31B23; display: flex; align-items: center; justify-content: center\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#FFFFFF\" aria-hidden=\"true\"><path d=\"M8 5v14l11-7z\"><\/path><\/svg><\/span><span style=\"font-size: 14px; line-height: 20px; font-weight: 500; color: #3A3A3A\">{{t.vidSoon}}<\/span><\/div><\/div><div style=\"display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid #D9D9D9; border-radius: 8px\"><div style=\"display: flex; align-items: center; gap: 12px\"><span style=\"min-width: 40px; height: 40px; box-sizing: border-box; padding: 0 8px; border-radius: 6px; background: #FFF1CC; color: #B3121A; font-size: 16px; line-height: 40px; font-weight: 700; text-align: center\">/<\/span><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.n3}}<\/h2><\/div><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.d3}}<\/p><svg width=\"310\" height=\"134\" viewBox=\"0 0 310 134\" role=\"img\" aria-label=\"{{t.aria3}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"306\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"306\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"306\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"306\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"306\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"306\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"306\" y1=\"28\" x2=\"306\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"85.5\" y=\"56\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"100\" y=\"68\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5/7<\/text><rect x=\"195.5\" y=\"56\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"210\" y=\"68\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">7\\5<\/text><\/svg><div class=\"ti-vid\" role=\"img\" aria-label=\"{{t.vidAria}}\" style=\"width: 100%; box-sizing: border-box; aspect-ratio: 16 / 9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; border: 2px dashed #BDBDBD; border-radius: 8px; background: #F2F2F2; text-align: center\"><span style=\"width: 52px; height: 52px; border-radius: 250px; background: #E31B23; display: flex; align-items: center; justify-content: center\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#FFFFFF\" aria-hidden=\"true\"><path d=\"M8 5v14l11-7z\"><\/path><\/svg><\/span><span style=\"font-size: 14px; line-height: 20px; font-weight: 500; color: #3A3A3A\">{{t.vidSoon}}<\/span><\/div><\/div><div style=\"display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid #D9D9D9; border-radius: 8px\"><div style=\"display: flex; align-items: center; gap: 12px\"><span style=\"min-width: 40px; height: 40px; box-sizing: border-box; padding: 0 8px; border-radius: 6px; background: #FFF1CC; color: #B3121A; font-size: 16px; line-height: 40px; font-weight: 700; text-align: center\">b<\/span><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.n4}}<\/h2><\/div><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.d4}}<\/p><svg width=\"310\" height=\"134\" viewBox=\"0 0 310 134\" role=\"img\" aria-label=\"{{t.aria4}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"306\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"306\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"306\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"306\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"306\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"306\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"306\" y1=\"28\" x2=\"306\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"85.5\" y=\"56\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"100\" y=\"68\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">7b9<\/text><rect x=\"193.5\" y=\"56\" width=\"43\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"215\" y=\"68\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">7b9r7<\/text><\/svg><div class=\"ti-vid\" role=\"img\" aria-label=\"{{t.vidAria}}\" style=\"width: 100%; box-sizing: border-box; aspect-ratio: 16 / 9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; border: 2px dashed #BDBDBD; border-radius: 8px; background: #F2F2F2; text-align: center\"><span style=\"width: 52px; height: 52px; border-radius: 250px; background: #E31B23; display: flex; align-items: center; justify-content: center\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#FFFFFF\" aria-hidden=\"true\"><path d=\"M8 5v14l11-7z\"><\/path><\/svg><\/span><span style=\"font-size: 14px; line-height: 20px; font-weight: 500; color: #3A3A3A\">{{t.vidSoon}}<\/span><\/div><\/div><div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.tipTitle}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.tipText}}<\/p><\/div><a class=\"cta\" href=\"Pentatonica.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
-"Pentatonica": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div><div style=\"display: flex; flex-direction: column; gap: 4px\"><span style=\"font-size: 16px; line-height: 24px; font-weight: 700; color: #121212\">{{caption}}<\/span><span style=\"font-size: 14px; line-height: 20px; color: #3A3A3A\">{{notesLine}}<\/span><\/div><svg viewBox=\"-44 0 364 170\" width=\"100%\" role=\"img\" aria-label=\"{{ariaBoard}}\" style=\"display: block; max-width: 520px\">\n<rect x=\"34\" y=\"13\" width=\"280\" height=\"132\" rx=\"4\" fill=\"#F2F2F2\"/>\n<sc-for list=\"{{hnInlays}}\" as=\"d\" hint-placeholder-count=\"2\"><circle cx=\"{{d.cx}}\" cy=\"{{d.cy}}\" r=\"6\" fill=\"#D9D9D9\"/><\/sc-for>\n<sc-for list=\"{{hnFrets}}\" as=\"f\" hint-placeholder-count=\"5\"><line x1=\"{{f.x}}\" y1=\"13\" x2=\"{{f.x}}\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><\/sc-for>\n<line x1=\"34\" y1=\"13\" x2=\"34\" y2=\"145\" stroke=\"{{hnNutC}}\" stroke-width=\"{{hnNutW}}\"/>\n<sc-for list=\"{{hnStrs}}\" as=\"s\" hint-placeholder-count=\"6\">\n<line x1=\"34\" y1=\"{{s.y}}\" x2=\"314\" y2=\"{{s.y}}\" stroke=\"#8A8A8A\" stroke-width=\"{{s.sw}}\"/>\n<text x=\"-6\" y=\"{{s.ty}}\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">{{s.label}}<\/text>\n<\/sc-for>\n<sc-for list=\"{{hnNums}}\" as=\"n\" hint-placeholder-count=\"5\"><text x=\"{{n.x}}\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">{{n.label}}<\/text><\/sc-for>\n<sc-for list=\"{{hnMutes}}\" as=\"x\" hint-placeholder-count=\"2\"><text x=\"{{x.cx}}\" y=\"{{x.ty}}\" text-anchor=\"middle\" font-size=\"18\" fill=\"#5A5A5A\">×<\/text><\/sc-for>\n<sc-for list=\"{{hnMarks}}\" as=\"m\" hint-placeholder-count=\"5\"><circle cx=\"{{m.cx}}\" cy=\"{{m.cy}}\" r=\"{{m.r}}\" fill=\"{{m.bg}}\" stroke=\"{{m.bd}}\" stroke-width=\"2\"/><text x=\"{{m.cx}}\" y=\"{{m.ty}}\" text-anchor=\"middle\" font-size=\"{{m.fs}}\" font-weight=\"500\" fill=\"{{m.fg}}\">{{m.label}}<\/text><\/sc-for>\n<\/svg>\n<ul style=\"margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px\">\n<li style=\"display: flex; align-items: center; gap: 12px\"><span style=\"width: 24px; height: 24px; flex: none; box-sizing: border-box; border-radius: 250px; background: #E31B23; border: 2px solid #E31B23\"><\/span><span style=\"font-size: 14px; line-height: 20px; color: #121212\">{{t.legRoot}}<\/span><\/li>\n<li style=\"display: flex; align-items: center; gap: 12px\"><span style=\"width: 24px; height: 24px; flex: none; box-sizing: border-box; border-radius: 250px; background: #FFFFFF; border: 2px solid #E31B23\"><\/span><span style=\"font-size: 14px; line-height: 20px; color: #121212\">{{t.legNote}}<\/span><\/li>\n<\/ul>\n<a class=\"cta\" href=\"Escalas.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
+"Pentatonica": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div><div style=\"display: flex; flex-direction: column; gap: 4px\"><span style=\"font-size: 16px; line-height: 24px; font-weight: 700; color: #121212\">{{caption}}<\/span><span style=\"font-size: 14px; line-height: 20px; color: #3A3A3A\">{{notesLine}}<\/span><\/div><svg viewBox=\"-44 0 364 170\" width=\"100%\" role=\"img\" aria-label=\"{{ariaBoard}}\" style=\"display: block; max-width: 520px\">\n<rect x=\"34\" y=\"13\" width=\"280\" height=\"132\" rx=\"4\" fill=\"#F2F2F2\"/>\n<sc-for list=\"{{hnInlays}}\" as=\"d\" hint-placeholder-count=\"2\"><circle cx=\"{{d.cx}}\" cy=\"{{d.cy}}\" r=\"6\" fill=\"#D9D9D9\"/><\/sc-for>\n<sc-for list=\"{{hnFrets}}\" as=\"f\" hint-placeholder-count=\"5\"><line x1=\"{{f.x}}\" y1=\"13\" x2=\"{{f.x}}\" y2=\"145\" stroke=\"#BDBDBD\" stroke-width=\"1.5\"/><\/sc-for>\n<line x1=\"34\" y1=\"13\" x2=\"34\" y2=\"145\" stroke=\"{{hnNutC}}\" stroke-width=\"{{hnNutW}}\"/>\n<sc-for list=\"{{hnStrs}}\" as=\"s\" hint-placeholder-count=\"6\">\n<line x1=\"34\" y1=\"{{s.y}}\" x2=\"314\" y2=\"{{s.y}}\" stroke=\"#8A8A8A\" stroke-width=\"{{s.sw}}\"/>\n<text x=\"-6\" y=\"{{s.ty}}\" text-anchor=\"end\" font-size=\"11\" fill=\"#5A5A5A\">{{s.label}}<\/text>\n<\/sc-for>\n<sc-for list=\"{{hnNums}}\" as=\"n\" hint-placeholder-count=\"5\"><text x=\"{{n.x}}\" y=\"164\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5A5A5A\">{{n.label}}<\/text><\/sc-for>\n<sc-for list=\"{{hnMutes}}\" as=\"x\" hint-placeholder-count=\"2\"><text x=\"{{x.cx}}\" y=\"{{x.ty}}\" text-anchor=\"middle\" font-size=\"18\" fill=\"#5A5A5A\">×<\/text><\/sc-for>\n<sc-for list=\"{{hnMarks}}\" as=\"m\" hint-placeholder-count=\"5\"><circle cx=\"{{m.cx}}\" cy=\"{{m.cy}}\" r=\"{{m.r}}\" fill=\"{{m.bg}}\" stroke=\"{{m.bd}}\" stroke-width=\"2\"/><text x=\"{{m.cx}}\" y=\"{{m.ty}}\" text-anchor=\"middle\" font-size=\"{{m.fs}}\" font-weight=\"500\" fill=\"{{m.fg}}\">{{m.label}}<\/text><\/sc-for>\n<\/svg>\n<ul style=\"margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px\">\n<li style=\"display: flex; align-items: center; gap: 12px\"><span style=\"width: 24px; height: 24px; flex: none; box-sizing: border-box; border-radius: 250px; background: #E31B23; border: 2px solid #E31B23\"><\/span><span style=\"font-size: 14px; line-height: 20px; color: #121212\">{{t.legRoot}}<\/span><\/li>\n<li style=\"display: flex; align-items: center; gap: 12px\"><span style=\"width: 24px; height: 24px; flex: none; box-sizing: border-box; border-radius: 250px; background: #FFFFFF; border: 2px solid #E31B23\"><\/span><span style=\"font-size: 14px; line-height: 20px; color: #121212\">{{t.legNote}}<\/span><\/li>\n<\/ul>\n<div id=\"pent5\" data-persist=\"\" style=\"display: flex; flex-direction: column; gap: 14px\"><\/div>\n<a class=\"cta\" href=\"Escalas.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "Escalas": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 15px; line-height: 22px; color: #121212; font-weight: 500\">{{t.intro}}<\/p>\n<\/div>\n<div id=\"ea-root\" style=\"display: flex; flex-direction: column; gap: 16px\"><\/div>\n<a class=\"cta\" href=\"Pentatonica.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "Progresiones": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div>\n<div role=\"group\" aria-label=\"{{t.modeAria}}\" style=\"display: flex; gap: 2px; padding: 2px; height: 48px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{modes}}\" as=\"m\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{m.pressed}}\" onClick=\"{{m.pick}}\" style=\"flex: 1; height: 44px; padding: 0; border: 0; border-radius: 4px; background: {{m.sbg}}; color: {{m.sfg}}; box-shadow: {{m.ssh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{m.label}}<\/button>\n<\/sc-for>\n<\/div>\n<div style=\"display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{roots}}\" as=\"c\" hint-placeholder-count=\"12\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 44px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.diaTitle}}<\/span>\n<div style=\"display: flex; gap: 4px\">\n<sc-for list=\"{{dia}}\" as=\"d\" hint-placeholder-count=\"7\">\n<div style=\"flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 8px 0; border-radius: 6px; background: #F2F2F2\">\n<span style=\"font-size: 12px; line-height: 16px; color: #5A5A5A\">{{d.rn}}<\/span>\n<span style=\"font-size: 13px; line-height: 20px; font-weight: 700; color: #121212\">{{d.name}}<\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.progTitle}}<\/span>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<sc-for list=\"{{progs}}\" as=\"g\" hint-placeholder-count=\"5\">\n<button type=\"button\" aria-pressed=\"{{g.pressed}}\" onClick=\"{{g.pick}}\" style=\"min-height: 44px; padding: 0 12px; border: 1px solid {{g.bd}}; border-radius: 6px; background: {{g.bg}}; color: {{g.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; text-align: left; cursor: pointer\">{{g.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid #D9D9D9; border-radius: 8px\">\n<div style=\"display: flex; flex-wrap: wrap; gap: 8px\">\n<sc-for list=\"{{seq}}\" as=\"q\" hint-placeholder-count=\"4\">\n<div style=\"width: {{q.w}}px; min-height: 64px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 8px 0 6px; border-radius: 6px; background: #FFF1CC\">\n<span style=\"font-size: 18px; line-height: 24px; font-weight: 700; color: #121212\">{{q.name}}<\/span>\n<span style=\"font-size: 12px; line-height: 16px; color: #B3121A\">{{q.rn}}<\/span>\n<span id=\"{{q.id}}\" role=\"img\" aria-label=\"{{q.aria}}\" style=\"display: block; margin-top: 4px; line-height: 0\"><\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{progDesc}}<\/p>\n<sc-if value=\"{{hasEx}}\">\n<div style=\"display: flex; flex-direction: column; gap: 4px; padding-top: 8px; border-top: 1px solid #E6E6E6\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.exTitle}}<\/span>\n<sc-for list=\"{{songs}}\" as=\"x\" hint-placeholder-count=\"2\"><span style=\"font-size: 14px; line-height: 20px; color: #121212\">♪ {{x.s}}<\/span><\/sc-for>\n<\/div>\n<\/sc-if>\n<\/div>\n<span style=\"font-size: 14px; line-height: 20px; color: #121212\">{{t.power}}<\/span>\n<div role=\"group\" aria-label=\"{{t.power}}\" style=\"display: flex; gap: 2px; padding: 2px; height: 48px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{hows}}\" as=\"m\" hint-placeholder-count=\"3\">\n<button type=\"button\" aria-pressed=\"{{m.pressed}}\" onClick=\"{{m.pick}}\" style=\"flex: 1; height: 44px; padding: 0; border: 0; border-radius: 4px; background: {{m.sbg}}; color: {{m.sfg}}; box-shadow: {{m.ssh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{m.label}}<\/button>\n<\/sc-for>\n<\/div>\n<p style=\"margin: 0; font-size: 12px; line-height: 16px; color: #5A5A5A\">{{t.foot}}<\/p>\n<a class=\"cta\" href=\"RiffsFamosos.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
 "Riffs": "<div style=\"width: 100%; min-height: var(--mh, 100vh); box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Inter', system-ui, sans-serif; color: #121212\">\n\n<header style=\"height: 56px; box-sizing: border-box; padding: 0 8px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; border-bottom: 1px solid #E6E6E6\">\n<div style=\"display: flex; align-items: center; gap: 4px\"><a href=\"Main.dc.html\" aria-label=\"{{t.backAria}}\" style=\"width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #121212\">\n<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"/><\/svg>\n<\/a><img src=\"@@U0@@\" alt=\"You Rock\" style=\"height: 40px; width: auto; display: block\"><\/div>\n<h1 style=\"margin: 0; text-align: center; font-size: 16px; line-height: 1.33; font-weight: 700; color: #121212\">{{t.title}}<\/h1>\n<div role=\"group\" aria-label=\"{{t.langAria}}\" style=\"justify-self: end; display: flex; gap: 2px; padding: 2px; height: 44px; box-sizing: border-box; border-radius: 6px; background: #F2F2F2\">\n<sc-for list=\"{{langs}}\" as=\"l\" hint-placeholder-count=\"2\">\n<button type=\"button\" aria-pressed=\"{{l.pressed}}\" aria-label=\"{{l.aria}}\" onClick=\"{{l.pick}}\" style=\"width: 44px; height: 40px; padding: 0; border: 0; border-radius: 4px; background: {{l.bg}}; color: {{l.fg}}; box-shadow: {{l.sh}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{l.label}}<\/button>\n<\/sc-for>\n<\/div>\n<\/header>\n\n<main style=\"padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 4px\">\n<span style=\"font-size: 12px; line-height: 16px; font-weight: 500; color: #B3121A\">{{t.eyebrow}}<\/span>\n<p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.intro}}<\/p>\n<\/div><div style=\"display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px\"><sc-for list=\"{{riffs}}\" as=\"c\" hint-placeholder-count=\"3\"><button type=\"button\" aria-pressed=\"{{c.pressed}}\" onClick=\"{{c.pick}}\" style=\"height: 44px; padding: 0 4px; border: 1px solid {{c.bd}}; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer\">{{c.label}}<\/button><\/sc-for><\/div><div style=\"display: {{d1}}; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.rn1}}<\/h2><svg width=\"342\" height=\"134\" viewBox=\"0 0 342 134\" role=\"img\" aria-label=\"{{t.rAria1}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"338\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"338\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"338\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"338\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"338\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"338\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"338\" y1=\"28\" x2=\"338\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"46.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"54\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">0<\/text><rect x=\"82.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"90\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">0<\/text><rect x=\"118.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"126\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">3<\/text><rect x=\"154.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"162\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">0<\/text><rect x=\"190.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"198\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5<\/text><rect x=\"226.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"234\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">0<\/text><rect x=\"262.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"270\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">3<\/text><rect x=\"298.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"306\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">0<\/text><text x=\"46\" y=\"16\" font-size=\"11\" font-weight=\"500\" fill=\"#B3121A\" font-family=\"Inter, sans-serif\">P.M.<\/text><line x1=\"76.0\" y1=\"12\" x2=\"316\" y2=\"12\" stroke=\"#B3121A\" stroke-width=\"1\" stroke-dasharray=\"3 3\"/><line x1=\"316\" y1=\"12\" x2=\"316\" y2=\"20\" stroke=\"#B3121A\" stroke-width=\"1\"/><\/svg><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.rd1}}<\/p><\/div><div style=\"display: {{d2}}; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.rn2}}<\/h2><svg width=\"342\" height=\"134\" viewBox=\"0 0 342 134\" role=\"img\" aria-label=\"{{t.rAria2}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"338\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"338\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"338\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"338\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"338\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"338\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"338\" y1=\"28\" x2=\"338\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"48.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"56\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">0<\/text><rect x=\"48.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"56\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">2<\/text><rect x=\"48.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"56\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">2<\/text><rect x=\"98.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"106\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">0<\/text><rect x=\"98.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"106\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">2<\/text><rect x=\"98.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"106\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">2<\/text><rect x=\"148.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"156\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">3<\/text><rect x=\"148.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"156\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5<\/text><rect x=\"148.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"156\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5<\/text><rect x=\"198.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"206\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5<\/text><rect x=\"198.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"206\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">7<\/text><rect x=\"198.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"206\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">7<\/text><rect x=\"248.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"256\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">3<\/text><rect x=\"248.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"256\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5<\/text><rect x=\"248.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"256\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">5<\/text><rect x=\"298.5\" y=\"110\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"306\" y=\"122\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">0<\/text><rect x=\"298.5\" y=\"92\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"306\" y=\"104\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">2<\/text><rect x=\"298.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"306\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">2<\/text><\/svg><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.rd2}}<\/p><\/div><div style=\"display: {{d3}}; flex-direction: column; gap: 8px\"><h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.rn3}}<\/h2><svg width=\"342\" height=\"134\" viewBox=\"0 0 342 134\" role=\"img\" aria-label=\"{{t.rAria3}}\" style=\"display: block\"><line x1=\"22\" y1=\"28\" x2=\"338\" y2=\"28\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"32\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">e<\/text><line x1=\"22\" y1=\"46\" x2=\"338\" y2=\"46\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"50\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">B<\/text><line x1=\"22\" y1=\"64\" x2=\"338\" y2=\"64\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"68\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">G<\/text><line x1=\"22\" y1=\"82\" x2=\"338\" y2=\"82\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"86\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">D<\/text><line x1=\"22\" y1=\"100\" x2=\"338\" y2=\"100\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"104\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">A<\/text><line x1=\"22\" y1=\"118\" x2=\"338\" y2=\"118\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><text x=\"6\" y=\"122\" font-size=\"11\" fill=\"#8A8A8A\" font-family=\"Inter, sans-serif\">E<\/text><line x1=\"22\" y1=\"28\" x2=\"22\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><line x1=\"338\" y1=\"28\" x2=\"338\" y2=\"118\" stroke=\"#8A8A8A\" stroke-width=\"1.5\"/><rect x=\"75.5\" y=\"20\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"90\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">8p5<\/text><rect x=\"145.5\" y=\"38\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"160\" y=\"50\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">8p5<\/text><rect x=\"215.5\" y=\"56\" width=\"29\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"230\" y=\"68\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">7p5<\/text><rect x=\"282.5\" y=\"74\" width=\"15\" height=\"16\" fill=\"#FFFFFF\"/><text x=\"290\" y=\"86\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"500\" fill=\"#121212\" font-family=\"Inter, sans-serif\">7<\/text><\/svg><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #3A3A3A\">{{t.rd3}}<\/p><\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<h2 style=\"margin: 0; font-size: 16px; line-height: 1.33; font-weight: 400; font-family: 'Archivo Black', 'Inter', sans-serif; letter-spacing: 0.01em; color: #121212\">{{t.howTitle}}<\/h2>\n<div style=\"display: flex; flex-direction: column; gap: 8px\">\n<sc-for list=\"{{how}}\" as=\"s\" hint-placeholder-count=\"4\">\n<div style=\"display: flex; align-items: flex-start; gap: 12px\">\n<span style=\"width: 28px; height: 28px; flex: none; border-radius: 250px; background: #FFF1CC; color: #B3121A; font-size: 14px; line-height: 20px; font-weight: 500; display: flex; align-items: center; justify-content: center\">{{s.n}}<\/span>\n<span style=\"font-size: 14px; line-height: 28px; color: #121212\">{{s.text}}<\/span>\n<\/div>\n<\/sc-for>\n<\/div>\n<\/div>\n<div style=\"display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 8px; background: #FFF1CC\"><span style=\"font-size: 14px; line-height: 20px; font-weight: 700; color: #121212\">{{t.noteTitle}}<\/span><p style=\"margin: 0; font-size: 14px; line-height: 20px; color: #121212\">{{t.noteText}}<\/p><\/div><a class=\"cta\" href=\"Plan.dc.html\" style=\"height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #E31B23; color: #FFFFFF; font-size: 16px; line-height: 1.3; font-weight: 500\">{{t.cta}}<\/a>\n<\/main>\n<\/div>",
@@ -2206,7 +2264,7 @@ const TPL = {
 };
 
 const ORDER = ["Inicio", "Herramientas", "Avanzada", "Main", "TeoImp", "RiffsFamosos", "Relativo", "EjPua", "QueRitmo", "Subdivision", "ControlesTono", "Partitura", "Braco", "Quiz", "Abiertos", "CambioAcordes", "TeoriaAcordes", "BarreDos", "EntMastil", "Canciones", "Buscador", "PowerChord", "Shapes", "Barre", "PowerQuiz", "Afinacion", "OtrasAfinaciones", "Postura", "ComoPracticar", "Pulso", "Batidas", "Tablatura", "Cifras", "Tecnicas", "Escalas", "Pentatonica", "Progresiones", "Plan", "Teoria", "Caged", "Septimas", "Blues", "Sistema32", "Improvisacion", "Modos", "RitmoAvanzado", "TecnicaPro", "Oido", "Sonido", "Repertorio", "Grabacion", "Posiciones", "Arpegios", "ModosCurso", "MenoresAv", "ImproEj", "Bending", "ArmoniaMov", "Reducida", "Acentos", "ManoDer", "Hotel", "Aranha", "Cancionero", "Can1", "Can2", "Can3", "Can4", "Can5", "Can6", "Can7", "Can8", "Can9", "Estilo", "Ejercicios1", "QueImprovisar", "BluesImpro", "Trucos"];
-const NAV = {"es": {"mods": [{"title": "Primeros pasos", "steps": [{"label": "Las guitarras y su sonido", "href": "ControlesTono"}, {"label": "Afinación", "href": "Afinacion"}, {"label": "Postura y manos", "href": "Postura"}, {"label": "Cómo practicar", "href": "ComoPracticar"}, {"label": "Sonido y equipo", "href": "Sonido"}]}, {"title": "Leer música", "steps": [{"label": "La partitura", "href": "Partitura"}, {"label": "La Tablatura", "href": "Tablatura"}, {"label": "Cifrado Americano", "href": "Cifras"}, {"label": "Las notas en la guitarra", "href": "Braco"}]}, {"title": "Acompañamiento", "z": 1, "steps": [{"label": "Teoría Imprescindible", "href": "TeoImp"}, {"label": "Los primeros acordes", "href": "Abiertos"}, {"label": "Ritmos de acompañamiento", "href": "Batidas"}, {"label": "Acordes con cejilla (A y E)", "href": "Barre"}, {"label": "Acordes con cejilla (D y C)", "href": "BarreDos"}, {"label": "Buscador de acordes", "href": "Buscador"}, {"label": "Bonus Track: Entendiendo el mástil", "href": "EntMastil"}]}, {"title": "Armonía avanzada", "steps": [{"label": "¿Qué es un power chord?", "href": "PowerChord"}, {"label": "Acordes con séptima", "href": "Septimas"}, {"label": "Otros tipos de acordes", "href": "ArmoniaMov"}, {"label": "Guitarra reducida", "href": "Reducida"}, {"label": "Sistema CAGED", "href": "Caged"}]}, {"title": "Mano derecha", "steps": [{"label": "¿Qué es el ritmo?", "href": "QueRitmo"}, {"label": "La subdivisión", "href": "Subdivision"}, {"label": "Acentuación con la púa", "href": "Acentos"}, {"label": "Ejercicios de púa", "href": "EjPua"}, {"label": "Mano derecha: patrones y palm mute", "href": "ManoDer"}]}, {"title": "Mano izquierda", "steps": [{"label": "¿Qué son las escalas?", "href": "Escalas"}, {"label": "Pentatónica menor", "href": "Pentatonica"}, {"label": "Hammer-on, pull-off, slide y bend", "href": "Tecnicas"}, {"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Hacer música con la pentatónica", "href": "HacerMusica"}]}, {"title": "Solo e improvisación", "steps": [{"label": "¿Qué es improvisar?", "href": "QueImprovisar"}, {"label": "Tu primera improvisación: el Blues", "href": "BluesImpro"}, {"label": "Improvisación guiada", "href": "ImproEj"}]}, {"title": "Repertorio y práctica", "steps": [{"label": "Riffs famosos", "href": "RiffsFamosos"}, {"label": "Something", "href": "Something"}, {"label": "Hotel California", "href": "Hotel"}]}, {"title": "Cuaderno de ejercicios", "steps": [{"label": "Plan de práctica", "href": "Plan"}, {"label": "Grabación y autoevaluación", "href": "Grabacion"}, {"label": "Ejercicio 1: Cambios básicos", "href": "Ejercicios1"}, {"label": "La araña", "href": "Aranha"}]}], "course": {"mods": [{"title": "Pentatónica en 5 posiciones", "steps": [{"label": "Pentatónica menor", "href": "Pentatonica"}, {"label": "Escalas en posiciones", "href": "Posiciones?scale=pmin&root=9"}, {"label": "Sistema 3:2", "href": "Sistema32"}]}, {"title": "Escala mayor en 5 posiciones", "steps": [{"label": "Escalas en posiciones", "href": "Posiciones?scale=maj&root=0"}]}, {"title": "Escala menor en 5 posiciones", "steps": [{"label": "Escalas en posiciones", "href": "Posiciones?scale=min&root=9"}]}, {"title": "Arpegios mayores y menores", "steps": [{"label": "Arpegios", "href": "Arpegios"}]}, {"title": "Arpegios de 7ª mayor y menor", "steps": [{"label": "Arpegios", "href": "Arpegios"}, {"label": "Acordes con séptima", "href": "Septimas"}]}, {"title": "Los modos como concepto", "steps": [{"label": "Modos como concepto", "href": "ModosCurso"}, {"label": "Mixolidio y dórico", "href": "Modos"}]}, {"title": "Improvisación I", "steps": [{"label": "Improvisación guiada", "href": "ImproEj"}, {"label": "Improvisar sobre 12 compases", "href": "Improvisacion"}]}, {"title": "Improvisación II", "steps": [{"label": "Improvisación guiada", "href": "ImproEj"}, {"label": "Pentatónica y blues", "href": "Blues"}]}, {"title": "Mano izquierda I: bending y vibrato", "steps": [{"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Técnicas de rock", "href": "Tecnicas"}]}, {"title": "Mano izquierda II: slides y ligados", "steps": [{"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Técnica refinada", "href": "TecnicaPro"}]}, {"title": "Armonía I: cejilla, 7ª y 9ª", "steps": [{"label": "Sistema CAGED", "href": "Caged"}, {"label": "Acordes con cejilla (A y E)", "href": "Barre"}, {"label": "Acordes móviles", "href": "ArmoniaMov"}, {"label": "Acordes con séptima", "href": "Septimas"}]}, {"title": "Armonía II: sus2, sus4 y guitarra reducida", "steps": [{"label": "Acordes móviles", "href": "ArmoniaMov"}, {"label": "Guitarra reducida", "href": "Reducida"}]}, {"title": "Mano derecha I: acentuación y ritmos", "steps": [{"label": "Acentuación con la púa", "href": "Acentos"}, {"label": "La araña", "href": "Aranha"}, {"label": "Ritmo avanzado", "href": "RitmoAvanzado"}, {"label": "Patrones de ritmo", "href": "Batidas"}]}, {"title": "Mano derecha II: arpegios, trémolo y palm-mute", "steps": [{"label": "Arpegios, trémolo y palm-mute", "href": "ManoDer"}, {"label": "Técnicas de rock", "href": "Tecnicas"}]}, {"title": "Avanzado y repertorio", "steps": [{"label": "Menor armónica y melódica", "href": "MenoresAv"}, {"label": "Hotel California", "href": "Hotel"}]}]}, "music": {"mods": [{"title": "Cancionero esencial", "steps": [{"label": "The Sky Is Crying", "href": "Can1"}, {"label": "Tutti Frutti", "href": "Can2"}, {"label": "Fly Me to the Moon", "href": "Can3"}, {"label": "Easy", "href": "Can4"}, {"label": "Celebration", "href": "Can5"}, {"label": "Paint It Black", "href": "Can6"}, {"label": "Three Little Birds", "href": "Can7"}, {"label": "Paranoid", "href": "Can8"}, {"label": "This Is the Life", "href": "Can9"}]}]}}, "en": {"mods": [{"title": "First steps", "steps": [{"label": "Guitars and their sound", "href": "ControlesTono"}, {"label": "Tuning", "href": "Afinacion"}, {"label": "Posture and hands", "href": "Postura"}, {"label": "How to practice", "href": "ComoPracticar"}, {"label": "Sound and gear", "href": "Sonido"}]}, {"title": "Reading music", "steps": [{"label": "Sheet music", "href": "Partitura"}, {"label": "Tablature", "href": "Tablatura"}, {"label": "Chord symbols", "href": "Cifras"}, {"label": "Notes on the guitar", "href": "Braco"}]}, {"title": "Accompaniment", "z": 1, "steps": [{"label": "Must-Know Theory", "href": "TeoImp"}, {"label": "The first chords", "href": "Abiertos"}, {"label": "Accompaniment rhythms", "href": "Batidas"}, {"label": "Barre chords (A and E)", "href": "Barre"}, {"label": "Barre chords (D and C)", "href": "BarreDos"}, {"label": "Chord finder", "href": "Buscador"}, {"label": "Bonus Track: Understanding the neck", "href": "EntMastil"}]}, {"title": "Advanced harmony", "steps": [{"label": "What is a power chord?", "href": "PowerChord"}, {"label": "Seventh chords", "href": "Septimas"}, {"label": "Other chord types", "href": "ArmoniaMov"}, {"label": "Reduced guitar", "href": "Reducida"}, {"label": "CAGED system", "href": "Caged"}]}, {"title": "Right hand", "steps": [{"label": "What is rhythm?", "href": "QueRitmo"}, {"label": "Subdivision", "href": "Subdivision"}, {"label": "Picking accents", "href": "Acentos"}, {"label": "Picking exercises", "href": "EjPua"}, {"label": "Right hand: patterns and palm mute", "href": "ManoDer"}]}, {"title": "Left hand", "steps": [{"label": "What are scales?", "href": "Escalas"}, {"label": "Minor pentatonic", "href": "Pentatonica"}, {"label": "Hammer-on, pull-off, slide and bend", "href": "Tecnicas"}, {"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Making music with the pentatonic", "href": "HacerMusica"}]}, {"title": "Solos and improvisation", "steps": [{"label": "What is improvising?", "href": "QueImprovisar"}, {"label": "Your first improvisation: the Blues", "href": "BluesImpro"}, {"label": "Guided improvisation", "href": "ImproEj"}]}, {"title": "Repertoire and practice", "steps": [{"label": "Famous riffs", "href": "RiffsFamosos"}, {"label": "Something", "href": "Something"}, {"label": "Hotel California", "href": "Hotel"}]}, {"title": "Exercise book", "steps": [{"label": "Practice plan", "href": "Plan"}, {"label": "Recording and self-review", "href": "Grabacion"}, {"label": "Exercise 1: Basic changes", "href": "Ejercicios1"}, {"label": "The spider", "href": "Aranha"}]}], "course": {"mods": [{"title": "Pentatonic in 5 positions", "steps": [{"label": "Minor pentatonic", "href": "Pentatonica"}, {"label": "Scales in positions", "href": "Posiciones?scale=pmin&root=9"}, {"label": "3:2 system", "href": "Sistema32"}]}, {"title": "Major scale in 5 positions", "steps": [{"label": "Scales in positions", "href": "Posiciones?scale=maj&root=0"}]}, {"title": "Minor scale in 5 positions", "steps": [{"label": "Scales in positions", "href": "Posiciones?scale=min&root=9"}]}, {"title": "Major and minor arpeggios", "steps": [{"label": "Arpeggios", "href": "Arpegios"}]}, {"title": "Major and minor 7th arpeggios", "steps": [{"label": "Arpeggios", "href": "Arpegios"}, {"label": "Seventh chords", "href": "Septimas"}]}, {"title": "Modes as a concept", "steps": [{"label": "Modes as a concept", "href": "ModosCurso"}, {"label": "Mixolydian and Dorian", "href": "Modos"}]}, {"title": "Improvisation I", "steps": [{"label": "Guided improvisation", "href": "ImproEj"}, {"label": "Improvising over 12 bars", "href": "Improvisacion"}]}, {"title": "Improvisation II", "steps": [{"label": "Guided improvisation", "href": "ImproEj"}, {"label": "Pentatonic and blues", "href": "Blues"}]}, {"title": "Left hand I: bending and vibrato", "steps": [{"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Rock techniques", "href": "Tecnicas"}]}, {"title": "Left hand II: slides and legato", "steps": [{"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Refined technique", "href": "TecnicaPro"}]}, {"title": "Harmony I: barre, 7th and 9th", "steps": [{"label": "CAGED system", "href": "Caged"}, {"label": "Barre chords (A and E)", "href": "Barre"}, {"label": "Movable chords", "href": "ArmoniaMov"}, {"label": "Seventh chords", "href": "Septimas"}]}, {"title": "Harmony II: sus2, sus4 and reduced guitar", "steps": [{"label": "Movable chords", "href": "ArmoniaMov"}, {"label": "Reduced guitar", "href": "Reducida"}]}, {"title": "Right hand I: accents and rhythms", "steps": [{"label": "Picking accents", "href": "Acentos"}, {"label": "The spider", "href": "Aranha"}, {"label": "Advanced rhythm", "href": "RitmoAvanzado"}, {"label": "Rhythm patterns", "href": "Batidas"}]}, {"title": "Right hand II: arpeggios, tremolo and palm-mute", "steps": [{"label": "Arpeggios, tremolo and palm-mute", "href": "ManoDer"}, {"label": "Rock techniques", "href": "Tecnicas"}]}, {"title": "Advanced and repertoire", "steps": [{"label": "Harmonic and melodic minor", "href": "MenoresAv"}, {"label": "Hotel California", "href": "Hotel"}]}]}, "music": {"mods": [{"title": "Essential songbook", "steps": [{"label": "The Sky Is Crying", "href": "Can1"}, {"label": "Tutti Frutti", "href": "Can2"}, {"label": "Fly Me to the Moon", "href": "Can3"}, {"label": "Easy", "href": "Can4"}, {"label": "Celebration", "href": "Can5"}, {"label": "Paint It Black", "href": "Can6"}, {"label": "Three Little Birds", "href": "Can7"}, {"label": "Paranoid", "href": "Can8"}, {"label": "This Is the Life", "href": "Can9"}]}]}}};
+const NAV = {"es": {"mods": [{"title": "Primeros pasos", "steps": [{"label": "Las guitarras y su sonido", "href": "ControlesTono"}, {"label": "Afinación", "href": "Afinacion"}, {"label": "Postura y manos", "href": "Postura"}, {"label": "Cómo practicar", "href": "ComoPracticar"}, {"label": "Sonido y equipo", "href": "Sonido"}]}, {"title": "Leer música", "steps": [{"label": "La partitura", "href": "Partitura"}, {"label": "La Tablatura", "href": "Tablatura"}, {"label": "Cifrado Americano", "href": "Cifras"}, {"label": "Las notas en la guitarra", "href": "Braco"}]}, {"title": "Acordes", "steps": [{"label": "Teoría Imprescindible", "href": "TeoImp"}, {"label": "Los primeros acordes", "href": "Abiertos"}, {"label": "Ritmos de acompañamiento", "href": "Batidas"}, {"label": "Acordes con cejilla (A y E)", "href": "Barre"}, {"label": "Acordes con cejilla (D y C)", "href": "BarreDos"}, {"label": "Buscador de acordes", "href": "Buscador"}, {"label": "Bonus Track: Entendiendo el mástil", "href": "EntMastil"}]}, {"title": "Armonía avanzada", "steps": [{"label": "¿Qué es un power chord?", "href": "PowerChord"}, {"label": "Acordes con séptima", "href": "Septimas"}, {"label": "Otros tipos de acordes", "href": "ArmoniaMov"}, {"label": "Guitarra reducida", "href": "Reducida"}, {"label": "Sistema CAGED", "href": "Caged"}]}, {"title": "Mano derecha y Riffs", "steps": [{"label": "¿Qué es el ritmo?", "href": "QueRitmo"}, {"label": "La subdivisión", "href": "Subdivision"}, {"label": "Ejercicios de acentuación", "href": "Acentos"}, {"label": "Ejercicios de silencio", "href": "EjPua"}, {"label": "Mano derecha: patrones y palm mute", "href": "ManoDer"}]}, {"title": "Mano izquierda", "steps": [{"label": "¿Qué son las escalas?", "href": "Escalas"}, {"label": "Pentatónica menor", "href": "Pentatonica"}, {"label": "Hammer-on, pull-off, slide y bend", "href": "Tecnicas"}, {"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Hacer música con la pentatónica", "href": "HacerMusica"}]}, {"title": "Solo e improvisación", "steps": [{"label": "¿Qué es improvisar?", "href": "QueImprovisar"}, {"label": "Tu primera improvisación: el Blues", "href": "BluesImpro"}, {"label": "Improvisación guiada", "href": "ImproEj"}]}, {"title": "Repertorio y práctica", "steps": [{"label": "Riffs famosos", "href": "RiffsFamosos"}, {"label": "Something", "href": "Something"}, {"label": "Hotel California", "href": "Hotel"}]}, {"title": "Cuaderno de ejercicios", "steps": [{"label": "Plan de práctica", "href": "Plan"}, {"label": "Grabación y autoevaluación", "href": "Grabacion"}, {"label": "Ejercicio 1: Cambios básicos", "href": "Ejercicios1"}, {"label": "La araña", "href": "Aranha"}]}], "course": {"mods": [{"title": "Pentatónica en 5 posiciones", "steps": [{"label": "Pentatónica menor", "href": "Pentatonica"}, {"label": "Escalas en posiciones", "href": "Posiciones?scale=pmin&root=9"}, {"label": "Sistema 3:2", "href": "Sistema32"}]}, {"title": "Escala mayor en 5 posiciones", "steps": [{"label": "Escalas en posiciones", "href": "Posiciones?scale=maj&root=0"}]}, {"title": "Escala menor en 5 posiciones", "steps": [{"label": "Escalas en posiciones", "href": "Posiciones?scale=min&root=9"}]}, {"title": "Arpegios mayores y menores", "steps": [{"label": "Arpegios", "href": "Arpegios"}]}, {"title": "Arpegios de 7ª mayor y menor", "steps": [{"label": "Arpegios", "href": "Arpegios"}, {"label": "Acordes con séptima", "href": "Septimas"}]}, {"title": "Los modos como concepto", "steps": [{"label": "Modos como concepto", "href": "ModosCurso"}, {"label": "Mixolidio y dórico", "href": "Modos"}]}, {"title": "Improvisación I", "steps": [{"label": "Improvisación guiada", "href": "ImproEj"}, {"label": "Improvisar sobre 12 compases", "href": "Improvisacion"}]}, {"title": "Improvisación II", "steps": [{"label": "Improvisación guiada", "href": "ImproEj"}, {"label": "Pentatónica y blues", "href": "Blues"}]}, {"title": "Mano izquierda I: bending y vibrato", "steps": [{"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Técnicas de rock", "href": "Tecnicas"}]}, {"title": "Mano izquierda II: slides y ligados", "steps": [{"label": "Bendings, slides y vibrato", "href": "Bending"}, {"label": "Técnica refinada", "href": "TecnicaPro"}]}, {"title": "Armonía I: cejilla, 7ª y 9ª", "steps": [{"label": "Sistema CAGED", "href": "Caged"}, {"label": "Acordes con cejilla (A y E)", "href": "Barre"}, {"label": "Acordes móviles", "href": "ArmoniaMov"}, {"label": "Acordes con séptima", "href": "Septimas"}]}, {"title": "Armonía II: sus2, sus4 y guitarra reducida", "steps": [{"label": "Acordes móviles", "href": "ArmoniaMov"}, {"label": "Guitarra reducida", "href": "Reducida"}]}, {"title": "Mano derecha I: acentuación y ritmos", "steps": [{"label": "Ejercicios de acentuación", "href": "Acentos"}, {"label": "La araña", "href": "Aranha"}, {"label": "Ritmo avanzado", "href": "RitmoAvanzado"}, {"label": "Patrones de ritmo", "href": "Batidas"}]}, {"title": "Mano derecha II: arpegios, trémolo y palm-mute", "steps": [{"label": "Arpegios, trémolo y palm-mute", "href": "ManoDer"}, {"label": "Técnicas de rock", "href": "Tecnicas"}]}, {"title": "Avanzado y repertorio", "steps": [{"label": "Menor armónica y melódica", "href": "MenoresAv"}, {"label": "Hotel California", "href": "Hotel"}]}]}, "music": {"mods": [{"title": "Cancionero esencial", "steps": [{"label": "The Sky Is Crying", "href": "Can1"}, {"label": "Tutti Frutti", "href": "Can2"}, {"label": "Fly Me to the Moon", "href": "Can3"}, {"label": "Easy", "href": "Can4"}, {"label": "Celebration", "href": "Can5"}, {"label": "Paint It Black", "href": "Can6"}, {"label": "Three Little Birds", "href": "Can7"}, {"label": "Paranoid", "href": "Can8"}, {"label": "This Is the Life", "href": "Can9"}]}]}}, "en": {"mods": [{"title": "First steps", "steps": [{"label": "Guitars and their sound", "href": "ControlesTono"}, {"label": "Tuning", "href": "Afinacion"}, {"label": "Posture and hands", "href": "Postura"}, {"label": "How to practice", "href": "ComoPracticar"}, {"label": "Sound and gear", "href": "Sonido"}]}, {"title": "Reading music", "steps": [{"label": "Sheet music", "href": "Partitura"}, {"label": "Tablature", "href": "Tablatura"}, {"label": "Chord symbols", "href": "Cifras"}, {"label": "Notes on the guitar", "href": "Braco"}]}, {"title": "Chords", "steps": [{"label": "Must-Know Theory", "href": "TeoImp"}, {"label": "The first chords", "href": "Abiertos"}, {"label": "Accompaniment rhythms", "href": "Batidas"}, {"label": "Barre chords (A and E)", "href": "Barre"}, {"label": "Barre chords (D and C)", "href": "BarreDos"}, {"label": "Chord finder", "href": "Buscador"}, {"label": "Bonus Track: Understanding the neck", "href": "EntMastil"}]}, {"title": "Advanced harmony", "steps": [{"label": "What is a power chord?", "href": "PowerChord"}, {"label": "Seventh chords", "href": "Septimas"}, {"label": "Other chord types", "href": "ArmoniaMov"}, {"label": "Reduced guitar", "href": "Reducida"}, {"label": "CAGED system", "href": "Caged"}]}, {"title": "Right hand and riffs", "steps": [{"label": "What is rhythm?", "href": "QueRitmo"}, {"label": "Subdivision", "href": "Subdivision"}, {"label": "Accent exercises", "href": "Acentos"}, {"label": "Rest exercises", "href": "EjPua"}, {"label": "Right hand: patterns and palm mute", "href": "ManoDer"}]}, {"title": "Left hand", "steps": [{"label": "What are scales?", "href": "Escalas"}, {"label": "Minor pentatonic", "href": "Pentatonica"}, {"label": "Hammer-on, pull-off, slide and bend", "href": "Tecnicas"}, {"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Making music with the pentatonic", "href": "HacerMusica"}]}, {"title": "Solos and improvisation", "steps": [{"label": "What is improvising?", "href": "QueImprovisar"}, {"label": "Your first improvisation: the Blues", "href": "BluesImpro"}, {"label": "Guided improvisation", "href": "ImproEj"}]}, {"title": "Repertoire and practice", "steps": [{"label": "Famous riffs", "href": "RiffsFamosos"}, {"label": "Something", "href": "Something"}, {"label": "Hotel California", "href": "Hotel"}]}, {"title": "Exercise book", "steps": [{"label": "Practice plan", "href": "Plan"}, {"label": "Recording and self-review", "href": "Grabacion"}, {"label": "Exercise 1: Basic changes", "href": "Ejercicios1"}, {"label": "The spider", "href": "Aranha"}]}], "course": {"mods": [{"title": "Pentatonic in 5 positions", "steps": [{"label": "Minor pentatonic", "href": "Pentatonica"}, {"label": "Scales in positions", "href": "Posiciones?scale=pmin&root=9"}, {"label": "3:2 system", "href": "Sistema32"}]}, {"title": "Major scale in 5 positions", "steps": [{"label": "Scales in positions", "href": "Posiciones?scale=maj&root=0"}]}, {"title": "Minor scale in 5 positions", "steps": [{"label": "Scales in positions", "href": "Posiciones?scale=min&root=9"}]}, {"title": "Major and minor arpeggios", "steps": [{"label": "Arpeggios", "href": "Arpegios"}]}, {"title": "Major and minor 7th arpeggios", "steps": [{"label": "Arpeggios", "href": "Arpegios"}, {"label": "Seventh chords", "href": "Septimas"}]}, {"title": "Modes as a concept", "steps": [{"label": "Modes as a concept", "href": "ModosCurso"}, {"label": "Mixolydian and Dorian", "href": "Modos"}]}, {"title": "Improvisation I", "steps": [{"label": "Guided improvisation", "href": "ImproEj"}, {"label": "Improvising over 12 bars", "href": "Improvisacion"}]}, {"title": "Improvisation II", "steps": [{"label": "Guided improvisation", "href": "ImproEj"}, {"label": "Pentatonic and blues", "href": "Blues"}]}, {"title": "Left hand I: bending and vibrato", "steps": [{"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Rock techniques", "href": "Tecnicas"}]}, {"title": "Left hand II: slides and legato", "steps": [{"label": "Bends, slides and vibrato", "href": "Bending"}, {"label": "Refined technique", "href": "TecnicaPro"}]}, {"title": "Harmony I: barre, 7th and 9th", "steps": [{"label": "CAGED system", "href": "Caged"}, {"label": "Barre chords (A and E)", "href": "Barre"}, {"label": "Movable chords", "href": "ArmoniaMov"}, {"label": "Seventh chords", "href": "Septimas"}]}, {"title": "Harmony II: sus2, sus4 and reduced guitar", "steps": [{"label": "Movable chords", "href": "ArmoniaMov"}, {"label": "Reduced guitar", "href": "Reducida"}]}, {"title": "Right hand I: accents and rhythms", "steps": [{"label": "Accent exercises", "href": "Acentos"}, {"label": "The spider", "href": "Aranha"}, {"label": "Advanced rhythm", "href": "RitmoAvanzado"}, {"label": "Rhythm patterns", "href": "Batidas"}]}, {"title": "Right hand II: arpeggios, tremolo and palm-mute", "steps": [{"label": "Arpeggios, tremolo and palm-mute", "href": "ManoDer"}, {"label": "Rock techniques", "href": "Tecnicas"}]}, {"title": "Advanced and repertoire", "steps": [{"label": "Harmonic and melodic minor", "href": "MenoresAv"}, {"label": "Hotel California", "href": "Hotel"}]}]}, "music": {"mods": [{"title": "Essential songbook", "steps": [{"label": "The Sky Is Crying", "href": "Can1"}, {"label": "Tutti Frutti", "href": "Can2"}, {"label": "Fly Me to the Moon", "href": "Can3"}, {"label": "Easy", "href": "Can4"}, {"label": "Celebration", "href": "Can5"}, {"label": "Paint It Black", "href": "Can6"}, {"label": "Three Little Birds", "href": "Can7"}, {"label": "Paranoid", "href": "Can8"}, {"label": "This Is the Life", "href": "Can9"}]}]}}};
 const SEQS = {"ruta": ["ControlesTono", "Afinacion", "Postura", "ComoPracticar", "Sonido", "Partitura", "Tablatura", "Cifras", "Braco", "TeoImp", "Abiertos", "Batidas", "Barre", "BarreDos", "Buscador", "EntMastil", "PowerChord", "Septimas", "ArmoniaMov", "Reducida", "Caged", "QueRitmo", "Subdivision", "Acentos", "EjPua", "ManoDer", "Escalas", "Pentatonica", "Tecnicas", "Bending", "HacerMusica", "QueImprovisar", "BluesImpro", "ImproEj", "RiffsFamosos", "Something", "Hotel", "Plan", "Grabacion", "Ejercicios1", "Aranha"], "curso": ["Pentatonica", "Posiciones?scale=pmin&root=9", "Sistema32", "Arpegios", "Septimas", "ModosCurso", "Modos", "ImproEj", "Improvisacion", "Blues", "Bending", "Tecnicas", "TecnicaPro", "Caged", "Barre", "ArmoniaMov", "Reducida", "Acentos", "Aranha", "RitmoAvanzado", "Batidas", "ManoDer", "MenoresAv", "Hotel"], "musica": ["Can1", "Can2", "Can3", "Can4", "Can5", "Can6", "Can7", "Can8", "Can9"]};
 (function () {
 'use strict';
@@ -2389,7 +2447,7 @@ const D = {
   "i6X": "Formas de Re y Do que se deslizan por el mástil.",
   "i7T": "Figuras por el mástil",
   "i7X": "Las figuras por cuerda o por CAGED.",
-  "i9T": "Acentuación con la púa",
+  "i9T": "Ejercicios de acentuación",
   "i9X": "Acentos y dirección de la púa.",
   "i11T": "La araña",
   "i11X": "Ejercicio de digitación para la mano izquierda.",
@@ -2432,7 +2490,7 @@ const D = {
   "i6X": "D and C shapes sliding along the neck.",
   "i7T": "Shapes on the fretboard",
   "i7X": "Shapes by string or by CAGED.",
-  "i9T": "Picking accents",
+  "i9T": "Accent exercises",
   "i9X": "Accents and pick direction.",
   "i11T": "The spider",
   "i11X": "Fingering exercise for the left hand.",
@@ -2634,8 +2692,8 @@ const D = {
       [
         "¿Qué es el ritmo?",
         "La subdivisión",
-        "Acentuación con la púa",
-        "Ejercicios de púa",
+        "Ejercicios de acentuación",
+        "Ejercicios de silencio",
         "Mano derecha: patrones y palm mute"
       ],
       [
@@ -2731,15 +2789,15 @@ const D = {
     "mTitle2": "Leer música",
     "mLabel2": "Módulo 2 · Básico",
     "mAria2": "Módulo 2: Leer música",
-    "mTitle3": "Acompañamiento",
+    "mTitle3": "Acordes",
     "mLabel3": "Módulo 3 · Básico e intermedio",
-    "mAria3": "Módulo 3: Acompañamiento",
+    "mAria3": "Módulo 3: Acordes",
     "mTitle4": "Armonía avanzada",
     "mLabel4": "Módulo 4 · Avanzado",
     "mAria4": "Módulo 4: Armonía avanzada",
-    "mTitle5": "Mano derecha",
+    "mTitle5": "Mano derecha y Riffs",
     "mLabel5": "Módulo 5 · Básico e intermedio",
-    "mAria5": "Módulo 5: Mano derecha",
+    "mAria5": "Módulo 5: Mano derecha y Riffs",
     "mTitle6": "Mano izquierda",
     "mLabel6": "Módulo 6 · Intermedio y avanzado",
     "mAria6": "Módulo 6: Mano izquierda",
@@ -2795,8 +2853,8 @@ const D = {
       [
         "What is rhythm?",
         "Subdivision",
-        "Picking accents",
-        "Picking exercises",
+        "Accent exercises",
+        "Rest exercises",
         "Right hand: patterns and palm mute"
       ],
       [
@@ -2892,15 +2950,15 @@ const D = {
     "mTitle2": "Reading music",
     "mLabel2": "Module 2 · Basic",
     "mAria2": "Module 2: Reading music",
-    "mTitle3": "Accompaniment",
+    "mTitle3": "Chords",
     "mLabel3": "Module 3 · Basic to intermediate",
-    "mAria3": "Module 3: Accompaniment",
+    "mAria3": "Module 3: Chords",
     "mTitle4": "Advanced harmony",
     "mLabel4": "Module 4 · Advanced",
     "mAria4": "Module 4: Advanced harmony",
-    "mTitle5": "Right hand",
+    "mTitle5": "Right hand and riffs",
     "mLabel5": "Module 5 · Basic to intermediate",
-    "mAria5": "Module 5: Right hand",
+    "mAria5": "Module 5: Right hand and riffs",
     "mTitle6": "Left hand",
     "mLabel6": "Module 6 · Intermediate and advanced",
     "mAria6": "Module 6: Left hand",
@@ -4617,7 +4675,7 @@ C["EntMastil"] = (DCLogic) => {
 // Entendiendo el mástil, nueva versión: una progresión, tres formas de tocarla (abiertos, cejilla, power chords)
 const EM_TX = {
   es: {
-    langAria: 'Idioma', backAria: 'Volver a la ruta', title: 'Bonus Track: Entendiendo el mástil', eyebrow: 'Módulo 4', cta: 'Siguiente',
+    langAria: 'Idioma', backAria: 'Volver a la ruta', title: 'Bonus Track: Entendiendo el mástil', eyebrow: 'Módulo 3 · Paso 3.7 de 3.7', cta: 'Siguiente',
     intro: 'Una misma progresión se puede tocar de varias maneras. Elige una tonalidad y una progresión, y decide cómo la tocas: con acordes abiertos, con cejilla o con power chords.',
     key: 'Tonalidad', modeAria: 'Modo', maj: 'Mayor', min: 'Menor', prog: 'Progresión', progHelp: 'Los números romanos indican el lugar que ocupa cada acorde dentro de la tonalidad. El I es el acorde que da nombre a la tonalidad (en Do mayor, Do), el IV es el cuarto acorde, el V es el quinto, y así sucesivamente. La mayúscula indica un acorde mayor, la minúscula un acorde menor, y el ♭ baja el acorde medio tono.', how: 'Cómo la tocas', chords: 'Acordes de la progresión',
     m_open: 'Abiertos', m_barre: 'Cejilla', m_power: 'Power chords',
@@ -4642,7 +4700,7 @@ const EM_TX = {
     foot: 'Los nombres usan una sola grafía por nota (por ejemplo Mib en vez de Re#). Los acordes de la tonalidad menor son los de la escala menor natural. El tono de cada canción es el de la grabación original.'
   },
   en: {
-    langAria: 'Language', backAria: 'Back to the path', title: 'Bonus Track: Understanding the neck', eyebrow: 'Module 4', cta: 'Next',
+    langAria: 'Language', backAria: 'Back to the path', title: 'Bonus Track: Understanding the neck', eyebrow: 'Module 3 · Step 3.7 of 3.7', cta: 'Next',
     intro: 'The same progression can be played in several ways. Pick a key and a progression, then decide how you play it: open chords, barre chords or power chords.',
     key: 'Key', modeAria: 'Mode', maj: 'Major', min: 'Minor', prog: 'Progression', progHelp: 'The Roman numerals show where each chord sits in the key. The I is the chord that names the key (in C major, C), the IV is the fourth chord, the V is the fifth, and so on. An uppercase numeral means a major chord, a lowercase one means a minor chord, and the ♭ lowers the chord by a half step.', how: 'How you play it', chords: 'Chords in the progression',
     m_open: 'Open', m_barre: 'Barre', m_power: 'Power chords',
@@ -5239,7 +5297,7 @@ try { localStorage.setItem('guitar.lang', l); } catch (e) {}
 }
 // "Escuchar" turns into "Parar" while it sounds (keep = the caller is about to start something else)
 resetBtns() { document.querySelectorAll('#rt-root .rt-play[data-stp]').forEach((b) => { b.textContent = b._lab || b.textContent; b.removeAttribute('data-stp'); }); }
-halt(keep) { if (!keep) this.resetBtns(); (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('.rt-on').forEach((e) => e.classList.remove('rt-on')); }
+halt(keep) { yrCut(); if (!keep) this.resetBtns(); (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('.rt-on').forEach((e) => e.classList.remove('rt-on')); }
 click(at, strong) {
 const ac = this._ac;
 const o = ac.createOscillator(), g = ac.createGain();
@@ -5529,7 +5587,7 @@ setLang(l) {
 this.setState({ lang: l });
 try { localStorage.setItem('guitar.lang', l); } catch (e) {}
 }
-halt() { (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('#ep-root .rt-on').forEach((e) => e.classList.remove('rt-on')); this._playing = null; }
+halt() { yrCut(); (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('#ep-root .rt-on').forEach((e) => e.classList.remove('rt-on')); this._playing = null; }
 click(at, vol, f) {
 const ac = this._ac, o = ac.createOscillator(), g = ac.createGain();
 o.type = 'square'; o.frequency.value = f;
@@ -5668,7 +5726,7 @@ paintBtns() { document.querySelectorAll('#ep-root .rt-play').forEach((b) => { co
 renderVals() {
 const st = this.state, lang = st.lang, es = lang === 'es';
 const T = es ? {
-langAria: 'Idioma', backAria: 'Volver a la ruta', title: 'Ejercicios de púa', eyebrow: 'Módulo 5',
+langAria: 'Idioma', backAria: 'Volver a la ruta', title: 'Ejercicios de silencio', eyebrow: 'Módulo 5',
 intro: 'Ejercicios para que tu mano derecha gane control y regularidad. Cada uno trae una explicación corta, la partitura y un vídeo del profesor tocándolo. Practícalos despacio, con el metrónomo, y sube el tempo solo cuando te salgan limpios. Sin prisas.',
 entriesAria: 'Ejercicios', soon: 'Más ejercicios, próximamente', exWord: 'Ejercicio', listen: 'Escuchar', stop: 'Parar', barsWord: 'Compases',
 bpmT: 'Tempo', slower: 'Más lento', faster: 'Más rápido',
@@ -5677,7 +5735,7 @@ vidT: 'Vídeo: el profesor toca el ejercicio', vidSoon: 'Aquí irá el vídeo de
 sub16: ['e', 'y', 'a'], songLink: 'Ver «Celebration» en el repertorio', octAria: 'Tablatura: La bemol en la 4ª cuerda, traste 6, y su octava en la 2ª, traste 9',
 cta: 'Siguiente'
 } : {
-langAria: 'Language', backAria: 'Back to the path', title: 'Picking exercises', eyebrow: 'Module 5',
+langAria: 'Language', backAria: 'Back to the path', title: 'Rest exercises', eyebrow: 'Module 5',
 intro: 'Exercises to give your picking hand control and steadiness. Each one comes with a short explanation, the score and a video of the teacher playing it. Practice them slowly, with the metronome, and only bump up the tempo once they come out clean. No rush.',
 entriesAria: 'Exercises', soon: 'More exercises coming soon', exWord: 'Exercise', listen: 'Listen', stop: 'Stop', barsWord: 'Bars',
 bpmT: 'Tempo', slower: 'Slower', faster: 'Faster',
@@ -5752,12 +5810,17 @@ const p = (x) => '<p class="pt-p">' + x + '</p>';
 // one strip of white-key notes: C major lives on 0..7, A minor on 5..12
 const strip = [];
 for (let i = 0; i < 13; i++) strip.push({ d: i, acc: '', m: 48 + 12 * Math.floor(i / 7) + ST[i % 7], name: NM[i % 7] });
+const majDeg = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°', 'I'];
+const majCh = es ? ['Do', 'Rem', 'Mim', 'Fa', 'Sol', 'Lam', 'Si°', 'Do'] : ['C', 'Dm', 'Em', 'F', 'G', 'Am', 'B°', 'C'];
+const cMaj = strip.slice(0, 8).map((n, i) => Object.assign({ deg: majDeg[i], chord: majCh[i] }, n));
+const dist = (label, steps) => '<p class="rl-int"><b>' + label + ':</b> ' + steps.map((x) => '<span class="' + (x === 'st' || x === 'H' ? 'rl-st' : '') + '">' + x + '</span>').join(' ') + '</p>';
+const W = es ? 'T' : 'W', H = es ? 'st' : 'H';
 const minDeg = ['i', 'ii°', 'III', 'iv', 'v', 'VI', 'VII', 'i'];
 const minCh = es ? ['Lam', 'Si°', 'Do', 'Rem', 'Mim', 'Fa', 'Sol', 'Lam'] : ['Am', 'B°', 'C', 'Dm', 'Em', 'F', 'G', 'Am'];
 const aMin = [5, 6, 7, 8, 9, 10, 11, 12].map((d, i) => ({ d, acc: '', m: 48 + 12 * Math.floor(d / 7) + ST[d % 7], name: NM[d % 7], deg: minDeg[i], chord: minCh[i] }));
 root.innerHTML = p(T.x1)
-+ '<div class="pt-card rt-card" data-staff="maj"><div class="rt-top"><b>' + T.majT + '</b><button type="button" class="rt-play" data-play="maj">▶ ' + T.listen + '</button></div>' + scaleStaff(strip.slice(0, 8), T.majT, 0, 7) + '</div>'
-+ '<div class="pt-card rt-card" data-staff="min"><div class="rt-top"><b>' + T.minT + '</b><button type="button" class="rt-play" data-play="min">▶ ' + T.listen + '</button></div>' + scaleStaff(aMin, T.minT, 0, 7) + '</div>'
++ '<div class="pt-card rt-card" data-staff="maj"><div class="rt-top"><b>' + T.majT + '</b><button type="button" class="rt-play" data-play="maj">▶ ' + T.listen + '</button></div>' + scaleStaff(cMaj, T.majT, 0, 7) + dist(es ? 'MAYOR' : 'MAJOR', [W, W, H, W, W, W, H]) + '</div>'
++ '<div class="pt-card rt-card" data-staff="min"><div class="rt-top"><b>' + T.minT + '</b><button type="button" class="rt-play" data-play="min">▶ ' + T.listen + '</button></div>' + scaleStaff(aMin, T.minT, 0, 7) + dist(es ? 'MENOR' : 'MINOR', [W, H, W, W, H, W, W]) + '</div>'
 + '<h2 class="cr-h">' + T.sameT + '</h2>' + p(T.sameX)
 + '<div class="pt-card"><div class="rl-strip">' + strip.map((n, i) => '<span class="' + (i <= 7 ? 'rl-maj ' : '') + (i >= 5 ? 'rl-min' : '') + '">' + n.name + '</span>').join('') + '</div>'
 + '<div class="rl-legend"><span><i class="rl-a"></i>' + T.majT + '</span><span><i class="rl-b"></i>' + T.minT + '</span></div></div>'
@@ -5895,7 +5958,7 @@ function celebPiano(root, es) {
     root.querySelectorAll('.cp-mc').forEach((e) => e.setAttribute('data-on', String(e.getAttribute('data-c') === c)));
   };
   const stop = () => {
-    st.playing = false; clearInterval(root._cpT); (root._cpTm || []).forEach(clearTimeout); root._cpTm = [];
+    yrCut(); st.playing = false; clearInterval(root._cpT); (root._cpTm || []).forEach(clearTimeout); root._cpTm = [];
     root.querySelectorAll('.cp-blk').forEach((e) => e.setAttribute('data-on', 'false'));
     root.querySelectorAll('[data-a="head"]').forEach((e) => { e.style.display = 'none'; });
     const b = root.querySelector('[data-a="play"]'); if (b) b.textContent = '▶ ' + T.listen;
@@ -5998,7 +6061,7 @@ function cgRun(root, st, T, S, playNote, onBlock) {
   return true;
 }
 function cgHalt(root, st, T) {
-  st.playing = false; clearInterval(root._ti); (root._tm || []).forEach(clearTimeout); root._tm = [];
+  yrCut(); st.playing = false; clearInterval(root._ti); (root._tm || []).forEach(clearTimeout); root._tm = [];
   (root._src || []).forEach((s) => { try { s.stop(); } catch (e) {} }); root._src = [];
   root.querySelectorAll('.cp-blk').forEach((e) => e.setAttribute('data-on', 'false'));
   root.querySelectorAll('[data-a="head"]').forEach((e) => { e.style.display = 'none'; });
@@ -6116,7 +6179,7 @@ function celebGtr2(root, es) {
       + '<div class="pt-note"><p class="pt-p">' + T.note + '</p></div></div>';
   };
   const halt = root._halt = () => {
-    st.playing = false; clearInterval(root._ti); (root._tm || []).forEach(clearTimeout); root._tm = [];
+    yrCut(); st.playing = false; clearInterval(root._ti); (root._tm || []).forEach(clearTimeout); root._tm = [];
     (root._src || []).forEach((s) => { try { s.stop(); } catch (e) {} }); root._src = [];
     root.querySelectorAll('.cg-n[data-on]').forEach((e) => e.removeAttribute('data-on'));
     const b = root.querySelector('[data-a="play"]'); if (b) b.textContent = '▶ ' + T.listen;
@@ -6258,7 +6321,7 @@ function celebBass(root, es) {
       + '<div class="pt-note"><p class="pt-p">' + T.note1 + '</p><p class="pt-p">' + T.note2 + '</p></div></div>';
   };
   const halt = root._halt = () => {
-    st.playing = false; clearTimeout(root._bsEnd); (root._tm || []).forEach(clearTimeout); root._tm = [];
+    yrCut(); st.playing = false; clearTimeout(root._bsEnd); (root._tm || []).forEach(clearTimeout); root._tm = [];
     (root._src || []).forEach((s) => { try { s.stop(); } catch (e) {} }); root._src = [];
     root.querySelectorAll('[data-on]').forEach((e) => { if (e.closest('.bs-rows')) e.removeAttribute('data-on'); });
     const b = root.querySelector('[data-a="play"]'); if (b) b.textContent = '▶ ' + T.listen;
@@ -6472,7 +6535,7 @@ function lsGuitarPattern(root, es, st0) {
   function firstChord(S) { let c = null; S.bars.some((b) => b.some((e) => { if (e[0]) { c = e[0]; return true; } return false; })); return c; }
   // the exercise's chord names have no slash: use the lead-sheet shape of the same name
   const stop = () => {
-    st.playing = false; clearInterval(root._gpT); (root._gpTm || []).forEach(clearTimeout); root._gpTm = [];
+    yrCut(); st.playing = false; clearInterval(root._gpT); (root._gpTm || []).forEach(clearTimeout); root._gpTm = [];
     root.querySelectorAll('.cp-blk,.ls-stp').forEach((e) => e.removeAttribute('data-on'));
     const b = root.querySelector('[data-a="play"]'); if (b) b.textContent = '▶ ' + T.listen;
   };
@@ -7166,6 +7229,43 @@ function hmNeck(start, dots, aria, strLab) {
   });
   return h + '</svg>';
 }
+// 7.1: the relatives on one neck (same layout as the 7.3 diagram): only the 6th string, major root and relative minor root.
+// k = pitch class of the major key; when its root is below fret 3 there is no room to go down, so the one an octave up is used
+function qiRel(k, es) {
+  const NM = es ? ['Do', 'Do♯', 'Re', 'Re♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'] : ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+  const low = (k + 8) % 12, fM = low < 3 ? low + 12 : low, fm = fM - 3, M = NM[k], m = NM[(k + 9) % 12];
+  const maj = es ? 'mayor' : 'major', min = es ? 'menor' : 'minor', fr = es ? 'traste' : 'fret';
+  const fmTxt = fm === 0 ? (es ? 'al aire' : 'open') : fr + ' ' + fm;
+  const n = 8, start = Math.max(0, fm - 2), w = 316 / n, X = (f) => 24 + (f - start + 0.5) * w, Y = (i) => 28 + 28 * i;
+  const aria = (es ? 'Sexta cuerda: ' : '6th string: ') + M + ' ' + maj + ', ' + fr + ' ' + fM + '; ' + m + ' ' + min + ', ' + fmTxt;
+  let h = '<svg class="qi-neck" viewBox="0 0 364 204" width="100%" role="img" aria-label="' + aria + '">';
+  for (let i = 0; i < 6; i++) h += '<line class="pt-line" x1="24" y1="' + Y(i) + '" x2="340" y2="' + Y(i) + '" stroke="#8A8A8A" stroke-width="' + (i === 5 ? 3 : 1 + i * 0.2) + '"' + (i === 5 ? '' : ' opacity="0.55"') + '/>';
+  for (let i = 0; i <= n; i++) {
+    const nut = (start === 0 && i === 1) || (start === 1 && i === 0);
+    h += '<line class="' + (nut ? 'qi-nut' : 'pt-line') + '" x1="' + (24 + i * w) + '" y1="28" x2="' + (24 + i * w) + '" y2="168" stroke="#8A8A8A" stroke-width="' + (nut ? 4 : 1) + '"' + (nut ? '' : ' opacity="0.55"') + '/>';
+  }
+  for (let f = start; f < start + n; f++) h += '<text class="qi-num' + (f === fm || f === fM ? ' qi-on' : '') + '" x="' + X(f) + '" y="196" text-anchor="middle">' + f + '</text>';
+  h += '<text class="qi-num" x="11" y="172" text-anchor="middle">6ª</text>';
+  const x1 = X(fm), x2 = X(fM), mid = (x1 + x2) / 2;
+  // the way from the song's key down to its relative: three frets
+  h += '<path d="M' + (x2 - 9) + ' 154Q' + mid + ' 108 ' + (x1 + 11) + ' 152" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4"/>';
+  h += '<path d="M' + (x1 + 9) + ' 155L' + (x1 + 10.5) + ' 143.5L' + (x1 + 19) + ' 150Z" fill="currentColor"/>';
+  h += '<text class="qi-arc" x="' + mid + '" y="122" text-anchor="middle">' + (es ? '3 trastes' : '3 frets') + '</text>';
+  const tag = (x, col, name, sub) => {
+    const c = Math.max(54, Math.min(310, x));
+    return '<line x1="' + x + '" y1="96" x2="' + x + '" y2="152" stroke="' + col + '" stroke-width="2"/><rect x="' + (c - 50) + '" y="58" width="100" height="40" rx="9" fill="' + col + '"/>'
+      + '<text class="qi-tg" x="' + c + '" y="75" text-anchor="middle">' + name + '</text><text class="qi-ts" x="' + c + '" y="90" text-anchor="middle">' + sub + '</text>';
+  };
+  h += tag(x1, '#8F6400', m + ' ' + min, fmTxt) + tag(x2, '#C9141C', M + ' ' + maj, fr + ' ' + fM);
+  const dot = (f, x, col, name) => '<g class="hm-n" data-m="' + (40 + f) + '" role="button" tabindex="0" aria-label="' + name + ', ' + fr + ' ' + f + '"><circle cx="' + x + '" cy="168" r="16" fill="' + col + '"/><text class="qi-dt" x="' + x + '" y="172.5" text-anchor="middle">' + name + '</text></g>';
+  h += dot(fm, x1, '#8F6400', m) + dot(fM, x2, '#C9141C', M) + '</svg>';
+  const legend = '<div class="hm-key"><span><i style="background:#C9141C"></i>' + (es ? 'Tono mayor (el de la canción)' : 'Major key (the song’s key)') + '</span><span><i style="background:#8F6400"></i>' + (es ? 'Tono menor: su relativo (desde aquí tocas la pentatónica)' : 'Minor key: its relative (play the pentatonic from here)') + '</span></div>';
+  const chips = '<b class="ej-h">' + (es ? 'Elige el tono mayor' : 'Pick the major key') + '</b><div class="qi-keys">' + NM.map((x, i) => '<button type="button" class="ej-chip" data-key="' + i + '" aria-pressed="' + (i === k) + '">' + x + '</button>').join('') + '</div>';
+  const jump = low < 3 ? '<div class="pt-note"><p class="pt-p"><b>' + (es ? 'Salto en el mástil:' : 'Jump on the neck:') + '</b> ' + (es
+    ? M + ' está ' + (low === 0 ? 'al aire (traste 0)' : 'en el traste ' + low) + ' y desde ahí no se pueden bajar 3 trastes. Usa el ' + M + ' del traste ' + fM + ' y baja 3: ' + m + ' menor está en el traste ' + fm + '.'
+    : M + ' is ' + (low === 0 ? 'the open string (fret 0)' : 'at fret ' + low) + ', so you cannot go down 3 frets from there. Use the ' + M + ' at fret ' + fM + ' and go down 3: ' + m + ' minor is at fret ' + fm + '.') + '</p></div>' : '';
+  return h + '<p class="qi-cap">' + M + ' ' + maj + ' → ' + m + ' ' + min + '</p>' + legend + chips + jump;
+}
 C["QueImprovisar"] = (DCLogic) => {
   const Base = C["Relativo"](DCLogic);
   class Component extends Base {
@@ -7181,9 +7281,7 @@ C["QueImprovisar"] = (DCLogic) => {
         p3: 'Para entender esto, necesitas saber lo que es el relativo y cómo se aplica en la guitarra. Atento al vídeo.',
         vT: 'Vídeo: ¿qué es improvisar? El relativo', vS: 'Aquí irá el vídeo explicativo.',
         dT: 'Cómo encontrar la pentatónica menor de un tono mayor', dX: 'En la 6.ª cuerda, la tónica del tono mayor está 3 trastes por encima de la tónica de su relativo menor. Toca la posición 1 de la pentatónica menor desde esa nota más grave: es la misma posición, movida por el mástil.',
-        lg: ['Tónica del tono mayor (el de la canción)', 'Tónica del relativo menor (desde aquí tocas la pentatónica)'], maj: 'mayor', min: 'menor', fr: 'traste', arc: '3 trastes', open: 'cuerda al aire',
-        jT: 'Salto en el mástil', jE: 'Del Mi al aire (traste 0) no se pueden bajar 3 trastes. Usa el Mi del traste 12 y baja 3: Do♯ menor está en el traste 9.', jF: 'Del Fa del traste 1 no se pueden bajar 3 trastes. Usa el Fa del traste 13 y baja 3: Re menor está en el traste 10.',
-        str: 'Cuerda', aria: 'Sexta cuerda: ', relT: 'El relativo en el piano', relV: 'Vídeo: el relativo en el piano', relS: 'Aquí irá el vídeo en el que se explica el relativo en el piano.'
+        relT: 'El relativo en el piano', relV: 'Vídeo: el relativo en el piano', relS: 'Aquí irá el vídeo en el que se explica el relativo en el piano.'
       } : {
         h1: 'What is improvising?',
         p1: 'Improvising is not making something up from scratch, with no net and no structure. We start from some defined “rules”. The most important is the key of the song, which tells us which scale or scales we can use.',
@@ -7191,42 +7289,20 @@ C["QueImprovisar"] = (DCLogic) => {
         p3: 'To understand this you need to know what the relative is and how it applies on the guitar. Watch the video.',
         vT: 'Video: what is improvising? The relative', vS: 'The explanatory video will go here.',
         dT: 'How to find the minor pentatonic of a major key', dX: 'On the 6th string, the root of the major key is 3 frets above the root of its relative minor. Play position 1 of the minor pentatonic from that lower note: it is the same position, moved along the neck.',
-        lg: ['Root of the major key (the song’s key)', 'Root of the relative minor (play the pentatonic from here)'], maj: 'major', min: 'minor', fr: 'fret', arc: '3 frets', open: 'open string',
-        jT: 'Jump on the neck', jE: 'From the open E (fret 0) you cannot go down 3 frets. Use the E at fret 12 and go down 3: C♯ minor is at fret 9.', jF: 'From the F at fret 1 you cannot go down 3 frets. Use the F at fret 13 and go down 3: D minor is at fret 10.',
-        str: 'String', aria: '6th string: ', relT: 'The relative on the piano', relV: 'Video: the relative on the piano', relS: 'The video explaining the relative on the piano will go here.'
+        relT: 'The relative on the piano', relV: 'Video: the relative on the piano', relS: 'The video explaining the relative on the piano will go here.'
       };
-      const NM = es ? ['Do', 'Do♯', 'Re', 'Re♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'] : ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
-      // 6th string: fret of the major root (fM), of its relative minor (fm); alt = the same root lower down the neck
-      const K = [{ M: 0, fM: 8, fm: 5 }, { M: 2, fM: 10, fm: 7 }, { M: 4, fM: 12, fm: 9, alt: 0, jump: 'jE' }, { M: 5, fM: 13, fm: 10, alt: 1, jump: 'jF' }, { M: 7, fM: 3, fm: 0 }, { M: 9, fM: 5, fm: 2 }, { M: 11, fM: 7, fm: 4 }];
-      const cx = (f) => 36 + (f - 0.5) * 25, X = (f) => (f === 0 ? 20 : cx(f));
-      const six = (k) => {
-        const M = NM[k.M], m = NM[(k.M + 9) % 12];
-        let h = '<svg class="hm-neck" viewBox="0 0 346 84" width="100%" role="img" aria-label="' + T.aria + M + ' ' + T.maj + ' – ' + m + ' ' + T.min + '"><rect class="hm-bd" x="36" y="24" width="300" height="36" rx="4"/>';
-        for (let n = 0; n <= 12; n++) h += '<line class="hm-fl" x1="' + (36 + n * 25) + '" y1="24" x2="' + (36 + n * 25) + '" y2="60" style="stroke-width:' + (n === 0 ? 3 : 1.5) + '"/>';
-        h += '<line class="hm-st" x1="6" y1="42" x2="336" y2="42" stroke-width="2"/>';
-        [0, 3, 5, 7, 9, 12].forEach((n) => { h += '<text class="hm-lb" x="' + X(n) + '" y="78" text-anchor="middle">' + n + '</text>'; });
-        // the arc: three frets up from the minor root to the major root
-        const x1 = X(k.fm), x2 = k.fM > 12 ? 338 : X(k.fM);
-        h += '<path class="hm-arc" d="M' + x1 + ' 27Q' + ((x1 + x2) / 2) + ' -2 ' + x2 + ' 27" fill="none" stroke-width="2"/><text class="hm-lb" x="' + ((x1 + x2) / 2) + '" y="11" text-anchor="middle">' + T.arc + '</text>';
-        if (k.fM > 12) h += '<path class="hm-arc" d="M334 20L341 27 332 31" fill="none" stroke-width="2"/>';
-        const dot = (f, cls, nm) => '<g class="hm-n" data-m="' + (40 + f) + '" role="button" tabindex="0" aria-label="' + T.str + ' 6, ' + T.fr + ' ' + f + ', ' + nm + '"><circle class="hm-' + cls + '" cx="' + X(f) + '" cy="42" r="13"/><text class="hm-tx' + (cls === 'dh' ? ' hm-t2' : '') + '" x="' + X(f) + '" y="46.2" text-anchor="middle">' + nm + '</text></g>';
-        if (k.alt !== undefined) h += dot(k.alt, 'dh', M);
-        if (k.fM <= 12) h += dot(k.fM, 'dj', M);
-        return h + dot(k.fm, 'dm', m) + '</svg>';
-      };
-      const lead = T.lg.map((x, i) => '<span><i class="' + (i ? 'hm-k1' : 'hm-k2') + '"></i>' + x + '</span>').join('');
-      const cards = K.map((k) => {
-        const M = NM[k.M], m = NM[(k.M + 9) % 12];
-        const fM = k.alt !== undefined ? k.fM + ' / ' + k.alt : k.fM;
-        const ttl = M + ' ' + T.maj + ' (' + T.fr + ' ' + fM + ') → ' + m + ' ' + T.min + ' (' + T.fr + ' ' + k.fm + (k.fm === 0 ? ', ' + T.open : '') + ')';
-        return '<div class="pt-card hm-fig"><b class="ea-h">' + ttl + '</b>' + six(k) + (k.jump ? '<div class="pt-note"><p class="pt-p"><b>' + T.jT + ':</b> ' + T[k.jump] + '</p></div>' : '') + '</div>';
-      }).join('');
+      const self = this, rel = () => qiRel(self._qiK || 0, es);
       root.innerHTML = '<div class="pt-card"><h2 class="bt-h3" style="margin:0">' + T.h1 + '</h2><p class="pt-p">' + T.p1 + '</p><p class="pt-p">' + T.p2 + '</p><p class="pt-p"><b>' + T.p3 + '</b></p></div>'
         + truVideo(T.vT, T.vS)
-        + '<div class="pt-card"><h2 class="bt-h3" style="margin:0">' + T.dT + '</h2><p class="pt-p">' + T.dX + '</p><div class="hm-key">' + lead + '</div></div>'
-        + cards
+        + '<div class="pt-card"><h2 class="bt-h3" style="margin:0">' + T.dT + '</h2><p class="pt-p">' + T.dX + '</p><div class="qi-rel">' + rel() + '</div></div>'
         + '<h2 class="bt-h3" style="margin:4px 0 0">' + T.relT + '</h2>' + truVideo(T.relV, T.relS) + '<p class="pt-p">' + R.intro + '</p>';
       root.onclick = (e) => {
+        const key = e.target.closest && e.target.closest('[data-key]');
+        if (key) {
+          self._qiK = +key.getAttribute('data-key');
+          root.querySelector('.qi-rel').innerHTML = rel();
+          return;
+        }
         const g = e.target.closest && e.target.closest('.hm-n');
         if (g) { const ac = pAudio(); if (!ac) return; try { pUnlock(); } catch (x) {} pluck(+g.getAttribute('data-m'), ac.currentTime + 0.02, 0.6); }
       };
@@ -7318,7 +7394,7 @@ C["BluesImpro"] = (DCLogic) => {
         if (nb) { nb.innerHTML = i < 0 ? T.idle : T.now + ': <b>' + T.bar + ' ' + (i + 1) + ' · ' + BLUES_BARS[i][0] + '</b> <span>' + BLUES_BARS[i][1] + '</span>'; nb.setAttribute('data-deg', i < 0 ? '' : BLUES_BARS[i][1]); }
       };
       const stop = root._biStop = () => {
-        st.playing = false; clearInterval(st.iv); clearTimeout(st.to); st.tm.forEach(clearTimeout); st.tm = [];
+        yrCut(); st.playing = false; clearInterval(st.iv); clearTimeout(st.to); st.tm.forEach(clearTimeout); st.tm = [];
         st.src.forEach((s) => { try { s.stop(); } catch (e) {} }); st.src = [];
         if (st.au) { try { st.au.pause(); } catch (e) {} }
         setBar(-1);
@@ -7771,7 +7847,7 @@ function skyBlues(root, es) {
     sv.querySelectorAll('[data-i]').forEach((e) => e.setAttribute('data-on', String(+e.getAttribute('data-i') === i)));
   };
   const stop = () => {
-    st.playing = false; clearInterval(root._skT); (root._skTm || []).forEach(clearTimeout); root._skTm = [];
+    yrCut(); st.playing = false; clearInterval(root._skT); (root._skTm || []).forEach(clearTimeout); root._skTm = [];
     (root._skSrc || []).forEach((s) => { try { s.stop(); } catch (e) {} }); root._skSrc = [];
     root.querySelectorAll('.sk-tab [data-on="true"]').forEach((e) => e.setAttribute('data-on', 'false'));
     const b = root.querySelector('[data-a="play"]'); if (b) b.textContent = '▶ ' + T.listen;
@@ -8159,6 +8235,64 @@ C["Can6"] = songSheet(6);
 C["Can7"] = songSheet(7);
 C["Can8"] = songSheet(8);
 C["Can9"] = songSheet(9);
+// Satisfaction intro, two bars on an eighth grid (0..7 = 1 & 2 & 3 & 4 &). p: grid slot, len: slots, f: fret on the 5th string,
+// d: staff step (-1 = B below middle C), fl: finger, beam: group id, tied: held from the bar before
+const SAT_BARS = [
+  [ { p: 0, len: 1, f: 2, d: -1, fl: 1 }, { p: 1, len: 1, rest: true }, { p: 2, len: 2, f: 2, d: -1, fl: 1 }, { p: 4, len: 1, rest: true },
+    { p: 5, len: 1, f: 2, d: -1, fl: 1, beam: 1 }, { p: 6, len: 1, f: 4, d: 0, acc: true, fl: 3, beam: 1 }, { p: 7, len: 1, f: 5, d: 1, fl: 4, beam: 1, tie: true } ],
+  [ { p: 0, len: 3, f: 5, d: 1, tied: true, dot: true }, { p: 3, len: 1, f: 5, d: 1, fl: 4 },
+    { p: 4, len: 1, f: 5, d: 1, fl: 4, beam: 2, pull: true }, { p: 5, len: 1, f: 4, d: 0, acc: true, fl: 3, beam: 2 },
+    { p: 6, len: 1, f: 4, d: 0, fl: 3, beam: 2, pull: true }, { p: 7, len: 1, f: 2, d: -1, fl: 1, beam: 2 } ]
+];
+const SAT_BPM = 137;
+// one system = one bar: staff on top, tab below, finger numbers and the count underneath
+function satBar(bi, es) {
+  const notes = SAT_BARS[bi], X = (p) => 78 + p * 33, yB = 70, Y = (d) => yB - (d - 2) * 5, T = (k) => 118 + k * 11, yA = T(4);
+  const ln = (x1, y1, x2, y2, w) => '<line class="pt-line" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="#8A8A8A" stroke-width="' + (w || 1) + '"/>';
+  let h = '<svg class="rf-tab rf-sat" viewBox="0 0 340 224" role="img" aria-label="' + (es ? 'Compás ' : 'Bar ') + (bi + 1) + ': ' + (es ? 'partitura y tablatura' : 'notation and tab') + '">';
+  h += '<text class="rf-sn" x="4" y="14">' + (bi + 1) + '</text>';
+  for (let i = 0; i < 5; i++) h += ln(4, 30 + i * 10, 332, 30 + i * 10);
+  h += '<path class="pt-ink" transform="translate(12 ' + (yB + 1.75) + ') scale(0.0621 -0.0621) translate(-120 0)" d="' + CR_CLEF + '"/>';
+  if (bi === 0) h += '<text class="rf-ts" x="50" y="49" text-anchor="middle">4</text><text class="rf-ts" x="50" y="69" text-anchor="middle">4</text>';
+  h += ln(332, 30, 332, 70, 1.4) + ln(4, 30, 4, 70, 1.4);
+  for (let k = 0; k < 6; k++) h += '<line class="rf-line" x1="4" y1="' + T(k) + '" x2="332" y2="' + T(k) + '"/>';
+  h += '<line class="rf-line" x1="4" y1="' + T(0) + '" x2="4" y2="' + T(5) + '"/><line class="rf-line" x1="332" y1="' + T(0) + '" x2="332" y2="' + T(5) + '"/>';
+  ['T', 'A', 'B'].forEach((c, i) => { h += '<text class="rf-tl" x="22" y="' + (134 + i * 14) + '" text-anchor="middle">' + c + '</text>'; });
+  const beams = {};
+  notes.forEach((n, i) => {
+    const x = X(n.p);
+    if (n.rest) {
+      h += '<g class="rf-rest"><circle class="pt-ink" cx="' + (x - 4) + '" cy="45" r="3.2"/><path d="M' + (x - 5) + ' 47.5 Q' + x + ' 50.5 ' + (x + 5) + ' 43.5 L' + (x - 2) + ' 63" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></g>';
+      return;
+    }
+    const y = Y(n.d);
+    h += '<g class="rf-col" data-i="' + bi + '-' + i + '">';
+    if (n.d <= 0) h += ln(x - 11, Y(0), x + 11, Y(0), 1.2);
+    if (n.acc) h += '<text class="rf-acc" x="' + (x - 14) + '" y="' + (y + 5) + '" text-anchor="middle">♯</text>';
+    h += '<ellipse class="pt-ink" cx="' + x + '" cy="' + y + '" rx="6.6" ry="4.6" transform="rotate(-20 ' + x + ' ' + y + ')"/>';
+    if (n.dot) h += '<circle class="pt-ink" cx="' + (x + 12) + '" cy="' + y + '" r="2.2"/>';
+    const sx = x + 6, top = n.beam ? 42 : y - 32;
+    h += '<rect class="pt-ink" x="' + (sx - 0.8) + '" y="' + top + '" width="1.6" height="' + (y - 1 - top) + '"/>';
+    // a single eighth carries a flag; the dotted quarter and the quarter do not
+    if (!n.beam && n.len === 1) h += '<path d="M' + sx + ' ' + top + ' c1 8 12 10 8 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+    if (n.beam) (beams[n.beam] = beams[n.beam] || []).push(sx);
+    h += '<g' + (n.tied ? ' opacity="0.45"' : '') + '><rect class="rf-bg" x="' + (x - 8) + '" y="' + (yA - 7) + '" width="16" height="14" rx="3"/><text class="rf-f" x="' + x + '" y="' + (yA + 4) + '" text-anchor="middle">' + n.f + '</text></g>';
+    if (n.fl) h += '<text class="rf-fl" x="' + x + '" y="198" text-anchor="middle">' + n.fl + '</text>';
+    h += '</g>';
+    // pull-off: slur under the two tab numbers, with its "p"
+    if (n.pull) h += '<path d="M' + (x + 3) + ' ' + (yA + 9) + ' Q' + (x + 16.5) + ' ' + (yA + 17) + ' ' + (x + 30) + ' ' + (yA + 9) + '" fill="none" stroke="currentColor" stroke-width="1.3"/><text class="rf-sn" x="' + (x + 16.5) + '" y="' + (yA + 23) + '" text-anchor="middle">p</text>';
+    // tie over the bar line
+    if (n.tie) h += '<path d="M' + (x + 7) + ' ' + (y + 7) + ' Q' + (x + 20) + ' ' + (y + 17) + ' 332 ' + (y + 12) + '" fill="none" stroke="currentColor" stroke-width="1.5"/>';
+    if (n.tied) h += '<path d="M44 ' + (y + 12) + ' Q' + (x - 18) + ' ' + (y + 17) + ' ' + (x - 6) + ' ' + (y + 7) + '" fill="none" stroke="currentColor" stroke-width="1.5"/>';
+  });
+  Object.keys(beams).forEach((k) => { const b = beams[k]; h += '<rect class="pt-ink" x="' + (b[0] - 0.8) + '" y="40" width="' + (b[b.length - 1] - b[0] + 1.6) + '" height="5"/>'; });
+  for (let p = 0; p < 8; p++) h += '<text class="rf-cnt" x="' + X(p) + '" y="218" text-anchor="middle"' + (p % 2 ? '' : ' font-weight="700"') + '>' + (p % 2 ? (es ? 'y' : '&amp;') : p / 2 + 1) + '</text>';
+  return h + '</svg>';
+}
+function satScore(es) {
+  return '<div class="rf-satw"><p class="rf-satm">Intro · ♩ = ' + SAT_BPM + ' · 4/4 · fuzz</p>' + satBar(0, es) + satBar(1, es)
+    + '<p class="pt-foot">' + (es ? 'Todo en la 5ª cuerda. Números en rojo: dedos. «p» es pull-off: tira de la cuerda al levantar el dedo, sin volver a atacar. La ligadura entre compases alarga el Re.' : 'All on the 5th string. Red numbers: fingers. “p” is a pull-off: tug the string as you lift the finger, without picking again. The tie across the bar line holds the D.') + '</p></div>';
+}
 C["RiffsFamosos"] = (DCLogic) => {
 // each column of a riff: frets per string, index 0 = high e ... 5 = low E (null = not played); label on top
 const C5 = (s6, f) => (s6 ? [null, null, null, null, f + 2, f] : [null, null, null, f + 2, f, null]);
@@ -8185,7 +8319,7 @@ const RIFFS = [
   cols: [5, 5, 3, 5].map((f) => ['', [null, null, null, null, f, null]]).concat([5, 4, 3].map((f) => ['', [null, null, null, null, null, f]]), [['', [null, null, null, null, 5, null]]]),
   tip: ['Re, Re, Do, Re, La, La♭, Sol, Re: baja por la 6ª cuerda y vuelve a la 5ª.', 'D, D, C, D, A, A♭, G, D: it walks down the 6th string and back to the 5th.'] },
 { song: '(I Can’t Get No) Satisfaction', artist: 'The Rolling Stones', year: 1965, tag: ['Notas sueltas', 'Single notes'],
-  cols: [2, 2, 4, 5, 5, 5, 4, 4, 2, 2].map((f) => ['', [null, null, null, null, f, null]]),
+  score: true, cols: [],
   tip: ['Tres notas en la 5ª cuerda (Si, Do#, Re). El original usa un pedal de fuzz, así que con distorsión te acercas mucho más.', 'Three notes on the 5th string (B, C#, D). The original uses a fuzz pedal, so add distortion and you’ll get much closer.'] },
 { song: 'Wild Thing', artist: 'The Troggs', year: 1966, tag: ['Acordes abiertos', 'Open chords'], simple: true,
   cols: [['A', [0, 2, 2, 2, 0, null]], ['D', [2, 3, 2, 0, null, null]], ['E', [0, 0, 1, 2, 2, 0]], ['D', [2, 3, 2, 0, null, null]]],
@@ -8214,7 +8348,7 @@ this.setState({ lang: l });
 try { localStorage.setItem('guitar.lang', l); } catch (e) {}
 }
 resetBtns() { document.querySelectorAll('#rf-root .rt-play[data-stp]').forEach((b) => { b.textContent = b._lab || b.textContent; b.removeAttribute('data-stp'); }); }
-halt() { this.resetBtns(); (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('#rf-root .rf-on').forEach((e) => e.classList.remove('rf-on')); }
+halt() { yrCut(); this.resetBtns(); (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('#rf-root .rf-on').forEach((e) => e.classList.remove('rf-on')); }
 // six-line tab, strings e B G D A E from top to bottom
 tab(cols) {
 const W = 44 + cols.length * 30, y = (s) => 26 + s * 14;
@@ -8241,7 +8375,7 @@ const T = this._cfg.t, L = this._cfg.es ? 0 : 1;
 const sel = this._sel || 0;
 const chipSt = (on) => 'padding:8px 14px;min-height:40px;border-radius:999px;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;border:1px solid ' + (on ? '#E31B23' : '#D9D9D9') + ';background:' + (on ? '#E31B23' : '#FFFFFF') + ';color:' + (on ? '#FFFFFF' : '#121212');
 root.innerHTML = '<div class="rf-chips" role="group" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">' + RIFFS.map((r, i) => '<button type="button" class="rf-chip" data-c="' + i + '" aria-pressed="' + (i === sel) + '" style="' + chipSt(i === sel) + '">' + r.song + '</button>').join('') + '</div>' + RIFFS.map((r, i) => '<div class="pt-card rf-card" data-r="' + i + '"' + (i === sel ? '' : ' style="display:none"') + '><div class="rt-top"><span class="rf-head"><span class="rf-num">' + (i + 1) + '</span><span><b>' + r.song + '</b><small>' + r.artist + ' · ' + r.year + '</small></span></span><button type="button" class="rt-play" data-p="' + i + '">▶ ' + T.listen + '</button></div>'
-+ '<span class="rf-tag">' + r.tag[L] + (r.simple ? ' · ' + T.simple : '') + '</span>' + this.tab(r.cols) + '<p class="pt-p">' + r.tip[L] + '</p></div>').join('')
++ '<span class="rf-tag">' + r.tag[L] + (r.simple ? ' · ' + T.simple : '') + '</span>' + (r.score ? satScore(this._cfg.es) : this.tab(r.cols)) + '<p class="pt-p">' + r.tip[L] + '</p></div>').join('')
 + '<div class="pt-note"><p class="pt-p">' + T.note + '</p></div>';
 const OPEN = [64, 59, 55, 50, 45, 40];
 root.onclick = (e) => {
@@ -8261,6 +8395,22 @@ b._lab = b.textContent; b.setAttribute('data-stp', '1'); b.textContent = '■ ' 
 const r = RIFFS[+b.getAttribute('data-p')];
 const card = root.querySelector('[data-r="' + b.getAttribute('data-p') + '"]');
 const ac = pAudio(); if (!ac) return;
+if (r.score) {
+const e8 = 30 / SAT_BPM, t0 = ac.currentTime + 0.1;
+SAT_BARS.forEach((bar, bi) => bar.forEach((n, i) => {
+if (n.rest || n.tied) return;
+const at = t0 + (bi * 8 + n.p) * e8, len = (n.len + (n.tie ? SAT_BARS[bi + 1][0].len : 0)) * e8;
+const pulled = i > 0 && bar[i - 1].pull;
+try { const so = pluck(45 + n.f, at, pulled ? 0.3 : 0.55); if (so) { so.stop(at + len * 0.96); this._os.push(so); } } catch (er) {}
+const el = card.querySelector('.rf-col[data-i="' + bi + '-' + i + '"]'), tied = n.tie ? card.querySelector('.rf-col[data-i="' + (bi + 1) + '-0"]') : null;
+const ms = (at - ac.currentTime) * 1000;
+this._tm.push(setTimeout(() => el && el.classList.add('rf-on'), ms));
+this._tm.push(setTimeout(() => el && el.classList.remove('rf-on'), ms + (n.tie ? e8 : len) * 950));
+if (tied) { this._tm.push(setTimeout(() => tied.classList.add('rf-on'), ms + e8 * 1000)); this._tm.push(setTimeout(() => tied.classList.remove('rf-on'), ms + len * 950)); }
+}));
+this._tm.push(setTimeout(() => this.resetBtns(), (16 * e8 + 0.4) * 1000));
+return;
+}
 let at = ac.currentTime + 0.08, k = 0;
 const step = r.cols.some((c) => c[0] && c[0] !== '|' && c[1].filter((f) => f != null).length > 2) ? 0.62 : 0.32;
 r.cols.forEach((c, i) => {
@@ -8356,6 +8506,7 @@ this.setState({ lang: l });
 try { localStorage.setItem('guitar.lang', l); } catch (e) {}
 }
 halt() {
+yrCut();
 this._gen = (this._gen || 0) + 1;
 if (this._tm) { clearInterval(this._tm); this._tm = null; }
 (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} });
@@ -10762,7 +10913,7 @@ nkT: 'El acorde con cejilla recorriendo el mástil', nkX: 'La forma no cambia: s
 nkBarreLeg: 'Cejilla', nkPlay: 'Reproducir', nkPause: 'Parar', nkPrevAria: 'Acorde anterior', nkNextAria: 'Acorde siguiente', nkNeckAria: 'Mástil con el acorde con cejilla en cada nota tónica',
 nkOn: 'Tónica en la', nkStr: 'cuerda', nkFretW: 'traste', nkOpenW: 'al aire', nkFirst: 'Es la posición más grave de este shape.', nkUp: (n) => 'Sube ' + n + (n === 1 ? ' traste' : ' trastes') + ' respecto al anterior.', nkNextW: 'Siguiente', nkNote: 'Cada paso es un acorde con una tónica natural. Solo te enseño las posiciones que caben en los 12 primeros trastes. En el traste 0 no hay cejilla: es el acorde abierto.',
 langAria: 'Idioma', backAria: 'Volver a los shapes', title: 'Acordes con cejilla (A y E)',
-intro: 'Las cejillas son el truco que te deja moverte por toda la guitarra. La idea es coger un acorde abierto (los del 4.1) y deslizarlo por el mástil. Cada traste que subes equivale a una tecla del piano (lo repasas en la 4.0).',
+intro: 'Las cejillas son el truco que te deja moverte por toda la guitarra. La idea es coger un acorde abierto (los del 3.2) y deslizarlo por el mástil. Cada traste que subes equivale a una tecla del piano (lo repasas en la 4.0).',
 shapeRow: 'Shape · cuerda de la tónica', rootRow: 'Nota tónica',
 ord: ordEs, shapeWord: 'Shape de ', minorWord: 'menor',
 legendRoot: 'Tónica', legendFifth: 'Quinta', legendMaj: 'Tercera mayor', legendMin: 'Tercera menor',
@@ -10783,7 +10934,7 @@ nkT: 'The barre chord sliding along the fretboard', nkX: 'The shape doesn’t ch
 nkBarreLeg: 'Barre', nkPlay: 'Play', nkPause: 'Stop', nkPrevAria: 'Previous chord', nkNextAria: 'Next chord', nkNeckAria: 'Fretboard with the barre chord on each root note',
 nkOn: 'Root on the', nkStr: 'string', nkFretW: 'fret', nkOpenW: 'open', nkFirst: 'This is the lowest position of this shape.', nkUp: (n) => 'Up ' + n + (n === 1 ? ' fret' : ' frets') + ' from the previous one.', nkNextW: 'Next', nkNote: 'Each step is a chord with a natural root. I only show the positions that fit in the first 12 frets. At fret 0 there’s no barre: it’s just the open chord.',
 langAria: 'Language', backAria: 'Back to the shapes', title: 'Barre chords (A and E)',
-intro: 'Barre chords are the trick that lets you move around the whole guitar. The idea is to take an open chord (the ones from 4.1) and slide it along the neck. Each fret you move up is like one key on the piano (you can review it in 4.0).',
+intro: 'Barre chords are the trick that lets you move around the whole guitar. The idea is to take an open chord (the ones from 3.2) and slide it along the neck. Each fret you move up is like one key on the piano (you can review it in 4.0).',
 shapeRow: 'Shape · root string', rootRow: 'Root note',
 ord: ordEn, shapeWord: 'Shape ', minorWord: 'minor',
 legendRoot: 'Root', legendFifth: 'Fifth', legendMaj: 'Major third', legendMin: 'Minor third',
@@ -12094,7 +12245,7 @@ setLang(l) {
 this.setState({ lang: l });
 try { localStorage.setItem('guitar.lang', l); } catch (e) {}
 }
-halt() { (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('#bt-root .rt-on').forEach((e) => e.classList.remove('rt-on')); this._playing = null; }
+halt() { yrCut(); (this._tm || []).forEach(clearTimeout); this._tm = []; (this._os || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._os = []; document.querySelectorAll('#bt-root .rt-on').forEach((e) => e.classList.remove('rt-on')); this._playing = null; }
 click(at, strong) {
 const ac = this._ac, o = ac.createOscillator(), g = ac.createGain();
 o.type = 'square'; o.frequency.value = strong ? 1500 : 1000;
@@ -12833,6 +12984,45 @@ return Object.assign({ t, langs }, out);
 }
 
  return Component; };
+// the five positions of the minor pentatonic, one neck each, going up the fretboard
+function pent5Paint(root, lang) {
+const host = document.getElementById('pent5');
+if (!host) return;
+const key = root + '|' + lang;
+if (host.firstChild && host.getAttribute('data-k') === key) return;
+host.setAttribute('data-k', key);
+const es = lang === 'es';
+const N = es ? ['Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si'] : ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const OPEN = [4, 9, 2, 7, 11, 4];
+const BOX = [
+[[0, 3], [0, 2], [0, 2], [0, 2], [0, 3], [0, 3]],
+[[3, 5], [2, 5], [2, 5], [2, 4], [3, 5], [3, 5]],
+[[5, 7], [5, 7], [5, 7], [4, 7], [5, 8], [5, 7]],
+[[7, 10], [7, 10], [7, 9], [7, 9], [8, 10], [7, 10]],
+[[10, 12], [10, 12], [9, 12], [9, 12], [10, 12], [10, 12]]
+];
+const r = (root - 4 + 12) % 12;
+const neck = (b, bi) => {
+const fr = b.map((a) => a.map((o) => r + o)), all = [].concat.apply([], fr);
+const lo = Math.min.apply(null, all), hi = Math.max.apply(null, all), n = Math.max(5, hi - lo + 1), FW = 280 / n;
+const Y = (st) => 24 + (st - 1) * 22, CX = (f) => 34 + (f - lo) * FW + FW / 2;
+const title = (es ? 'Posición ' : 'Position ') + (bi + 1), sub = (es ? 'trastes ' : 'frets ') + lo + '–' + hi;
+let h = '<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 14px; line-height: 20px; color: #121212"><b>' + title + '</b> · ' + sub + '</span>';
+h += '<svg viewBox="-44 0 364 170" width="100%" role="img" aria-label="' + title + ', ' + sub + '" style="display: block; max-width: 520px"><rect x="34" y="13" width="280" height="132" rx="4" fill="#F2F2F2"/>';
+for (let k = 0; k < n; k++) { const f = lo + k, x = 34 + k * FW + FW / 2; if ([3, 5, 7, 9, 15, 17].indexOf(f) >= 0) h += '<circle cx="' + x + '" cy="79" r="6" fill="#D9D9D9"/>'; else if (f === 12) h += '<circle cx="' + x + '" cy="57" r="6" fill="#D9D9D9"/><circle cx="' + x + '" cy="101" r="6" fill="#D9D9D9"/>'; }
+for (let k = 0; k <= n; k++) h += '<line x1="' + (34 + k * FW) + '" y1="13" x2="' + (34 + k * FW) + '" y2="145" stroke="#BDBDBD" stroke-width="1.5"/>';
+[4, 11, 7, 2, 9, 4].forEach((pc, i) => { const st = i + 1; h += '<line x1="34" y1="' + Y(st) + '" x2="314" y2="' + Y(st) + '" stroke="#8A8A8A" stroke-width="' + (1 + (st - 1) * 0.25) + '"/><text x="-6" y="' + (Y(st) + 4) + '" text-anchor="end" font-size="11" fill="#5A5A5A">' + st + ' · ' + N[pc] + '</text>'; });
+for (let k = 0; k < n; k++) h += '<text x="' + (34 + k * FW + FW / 2) + '" y="164" text-anchor="middle" font-size="12" fill="#5A5A5A">' + (lo + k) + '</text>';
+fr.forEach((a, i) => a.forEach((f) => {
+const pc = (OPEN[i] + f) % 12, isRoot = pc === root, lab = N[pc], fs = lab.length >= 4 ? 8 : lab.length === 3 ? 9 : lab.length === 2 ? 10.5 : 12, cy = Y(6 - i);
+h += '<circle cx="' + CX(f) + '" cy="' + cy + '" r="11" fill="' + (isRoot ? '#E31B23' : '#FFFFFF') + '" stroke="#E31B23" stroke-width="2"/><text x="' + CX(f) + '" y="' + (cy + fs * 0.35) + '" text-anchor="middle" font-size="' + fs + '" font-weight="500" fill="' + (isRoot ? '#FFFFFF' : '#B3121A') + '">' + lab + '</text>';
+}));
+return h + '</svg></div>';
+};
+host.innerHTML = '<h2 class="bt-h3" style="margin: 8px 0 0">' + (es ? 'Las 5 posiciones' : 'The 5 positions') + '</h2><p class="pt-p">' + (es
+? 'La misma escala (La menor) recorriendo el mástil. Cada posición empieza donde termina la anterior; la tónica va en rojo. Aprende bien la 1 y ve sumando las demás.'
+: 'The same scale (A minor) going up the neck. Each position starts where the one before ends; the root is in red. Learn position 1 well, then add the others.') + '</p>' + BOX.map(neck).join('');
+}
 C["Pentatonica"] = (DCLogic) => { 
 class Component extends DCLogic {
 constructor(props) {
@@ -12967,6 +13157,7 @@ const BOX = [
 ];
 const root = this.state.root;
 const bx = this.state.box;
+setTimeout(() => pent5Paint(root, lang), 0);
 const r = (root - 4 + 12) % 12;
 let fr = BOX[bx].map((a) => a.map((o) => r + o));
 let lo = Math.min.apply(null, fr.map((a) => a[0]));
@@ -16472,7 +16663,7 @@ const D = {
     "links": [
      {
       "href": "Acentos.dc.html",
-      "label": "Acentuación con la púa"
+      "label": "Ejercicios de acentuación"
      },
      {
       "href": "Aranha.dc.html",
@@ -16833,7 +17024,7 @@ const D = {
     "links": [
      {
       "href": "Acentos.dc.html",
-      "label": "Picking accents"
+      "label": "Accent exercises"
      },
      {
       "href": "Aranha.dc.html",
@@ -19018,7 +19209,7 @@ const D = {
   ],
   "tipT": "Para sonar más lleno",
   "tipX": "Si te falta cuerpo, añade la tónica en otra octava con otra cuerda. Con tres o cuatro cuerdas sigues dejándole sitio al bajo.",
-  "cta": "Siguiente: acentuación con la púa"
+  "cta": "Siguiente: ejercicios de acentuación"
  },
  "en": {
   "langAria": "Language",
@@ -19072,7 +19263,7 @@ const D = {
   ],
   "tipT": "To sound fuller",
   "tipX": "If you need more body, add the root in another octave on another string. With three or four strings you’re still leaving room for the bass.",
-  "cta": "Next: picking accents"
+  "cta": "Next: accent exercises"
  }
 };
 const t = D[lang];
@@ -19274,7 +19465,7 @@ const D = {
  "es": {
   "langAria": "Idioma",
   "backAria": "Volver a la ruta",
-  "title": "Acentuación con la púa",
+  "title": "Ejercicios de acentuación",
   "eyebrow": "Mano derecha",
   "intro": "Semicorcheas con la púa siempre en marcha (abajo-arriba) y un acento que se va moviendo: primero en el pulso, luego en la «e», la «&» y la «a».",
   "accTitle": "Dónde va el acento",
@@ -19328,7 +19519,7 @@ const D = {
  "en": {
   "langAria": "Language",
   "backAria": "Back to the path",
-  "title": "Picking accents",
+  "title": "Accent exercises",
   "eyebrow": "Right hand",
   "intro": "Sixteenth notes with the pick always moving (down-up) and an accent that keeps shifting: first on the beat, then on the “e”, the “&” and the “a”.",
   "accTitle": "Where the accent goes",
@@ -19658,7 +19849,7 @@ o.start(n);
 o.stop(n + d + 0.05);
 } catch (e) {}
 }
-arpHalt() { (this._aTm || []).forEach(clearTimeout); this._aTm = []; (this._aOs || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._aOs = []; document.querySelectorAll('#hc-arp .rf-on').forEach((e) => e.classList.remove('rf-on')); }
+arpHalt() { yrCut(); (this._aTm || []).forEach(clearTimeout); this._aTm = []; (this._aOs || []).forEach((o) => { try { o.stop(); } catch (e) {} }); this._aOs = []; document.querySelectorAll('#hc-arp .rf-on').forEach((e) => e.classList.remove('rf-on')); }
 arpPaint(T) {
 if (!this.__render) return;
 const root = document.getElementById('hc-arp');
@@ -20906,7 +21097,7 @@ const D = {
   ],
   "tipT": "Calidad antes que velocidad",
   "tipX": "Si una nota suena sucia o pierdes el pulso, baja el tempo. Mejor limpio a 60 BPM que sucio a 120.",
-  "linkA": "Ver también: acentuación con la púa",
+  "linkA": "Ver también: ejercicios de acentuación",
   "cta": "Siguiente: arpegios y trémolo"
  },
  "en": {
@@ -21007,7 +21198,7 @@ const D = {
   ],
   "tipT": "Quality before speed",
   "tipX": "If a note sounds dirty or you lose the pulse, slow down. Better clean at 60 BPM than dirty at 120.",
-  "linkA": "See also: picking accents",
+  "linkA": "See also: accent exercises",
   "cta": "Next: arpeggios and tremolo"
  }
 };
@@ -22936,10 +23127,10 @@ function slSideMeta(m, i, dn, en) {
 // side menu lists for Música (songs), Guitarra avanzada and Herramientas: same numbered rows as the Principiante menu
 const HUBLIST = {
   es: { av: [["TeoriaAcordes","Teoría esencial","Cómo se forman los acordes: tríadas, séptimas y novenas."],["Batidas","Ritmos de acompañamiento","Patrones de rasgueo para practicar."],["RitmoAvanzado","Ritmo avanzado","Seis patrones: corcheas, semicorcheas, galope, síncopa, contratiempo y shuffle."],["ImproEj","Improvisación guiada","Lleva una frase por varias posiciones y muévete por todo el mástil."],["Teoria","Teoría de escalas","Cómo se construye una escala: tonos y semitonos."],["Posiciones","Escalas en 5 posiciones","Las cinco posiciones de la escala sobre el mástil."],["Arpegios","Arpegios en el mástil","Los arpegios de los acordes sobre el mástil."],["Modos","Modos: mixolidio y dórico","Los modos mixolidio y dórico sobre el mástil."],["ModosCurso","Modos como concepto","Qué son los modos y de dónde salen."],["MenoresAv","Menor armónica y melódica","Las escalas menor armónica y menor melódica."]],
-    tl: [["OtrasAfinaciones","Afinador","Afina con el micrófono en estándar, medio tono abajo o Drop D."],["Pulso","Metrónomo","BPM, compás y sonido del clic."],["Braco","Las notas en la guitarra","Todas las notas sobre el mástil."],["Biblioteca","Biblioteca","Todas las lecciones y canciones en una lista, con buscador y filtros."],["Oido","Entrenamiento de oído","Reconoce intervalos, acordes y notas sin mirar el mástil."],["Buscador","Buscador de acordes","Escribe un acorde y te enseño sus posiciones."],["CambioAcordes","Cambio de acordes","Un mástil animado al ritmo del metrónomo."],["PowerQuiz","Quiz de power chords","Mira el diagrama y adivina qué power chord es."],["Cejillas","Acordes con cejilla","Las formas de Mi, La, Re y Do recorriendo el mástil."],["Acentos","Acentuación con la púa","Acentos y dirección de la púa."],["Aranha","La araña","Ejercicio de digitación para la mano izquierda."]],
+    tl: [["OtrasAfinaciones","Afinador","Afina con el micrófono en estándar, medio tono abajo o Drop D."],["Pulso","Metrónomo","BPM, compás y sonido del clic."],["Braco","Las notas en la guitarra","Todas las notas sobre el mástil."],["Biblioteca","Biblioteca","Todas las lecciones y canciones en una lista, con buscador y filtros."],["Oido","Entrenamiento de oído","Reconoce intervalos, acordes y notas sin mirar el mástil."],["Buscador","Buscador de acordes","Escribe un acorde y te enseño sus posiciones."],["CambioAcordes","Cambio de acordes","Un mástil animado al ritmo del metrónomo."],["PowerQuiz","Quiz de power chords","Mira el diagrama y adivina qué power chord es."],["Cejillas","Acordes con cejilla","Las formas de Mi, La, Re y Do recorriendo el mástil."],["Acentos","Ejercicios de acentuación","Acentos y dirección de la púa."],["Aranha","La araña","Ejercicio de digitación para la mano izquierda."]],
     song: ["Slow Blues","Rock n' Roll","Jazz / Swing","Balada","Disco","Rock","Reggae","Hard rock","Country"] },
   en: { av: [["TeoriaAcordes","Essential theory","How chords are built: triads, sevenths and ninths."],["Batidas","Accompaniment rhythms","Strumming patterns to practice."],["RitmoAvanzado","Advanced rhythm","Six patterns: eighths, sixteenths, gallop, syncopation, offbeat and shuffle."],["ImproEj","Guided improvisation","Take a phrase through several positions and move around the whole neck."],["Teoria","Scale theory","How a scale is built: whole steps and half steps."],["Posiciones","Scales in 5 positions","The five positions of the scale on the neck."],["Arpegios","Arpeggios on the fretboard","Chord arpeggios on the neck."],["Modos","Modes: mixolydian and dorian","The mixolydian and dorian modes on the neck."],["ModosCurso","Modes as a concept","What modes are and where they come from."],["MenoresAv","Harmonic and melodic minor","The harmonic and melodic minor scales."]],
-    tl: [["OtrasAfinaciones","Tuner","Tune with the microphone in standard, half step down or Drop D."],["Pulso","Metronome","BPM, time signature and click sound."],["Braco","Notes on the guitar","Every note on the fretboard."],["Biblioteca","Library","All lessons and songs in one list, with search and filters."],["Oido","Ear training","Recognise intervals, chords and notes without looking at the neck."],["Buscador","Chord finder","Type a chord and I\u2019ll show you its positions."],["CambioAcordes","Chord changes","An animated neck in time with the metronome."],["PowerQuiz","Power chord quiz","Look at the diagram and guess which power chord it is."],["Cejillas","Barre chords","The E, A, D and C shapes travelling along the neck."],["Acentos","Picking accents","Accents and pick direction."],["Aranha","The spider","Fingering exercise for the left hand."]],
+    tl: [["OtrasAfinaciones","Tuner","Tune with the microphone in standard, half step down or Drop D."],["Pulso","Metronome","BPM, time signature and click sound."],["Braco","Notes on the guitar","Every note on the fretboard."],["Biblioteca","Library","All lessons and songs in one list, with search and filters."],["Oido","Ear training","Recognise intervals, chords and notes without looking at the neck."],["Buscador","Chord finder","Type a chord and I\u2019ll show you its positions."],["CambioAcordes","Chord changes","An animated neck in time with the metronome."],["PowerQuiz","Power chord quiz","Look at the diagram and guess which power chord it is."],["Cejillas","Barre chords","The E, A, D and C shapes travelling along the neck."],["Acentos","Accent exercises","Accents and pick direction."],["Aranha","The spider","Fingering exercise for the left hand."]],
     song: ["Slow Blues","Rock n' Roll","Jazz / Swing","Ballad","Disco","Rock","Reggae","Hard rock","Country"] }
 };
 const SD_CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
@@ -24006,95 +24197,6 @@ app.addEventListener('click', (e) => {
   flash(best);
 });
 
-// ---------- licks: short phrases in box 1 that light up note by note on the page's neck ----------
-// each note: [string, fret relative to the root on the 6th string, length in beats]
-const LICKS = [
-  { es: 'Bajada clásica', en: 'Classic descent', n: [[1, 3, .5], [1, 0, .5], [2, 3, .5], [2, 0, .5], [3, 2, .5], [3, 0, .5], [4, 2, 2]] },
-  { es: 'Subida a la tónica', en: 'Climb to the root', n: [[6, 0, .5], [6, 3, .5], [5, 0, .5], [5, 2, .5], [4, 0, .5], [4, 2, 2]] },
-  { es: 'Frase de blues', en: 'Blues phrase', n: [[3, 0, .5], [3, 2, .5], [2, 0, .5], [2, 3, .5], [1, 0, 1], [2, 3, .5], [2, 0, .5], [3, 2, .5], [3, 0, .5], [4, 2, 2]] }
-];
-const LK = { i: 0, bpm: 80, play: false, tm: [], src: [], el: null };
-function lkStop() {
-  LK.tm.forEach(clearTimeout); LK.tm = [];
-  LK.src.forEach((s) => { try { s.stop(); } catch (e) {} }); LK.src = [];
-  LK.play = false;
-  app.querySelectorAll('.lk-on').forEach((c) => c.classList.remove('lk-on'));
-  if (LK.el) lkPaint();
-}
-function lkNeck() {
-  const ss = app.querySelectorAll('main svg');
-  for (let i = 0; i < ss.length; i++) { const nk = neckInfo(ss[i]); if (nk) return { svg: ss[i], nk }; }
-  return null;
-}
-function lkPlay() {
-  const ac = pAudio();
-  if (!ac || !current || !current.state) return;
-  lkStop();
-  const nk = lkNeck(), beat = 60 / LK.bpm, t0 = ac.currentTime + 0.08;
-  // root fret on the 6th string; use the octave the page's neck is showing
-  let r = (current.state.root - 4 + 12) % 12;
-  if (nk && !noteCircle(nk.svg, nk.nk, 6, r) && noteCircle(nk.svg, nk.nk, 6, r + 12)) r += 12;
-  let t = 0;
-  LK.play = true; lkPaint();
-  if (nk) { const b = nk.svg.getBoundingClientRect(); if (b.top < 0 || b.bottom > window.innerHeight) nk.svg.scrollIntoView({ block: 'nearest', behavior: calm() ? 'auto' : 'smooth' }); }
-  LICKS[LK.i].n.forEach((nt) => {
-    const f = r + nt[1], s = nt[0], at = t;
-    LK.src.push(pluck(OPEN_MIDI[s - 1] + f, t0 + at));
-    LK.tm.push(setTimeout(() => {
-      app.querySelectorAll('.lk-on').forEach((c) => c.classList.remove('lk-on'));
-      const c = nk ? noteCircle(nk.svg, nk.nk, s, f) : null;
-      if (c) {
-        c.classList.add('lk-on');
-        const tx = c.nextElementSibling;
-        if (tx && tx.tagName.toLowerCase() === 'text') tx.classList.add('lk-on');
-        flash(c);
-      }
-    }, 80 + at * 1000));
-    t += nt[2] * beat;
-  });
-  LK.tm.push(setTimeout(lkStop, 80 + t * 1000 + 400));
-}
-function lkPaint() {
-  const el = LK.el, en = document.documentElement.lang === 'en';
-  el.querySelectorAll('.lk-c button').forEach((b, i) => b.setAttribute('aria-pressed', String(i === LK.i)));
-  el.querySelectorAll('.lk-sp button').forEach((b) => b.setAttribute('aria-pressed', String(+b.getAttribute('data-b') === LK.bpm)));
-  const pl = el.querySelector('.lk-play');
-  pl.innerHTML = (LK.play
-    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>' + (en ? 'Stop' : 'Parar')
-    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>' + (en ? 'Play' : 'Tocar'));
-}
-function attachLicks(name, lang) {
-  if (LK.play) lkStop();
-  LK.el = null;
-  if (name !== 'Pentatonica' || !current || !current.state) return;
-  const main = app.querySelector('main'), nk = lkNeck();
-  if (!main || !nk) return;
-  const en = lang === 'en';
-  const d = document.createElement('section');
-  d.className = 'lk';
-  const box1 = current.state.box === 0;
-  d.innerHTML = '<div class="lk-h"><span class="lk-e">Licks</span><span class="lk-t">' + (en ? 'Hear phrases in box 1' : 'Escucha frases en la caja 1') + '</span>'
-    + '<p>' + (en ? 'Watch each note light up on the neck above. Every lick ends on the root, the target note that makes a phrase sound finished.' : 'Mira cómo se ilumina cada nota en el mástil de arriba. Todos terminan en la tónica, la nota objetivo que hace que la frase suene acabada.') + '</p></div>'
-    + (box1
-      ? '<div class="lk-c" role="group" aria-label="Licks">' + LICKS.map((k, i) => '<button type="button" data-i="' + i + '">' + esc(en ? k.en : k.es) + '</button>').join('') + '</div>'
-        + '<div class="lk-row"><div class="lk-sp" role="group" aria-label="' + (en ? 'Speed (BPM)' : 'Velocidad (BPM)') + '">' + [60, 80, 100].map((b) => '<button type="button" data-b="' + b + '">' + b + '</button>').join('') + '</div><button type="button" class="lk-play"></button></div>'
-      : '<div class="lk-msg"><span>' + (en ? 'The licks use box 1.' : 'Los licks usan la caja 1.') + '</span><button type="button" class="lk-go">' + (en ? 'Show box 1' : 'Ver caja 1') + '</button></div>');
-  d.addEventListener('click', (e) => {
-    const b = e.target.closest && e.target.closest('button');
-    if (!b) return;
-    if (b.classList.contains('lk-go')) { current.setState({ box: 0 }); return; }
-    if (b.hasAttribute('data-i')) { LK.i = +b.getAttribute('data-i'); lkPlay(); return; }
-    if (b.hasAttribute('data-b')) { LK.bpm = +b.getAttribute('data-b'); if (LK.play) lkPlay(); else lkPaint(); return; }
-    if (b.classList.contains('lk-play')) { if (LK.play) lkStop(); else lkPlay(); }
-  });
-  let host = nk.svg;
-  while (host.parentElement && host.parentElement !== main) host = host.parentElement;
-  const after = host.nextElementSibling && /Tónica|Root/.test(host.nextElementSibling.textContent) && host.nextElementSibling.textContent.length < 80 ? host.nextElementSibling : host;
-  after.insertAdjacentElement('afterend', d);
-  LK.el = d;
-  if (box1) lkPaint();
-}
-
 // ---------- 4.3 / 4.4: each fret is one piano key ----------
 const PZ = { str: 0, sel: 0, page: -1 };
 const PZ_SH = { e: 6, em: 6, a: 5, am: 5, d: 4, dm: 4, c: 5 };
@@ -24729,7 +24831,7 @@ function scaleTap(root) {
   const halt = () => {
     const sp = root._sp; if (!sp) return;
     root._sp = null;
-    sp.tms.forEach(clearTimeout); sp.src.forEach((x) => { try { x.stop(); } catch (er) {} });
+    yrCut(); sp.tms.forEach(clearTimeout); sp.src.forEach((x) => { try { x.stop(); } catch (er) {} });
     root.querySelectorAll('.sc-on').forEach((n) => n.classList.remove('sc-on'));
     if (sp.btn.isConnected) sp.btn.textContent = sp.lab;
   };
@@ -24892,6 +24994,95 @@ function attachSearch(name, lang) {
   else if (app.firstChild !== SB.el) app.insertBefore(SB.el, app.firstChild);
 }
 
+// ===== Repertorio: every song screen has the same order — intro card · instrument · full lead sheet · your part · the rest =====
+const RP_KEYS = ['piano', 'gtr', 'gtr2', 'bass', 'drums'];
+const RP_NAMES = { es: ['Piano', 'Guitarra', 'Guitarra 2', 'Bajo', 'Batería'], en: ['Piano', 'Guitar', 'Guitar 2', 'Bass', 'Drums'] };
+// songs 1–4: the blocks of each screen, in the order they are written, and who they are for
+const RP_TAGS = {
+  1: ['all', 'gtr gtr2', 'all', 'gtr', 'gtr bass', 'gtr gtr2'],
+  2: ['all', 'gtr gtr2', 'all', 'gtr', 'gtr2'],
+  3: ['all', 'gtr gtr2', 'all', 'gtr', 'gtr gtr2'],
+  4: ['all', 'gtr gtr2', 'gtr gtr2']
+};
+// what is still to come for an instrument that has no material of its own yet
+const RP_SOON = {
+  es: { piano: 'el ejercicio de piano: progresión y posiciones de los acordes', gtr: 'la progresión de acordes, el rasgueo o el riff', gtr2: 'el segundo papel de guitarra: arreglos, frases o solo', bass: 'la línea de bajo', drums: 'el patrón rítmico de batería' },
+  en: { piano: 'the piano exercise: progression and chord positions', gtr: 'the chord progression, strumming or riff', gtr2: 'the second guitar part: fills, lines or solo', bass: 'the bass line', drums: 'the drum groove' }
+};
+let rpSheet = null; // the lead sheet keeps its state across re-renders of the same song
+function rpGet() { try { const v = localStorage.getItem('guitar.inst'); if (RP_KEYS.indexOf(v) >= 0) return v; } catch (e) {} return rpGet.v || 'gtr'; }
+function rpSet(v) { rpGet.v = v; try { localStorage.setItem('guitar.inst', v); } catch (e) {} }
+function repLayout(name, lang) {
+  const m = /^Can([1-9])$/.exec(name); if (!m) return;
+  const n = +m[1], es = lang === 'es', L = es ? 'es' : 'en';
+  const card = app.querySelector('.cf-card'); if (!card || card.parentNode.querySelector(':scope > .rp-inst')) return;
+  const box = card.parentNode, S = SONG_SHEETS.find((x) => x.n === n);
+  const el = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; return d; };
+  // 1) intro card: the title above the two-line explanation
+  const intro = card.querySelector(':scope > p.pt-p');
+  if (intro) { const t = document.createElement('h3'); t.className = 'rp-learn'; t.textContent = es ? '¿Qué vas a aprender?' : 'What will you learn?'; card.insertBefore(t, intro); intro.style.margin = '0'; }
+  // sort what the screen already had
+  const rest = Array.prototype.slice.call(box.children).filter((c) => c !== card && (card.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING));
+  const mine = [], other = [];
+  let pastPractice = false;
+  rest.forEach((c) => {
+    if (c.matches('a[href*="Lead"]')) { c.remove(); return; }
+    if (c.matches('a.cta')) return;
+    if (c.id === 'cp-root') { mine.push(c); c.setAttribute('data-rp', 'piano gtr gtr2 bass'); return; }
+    if (c.querySelector('[data-sp], .sp-play')) pastPractice = true;
+    if (RP_TAGS[n] && !pastPractice && mine.length < RP_TAGS[n].length) { c.setAttribute('data-rp', RP_TAGS[n][mine.length]); mine.push(c); }
+    else other.push(c);
+  });
+  // 2) instrument  3) lead sheet  4) your part  5) practice, material and links
+  const pick = el('pt-card rp-inst', '<b class="ej-h">' + (es ? 'Elige tu instrumento' : 'Pick your instrument') + '</b><div class="rp-chips" role="group">' + RP_KEYS.map((k, i) => '<button type="button" class="ej-chip" data-rpi="' + k + '">' + RP_NAMES[L][i] + '</button>').join('') + '</div><button type="button" class="rp-go"></button>');
+  const key = name + '|' + L;
+  if (!rpSheet || rpSheet.key !== key) {
+    const host = el('rp-sheet'); host.id = 'rp-sheet'; host.setAttribute('data-own-theme', '');
+    rpSheet = { key, el: host, st: { open: false, mode: 'chord', chord: '', sec: 'verse', part: '', pos: 'root', inst: 'piano', form: 'full' }, inst: '' };
+    if (n !== 5 && LSL_SONGS[n]) host.innerHTML = leadRender(n, S, es);
+  }
+  const sheet = rpSheet.el;
+  const head = el('rp-yours'); head.innerHTML = '<h2 class="cr-h" style="margin:0"></h2>';
+  const soon = el('pt-card rp-soon');
+  const end = box.querySelector(':scope > a.cta');
+  [pick, sheet, head].concat(mine, [soon], other).forEach((x) => box.insertBefore(x, end));
+  const apply = (changed) => {
+    const inst = rpGet(), label = RP_NAMES[L][RP_KEYS.indexOf(inst)];
+    pick.querySelectorAll('[data-rpi]').forEach((b) => b.setAttribute('aria-pressed', String(b.getAttribute('data-rpi') === inst)));
+    pick.querySelector('.rp-go').textContent = (es ? 'Ir a tu parte: ' : 'Go to your part: ') + label + ' ↓';
+    head.firstChild.textContent = (es ? 'Tu parte: ' : 'Your part: ') + label;
+    let own = false;
+    mine.forEach((b) => {
+      const tag = b.getAttribute('data-rp') || 'all', show = tag === 'all' || tag.split(' ').indexOf(inst) >= 0;
+      // whatever is sounding in a block that is about to disappear is stopped first
+      if (!show) b.querySelectorAll('button').forEach((x) => { if (/^■/.test(x.textContent.trim())) x.click(); });
+      b.hidden = !show; b.style.display = show ? (b.style.flexDirection ? 'flex' : '') : 'none';
+      if (show && tag !== 'all') own = true;
+      if (show && b.id === 'cp-root' && (!b._hub || b._hub.inst !== inst)) {
+        b.querySelectorAll('button').forEach((x) => { if (/^■/.test(x.textContent.trim())) x.click(); });
+        b._hub = { inst }; celebHub(b, es);
+      }
+      if (show && changed && b.id === 'sk-root' && b._sk && (inst === 'bass' || inst === 'gtr')) {
+        b.querySelectorAll('button').forEach((x) => { if (/^■/.test(x.textContent.trim())) x.click(); });
+        b._sk.inst = inst; skyBlues(b, es);
+      }
+    });
+    soon.hidden = own; soon.style.display = own ? 'none' : '';
+    if (!own) soon.innerHTML = '<span class="rt-badge">' + (es ? 'Muy pronto' : 'Coming soon') + '</span><p class="pt-p">' + (es ? 'Aquí irá ' : 'Here you will find ') + RP_SOON[L][inst] + (es ? ' de esta canción.' : ' for this song.') + '</p>';
+    // song 5: its lead sheet shows the chords on the chosen instrument (piano, or guitar for the string players)
+    if (n === 5 && rpSheet.inst !== inst) {
+      sheet.querySelectorAll('.ls-panel button').forEach((x) => { if (/^■/.test(x.textContent.trim())) x.click(); });
+      rpSheet.inst = inst; rpSheet.st.inst = inst === 'piano' ? 'piano' : 'guitar'; rpSheet.st.open = false;
+      leadCeleb(sheet, es, rpSheet.st);
+    }
+  };
+  pick.onclick = (e) => {
+    const b = e.target.closest && e.target.closest('button'); if (!b) return;
+    if (b.className === 'rp-go') { const hd = app.querySelector('header'); window.scrollTo({ top: head.getBoundingClientRect().top + window.scrollY - (hd ? hd.offsetHeight : 56) - 12, behavior: 'smooth' }); return; }
+    const v = b.getAttribute('data-rpi'); if (v) { rpSet(v); apply(true); }
+  };
+  apply(false);
+}
 function mount(name, q) {
   unmount();
   const Cmp = C[name](DCLogic);
@@ -24946,7 +25137,6 @@ function mount(name, q) {
     try { const hd = app.querySelector(':scope > div > header'); if (hd) app.firstElementChild.style.setProperty('--hdh', hd.offsetHeight + 'px'); } catch (e) {}
     try { attachMarker(name, l || 'es'); } catch (e) {}
     try { attachResume(name, l || 'es'); } catch (e) {}
-    try { attachLicks(name, l || 'es'); } catch (e) {}
     try { attachPiano(name, l || 'es'); } catch (e) {}
     try { attachChroma(name, l || 'es'); } catch (e) {}
     try { attachTeoQuiz(name, l || 'es'); } catch (e) {}
@@ -24959,6 +25149,7 @@ function mount(name, q) {
     try { stageVideos(l || 'es'); } catch (e) {}
     for (const k in persist) { const e = document.getElementById(k); if (e && e !== persist[k]) e.replaceWith(persist[k]); }
     deferred.forEach((f) => { try { f(); } catch (e) {} });
+    try { repLayout(name, l || 'es'); } catch (e) { console.error(e); }
     // diagram labels (12px minimum, necks cut to the chord) are fixed here too, not 120 ms later: that late pass made every diagram jump after each selection
     // the roaming boards are windowed before minSvgText measures them (otherwise they get a sideways scroll box)
     try { Array.prototype.forEach.call(app.querySelectorAll('svg'), (sv) => windowRoamNeck(sv)); } catch (e) {}
@@ -25251,8 +25442,8 @@ body.stage #app #sbar input:focus,body.stage #app #sbar input:focus-visible,body
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '23 nov 2026 · 18:23';
-  var BUILD_ID = '2026-11-23T18:23';
+  var BUILD = '26 nov 2026 · 14:25';
+  var BUILD_ID = '2026-11-26T14:25';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
