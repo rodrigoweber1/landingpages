@@ -41,16 +41,17 @@ function quizPlan(a, L) {
   }
   return plan;
 }
-const quizIntroHTML = () => `<h1>Descubra seu nível</h1>
+// na abertura não há título: "Descubra seu nível" é o próprio botão
+const quizIntroHTML = abertura => `${abertura ? '' : '<h1>Descubra seu nível</h1>'}
       <p class="mut">8 perguntas rápidas, cerca de 2 minutos. Responda com sinceridade: o objetivo é começar no ponto certo, não passar num teste.</p>
-      <div class="row" style="margin-top:14px"><button class="btn pri" data-act="qzStart">Começar</button><button class="btn ghost" data-act="qzSkip">Pular por enquanto</button></div>`;
+      <div class="row" style="margin-top:14px"><button class="btn pri" data-act="qzStart">${abertura ? 'Descubra seu nível' : 'Começar'}</button><button class="btn ghost" data-act="qzSkip">Pular por enquanto</button></div>`;
 // em toda abertura: a tela do logo (classe "welcome", ver index.html) fica aberta e mostra o convite do quiz, com a opção de pular
 const welcomeEl = () => document.querySelector('#intro.welcome:not(.out)');
 const behind = on => document.querySelectorAll('header.top, #view, #navBot').forEach(e => { e.inert = on; });
 function quizWelcome() {
   const i = welcomeEl(); if (!i) return;
   // boas-vindas (a frase fica em inglês em todos os idiomas, como "Your Guitar Coach") e, abaixo, o convite do quiz
-  i.querySelector('.in-card').innerHTML = `<p class="in-hello">Bem-vindo</p><p class="in-tag" lang="en" translate="no">The best way to practice every day</p>${quizIntroHTML()}`; behind(true);
+  i.querySelector('.in-card').innerHTML = `<p class="in-hello">Bem-vindo</p><p class="in-tag" lang="en" translate="no">The best way to practice every day</p>${quizIntroHTML(true)}`; behind(true);
   i.setAttribute('role', 'dialog'); i.setAttribute('aria-modal', 'true'); i.setAttribute('aria-label', 'SuperPick');
   setTimeout(() => i.classList.add('ready'), Math.max(0, 1700 - (performance.now() - i.dataset.t)));   // o texto entra quando o logo já se formou
 }

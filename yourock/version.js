@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.21.0';
+var APP_VERSION = '1.21.1';
 var APP_DATE = '2026-11-28';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Abertura: "Descubra seu nível" agora é o botão que inicia o quiz', en: 'Opening screen: "Find your level" is now the button that starts the quiz', es: 'Inicio: "Descubre tu nivel" ahora es el botón que empieza el cuestionario' },
   { pt: 'Tela de abertura com mensagem de boas-vindas', en: 'Welcome message on the opening screen', es: 'Mensaje de bienvenida en la pantalla de inicio' },
   { pt: 'Diagramas na vertical ou na horizontal: acordes, braço dos exercícios e tela Notas', en: 'Vertical or horizontal diagrams: chords, exercise fretboard and the Notes screen', es: 'Diagramas en vertical u horizontal: acordes, mástil de los ejercicios y pantalla Notas' },
   { pt: 'No iPhone, a barra de abas recolhe num botão ao rolar para baixo e volta ao rolar para cima', en: 'On iPhone, the tab bar shrinks to a button when you scroll down and comes back when you scroll up', es: 'En el iPhone, la barra de pestañas se recoge en un botón al bajar y vuelve al subir' },
