@@ -304,26 +304,8 @@ function chordMode() {
   const inp = $('#chTxt'); if (inp) { inp.placeholder = seq ? T('Digite de 1 a 6 acordes: Am F C G…') : T('Digite um acorde: Am7, C#dim, G/B…'); inp.value = seq ? CH.stext : CH.text; }
   if (seq) seqRes(); else { $('#chErr').textContent = ''; chordRes(); }
 }
-function chordSVG(v) {
-  const fr = v.f.map((f, s) => (f > 0 ? f : null)).filter(x => x != null), mn = fr.length ? Math.min(...fr) : 1, base = fr.length && Math.max(...fr) > 5 ? mn : 1;   // só 'desce' pelo braço quando o acorde não cabe nas 5 primeiras casas
-  const X = s => 24 + s * 19, Y = r => 36 + r * 24;
-  let o = `<svg viewBox="-9 14 143 148" xmlns="http://www.w3.org/2000/svg">`;
-  for (let r = 0; r <= 5; r++) o += `<line class="${r === 0 && base === 1 ? 'nut' : 'fret'}" x1="${X(0)}" x2="${X(5)}" y1="${Y(r)}" y2="${Y(r)}"/>`;
-  for (let s = 0; s < 6; s++) o += `<line class="strg" x1="${X(s)}" x2="${X(s)}" y1="${Y(0)}" y2="${Y(5)}" stroke-width="1.2"/>`;
-  // número da casa: termina antes da coluna da corda grave, para não ficar embaixo da bolinha (cabe "10ª", "12ª")
-  if (base > 1) o += `<text class="fnum" x="12" y="${Y(0) + 17}" style="font-size:12px;font-weight:700;fill:var(--tx);text-anchor:end">${base}ª</text>`;
-  if (v.barre && base === 1) o += `<text class="fnum" x="12" y="${Y(v.barre.fret - 1) + 17}" style="font-size:12px;font-weight:700;fill:var(--tx);text-anchor:end">${v.barre.fret}ª</text>`;   // número da casa da pestana
-  // pestana: cápsula da altura da casa, maior que as bolinhas (antes ficava escondida atrás delas quando cobria poucas cordas)
-  if (v.barre) { const r = v.barre.fret - base; o += `<rect x="${X(v.barre.from) - 13}" y="${Y(r) + 1}" width="${X(v.barre.to) - X(v.barre.from) + 26}" height="22" rx="11" fill="var(--acc)" opacity=".6"/>`; }
-  v.f.forEach((f, s) => {
-    if (f < 0) { o += `<text class="fnum" x="${X(s)}" y="${Y(0) - 10}" style="font-size:13px">×</text>`; return; }
-    if (f === 0) { o += `<circle cx="${X(s)}" cy="${Y(0) - 14}" r="5" fill="none" stroke="var(--strc)" stroke-width="1.5"/>`; return; }
-    const t = S().label === 'fret' ? String(f) : pcName(OPEN[s] + f), r = f - base;
-    o += `<g class="dot sel"><circle cx="${X(s)}" cy="${Y(r) + 12}" r="9"/><text x="${X(s)}" y="${Y(r) + 12}" style="font-size:${t.length > 2 ? 7 : 9}px">${t}</text></g>`;
-  });
-  return o + '</svg>';
-}
-// ---------- buscador: diagramas de linhas finas; tocar num deles abre a barra "Ouvir / + Sequência" ----------
+// ---------- diagramas de acorde (um padrão só no app: Buscador, Sequência e Treinar) ----------
+// no Buscador, tocar num deles abre a barra "Ouvir / + Sequência"
 const CH_ICON = {
   plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
@@ -331,13 +313,14 @@ const CH_ICON = {
 };
 // no dicionário geral, "Sequência" é a de dias seguidos (Streak); o botão da barra tem o próprio texto
 const CH_SEQ = { pt: 'Sequência', en: 'Sequence', es: 'Secuencia' };
-// diagrama do buscador: pequeno = só a forma (a tônica em destaque); grande (barra) = com o nome da nota ou a casa
+// diagrama de acorde: pequeno = só a forma (a tônica em destaque); grande (barra) = com o nome da nota ou a casa
 function chordLite(v, root, big) {
   const fr = v.f.filter(f => f > 0), mn = fr.length ? Math.min(...fr) : 1, base = fr.length && Math.max(...fr) > 4 ? mn : 1;
   const X = s => 27 + s * 16, Y = r => 24 + r * 20, b = v.barre;
-  let o = '<svg class="chd" viewBox="0 6 118 104" aria-hidden="true">';
-  for (let r = 0; r <= 4; r++) o += `<line class="${r === 0 && base === 1 ? 'nt' : 'ln'}" x1="${X(0)}" x2="${X(5)}" y1="${Y(r)}" y2="${Y(r)}"/>`;
-  for (let s = 0; s < 6; s++) o += `<line class="ln" x1="${X(s)}" x2="${X(s)}" y1="${Y(0)}" y2="${Y(4)}"/>`;
+  const rows = Math.max(4, fr.length ? Math.max(...fr) - base + 1 : 4);   // posição guardada com a mão mais aberta ganha uma casa
+  let o = `<svg class="chd" viewBox="0 6 118 ${24 + rows * 20}" aria-hidden="true">`;
+  for (let r = 0; r <= rows; r++) o += `<line class="${r === 0 && base === 1 ? 'nt' : 'ln'}" x1="${X(0)}" x2="${X(5)}" y1="${Y(r)}" y2="${Y(r)}"/>`;
+  for (let s = 0; s < 6; s++) o += `<line class="ln" x1="${X(s)}" x2="${X(s)}" y1="${Y(0)}" y2="${Y(rows)}"/>`;
   if (base > 1) o += `<text x="9" y="${Y(0) + 10}" style="font-size:${big ? 11 : 16}px">${base}</text>`;
   if (b) o += `<rect class="b" x="${X(b.from) - 7}" y="${Y(b.fret - base) + 3}" width="${X(b.to) - X(b.from) + 14}" height="14" rx="7"/>`;
   v.f.forEach((f, s) => {
@@ -432,7 +415,7 @@ function viewChords() {
   chordSync(); chordRes(); if (CH.mode === 'seq') chordMode();
   if (window.ChordSequencer) {
     try {
-      const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, diagram: v => chordSVG(v), names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); chordBarSync(); } });
+      const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, diagram: (v, root) => chordLite(v, root), names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); chordBarSync(); } });
       if (DB.chordSeq) seq.setState(DB.chordSeq);
       CH.seq = seq; cleanup = () => { CH.seq = null; seq.destroy(); };
     } catch (e) {}

@@ -367,7 +367,7 @@
         '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/><circle cx="9" cy="12" r="1.8"/><circle cx="15" cy="12" r="1.8"/><circle cx="9" cy="18" r="1.8"/><circle cx="15" cy="18" r="1.8"/></svg>' + (i + 1) + '</span>' +
         (opts.diagram ? '<span class="cs-nm">' + esc(noteName(ROOTS[sl.r][0], ROOTS[sl.r][1], nl()) + Q[sl.q].sym) + '</span>' : '') +
         '<button type="button" class="cs-x" data-a="rem" data-i="' + i + '" aria-label="' + esc(t.rem) + '">×</button></div>';
-      if (opts.diagram) { var vv = V(i); return h + '<div class="cs-d cs-st">' + (vv ? opts.diagram(vv) : '<span style="font-size:13px;color:var(--mut);padding:40px 0">' + esc(t.none) + '</span>') + '</div></div>'; }
+      if (opts.diagram) { var vv = V(i); return h + '<div class="cs-d cs-st">' + (vv ? opts.diagram(vv, spell(P(i))[0].pc) : '<span style="font-size:13px;color:var(--mut);padding:40px 0">' + esc(t.none) + '</span>') + '</div></div>'; }
       h += '<div class="cs-sels">';
       h += '<select data-a="r" data-i="' + i + '" aria-label="' + esc(t.root) + '">' + ROOTS.map(function (r, k) { return '<option value="' + k + '"' + (k === sl.r ? ' selected' : '') + '>' + esc(noteName(r[0], r[1], nl())) + '</option>'; }).join('') + '</select>';
       h += '<select data-a="q" data-i="' + i + '" aria-label="' + esc(t.type) + '">' + Object.keys(Q).map(function (k) { return '<option value="' + k + '"' + (k === sl.q ? ' selected' : '') + '>' + esc(Q[k][lang] || Q[k].es) + '</option>'; }).join('') + '</select></div>';

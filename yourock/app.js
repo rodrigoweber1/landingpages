@@ -186,10 +186,10 @@ function chordMini(name) {
   if (!(name in CHV)) { const c = parseChord(name); CHV[name] = c ? (findVoicings(c.root, QUAL.find(x => x.k === c.q).iv, c.bass)[0] || null) : null; }
   return CHV[name];
 }
-// exercícios de troca de acordes: mostra os diagramas pequenos (verticais, como na seção Acordes); o acorde da vez fica em destaque
+// exercícios de troca de acordes: os mesmos diagramas da seção Acordes; o acorde da vez fica em destaque
 function chordStripHTML(ex) {
   const list = [...new Set(ex.chords || [])]; if (list.length < 2) return '';
-  const items = list.map((n, i) => { const v = chordMini(n); return v ? `<div class="cmini${i === 0 ? ' on' : ''}" data-ch="${esc(n)}"><b>${esc(n)}</b>${chordSVG(v)}</div>` : ''; }).join('');
+  const items = list.map((n, i) => { const v = chordMini(n); return v ? `<div class="cmini${i === 0 ? ' on' : ''}" data-ch="${esc(n)}"><b>${esc(n)}</b>${chordLite(v, parseChord(n).root)}</div>` : ''; }).join('');
   return items ? `<div class="cstrip">${items}</div>` : '';
 }
 function chordStripOn(name) { document.querySelectorAll('.cmini').forEach(e => e.classList.toggle('on', e.dataset.ch === name)); }
