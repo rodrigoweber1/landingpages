@@ -191,7 +191,7 @@ const QUAL = [
   { k: 'aug', n: 'Aumentado', iv: [0, 4, 8], al: ['aug', '+'] },
   { k: '5', n: 'Power chord (quinta)', iv: [0, 7], al: ['5'] },
 ];
-const CH = { root: 0, q: '', bass: null, text: 'C', v: [], seq: null, mode: 'one', stext: 'Am F C G', sv: [] };
+const CH = { root: 0, q: '', bass: null, text: 'C', best: null, items: [], sel: null, okUntil: 0, seq: null, mode: 'one', stext: 'Am F C G', sv: [] };
 const T = s => (typeof tr === 'function' ? tr(s) : s);
 // qualidade do buscador -> tipo do sequenciador
 const SEQ_Q = { '': 'maj', m: 'min', 7: 'd7', maj7: 'maj7', m7: 'm7', mmaj7: 'mmaj7', 6: 'six', m6: 'm6', sus2: 'sus2', sus4: 'sus4', '7sus4': 's74', add9: 'add9', 9: 'd9', m9: 'm9', dim: 'dim', dim7: 'dim7', m7b5: 'm7b5', aug: 'aug', 5: 'p5' };
@@ -287,11 +287,14 @@ function seqRes() {
     const mv = Math.abs(d) < 1 ? `<span>${T('mesma região')}</span>` : `<span>${d > 0 ? T('mão sobe') : T('mão desce')}</span> <b>${Math.abs(d)}</b> <span>${Math.abs(d) === 1 ? T('casa') : T('casas')}</span>`;
     return `<span class="mut small">${mv}${com ? ` · <b>${com}</b> <span>${com === 1 ? T('dedo fica no lugar') : T('dedos ficam no lugar')}</span>` : ''}</span>`;
   };
-  out.innerHTML = `<div class="card"><div class="row sp"><div><div class="chtitle" style="font-size:26px">${esc(cs.map(chordTitle).join(' → '))}</div>
+  const items = [];
+  out.innerHTML = `<div class="chhead"><div><div class="chtitle seqt">${esc(cs.map(chordTitle).join(' → '))}</div>
     <div class="mut small" style="margin-top:4px">${T('Posições escolhidas para a mão andar o mínimo possível entre os acordes.')}${base - mine >= 1 ? ` <b>${T('Movimento da mão:')} ${mine.toFixed(0)} ${T(mine.toFixed(0) === '1' ? 'casa' : 'casas')}</b> (${T('sem otimizar:')} ${base.toFixed(0)})` : ''}</div></div>
     <div class="row"><button class="btn pri" data-act="chsPlayAll">▶ ${T('Ouvir sequência')}</button><button class="btn" data-act="chsAddAll">+ ${T('Tudo para a prática')}</button></div></div>
-    ${miss.length ? `<div class="small" style="margin-top:8px;color:var(--warn)">${T('Sem posições confortáveis')}: ${esc(miss.join(', '))}</div>` : ''}</div>
-    <div class="cgrid">${CH.sv.map((x, i) => `<div class="card cv" style="margin:0"><div class="row sp" style="margin-bottom:2px"><b>${i + 1}. ${esc(chordTitle(x.c))}</b><span class="small mut">${x.v.barre ? T('pestana') : x.v.hasOpen ? T('aberto') : ''}</span></div>${chordSVG(x.v)}<div style="min-height:34px;text-align:center">${cap(i)}</div><div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn sm" data-act="chsPlay" data-i="${i}" style="flex:1" aria-label="${T('Ouvir')}" title="${T('Ouvir')}">▶</button><button class="btn sm" data-act="chsAdd" data-i="${i}" style="flex:1" aria-label="${T('Adicionar à sequência')}" title="${T('Adicionar à sequência')}">+</button></div></div>`).join('')}</div>`;
+    ${miss.length ? `<div class="small" style="margin-top:8px;color:var(--warn)">${T('Sem posições confortáveis')}: ${esc(miss.join(', '))}</div>` : ''}
+    <p class="chtip">${T('Toque num acorde para ouvir e adicionar à sequência')}</p>
+    <div class="chgrid seqg">${CH.sv.map((x, i) => `<div><div class="chseq-t"><b>${i + 1}. ${esc(chordTitle(x.c))}</b><span>${x.v.barre ? T('pestana') : x.v.hasOpen ? T('aberto') : ''}</span></div>${chordTile(items, { v: x.v, root: x.c.root, q: x.c.q, title: chordTitle(x.c) })}<div class="chseq-c">${cap(i)}</div></div>`).join('')}</div>`;
+  CH.items = items; CH.sel = null;
 }
 function chordMode() {
   const seq = CH.mode === 'seq', b = $('#chMode'); if (b) { b.setAttribute('aria-pressed', seq); b.classList.toggle('pri', seq); }
@@ -320,14 +323,94 @@ function chordSVG(v) {
   });
   return o + '</svg>';
 }
+// ---------- buscador: diagramas de linhas finas; tocar num deles abre a barra "Ouvir / + Sequência" ----------
+const CH_ICON = {
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>',
+};
+// no dicionário geral, "Sequência" é a de dias seguidos (Streak); o botão da barra tem o próprio texto
+const CH_SEQ = { pt: 'Sequência', en: 'Sequence', es: 'Secuencia' };
+// diagrama do buscador: pequeno = só a forma (a tônica em destaque); grande (barra) = com o nome da nota ou a casa
+function chordLite(v, root, big) {
+  const fr = v.f.filter(f => f > 0), mn = fr.length ? Math.min(...fr) : 1, base = fr.length && Math.max(...fr) > 4 ? mn : 1;
+  const X = s => 27 + s * 16, Y = r => 24 + r * 20, b = v.barre;
+  let o = '<svg class="chd" viewBox="0 6 118 104" aria-hidden="true">';
+  for (let r = 0; r <= 4; r++) o += `<line class="${r === 0 && base === 1 ? 'nt' : 'ln'}" x1="${X(0)}" x2="${X(5)}" y1="${Y(r)}" y2="${Y(r)}"/>`;
+  for (let s = 0; s < 6; s++) o += `<line class="ln" x1="${X(s)}" x2="${X(s)}" y1="${Y(0)}" y2="${Y(4)}"/>`;
+  if (base > 1) o += `<text x="9" y="${Y(0) + 10}" style="font-size:${big ? 11 : 16}px">${base}</text>`;
+  if (b) o += `<rect class="b" x="${X(b.from) - 7}" y="${Y(b.fret - base) + 3}" width="${X(b.to) - X(b.from) + 14}" height="14" rx="7"/>`;
+  v.f.forEach((f, s) => {
+    if (f < 0) { o += `<text class="m" x="${X(s)}" y="${Y(0) - 10}">×</text>`; return; }
+    const rt = (OPEN[s] + f) % 12 === root;
+    if (f === 0) { o += `<circle class="${rt ? 'r' : 'n'}" cx="${X(s)}" cy="${Y(0) - 10}" r="4.5"/>`; return; }
+    const y = Y(f - base) + 10, under = b && f === b.fret && s >= b.from && s <= b.to;
+    if (!big && under && !rt) return;   // no pequeno a cápsula da pestana já representa essas notas
+    o += `<circle class="${rt ? 'r' : 'n'}" cx="${X(s)}" cy="${y}" r="${big ? 7.8 : under ? 5 : 6.2}"/>`;
+    if (big) { const t = S().label === 'fret' ? String(f) : pcName(OPEN[s] + f); o += `<text class="${rt ? 'on' : ''}" x="${X(s)}" y="${y}" style="font-size:${t.length > 3 ? 6 : t.length > 2 ? 7 : t.length > 1 ? 8 : 9.5}px">${t}</text>`; }
+  });
+  return o + '</svg>';
+}
+function chordTile(list, it) {
+  const i = list.push(it) - 1;
+  return `<button type="button" class="chv" data-act="chSel" data-i="${i}" aria-pressed="false" aria-label="${esc(it.title + ': ' + it.v.f.map(f => (f < 0 ? 'x' : f)).join(' '))}">${chordLite(it.v, it.root)}</button>`;
+}
+// posições de um grupo: sem variantes que só mudam por cordas abafadas, ordenadas pela casa
+function chordPick(root, iv, bass, n) {
+  const got = [];
+  for (const v of findVoicings(root, iv, bass, 48)) {
+    if (got.some(u => u.f.every((f, s) => f === v.f[s] || f < 0 || v.f[s] < 0))) continue;
+    got.push(v); if (got.length === n) break;
+  }
+  return got.sort((a, b) => a.minF - b.minF || a.score - b.score);
+}
+// estado fundamental + uma lista por inversão (a nona não conta como inversão); com baixo escolhido (G/B), um grupo só
+function chordGroups(root, q, bass) {
+  if (bass != null && bass !== root) return [{ n: 'Com o baixo escolhido', bass, v: chordPick(root, q.iv, bass, 8) }].filter(g => g.v.length);
+  const names = ['Estado fundamental', '1ª inversão', '2ª inversão', '3ª inversão'], ninth = ['9', 'm9', 'add9'].includes(q.k);
+  return q.iv.filter(i => !(ninth && i === 2)).slice(0, names.length).map((i, k) => { const b = k ? (root + i) % 12 : null; return { n: names[k], bass: b, v: chordPick(root, q.iv, b, k ? 4 : 8) }; }).filter(g => g.v.length);
+}
 function chordRes() {
   const q = QUAL.find(x => x.k === CH.q), cm = { root: CH.root, q: CH.q, bass: CH.bass };
   const names = q.iv.map(i => pcName(CH.root + i)).join(' · '), ivs = q.iv.map(i => (q.k === 'sus2' && i === 2 ? '2' : q.k === 'add9' && i === 2 ? '9' : IVN[i])).join(' · ');
-  CH.v = findVoicings(CH.root, q.iv, CH.bass);
-  $('#chRes').innerHTML = `<div class="card"><div class="row sp"><div><div class="chtitle">${esc(chordTitle(cm))}</div><div class="mut">${q.n}${CH.bass != null ? ' · baixo em ' + pcName(CH.bass) : ''}</div></div><button class="btn pri" data-act="chPlay" data-i="-1">▶ Ouvir acorde</button></div>
-    <div class="row small" style="margin-top:10px"><span class="chip">Notas: <b>${esc(names)}</b></span><span class="chip">Fórmula: <b>${ivs}</b></span></div></div>
-    ${CH.v.length ? `<div class="cgrid">${CH.v.map((v, i) => `<div class="card cv" style="margin:0">${chordSVG(v)}<div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn sm" data-act="chPlay" data-i="${i}" style="flex:1" aria-label="${T('Ouvir')}" title="${T('Ouvir')}">▶</button><button class="btn sm" data-act="chAdd" data-i="${i}" style="flex:1" aria-label="${T('Adicionar à sequência')}" title="${T('Adicionar à sequência')}">+</button></div></div>`).join('')}</div>` : '<div class="card mut">Não encontrei uma digitação simples (até 4 dedos) para esse acorde com essa nota no baixo.</div>'}`;
+  const all = [], groups = chordGroups(CH.root, q, CH.bass);
+  CH.best = findVoicings(CH.root, q.iv, CH.bass, 1)[0] || null;
+  const list = groups.map(g => { const title = chordTitle({ root: CH.root, q: CH.q, bass: g.bass }); return `<h3 class="chgh"><span>${g.n}</span><span>${esc(title)}</span></h3><div class="chgrid">${g.v.map(v => chordTile(all, { v, root: CH.root, q: CH.q, title })).join('')}</div>`; }).join('');
+  CH.items = all; CH.sel = null;
+  $('#chRes').innerHTML = `<div class="chhead"><div><div class="chtitle">${esc(chordTitle(cm))}</div><div class="mut">${q.n}${CH.bass != null ? ' · baixo em ' + pcName(CH.bass) : ''}</div></div><button class="btn pri" data-act="chPlay">▶ Ouvir acorde</button></div>
+    <div class="chinfo"><span><span>Notas:</span> <b>${esc(names)}</b></span><span><span>Fórmula:</span> <b>${ivs}</b></span></div>
+    ${list ? `<p class="chtip">Toque num acorde para ouvir e adicionar à sequência</p>${list}` : '<p class="mut">Não encontrei uma digitação simples (até 4 dedos) para esse acorde com essa nota no baixo.</p>'}`;
 }
+function chordStrum(v) { ensureCtx(); v.f.map((f, s) => (f >= 0 ? OPEN[s] + f : null)).filter(x => x != null).forEach((m, k) => pluck(AC.currentTime + k * 0.055, m, 1.8)); }
+// barra do acorde escolhido: fica presa ao rodapé enquanto a lista está na tela (position:sticky dentro de #chRes)
+function chordBar(i) {
+  const it = CH.items[i]; if (!it) return;
+  CH.sel = i; CH.okUntil = 0;
+  const tiles = [...document.querySelectorAll('#chRes .chv')]; tiles.forEach(b => b.setAttribute('aria-pressed', +b.dataset.i === i));
+  let bar = $('#chBar');
+  if (!bar) { $('#chRes').insertAdjacentHTML('beforeend', '<div class="chbar" id="chBar" role="region" aria-label="Acorde escolhido"></div>'); bar = $('#chBar'); }
+  bar.innerHTML = `${chordLite(it.v, it.root, true)}<div><div class="chbar-t"><b>${esc(it.title)}</b><span class="chbar-n" aria-live="polite"></span></div>
+    <div class="chbar-a"><button type="button" class="btn" data-act="chBarPlay" aria-label="Ouvir" title="Ouvir">${CH_ICON.play}</button><button type="button" class="btn pri" data-act="chBarAdd"></button></div></div>`;
+  chordBarSync();
+  // posição da barra presa ao rodapé, sem contar o deslocamento da animação de entrada
+  const hid = tiles[i] ? tiles[i].getBoundingClientRect().bottom - (innerHeight - parseFloat(getComputedStyle(bar).bottom) - bar.offsetHeight) : -99;
+  if (hid > -6) window.scrollBy({ top: hid + 10, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });   // a barra não pode cobrir o acorde tocado
+}
+function chordBarSync() {
+  const bar = $('#chBar'); if (!bar) return;
+  const add = bar.querySelector('[data-act=chBarAdd]'), s = CH.seq && CH.seq.size();
+  add.hidden = !s; if (!s) return;
+  const full = s.n >= s.max, ok = !full && Date.now() < CH.okUntil;
+  bar.querySelector('.chbar-n').textContent = `Sequência: ${s.n} de ${s.max}`;
+  add.disabled = full;
+  add.innerHTML = `${full ? '' : ok ? CH_ICON.check : CH_ICON.plus}<span>${full ? 'Sequência cheia' : ok ? 'Adicionado' : CH_SEQ[LANG] || CH_SEQ.pt}</span>`;
+}
+function chordClose() {
+  const bar = $('#chBar'), t = document.querySelector(`#chRes .chv[data-i="${CH.sel}"]`), inside = bar && bar.contains(document.activeElement);
+  if (bar) bar.remove(); if (t) { t.setAttribute('aria-pressed', 'false'); if (inside) t.focus(); }
+  CH.sel = null;
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && CH.sel != null && $('#chBar')) chordClose(); });
 function chordSync() {
   document.querySelectorAll('#chRoots .chip').forEach(c => c.classList.toggle('on', +c.dataset.pc === CH.root));
   const sel = $('#chQ'); if (sel) sel.value = CH.q;
@@ -349,7 +432,7 @@ function viewChords() {
   chordSync(); chordRes(); if (CH.mode === 'seq') chordMode();
   if (window.ChordSequencer) {
     try {
-      const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, diagram: v => chordSVG(v), names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); } });
+      const seq = ChordSequencer.mount('#seq', { lang: LANG, addButton: false, diagram: v => chordSVG(v), names: () => (S().names === 'solfejo' ? 'es' : 'en'), storageKey: null, onChange: st => { DB.chordSeq = st; save(); chordBarSync(); } });
       if (DB.chordSeq) seq.setState(DB.chordSeq);
       CH.seq = seq; cleanup = () => { CH.seq = null; seq.destroy(); };
     } catch (e) {}
@@ -388,9 +471,12 @@ const toolActs = {
   nsel(d) { const pc = +d.pc; NT.sel = pc < 0 || NT.sel === pc ? null : pc; notesDraw(); },
   nplay(d) { ensureCtx(); const s = +d.s, f = +d.f, pc = (OPEN[s] + f) % 12; pluck(AC.currentTime, OPEN[s] + f, 1.6); NT.sel = NT.sel === pc && d.sel !== '1' ? NT.sel : pc; notesDraw(); },
   chRoot(d) { CH.root = +d.pc; if (CH.bass != null) CH.bass = null; chordSync(); chordUpdateText(); chordRes(); },
-  chAdd(d) {
-    const v = CH.v[+d.i]; if (!CH.seq || !v) return;
-    toast(seqAddOne(CH.root, CH.q, v) ? T('Adicionado à sequência') : T('A sequência está cheia'));
+  chSel(d) { const i = +d.i; if (CH.sel === i && $('#chBar')) { chordClose(); return; } chordBar(i); if (CH.items[i]) chordStrum(CH.items[i].v); },
+  chBarPlay() { const it = CH.items[CH.sel]; if (it) chordStrum(it.v); },
+  chBarAdd() {
+    const it = CH.items[CH.sel]; if (!it || !CH.seq) return;
+    if (seqAddOne(it.root, it.q, it.v)) { CH.okUntil = Date.now() + 1200; setTimeout(chordBarSync, 1250); }
+    chordBarSync();
   },
   chMode() { CH.mode = CH.mode === 'seq' ? 'one' : 'seq'; chordMode(); },
   chsRoot(d) {
@@ -400,8 +486,6 @@ const toolActs = {
   },
   chsDel() { const p = CH.stext.trim().split(/\s+/); p.pop(); CH.stext = p.join(' '); $('#chTxt').value = CH.stext; seqRes(); },
   chsClr() { CH.stext = ''; $('#chTxt').value = ''; seqRes(); },
-  chsPlay(d) { ensureCtx(); const x = CH.sv[+d.i]; if (!x) return; x.v.f.forEach((f, s) => { if (f >= 0) pluck(AC.currentTime + s * 0.055, OPEN[s] + f, 1.8); }); },
-  chsAdd(d) { const x = CH.sv[+d.i]; if (!CH.seq || !x) return; toast(seqAddOne(x.c.root, x.c.q, x.v) ? T('Adicionado à sequência') : T('A sequência está cheia')); },
   chsPlayAll() {
     ensureCtx(); const t0 = AC.currentTime + 0.05;
     CH.sv.forEach((x, i) => x.v.f.forEach((f, s) => { if (f >= 0) pluck(t0 + i * 1.3 + s * 0.055, OPEN[s] + f, 1.2); }));
@@ -412,11 +496,9 @@ const toolActs = {
     for (const x of CH.sv) { if (!seqAddOne(x.c.root, x.c.q, x.v)) break; n++; }
     toast(n === CH.sv.length ? T('Adicionado à sequência') : T('A sequência está cheia'));
   },
-  chPlay(d) {
-    ensureCtx(); const i = +d.i, q = QUAL.find(x => x.k === CH.q); let midis;
-    if (i < 0) { const v = CH.v[0]; if (v) midis = v.f.map((f, s) => (f >= 0 ? OPEN[s] + f : null)).filter(x => x != null); else { const r = 48 + CH.root; midis = q.iv.map(x => r + x); } }
-    else midis = CH.v[i].f.map((f, s) => (f >= 0 ? OPEN[s] + f : null)).filter(x => x != null);
-    midis.forEach((m, k) => pluck(AC.currentTime + k * 0.055, m, 1.8));
+  chPlay() {
+    if (CH.best) { chordStrum(CH.best); return; }
+    ensureCtx(); const q = QUAL.find(x => x.k === CH.q); q.iv.forEach((x, k) => pluck(AC.currentTime + k * 0.055, 48 + CH.root + x, 1.8));
   },
 };
 const toolIn = {

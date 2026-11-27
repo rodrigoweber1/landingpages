@@ -8,6 +8,17 @@ const LI = { pt: 0, en: 1, es: 2 }[LANG];
 // pt | en | es
 const D_RAW = `
 Hoje|Today|Hoy
+dia|day|día
+dias|days|días
+Estado fundamental|Root position|Estado fundamental
+1ª inversão|1st inversion|1.ª inversión
+2ª inversão|2nd inversion|2.ª inversión
+3ª inversão|3rd inversion|3.ª inversión
+Com o baixo escolhido|With the chosen bass note|Con el bajo elegido
+Toque num acorde para ouvir e adicionar à sequência|Tap a chord to hear it and add it to the sequence|Toca un acorde para escucharlo y añadirlo a la secuencia
+Acorde escolhido|Selected chord|Acorde elegido
+Adicionado|Added|Añadido
+Sequência cheia|Sequence full|Secuencia llena
 Tema de cores|Color theme|Tema de color
 Braço na vertical no celular, na tela Notas (bolinhas maiores)|Vertical fretboard on phones, in the Notes screen (bigger dots)|Mástil en vertical en el móvil, en la pantalla Notas (puntos más grandes)
 Adicionar à sequência|Add to sequence|Añadir a la secuencia
@@ -209,7 +220,6 @@ Power chords E5 · G5 · A5 (nota a nota)|Power chords E5 · G5 · A5 (note by n
 Os três power chords do riff clássico, uma nota de cada vez. Prepare a forma antes de cada acorde.|The three power chords of the classic riff, one note at a time. Prepare the shape before each chord.|Los tres power chords del riff clásico, una nota cada vez. Prepara la forma antes de cada acorde.
 Afinador|Tuner|Afinador
 Ajustes|Settings|Ajustes
-YouRock – treino de guitarra que escuta você|YouRock – guitar practice that listens to you|YouRock – práctica de guitarra que te escucha
 Bora treinar 🎸|Let's practice 🎸|¡A practicar! 🎸
 Treino que escuta você, ajusta a velocidade e mostra onde evoluir.|Practice that listens to you, adjusts the speed and shows where you improve.|Práctica que te escucha, ajusta la velocidad y te muestra dónde mejoras.
 Sequência|Streak|Racha
@@ -786,7 +796,7 @@ Toque em Compartilhar no Safari (em alguns iPhones, primeiro em •••)|Tap S
 Escolha Adicionar à Tela de Início|Choose Add to Home Screen|Elige Añadir a pantalla de inicio
 Toque em Adicionar|Tap Add|Toca Añadir
 O app instalado pode começar sem o progresso salvo no navegador.|The installed app may start without the progress saved in the browser.|La app instalada puede empezar sin el progreso guardado en el navegador.
-Instale o YouRock na tela de início|Install YouRock on your Home Screen|Instala YouRock en tu pantalla de inicio
+Instale o SuperPick na tela de início|Install SuperPick on your Home Screen|Instala SuperPick en tu pantalla de inicio
 Abre em tela cheia, com ícone próprio, e funciona sem internet.|Opens full screen, with its own icon, and works offline.|Se abre a pantalla completa, con su propio icono, y funciona sin internet.
 Entendi|Got it|Entendido
 Sem conexão: o app continua como está. Atualize quando a internet voltar.|No connection: the app stays as it is. Update when you are back online.|Sin conexión: la app sigue como está. Actualiza cuando vuelva internet.
@@ -878,6 +888,7 @@ const FRAG = F_RAW.trim().split('\n').map(l => { const p = l.split('|'); return 
 
 const RULES = [
   [/^Trinados (.+)$/, 'Trills $1', 'Trinos $1'],
+  [/^Sequência: (\d+) de (\d+)$/, 'Sequence: $1 of $2', 'Secuencia: $1 de $2'],
   [/^meta (\d+) BPM$/, 'target $1 BPM', 'meta $1 BPM'],  [/^Arpejo Am \| C dedilhado$/, 'Fingerpicked Am | C arpeggio', 'Arpegio Am | C con los dedos'],
   [/^Meta semanal: (\d+) de (\d+) min \((\d+)%\)\.$/, 'Weekly goal: $1 of $2 min ($3%).', 'Meta semanal: $1 de $2 min ($3 %).'],
   [/^Nível (\w+) \((.+)\): (\d+\/\d+) exercícios dominados\. Faltam (\d+) para liberar o próximo nível\.$/, 'Level $1 ($2): $3 exercises mastered. $4 more to unlock the next level.', 'Nivel $1 ($2): $3 ejercicios dominados. Faltan $4 para desbloquear el siguiente nivel.'],

@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.15.0';
-var APP_DATE = '2026-11-26';
+var APP_VERSION = '1.16.0';
+var APP_DATE = '2026-11-27';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Novo nome: SuperPick, Your Guitar Coach. Acordes em diagramas de linhas finas, separados por inversão; toque num deles para ouvir e adicionar à sequência', en: 'New name: SuperPick, Your Guitar Coach. Chords as fine line diagrams grouped by inversion; tap one to hear it and add it to the sequence', es: 'Nuevo nombre: SuperPick, Your Guitar Coach. Acordes en diagramas de líneas finas por inversión; toca uno para escucharlo y añadirlo a la secuencia' },
   { pt: 'O quiz Descubra seu nível aparece em toda abertura do app, com a opção de pular', en: 'The Find your level quiz appears every time you open the app, with the option to skip', es: 'El quiz Descubre tu nivel aparece cada vez que abres la app, con la opción de saltarlo' },
   { pt: 'Primeira vez: o quiz Descubra seu nível aparece na própria tela de abertura, abaixo do logo', en: 'First visit: the Find your level quiz appears on the opening screen itself, below the logo', es: 'Primera vez: el quiz Descubre tu nivel aparece en la propia pantalla de apertura, debajo del logo' },
   { pt: 'App instalável (ícone no iPhone e guia de instalação), uso sem internet mais seguro e abertura mais longa', en: 'Installable app (iPhone icon and install guide), safer offline use and a longer opening animation', es: 'App instalable (icono en iPhone y guía de instalación), uso sin internet más seguro y animación de apertura más larga' },

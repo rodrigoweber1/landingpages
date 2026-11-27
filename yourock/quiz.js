@@ -47,7 +47,7 @@ const behind = on => document.querySelectorAll('header.top, #view, #navBot').for
 function quizWelcome() {
   const i = welcomeEl(); if (!i) return;
   i.querySelector('.in-card').innerHTML = quizIntroHTML(); behind(true);
-  i.setAttribute('role', 'dialog'); i.setAttribute('aria-modal', 'true'); i.setAttribute('aria-label', 'YouRock');
+  i.setAttribute('role', 'dialog'); i.setAttribute('aria-modal', 'true'); i.setAttribute('aria-label', 'SuperPick');
   setTimeout(() => i.classList.add('ready'), Math.max(0, 1700 - (performance.now() - i.dataset.t)));   // o texto entra quando o logo já se formou
 }
 function welcomeClose() { const i = welcomeEl(); if (!i) return; i.classList.add('out'); behind(false); }

@@ -192,8 +192,8 @@
   var D = {
     pt: {
       title: 'Sequência de prática',
-      intro: 'Monte sua própria progressão com o + dos acordes acima, arraste para mudar a ordem e toque em play.',
-      empty: 'Ainda não há acordes. Toque em «Adicionar acorde».', emptyAdd: 'Ainda não há acordes. Toque no + de um acorde acima para adicioná-lo.', add: 'Adicionar acorde', full: 'Sequência cheia (8)',
+      intro: 'Toque num acorde acima e use o botão Sequência para montar sua progressão. Arraste para mudar a ordem e toque em play.',
+      empty: 'Ainda não há acordes. Toque em «Adicionar acorde».', emptyAdd: 'Ainda não há acordes. Toque num acorde acima e depois em «Sequência».', add: 'Adicionar acorde', full: 'Sequência cheia (8)',
       drag: 'Arraste para mudar a ordem', rem: 'Remover este acorde', root: 'Nota', type: 'Tipo',
       pos: 'Posição', cycle: 'Trocar de posição', fret: 'casa', open: 'Posição aberta', barre: 'Pestana na casa',
       none: 'Sem posições confortáveis', play: 'Tocar', stop: 'Parar', metro: 'Metrônomo', tempo: 'Velocidade',
@@ -202,8 +202,8 @@
     },
     es: {
       title: 'Secuencia de práctica',
-      intro: 'Monta tu propia progresión con el + de los acordes de arriba, arrastra para cambiar el orden y pulsa play.',
-      empty: 'Todavía no hay acordes. Pulsa «Añadir acorde».', emptyAdd: 'Todavía no hay acordes. Pulsa el + de un acorde de arriba para añadirlo.', add: 'Añadir acorde', full: 'Secuencia llena (8)',
+      intro: 'Toca un acorde de arriba y usa el botón Secuencia para montar tu progresión. Arrastra para cambiar el orden y pulsa play.',
+      empty: 'Todavía no hay acordes. Pulsa «Añadir acorde».', emptyAdd: 'Todavía no hay acordes. Toca un acorde de arriba y luego «Secuencia».', add: 'Añadir acorde', full: 'Secuencia llena (8)',
       drag: 'Arrastra para cambiar el orden', rem: 'Quitar este acorde', root: 'Nota', type: 'Tipo',
       pos: 'Posición', cycle: 'Cambiar de posición', fret: 'traste', open: 'Posición abierta', barre: 'Cejilla en el traste',
       none: 'Sin posiciones cómodas', play: 'Reproducir', stop: 'Parar', metro: 'Metrónomo', tempo: 'Velocidad',
@@ -212,8 +212,8 @@
     },
     en: {
       title: 'Practice sequence',
-      intro: 'Build your own progression with the + on the chords above, drag to reorder and hit play.',
-      empty: 'No chords yet. Tap “Add chord”.', emptyAdd: 'No chords yet. Tap the + on a chord above to add it.', add: 'Add chord', full: 'Sequence full (8)',
+      intro: 'Tap a chord above and use the Sequence button to build your progression. Drag to reorder and hit play.',
+      empty: 'No chords yet. Tap “Add chord”.', emptyAdd: 'No chords yet. Tap a chord above, then “Sequence”.', add: 'Add chord', full: 'Sequence full (8)',
       drag: 'Drag to change the order', rem: 'Remove this chord', root: 'Note', type: 'Type',
       pos: 'Position', cycle: 'Change position', fret: 'fret', open: 'Open position', barre: 'Barre at fret',
       none: 'No comfortable shapes', play: 'Play', stop: 'Stop', metro: 'Metronome', tempo: 'Speed',
@@ -536,6 +536,8 @@
       clear: function () { S.sl = []; S.cur = 0; stop(true); save(); paint(); },
       play: function () { if (!S.run && S.sl.length && startClock()) { S.run = true; hq = []; bt = S.cur * S.beats; sched(); paint(); } },
       stop: function () { stop(); },
+      /** { n: acordes na sequência, max: quantos cabem nesta tela } */
+      size: function () { return { n: S.sl.length, max: maxNow() }; },
       setBpm: function (v) { setBpm(v); },
       setLang: function (l) { lang = D[l] ? l : 'pt'; paint(); },
       /** { chords:[{root,q,pos}], bpm, beats, mute } — para guardar en tu base de datos */

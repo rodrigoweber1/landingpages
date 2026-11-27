@@ -492,7 +492,7 @@ function gameHTML() {
 // iPhone/iPad abrindo no navegador (ainda não instalado): ensina a pôr o app na tela de início
 const installed = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
 const installSteps = () => `<ol class="inst small"><li>Toque em Compartilhar no Safari (em alguns iPhones, primeiro em •••)</li><li>Escolha Adicionar à Tela de Início</li><li>Toque em Adicionar</li></ol><div class="mut small">O app instalado pode começar sem o progresso salvo no navegador.</div>`;
-const installCard = () => (!IOS || installed() || S().instOk ? '' : `<div class="card instcard"><div class="row sp" style="flex-wrap:nowrap"><b>Instale o YouRock na tela de início</b><svg class="ishare" aria-hidden="true"><use href="#i-share"/></svg></div><div class="mut small">Abre em tela cheia, com ícone próprio, e funciona sem internet.</div>${installSteps()}<div class="row" style="margin-top:10px"><button class="btn sm" data-act="instOk">Entendi</button></div></div>`);
+const installCard = () => (!IOS || installed() || S().instOk ? '' : `<div class="card instcard"><div class="row sp" style="flex-wrap:nowrap"><b>Instale o SuperPick na tela de início</b><svg class="ishare" aria-hidden="true"><use href="#i-share"/></svg></div><div class="mut small">Abre em tela cheia, com ícone próprio, e funciona sem internet.</div>${installSteps()}<div class="row" style="margin-top:10px"><button class="btn sm" data-act="instOk">Entendi</button></div></div>`);
 function viewHome() {
   const st = stats(); if (!TODAY) TODAY = recommend(S().planMin);
   const goal = S().goal * 60, pct = goal ? Math.min(100, Math.round(100 * st.week / goal)) : 0;
@@ -516,7 +516,7 @@ function viewHome() {
   </div>
   <div class="grid g2"><div class="card"><h2>Insights</h2>${ins.map(i => `<div class="ins ${i.t}">${esc(i.m)}</div>`).join('')}<a class="btn sm" href="#/stats" style="display:inline-block;margin-top:6px">Ver progresso completo</a></div>
   <div class="card"><div class="row sp"><h2>Minhas rotinas</h2><button class="btn sm" data-act="newRoutine">+ Nova</button></div><div id="routines">${routinesHTML()}</div></div></div></div></div>
-  <div class="mut small" style="text-align:center;margin:18px 0 6px"><a href="#/settings" style="color:inherit;text-decoration:none">YouRock v${APP_VERSION}</a></div>`;
+  <div class="mut small" style="text-align:center;margin:18px 0 6px"><a href="#/settings" style="color:inherit;text-decoration:none">SuperPick v${APP_VERSION}</a></div>`;
   $('#planMin').onchange = e => { S().planMin = +e.target.value; save(); TODAY = recommend(S().planMin); render(); };
   view.classList.add('wide');
 }
@@ -663,8 +663,8 @@ function viewSettings() {
   <label class="lbl"><input type="checkbox" data-in="boardV" ${s.boardV !== false ? 'checked' : ''}> Braço na vertical no celular, na tela Notas (bolinhas maiores)</label>
   <label class="lbl"><input type="checkbox" data-in="lefty" ${s.lefty ? 'checked' : ''}> Modo canhoto (espelha o braço)</label></div>
   ${Reminder.settingsHTML()}
-  <div class="card"><h2>Sobre</h2><div class="row sp"><div><b>YouRock</b> <span class="mut">v${APP_VERSION}</span><div class="mut small">${APP_DATE}</div></div><button class="btn sm" data-act="upd">Atualizar app</button></div>
-  ${IOS && !installed() ? `<div class="small" style="margin-top:12px"><b>Instale o YouRock na tela de início</b></div>${installSteps()}` : ''}
+  <div class="card"><h2>Sobre</h2><div class="row sp"><div><b>SuperPick</b> <span class="mut">v${APP_VERSION}</span><div class="mut small">${APP_DATE}</div></div><button class="btn sm" data-act="upd">Atualizar app</button></div>
+  ${IOS && !installed() ? `<div class="small" style="margin-top:12px"><b>Instale o SuperPick na tela de início</b></div>${installSteps()}` : ''}
   ${APP_NOTES.length ? `<div class="small" style="margin-top:12px"><b>Novidades</b></div><ul class="small mut" style="margin:6px 0 0;padding-left:18px">${APP_NOTES.map(n => `<li>${esc(n[LANG] || n.pt)}</li>`).join('')}</ul>` : ''}</div>
   <div class="card"><h2>Teste do microfone</h2><div class="mut small">Ligue, toque uma corda solta e veja: o nível deve passar de ~20%, a nota detectada deve bater com a corda e cada palhetada deve contar um ataque.</div>
   <div class="row" style="margin:12px 0"><button class="btn pri" id="mtBtn" data-act="mtest">${ic('i-mic')}Ligar teste</button><span class="mut small" id="mtErr"></span></div>
@@ -765,7 +765,7 @@ const act = {
         out.push({ t: now - d * 864e5 - k * 3e6, ex: e.id, focus: e.focus, secs: 180 + Math.floor(Math.random() * 420), acc, bpm, clean: acc >= .85 ? bpm : Math.round(bpm * .9) }); } }
     DB.sessions = out; DB.best = {}; out.forEach(s => { const b = DB.best[s.ex] || { n: 0, clean: 0 }; b.n++; b.last = s.bpm; b.t = s.t; b.clean = Math.max(b.clean, s.clean); DB.best[s.ex] = b; }); save(); TODAY = null; render(); toast('Dados de exemplo carregados');
   },
-  export() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' })); a.download = 'yourock-backup.json'; a.click(); },
+  export() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' })); a.download = 'superpick-backup.json'; a.click(); },
   wipe() { if (!confirm('Apagar todos os seus dados? Isso não pode ser desfeito.')) return; DB = fresh(); save(); Acct.forcePush(); TODAY = null; Sess.queue = []; Sess.ex = null; render(); },
 };
 Object.assign(act, toolActs, quizActs, accActs, tunerActs);
