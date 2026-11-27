@@ -31,7 +31,7 @@ function vNeckBase(first, last, lefty, g) {
   let o = '';
   const xa = Math.min(g.X(0), g.X(5)) - 8, xb = Math.max(g.X(0), g.X(5)) + 8;
   for (let k = 0; k <= g.rows; k++) o += `<line class="${k === 0 && first === 0 ? 'nut' : 'fret'}" x1="${xa}" x2="${xb}" y1="${g.nutY + k * g.FH}" y2="${g.nutY + k * g.FH}"/>`;
-  for (let s = 0; s < 6; s++) o += `<line class="strg" x1="${g.X(s)}" x2="${g.X(s)}" y1="${first === 0 ? 28 : g.nutY}" y2="${g.nutY + g.rows * g.FH}" stroke-width="${1 + (5 - s) * 0.45}"/><text class="slab" x="${g.X(s)}" y="12">${'EADGBe'[s]}</text>`;
+  for (let s = 0; s < 6; s++) o += `<line class="strg" data-s="${s}" x1="${g.X(s)}" x2="${g.X(s)}" y1="${first === 0 ? 28 : g.nutY}" y2="${g.nutY + g.rows * g.FH}" stroke-width="${1 + (5 - s) * 0.45}"/><text class="slab" x="${g.X(s)}" y="12">${'EADGBe'[s]}</text>`;
   const nx = lefty ? g.W - 16 : 16, mx = lefty ? 16 : g.W - 16;
   for (let f = g.base; f <= last; f++) {
     o += `<text class="fnum${isMark(f) ? ' mk' : ''}" x="${nx}" y="${g.Y(f)}" style="dominant-baseline:middle">${f}</text>`;
@@ -160,6 +160,7 @@ function viewNotes() {
   <div class="card"><div class="row" id="nCtl" style="margin-bottom:12px"></div><div class="row" id="nChips"></div>
     <div class="row" style="margin-top:12px"><label class="small mut">Casas</label><select data-tin="nfrets" style="width:auto">${[12, 15, 19, 22].map(n => `<option value="${n}" ${NT.frets === n ? 'selected' : ''}>0 a ${n}</option>`).join('')}</select>
     <label class="small mut">Rótulo</label><select data-tin="nlab" style="width:auto"><option value="name" ${S().label !== 'fret' ? 'selected' : ''}>Nome da nota</option><option value="fret" ${S().label === 'fret' ? 'selected' : ''}>Número da casa</option></select></div></div>
+  <div class="orow vonly">${orientHTML('notes')}</div>
   <div class="board" id="nBoard" style="overflow-x:auto"></div>
   <div class="grid g2" style="margin-top:14px">
     <div class="card"><h3>Cordas soltas</h3><div class="row" style="margin-top:8px">${[5, 4, 3, 2, 1, 0].map(s => `<button class="btn" data-act="nplay" data-s="${s}" data-f="0">${'6EADGB'.length ? ['E', 'B', 'G', 'D', 'A', 'E'][5 - s] : ''} <span class="mut small">${pcName(OPEN[s])}</span></button>`).join('')}</div><div class="mut small" style="margin-top:8px">Da mais fina (1ª) para a mais grossa (6ª). Nomes em cifra e, ao lado, no seu estilo de nomes.</div></div>
@@ -290,7 +291,7 @@ function seqRes() {
   const items = [];
   out.innerHTML = `<div class="chhead"><div><div class="chtitle seqt">${esc(cs.map(chordTitle).join(' → '))}</div>
     <div class="mut small" style="margin-top:4px">${T('Posições escolhidas para a mão andar o mínimo possível entre os acordes.')}${base - mine >= 1 ? ` <b>${T('Movimento da mão:')} ${mine.toFixed(0)} ${T(mine.toFixed(0) === '1' ? 'casa' : 'casas')}</b> (${T('sem otimizar:')} ${base.toFixed(0)})` : ''}</div></div>
-    <div class="row"><button class="btn pri" data-act="chsPlayAll">▶ ${T('Ouvir sequência')}</button><button class="btn" data-act="chsAddAll">+ ${T('Tudo para a prática')}</button></div></div>
+    <div class="row">${orientHTML('chord')}<button class="btn pri" data-act="chsPlayAll">▶ ${T('Ouvir sequência')}</button><button class="btn" data-act="chsAddAll">+ ${T('Tudo para a prática')}</button></div></div>
     ${miss.length ? `<div class="small" style="margin-top:8px;color:var(--warn)">${T('Sem posições confortáveis')}: ${esc(miss.join(', '))}</div>` : ''}
     <p class="chtip">${T('Toque num acorde para ouvir e adicionar à sequência')}</p>
     <div class="chgrid seqg">${CH.sv.map((x, i) => `<div><div class="chseq-t"><b>${i + 1}. ${esc(chordTitle(x.c))}</b><span>${x.v.barre ? T('pestana') : x.v.hasOpen ? T('aberto') : ''}</span></div>${chordTile(items, { v: x.v, root: x.c.root, q: x.c.q, title: chordTitle(x.c) })}<div class="chseq-c">${cap(i)}</div></div>`).join('')}</div>`;
@@ -315,6 +316,7 @@ const CH_ICON = {
 const CH_SEQ = { pt: 'Sequência', en: 'Sequence', es: 'Secuencia' };
 // diagrama de acorde: pequeno = só a forma (a tônica em destaque); grande (barra) = com o nome da nota ou a casa
 function chordLite(v, root, big) {
+  if (S().chordH) return chordWide(v, root, big);
   const fr = v.f.filter(f => f > 0), mn = fr.length ? Math.min(...fr) : 1, base = fr.length && Math.max(...fr) > 4 ? mn : 1;
   const X = s => 27 + s * 16, Y = r => 24 + r * 20, b = v.barre;
   const rows = Math.max(4, fr.length ? Math.max(...fr) - base + 1 : 4);   // posição guardada com a mão mais aberta ganha uma casa
@@ -333,6 +335,56 @@ function chordLite(v, root, big) {
     if (big) { const t = S().label === 'fret' ? String(f) : pcName(OPEN[s] + f); o += `<text class="${rt ? 'on' : ''}" x="${X(s)}" y="${y}" style="font-size:${t.length > 3 ? 6 : t.length > 2 ? 7 : t.length > 1 ? 8 : 9.5}px">${t}</text>`; }
   });
   return o + '</svg>';
+}
+// o mesmo diagrama deitado: cordas na horizontal (a mais fina em cima), casas para a direita, nomes das cordas no fim
+function chordWide(v, root, big) {
+  const fr = v.f.filter(f => f > 0), mn = fr.length ? Math.min(...fr) : 1, base = fr.length && Math.max(...fr) > 4 ? mn : 1;
+  const cols = Math.max(4, fr.length ? Math.max(...fr) - base + 1 : 4), x0 = 22, FW = 24, W = x0 + cols * FW + 18, lf = S().lefty, b = v.barre;
+  const X = x => (lf ? W - x : x), Y = s => 12 + (5 - s) * 16, C = c => x0 + (c + 0.5) * FW;   // canhoto: espelhado, como no braço dos exercícios
+  let o = `<svg class="chd chw" viewBox="0 0 ${W} 116" aria-hidden="true">`;
+  for (let c = 0; c <= cols; c++) o += `<line class="${c === 0 && base === 1 ? 'nt' : 'ln'}" x1="${X(x0 + c * FW)}" x2="${X(x0 + c * FW)}" y1="${Y(5)}" y2="${Y(0)}"/>`;
+  for (let s = 0; s < 6; s++) o += `<line class="ln" x1="${X(x0)}" x2="${X(x0 + cols * FW)}" y1="${Y(s)}" y2="${Y(s)}"/><text class="sl" x="${X(x0 + cols * FW + 10)}" y="${Y(s)}">${'EADGBe'[s]}</text>`;
+  if (base > 1) o += `<text x="${X(C(0))}" y="107" style="font-size:${big ? 11 : 14}px">${base}</text>`;
+  if (b) o += `<rect class="b" x="${X(C(b.fret - base)) - 7}" y="${Y(b.to) - 7}" width="14" height="${Y(b.from) - Y(b.to) + 14}" rx="7"/>`;
+  v.f.forEach((f, s) => {
+    if (f < 0) { o += `<text class="m" x="${X(9)}" y="${Y(s)}">×</text>`; return; }
+    const rt = (OPEN[s] + f) % 12 === root;
+    if (f === 0) { o += `<circle class="${rt ? 'r' : 'n'}" cx="${X(9)}" cy="${Y(s)}" r="4.5"/>`; return; }
+    const x = X(C(f - base)), under = b && f === b.fret && s >= b.from && s <= b.to;
+    if (!big && under && !rt) return;
+    o += `<circle class="${rt ? 'r' : 'n'}" cx="${x}" cy="${Y(s)}" r="${big ? 7.8 : under ? 5 : 6.2}"/>`;
+    if (big) { const t = S().label === 'fret' ? String(f) : pcName(OPEN[s] + f); o += `<text class="${rt ? 'on' : ''}" x="${x}" y="${Y(s)}" style="font-size:${t.length > 3 ? 6 : t.length > 2 ? 7 : t.length > 1 ? 8 : 9.5}px">${t}</text>`; }
+  });
+  return o + '</svg>';
+}
+// ---------- botão vertical / horizontal ----------
+// três preferências: acordes (chordH), braço da tela Notas (boardV) e braço dos exercícios (exV)
+const ORI_ICON = {
+  v: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M10 3v18M14 3v18"/></svg>',
+  h: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10h18M3 14h18"/></svg>',
+};
+const oriIsH = k => (k === 'chord' ? !!S().chordH : k === 'notes' ? S().boardV === false : S().exV !== true);
+function orientHTML(k) {
+  const h = oriIsH(k);
+  return `<div class="orient" data-k="${k}" role="group" aria-label="Orientação do diagrama">${['v', 'h'].map(v => { const n = v === 'h' ? 'Diagrama na horizontal' : 'Diagrama na vertical'; return `<button type="button" data-act="orient" data-k="${k}" data-v="${v}" aria-pressed="${(v === 'h') === h}" aria-label="${n}" title="${n}">${ORI_ICON[v]}</button>`; }).join('')}</div>`;
+}
+const orientApply = () => document.documentElement.classList.toggle('chw', !!S().chordH);
+// troca o desenho no lugar, sem remontar a tela (o treino e a sequência continuam como estavam)
+function orientRedraw(k) {
+  orientApply();
+  if (k === 'notes') { if ($('#nBoard')) notesDraw(); }
+  else if (k === 'ex') {
+    const svg = document.querySelector('.da .board svg');
+    if (svg && Sess.ex && Sess.ex.type === 'notes') { svg.outerHTML = fretboardSVG(Sess.ex, S().lefty, S().label); applyStatus(); }
+  } else if ($('#chRes')) {
+    const sel = CH.sel; if (CH.mode === 'seq') seqRes(); else chordRes();
+    if (sel != null) chordBar(sel);
+    if (CH.seq) CH.seq.redraw();
+  } else {
+    document.querySelectorAll('.cswrap').forEach(w => { w.outerHTML = chordStripHTML({ chords: JSON.parse(w.dataset.list) }); });
+    const c = $('#chordNow'); if (c) chordStripOn(c.textContent);
+  }
+  document.querySelectorAll(`.orient[data-k="${k}"] button`).forEach(b => b.setAttribute('aria-pressed', (b.dataset.v === 'h') === oriIsH(k)));
 }
 function chordTile(list, it) {
   const i = list.push(it) - 1;
@@ -360,7 +412,7 @@ function chordRes() {
   CH.best = findVoicings(CH.root, q.iv, CH.bass, 1)[0] || null;
   const list = groups.map(g => { const title = chordTitle({ root: CH.root, q: CH.q, bass: g.bass }); return `<h3 class="chgh"><span>${g.n}</span><span>${esc(title)}</span></h3><div class="chgrid">${g.v.map(v => chordTile(all, { v, root: CH.root, q: CH.q, title })).join('')}</div>`; }).join('');
   CH.items = all; CH.sel = null;
-  $('#chRes').innerHTML = `<div class="chhead"><div><div class="chtitle">${esc(chordTitle(cm))}</div><div class="mut">${q.n}${CH.bass != null ? ' · baixo em ' + pcName(CH.bass) : ''}</div></div><button class="btn pri" data-act="chPlay">▶ Ouvir acorde</button></div>
+  $('#chRes').innerHTML = `<div class="chhead"><div><div class="chtitle">${esc(chordTitle(cm))}</div><div class="mut">${q.n}${CH.bass != null ? ' · baixo em ' + pcName(CH.bass) : ''}</div></div><div class="chacts">${orientHTML('chord')}<button class="btn pri" data-act="chPlay">▶ Ouvir acorde</button></div></div>
     <div class="chinfo"><span><span>Notas:</span> <b>${esc(names)}</b></span><span><span>Fórmula:</span> <b>${ivs}</b></span></div>
     ${list ? `<p class="chtip">Toque num acorde para ouvir e adicionar à sequência</p>${list}` : '<p class="mut">Não encontrei uma digitação simples (até 4 dedos) para esse acorde com essa nota no baixo.</p>'}`;
 }
@@ -442,6 +494,11 @@ function themePicker() {
 
 // ---------- ações e entradas das ferramentas ----------
 const toolActs = {
+  orient(d) {
+    const h = d.v === 'h'; if (h === oriIsH(d.k)) return;
+    if (d.k === 'chord') S().chordH = h; else if (d.k === 'notes') S().boardV = !h; else S().exV = !h;
+    save(); orientRedraw(d.k);
+  },
   mToggle() { Metro.run ? metroStop() : metroStart(); },
   mBpm(d) { const m = M(); m.bpm = clampN(m.bpm + +d.d, 30, 240); mUpdate(); save(); },
   mTap() {

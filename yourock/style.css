@@ -305,6 +305,29 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
   main.wt .tus b{font-size:28px}
 }
 
+/* diagramas na vertical ou na horizontal */
+.orient{display:inline-flex;flex:none;gap:2px;padding:3px;border-radius:999px;background:var(--bg3)}
+.orient button{display:grid;place-items:center;width:46px;height:38px;padding:0;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--mut);touch-action:manipulation}
+.orient button[aria-pressed=true]{background:var(--bg);border-color:var(--line);color:var(--acc)}
+.orient button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.orient svg{width:24px;height:24px}
+.orow{display:flex;justify-content:flex-end;margin:10px 0 -4px}
+.cswrap .orow{margin:0 0 4px}
+.chacts{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+@media(min-width:760px){.orow.vonly{display:none}}
+.chd text.sl{fill:var(--mut);font-size:10px;font-weight:600}
+/* acordes deitados são mais largos: menos colunas */
+html.chw .chgrid,html.chw .chgrid.seqg,html.chw .cs-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px}
+@media(min-width:760px){html.chw .chgrid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}html.chw .chgrid.seqg{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}html.chw .cs-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}
+html.chw .chbar{grid-template-columns:clamp(132px,40vw,184px) minmax(0,1fr)}
+html.chw .cmini{width:156px}
+@media(max-width:420px){html.chw .cmini{width:46%}}
+/* braço do exercício na vertical */
+.board svg.vex{max-width:420px;margin:0 auto}
+.vex .dot text{font-size:13px}
+@media(prefers-reduced-motion:no-preference){.vex .strg.vib{animation-name:strVx}}
+@keyframes strVx{0%{stroke:var(--acc);transform:translateX(0)}8%{transform:translateX(-1.05px)}16%{transform:translateX(1.05px)}26%{stroke:var(--acc);transform:translateX(-0.84px)}36%{transform:translateX(0.84px)}48%{transform:translateX(-0.56px)}60%{transform:translateX(0.56px)}74%{transform:translateX(-0.28px)}88%{transform:translateX(0.14px)}100%{transform:translateX(0)}}
+
 /* afinador: cordas, progresso e opções */
 .tumodes{margin-bottom:14px}
 .tustrs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:14px}
@@ -324,20 +347,26 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 @media(max-width:759px){
   html.ios{--tbh:62px;--tbb:max(12px,calc(env(safe-area-inset-bottom,0px) - 13px));--tbx:16px}
   html.ios body{padding-bottom:calc(var(--tbb) + var(--tbh) + 22px)}
-  html.ios .nav.bottom{left:max(var(--tbx),env(safe-area-inset-left,0px));right:max(var(--tbx),env(safe-area-inset-right,0px));bottom:var(--tbb);height:var(--tbh);max-width:500px;margin:0 auto;padding:4px;gap:0;z-index:31;
+  html.ios .nav.bottom{--tbl:max(var(--tbx),env(safe-area-inset-left,0px),env(safe-area-inset-right,0px));left:max(var(--tbl),calc(50% - 250px));right:auto;width:min(500px,calc(100% - 2 * var(--tbl)));bottom:var(--tbb);height:var(--tbh);margin:0;padding:4px;gap:0;z-index:31;overflow:hidden;transition:width .38s cubic-bezier(.32,.72,0,1);
     border:.5px solid color-mix(in srgb,var(--tx) 16%,transparent);border-radius:999px;background:color-mix(in srgb,var(--bg2) 68%,transparent);
     -webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);
     box-shadow:0 8px 28px rgba(0,0,0,.3),inset 0 .5px 0 rgba(255,255,255,.14);
     -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
   html.ios .nav.bottom::before{content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/5);border-radius:999px;background:color-mix(in srgb,var(--tx) 11%,transparent);
-    transform:translateX(calc(var(--i,0)*100%));transition:transform .38s cubic-bezier(.32,.72,0,1),opacity .2s}
+    transform:translateX(calc(var(--i,0)*100%));transition:transform .38s cubic-bezier(.32,.72,0,1),width .38s cubic-bezier(.32,.72,0,1),opacity .2s}
   html.ios .nav.bottom.none::before{opacity:0}
   html.ios .nav.bottom a,html.ios .nav.bottom button{position:relative;justify-content:center;gap:2px;min-height:0;height:100%;padding:0 1px;border-radius:999px;background:transparent;font:inherit;color:color-mix(in srgb,var(--tx) 78%,var(--bg2));
-    -webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s cubic-bezier(.32,.72,0,1),color .2s}
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;white-space:nowrap;transition:transform .18s cubic-bezier(.32,.72,0,1),color .2s,flex-basis .38s cubic-bezier(.32,.72,0,1),flex-grow .38s cubic-bezier(.32,.72,0,1),opacity .2s ease .14s,visibility 0s linear}
   html.ios .nav.bottom a.on,html.ios .nav.bottom button.on{color:var(--acc);background:transparent}
   html.ios .nav.bottom a:active,html.ios .nav.bottom button:active{transform:scale(.92)}
   html.ios .nav.bottom svg{width:25px;height:25px;color:inherit}
   html.ios .nav.bottom a>span,html.ios .nav.bottom button>span{font-size:10px;line-height:13px;font-weight:600;letter-spacing:0}
+  /* recolhida: só a aba atual, num botão redondo. Ao reabrir, as outras aparecem depois que já há espaço, para os nomes não se amontoarem */
+  html.ios .nav.bottom.min{width:var(--tbh)}
+  html.ios .nav.bottom.min::before{width:calc(100% - 8px);transform:none}
+  html.ios .nav.bottom.min>*{flex:0 0 0;min-width:0;padding:0;opacity:0;visibility:hidden;pointer-events:none;transition:flex-basis .38s cubic-bezier(.32,.72,0,1),flex-grow .38s cubic-bezier(.32,.72,0,1),opacity .12s,visibility 0s linear .12s}
+  html.ios .nav.bottom.min>.on{flex:1 0 0;opacity:1;visibility:visible;pointer-events:auto}
+  html.ios .nav.bottom.min>*>span{display:none}
   /* o que fica preso ao rodapé sobe junto com a barra */
   html.ios .actbar{bottom:calc(var(--tbb) + var(--tbh) + 8px)}
   html.ios .cs-dock{bottom:calc(var(--tbb) + var(--tbh) + 8px)}
@@ -350,6 +379,7 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
   html.ios #toolsSheet .tsp a{border-radius:20px}
 }
 @media(max-width:359px){html.ios{--tbx:8px}html.ios .nav.bottom a>span,html.ios .nav.bottom button>span{font-size:9px}}
+@media(prefers-reduced-motion:reduce){html.ios .nav.bottom,html.ios .nav.bottom::before,html.ios .nav.bottom>*{transition:none!important}}
 /* "Reduzir transparência" do iOS: fundo sólido */
 @media(prefers-reduced-transparency:reduce){html.ios .nav.bottom,html.ios #toolsSheet .tsp{background:var(--bg2);-webkit-backdrop-filter:none;backdrop-filter:none}}
 
@@ -405,6 +435,23 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 .inst{margin:10px 0 8px;padding-left:20px}
 .inst li{margin:4px 0}
 
+/* quiz: progresso, uma etapa por pergunta (a atual se preenche ao entrar) */
+.qhead{min-height:44px}
+.qprog{display:flex;gap:5px;margin:4px 0 18px}
+.qprog i{flex:1;height:8px;border-radius:99px;overflow:hidden;background:color-mix(in srgb,var(--tx) 15%,transparent)}
+.qprog i.on{background:var(--acc)}
+.qprog i.cur::after{content:'';display:block;height:100%;background:var(--acc);transform-origin:left;animation:qFill .28s cubic-bezier(.23,1,.32,1) .05s both}
+@keyframes qFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.qprog i.cur::after{animation:none}}
+/* resultado do quiz: os quatro níveis. Cada coluna tem no mínimo a largura do nome; em telas estreitas, duas por linha */
+.qlvls{display:grid;grid-template-columns:repeat(4,minmax(max-content,1fr));gap:6px;margin:12px 0 6px}
+.qlvls>div{text-align:center;padding:8px 4px;border-radius:12px;border:1px solid var(--line);opacity:.4}
+.qlvls>div.on{opacity:1;border-color:var(--lv);background:color-mix(in srgb,var(--lv) 14%,transparent)}
+.qlvls b{display:block;font-size:20px;font-weight:800;line-height:1;color:var(--lv)}
+.qlvls span{display:block;margin-top:4px;font-size:12px;line-height:1.3;color:var(--mut)}
+.qlvls>div.on span{color:var(--tx)}
+@media(min-width:600px){.qlvls{gap:8px}.qlvls span{font-size:13px}}
+@media(max-width:389px){.qlvls{grid-template-columns:repeat(2,minmax(0,1fr))}.qlvls span{font-size:13px}}
 /* quiz: palheta de nível ao lado de cada resposta */
 .qopt{display:flex;align-items:center;gap:14px;text-align:left;padding:9px 16px 9px 13px;min-height:56px}
 .qlv{width:38px;height:38px;flex:none;fill:none;stroke-linecap:round;stroke-linejoin:round}
@@ -426,16 +473,21 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 #intro.welcome{animation:none;justify-content:flex-start;overflow-y:auto;padding:calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom))}
 #intro.welcome>*{flex:none}
 #intro.welcome>.in-mark{margin-top:auto}
-#intro.welcome>.in-card{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;max-width:430px;min-height:270px;margin:34px 0 auto}
+#intro.welcome>.in-card{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;max-width:430px;min-height:350px;margin:26px 0 auto}
+.in-card .in-hello{margin:0;font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.in-card .in-tag{margin:6px 0 0;font-size:18px;line-height:1.4;text-wrap:balance}
+.in-card h1{margin:30px 0 0;font-size:20px}
 .in-card>*{visibility:hidden}
 .in-card p{margin:8px 0 6px;line-height:1.55}
 .in-card .row{flex-direction:column;align-items:stretch;width:100%;max-width:280px;gap:8px}
 .in-card .btn{justify-content:center;min-height:46px}
 #intro.ready .in-card>*{visibility:visible;animation:inRise .5s var(--eo) both}
 #intro.ready .in-card>:nth-child(2){animation-delay:.07s}
-#intro.ready .in-card>:nth-child(3){animation-delay:.14s}
+#intro.ready .in-card>:nth-child(3){animation-delay:.28s}
+#intro.ready .in-card>:nth-child(4){animation-delay:.35s}
+#intro.ready .in-card>:nth-child(5){animation-delay:.42s}
 #intro.welcome.out{animation:inSkip .25s ease-out forwards;pointer-events:none}
-@media(max-height:640px){#intro.welcome>.in-mark{width:92px;height:92px;margin-bottom:8px}#intro.welcome>.in-card{margin-top:18px;min-height:240px}}
+@media(max-height:700px){#intro.welcome>.in-mark{width:92px;height:92px;margin-bottom:8px}#intro.welcome>.in-card{margin-top:16px;min-height:330px}.in-card .in-hello{font-size:28px}.in-card .in-tag{font-size:16px}.in-card h1{margin-top:18px}}
 /* celular deitado: logo à esquerda, convite à direita, tudo visível sem rolar */
 @media(orientation:landscape) and (max-height:500px){
   #intro.welcome{display:grid;grid-template-columns:minmax(0,200px) minmax(0,400px);grid-template-rows:1fr auto auto auto 1fr;justify-content:center;justify-items:center;column-gap:36px}
@@ -443,4 +495,8 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
   #intro.welcome>.in-name{grid-area:3/1}
   #intro.welcome>.in-sub{grid-area:4/1}
   #intro.welcome>.in-card{grid-area:1/2/6/3;align-self:center;min-height:0;margin:0}
+  .in-card h1{margin-top:14px}
+  .in-card p{line-height:1.45}
+  .in-card .row{flex-direction:row;max-width:400px;margin-top:10px!important}
+  .in-card .btn{flex:1}
 }

@@ -154,7 +154,20 @@ function recommend(min) {
 let TODAY = null;
 
 // ---------- fretboard ----------
+// o mesmo braço do exercício na vertical (celular): cordas em colunas, casas descendo, bolinhas maiores
+const useVEx = () => S().exV === true && window.matchMedia && matchMedia('(max-width:759px)').matches;
+function fretboardVSVG(ex, lefty, label) {
+  const notes = ex.notes, fr = notes.map(n => n[1]), lo = Math.min(...fr), hi = Math.max(...fr);
+  const first = lo <= 1 ? 0 : lo, last = hi === 0 ? 4 : Math.max(hi, first + 4), g = vGeom(first, last, lefty);
+  let o = `<svg class="vex" viewBox="0 -6 ${g.W} ${g.H + 6}" xmlns="http://www.w3.org/2000/svg">` + vNeckBase(first, last, lefty, g);
+  const seen = new Set();
+  notes.forEach(([s, f]) => { const k = s + '_' + f; if (seen.has(k)) return; seen.add(k);
+    if (f === 0) { o += `<g class="dot open" id="d${k}"><circle cx="${g.X(s)}" cy="11" r="13"/><text x="${g.X(s)}" y="11">${'EADGBe'[s]}</text></g>`; return; }
+    o += `<g class="dot" id="d${k}"><circle cx="${g.X(s)}" cy="${g.Y(f)}" r="15"/><text x="${g.X(s)}" y="${g.Y(f)}">${label === 'fret' ? f : pcName(OPEN[s] + f)}</text></g>`; });
+  return o + '</svg>';
+}
 function fretboardSVG(ex, lefty, label, horiz) {
+  if (!horiz && useVEx()) return fretboardVSVG(ex, lefty, label);
   const notes = ex.notes, fr = notes.map(n => n[1]);
   const lo = Math.min(...fr), hi = Math.max(...fr);
   const mob = window.matchMedia && matchMedia('(max-width:759px)').matches;   // celular: braço horizontal, só o trecho que importa, com casas largas (bolinhas maiores)
@@ -190,7 +203,7 @@ function chordMini(name) {
 function chordStripHTML(ex) {
   const list = [...new Set(ex.chords || [])]; if (list.length < 2) return '';
   const items = list.map((n, i) => { const v = chordMini(n); return v ? `<div class="cmini${i === 0 ? ' on' : ''}" data-ch="${esc(n)}"><b>${esc(n)}</b>${chordLite(v, parseChord(n).root)}</div>` : ''; }).join('');
-  return items ? `<div class="cstrip">${items}</div>` : '';
+  return items ? `<div class="cswrap" data-list="${esc(JSON.stringify(list))}"><div class="orow">${orientHTML('chord')}</div><div class="cstrip">${items}</div></div>` : '';
 }
 function chordStripOn(name) { document.querySelectorAll('.cmini').forEach(e => e.classList.toggle('on', e.dataset.ch === name)); }
 function strumHTML(ex) {
@@ -460,6 +473,23 @@ if (IOS) {
     const a = e.target.closest('a'); if (!a || a.getAttribute('href') !== location.hash) return;
     closeTools(); scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   });
+  // rolando para baixo a barra recolhe até a aba atual (um botão redondo à esquerda); rolando para cima, volta inteira
+  const nb = $('#navBot'); let lastY = 0, acc = 0, tick = false;
+  const abrir = () => { acc = 0; nb.classList.remove('min'); };
+  const passo = () => {
+    tick = false;
+    const max = Math.max(0, document.documentElement.scrollHeight - innerHeight), y = Math.min(max, Math.max(0, scrollY)), d = y - lastY;   // limita o "elástico" do Safari
+    lastY = y;
+    if (y < 40 || !nb.querySelector('.on')) return abrir();   // no topo, ou em tela fora das abas, fica aberta
+    if (!d || $('#toolsSheet')) return;
+    acc = (d > 0) === (acc > 0) ? acc + d : d;
+    if (acc > 32) nb.classList.add('min'); else if (acc < -32) nb.classList.remove('min');
+  };
+  addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(passo); } }, { passive: true });
+  addEventListener('hashchange', abrir);
+  // tocar no botão recolhido só reabre a barra (sem navegar nem abrir o menu de Ferramentas)
+  nb.addEventListener('click', e => { if (!nb.classList.contains('min')) return; e.preventDefault(); e.stopPropagation(); abrir(); }, true);
+  nb.addEventListener('focusin', e => { if (e.target.matches(':focus-visible')) abrir(); });
 }
 function closeTools() { const e = $('#toolsSheet'); if (e) e.remove(); }
 const routes = { home: viewHome, vault: viewVault, train: viewTrain, stats: viewStats, metro: viewMetro, notes: viewNotes, chords: viewChords, tuner: viewTuner, settings: viewSettings, quiz: viewQuiz, account: () => Acct.viewAccount() };
@@ -470,7 +500,7 @@ function render() {
   if (r === 'train') TLOPEN = false;   // dropdown de exercícios sempre começa fechado
   if (r === 'home' && !DB.placed && !DB.placeSkip && !DB.sessions.length) { location.hash = '#/quiz'; return; }
   closeTools(); $('#navTop').innerHTML = navHTML(r); $('#navBot').innerHTML = navBotHTML(r); navMark(r); const gb = $('#gearBtn'); if (gb) gb.classList.toggle('on', r === 'settings');
-  view.innerHTML = ''; view.classList.remove('wide', 'wm', 'ws', 'wt'); routes[r](); window.scrollTo(0, 0);
+  orientApply(); view.innerHTML = ''; view.classList.remove('wide', 'wm', 'ws', 'wt'); routes[r](); window.scrollTo(0, 0);
 }
 addEventListener('hashchange', render);
 
@@ -568,6 +598,7 @@ function viewTrain() {
   view.innerHTML = `<div style="margin-bottom:10px"><button class="btn sm ghost" data-act="backTrail">← Voltar</button></div><div class="row sp"><div><div class="meta row">${pill(ex.focus)}<span class="tag">${LVL[ex.lvl]}</span><span class="tag">meta ${ex.target} BPM</span></div><h2 style="margin-top:6px">${esc(ex.name)}</h2><div class="mut small">${esc(ex.desc)}</div><div class="small" id="durInfo" style="margin-top:6px"></div></div>
     <div class="tag">${Sess.qi + 1} / ${Sess.queue.length}</div></div>
   <div class="dsk"><div class="da">
+  ${ex.type === 'notes' ? `<div class="orow vonly">${orientHTML('ex')}</div>` : ''}
   <div class="board" style="margin-top:12px">${ex.type === 'notes' ? fretboardSVG(ex, lefty, S().label) : strumHTML(ex)}<div class="cd" id="cd"></div></div>
   <div class="small" id="why" style="min-height:18px;margin-top:6px;color:var(--bad)"></div></div>
   <div class="db"><div class="hud">

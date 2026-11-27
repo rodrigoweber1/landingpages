@@ -49,7 +49,8 @@ const welcomeEl = () => document.querySelector('#intro.welcome:not(.out)');
 const behind = on => document.querySelectorAll('header.top, #view, #navBot').forEach(e => { e.inert = on; });
 function quizWelcome() {
   const i = welcomeEl(); if (!i) return;
-  i.querySelector('.in-card').innerHTML = quizIntroHTML(); behind(true);
+  // boas-vindas (a frase fica em inglês em todos os idiomas, como "Your Guitar Coach") e, abaixo, o convite do quiz
+  i.querySelector('.in-card').innerHTML = `<p class="in-hello">Bem-vindo</p><p class="in-tag" lang="en" translate="no">The best way to practice every day</p>${quizIntroHTML()}`; behind(true);
   i.setAttribute('role', 'dialog'); i.setAttribute('aria-modal', 'true'); i.setAttribute('aria-label', 'SuperPick');
   setTimeout(() => i.classList.add('ready'), Math.max(0, 1700 - (performance.now() - i.dataset.t)));   // o texto entra quando o logo já se formou
 }
@@ -61,8 +62,8 @@ function viewQuiz() {
   }
   if (QZ.i >= QZ_Q.length) return quizResult();
   const q = QZ_Q[QZ.i];
-  view.innerHTML = `<div class="card" style="margin-top:12px"><div class="row sp"><span class="mut small">Pergunta ${QZ.i + 1} de ${QZ_Q.length}</span>${QZ.i ? '<button class="btn sm ghost" data-act="qzBack">← Voltar</button>' : ''}</div>
-    <div class="meter" style="height:6px;margin:8px 0 14px"><b style="width:${Math.round(100 * QZ.i / QZ_Q.length)}%;background:var(--acc)"></b></div>
+  view.innerHTML = `<div class="card" style="margin-top:12px"><div class="row sp qhead"><span class="mut small">Pergunta ${QZ.i + 1} de ${QZ_Q.length}</span>${QZ.i ? '<button class="btn sm ghost" data-act="qzBack">← Voltar</button>' : ''}</div>
+    <div class="qprog" aria-hidden="true">${QZ_Q.map((_, k) => `<i${k < QZ.i ? ' class="on"' : k === QZ.i ? ' class="cur"' : ''}></i>`).join('')}</div>
     <h2>${esc(q.q)}</h2>
     <div class="grid" style="margin-top:12px">${q.o.map((t, k) => `<button class="btn qopt" data-act="qzAns" data-v="${k}">${q.f === 'goal' ? '' : qzPick(k + 1)}<span>${esc(t)}</span></button>`).join('')}</div></div>`;
 }
@@ -77,7 +78,7 @@ function quizResult() {
   const rows = ar.filter(x => x.mn <= L).map(rowOn).join('') + ar.filter(x => x.mn > L).map(rowOff).join('');
   view.innerHTML = `<div class="card" style="margin-top:12px"><div class="mut small">Seu ponto de partida</div>
     <h1 style="color:${lv.color}">Nível ${lv.roman} · ${lv.name}</h1><p class="mut">${lv.desc}</p>
-    <div class="row" style="gap:8px;margin:12px 0 4px">${[1, 2, 3, 4].map(n => { const x = LEVELS[n], on = n === L; return `<div style="flex:1;min-width:64px;text-align:center;padding:8px 4px;border-radius:12px;border:1px solid ${on ? x.color : 'var(--line)'};${on ? `background:color-mix(in srgb,${x.color} 14%,transparent);` : 'opacity:.4;'}"><div style="font-size:20px;font-weight:800;line-height:1;color:${x.color}">${x.roman}</div><div class="small ${on ? '' : 'mut'}" style="margin-top:3px">${x.name}</div></div>`; }).join('')}</div>
+    <div class="qlvls">${[1, 2, 3, 4].map(n => { const x = LEVELS[n], on = n === L; return `<div${on ? ' class="on"' : ''} style="--lv:${x.color}"><b>${x.roman}</b><span>${x.name}</span></div>`; }).join('')}</div>
     <div class="small mut">Pontuação: ${sum} de 21. Você pode mudar o nível quando quiser em Ajustes.</div></div>
     <div class="grid g2"><div class="card"><h2>Por área</h2>${rows}</div>
     <div class="card"><h2>Primeiro treino sugerido</h2>${plan.map((p, i) => { const e = EXMAP[p.id]; return `<div class="ex card" style="margin:6px 0"><div class="meta">${pill(e.focus)}<b>${i + 1}. ${esc(e.name)}</b><span class="tag">${LVL[e.lvl]}</span></div><span class="reason">${esc(p.why)}</span></div>`; }).join('')}

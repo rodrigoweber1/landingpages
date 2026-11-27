@@ -540,6 +540,7 @@
       size: function () { return { n: S.sl.length, max: maxNow() }; },
       setBpm: function (v) { setBpm(v); },
       setLang: function (l) { lang = D[l] ? l : 'pt'; paint(); },
+      redraw: function () { paint(); },
       /** { chords:[{root,q,pos}], bpm, beats, mute } — para guardar en tu base de datos */
       getState: function () {
         return { chords: S.sl.map(function (x) { var r = ROOTS[x.r]; return { root: noteName(r[0], r[1], 'en'), q: x.q, pos: x.v, frets: x.cv ? x.cv.f : undefined, barre: x.cv ? x.cv.barre : undefined }; }), bpm: S.bpm, beats: S.beats, mute: S.mute };

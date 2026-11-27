@@ -1,9 +1,13 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.20.0';
-var APP_DATE = '2026-11-27';
+var APP_VERSION = '1.21.0';
+var APP_DATE = '2026-11-28';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Tela de abertura com mensagem de boas-vindas', en: 'Welcome message on the opening screen', es: 'Mensaje de bienvenida en la pantalla de inicio' },
+  { pt: 'Diagramas na vertical ou na horizontal: acordes, braço dos exercícios e tela Notas', en: 'Vertical or horizontal diagrams: chords, exercise fretboard and the Notes screen', es: 'Diagramas en vertical u horizontal: acordes, mástil de los ejercicios y pantalla Notas' },
+  { pt: 'No iPhone, a barra de abas recolhe num botão ao rolar para baixo e volta ao rolar para cima', en: 'On iPhone, the tab bar shrinks to a button when you scroll down and comes back when you scroll up', es: 'En el iPhone, la barra de pestañas se recoge en un botón al bajar y vuelve al subir' },
+  { pt: 'Quiz: barra de progresso mais visível, uma etapa por pergunta, e nomes dos níveis sem estourar no resultado', en: 'Quiz: clearer progress bar, one step per question, and level names that fit on the result screen', es: 'Quiz: barra de progreso más visible, un paso por pregunta, y nombres de los niveles sin desbordarse en el resultado' },
   { pt: 'Depois do resultado do quiz, uma tela com a palheta animada enquanto o app personaliza sua experiência', en: 'After the quiz result, a screen with the animated pick while the app personalizes your experience', es: 'Después del resultado del quiz, una pantalla con la púa animada mientras la app personaliza tu experiencia' },
   { pt: 'Quiz: cada resposta mostra uma palheta com 1 a 4 traços, conforme o nível', en: 'Quiz: each answer shows a pick with 1 to 4 bars, according to the level', es: 'Quiz: cada respuesta muestra una púa con 1 a 4 trazos, según el nivel' },
   { pt: 'Logo com o formato de uma palheta de verdade', en: 'Logo shaped like a real guitar pick', es: 'Logo con la forma de una púa real' },
