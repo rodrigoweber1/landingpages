@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.17.0';
+var APP_VERSION = '1.18.0';
 var APP_DATE = '2026-11-27';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Logo com o formato de uma palheta de verdade', en: 'Logo shaped like a real guitar pick', es: 'Logo con la forma de una púa real' },
   { pt: 'O mesmo desenho de linhas finas em todos os diagramas: troca de acordes, sequência de prática e braço das notas', en: 'The same fine line drawing on every diagram: chord changes, practice sequence and the note fretboard', es: 'El mismo dibujo de líneas finas en todos los diagramas: cambio de acordes, secuencia de práctica y mástil de notas' },
   { pt: 'Novo nome: SuperPick, Your Guitar Coach. Acordes em diagramas de linhas finas, separados por inversão; toque num deles para ouvir e adicionar à sequência', en: 'New name: SuperPick, Your Guitar Coach. Chords as fine line diagrams grouped by inversion; tap one to hear it and add it to the sequence', es: 'Nuevo nombre: SuperPick, Your Guitar Coach. Acordes en diagramas de líneas finas por inversión; toca uno para escucharlo y añadirlo a la secuencia' },
   { pt: 'O quiz Descubra seu nível aparece em toda abertura do app, com a opção de pular', en: 'The Find your level quiz appears every time you open the app, with the option to skip', es: 'El quiz Descubre tu nivel aparece cada vez que abres la app, con la opción de saltarlo' },
