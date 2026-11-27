@@ -13,6 +13,8 @@ const QZ_Q = [
 const QZ_GOAL = [['chords', 'rhythm'], ['lead', 'legato'], ['pick', 'rhythm', 'chords'], ['mech', 'pick']];
 const QZ_STEP = ['Iniciante', 'Básico', 'Intermediário', 'Avançado'];
 let QZ = { i: -1, a: [] };
+// ícone das respostas: o contorno da palheta do logo com 4 traços crescentes, acesos até o nível (1 a 4)
+const qzPick = n => `<svg class="qlv" viewBox="0 0 32 32" aria-hidden="true"><path class="o" d="M16 3.5C23.2 3.5 26.71 5.27 26.71 9.95C26.71 16.59 18.82 28.8 16 28.8C13.18 28.8 5.29 16.59 5.29 9.95C5.29 5.27 8.8 3.5 16 3.5Z"/>${['M10.6 18.6V15.4', 'M14.2 18.6V13.2', 'M17.8 18.6V11', 'M21.4 18.6V8.8'].map((d, k) => `<path${k < n ? '' : ' class="off"'} d="${d}"/>`).join('')}</svg>`;
 
 function quizLevel(a) {
   const sum = a.slice(0, 7).reduce((x, y) => x + y, 0);
@@ -61,7 +63,7 @@ function viewQuiz() {
   view.innerHTML = `<div class="card" style="margin-top:12px"><div class="row sp"><span class="mut small">Pergunta ${QZ.i + 1} de ${QZ_Q.length}</span>${QZ.i ? '<button class="btn sm ghost" data-act="qzBack">← Voltar</button>' : ''}</div>
     <div class="meter" style="height:6px;margin:8px 0 14px"><b style="width:${Math.round(100 * QZ.i / QZ_Q.length)}%;background:var(--acc)"></b></div>
     <h2>${esc(q.q)}</h2>
-    <div class="grid" style="margin-top:12px">${q.o.map((t, k) => `<button class="btn" style="text-align:left;padding:12px 16px" data-act="qzAns" data-v="${k}">${esc(t)}</button>`).join('')}</div></div>`;
+    <div class="grid" style="margin-top:12px">${q.o.map((t, k) => `<button class="btn qopt" data-act="qzAns" data-v="${k}">${q.f === 'goal' ? '' : qzPick(k + 1)}<span>${esc(t)}</span></button>`).join('')}</div></div>`;
 }
 function quizResult() {
   const a = QZ.a, { L, sum } = quizLevel(a), plan = quizPlan(a, L), lv = LEVELS[L];
