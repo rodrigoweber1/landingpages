@@ -33,6 +33,7 @@ Descubra seu nível|Find your level|Descubre tu nivel
 8 perguntas rápidas, cerca de 2 minutos. Responda com sinceridade: o objetivo é começar no ponto certo, não passar num teste.|8 quick questions, about 2 minutes. Answer honestly: the goal is to start at the right place, not to pass a test.|8 preguntas rápidas, unos 2 minutos. Responde con sinceridad: el objetivo es empezar en el punto correcto, no aprobar un examen.
 Começar|Start|Empezar
 Pular por enquanto|Skip for now|Saltar por ahora
+Estamos personalizando sua experiência|We are personalizing your experience|Estamos personalizando tu experiencia
 ← Voltar|← Back|← Atrás
 Há quanto tempo você toca guitarra?|How long have you been playing guitar?|¿Cuánto tiempo llevas tocando guitarra?
 Nunca toquei|I have never played|Nunca he tocado

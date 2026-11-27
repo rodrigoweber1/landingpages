@@ -13,8 +13,9 @@ const QZ_Q = [
 const QZ_GOAL = [['chords', 'rhythm'], ['lead', 'legato'], ['pick', 'rhythm', 'chords'], ['mech', 'pick']];
 const QZ_STEP = ['Iniciante', 'Básico', 'Intermediário', 'Avançado'];
 let QZ = { i: -1, a: [] };
+const QZ_PICK = 'M16 3.5C23.2 3.5 26.71 5.27 26.71 9.95C26.71 16.59 18.82 28.8 16 28.8C13.18 28.8 5.29 16.59 5.29 9.95C5.29 5.27 8.8 3.5 16 3.5Z';   // contorno da palheta do logo
 // ícone das respostas: o contorno da palheta do logo com 4 traços crescentes, acesos até o nível (1 a 4)
-const qzPick = n => `<svg class="qlv" viewBox="0 0 32 32" aria-hidden="true"><path class="o" d="M16 3.5C23.2 3.5 26.71 5.27 26.71 9.95C26.71 16.59 18.82 28.8 16 28.8C13.18 28.8 5.29 16.59 5.29 9.95C5.29 5.27 8.8 3.5 16 3.5Z"/>${['M10.6 18.6V15.4', 'M14.2 18.6V13.2', 'M17.8 18.6V11', 'M21.4 18.6V8.8'].map((d, k) => `<path${k < n ? '' : ' class="off"'} d="${d}"/>`).join('')}</svg>`;
+const qzPick = n => `<svg class="qlv" viewBox="0 0 32 32" aria-hidden="true"><path class="o" d="${QZ_PICK}"/>${['M10.6 18.6V15.4', 'M14.2 18.6V13.2', 'M17.8 18.6V11', 'M21.4 18.6V8.8'].map((d, k) => `<path${k < n ? '' : ' class="off"'} d="${d}"/>`).join('')}</svg>`;
 
 function quizLevel(a) {
   const sum = a.slice(0, 7).reduce((x, y) => x + y, 0);
@@ -82,6 +83,22 @@ function quizResult() {
     <div class="card"><h2>Primeiro treino sugerido</h2>${plan.map((p, i) => { const e = EXMAP[p.id]; return `<div class="ex card" style="margin:6px 0"><div class="meta">${pill(e.focus)}<b>${i + 1}. ${esc(e.name)}</b><span class="tag">${LVL[e.lvl]}</span></div><span class="reason">${esc(p.why)}</span></div>`; }).join('')}
     <div class="row" style="margin-top:10px"><button class="btn pri" data-act="qzGo">▶ Começar este treino</button><button class="btn" data-act="qzHome">Usar na tela Hoje</button><button class="btn ghost" data-act="qzStart">Refazer</button></div></div></div>`;
 }
+// página intermediária depois do resultado: a palheta da abertura toca de novo (duas vezes) enquanto o destino é montado por baixo
+const QZ_PERSO_MS = 3600;
+function qzPersonalize(go) {
+  if (document.getElementById('perso')) return;
+  const bars = ['M10.9 11.6V16', 'M13.5 9.2V18.4', 'M16 7.3V20.3', 'M18.5 9.8V17.8', 'M21.1 11.8V15.8'].map((d, n) => `<path style="--n:${n}" d="${d}"/>`).join('');
+  const el = document.createElement('div'); el.id = 'perso'; el.setAttribute('role', 'status');
+  el.innerHTML = `<div class="in-mark" aria-hidden="true"><svg class="in-echo" viewBox="0 0 32 32"><path d="${QZ_PICK}"/></svg><svg class="in-pick" viewBox="0 0 32 32"><path class="in-edge" d="${QZ_PICK}"/><g class="in-ghost">${bars}</g><g class="in-bars">${bars}</g></svg></div><p>Estamos personalizando sua experiência</p>`;
+  document.body.appendChild(el); behind(true);
+  const t0 = performance.now(), calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let fim = false;
+  const end = () => { if (fim) return; fim = true; clearTimeout(timer); removeEventListener('keydown', skip, true); behind(false); el.classList.add('out'); setTimeout(() => el.remove(), 320); };
+  const skip = () => { if (performance.now() - t0 > 700) end(); };   // um toque pula (mas não o segundo clique de quem tocou duas vezes no botão)
+  const timer = setTimeout(end, calmo ? 1500 : QZ_PERSO_MS);
+  el.addEventListener('pointerdown', skip); addEventListener('keydown', skip, true);
+  setTimeout(go, 280);   // troca de tela só depois que esta página já cobriu tudo
+}
 const quizActs = {
   qzStart() { welcomeClose(); QZ = { i: 0, a: [] }; if (location.hash !== '#/quiz') location.hash = '#/quiz'; else viewQuiz(); },
   qzSkip() {
@@ -95,6 +112,6 @@ const quizActs = {
     viewQuiz(); window.scrollTo(0, 0);
   },
   qzBack() { if (QZ.i > 0) QZ.i--; viewQuiz(); },
-  qzGo() { setQueue(TODAY.map(p => p.id)); },
-  qzHome() { location.hash = '#/home'; },
+  qzGo() { const ids = TODAY.map(p => p.id); qzPersonalize(() => setQueue(ids)); },
+  qzHome() { qzPersonalize(() => { location.hash = '#/home'; }); },
 };

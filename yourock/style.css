@@ -411,6 +411,16 @@ input[type=email],input[type=password]{background:var(--bg3);border:1px solid va
 .qlv .o{stroke:var(--acc);stroke-width:1.7}
 .qlv path:not(.o){stroke:var(--tx);stroke-width:2.1}
 .qlv path.off{opacity:.24}
+/* depois do resultado do quiz: "personalizando", com a palheta da abertura tocando duas vezes */
+#perso{--eo:cubic-bezier(.23,1,.32,1);position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px;background:var(--bg);text-align:center;animation:inFade .25s ease-out both;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#perso .in-mark{margin:0}
+#perso p{margin:0;max-width:300px;font-size:21px;font-weight:700;line-height:1.35;text-wrap:balance;animation:inRise .6s var(--eo) .45s both}
+#perso .in-echo{animation:inEcho 1s var(--eo) .74s forwards,inEcho 1s var(--eo) 2.1s forwards}
+#perso .in-bars path{animation:inString 1.4s linear calc(.64s + var(--n)*55ms) both,inString 1.4s linear calc(2s + var(--n)*55ms) forwards}
+#perso .in-ghost path{animation:inGhost 1.4s linear calc(.64s + var(--n)*55ms) both,inGhost 1.4s linear calc(2s + var(--n)*55ms) forwards}
+#perso.out{animation:inSkip .3s ease-out forwards;pointer-events:none}
+@keyframes inFade{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#perso .in-mark *,#perso p{animation:none!important}#perso .in-ghost{display:none}}
 /* convite do quiz: a abertura não some; vira a página inicial, com "Descubra seu nível" abaixo do logo (o espaço já fica reservado, o logo não pula) */
 .in-card{display:none}
 #intro.welcome{animation:none;justify-content:flex-start;overflow-y:auto;padding:calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom))}

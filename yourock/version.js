@@ -1,9 +1,10 @@
 // Versão do app: única fonte da verdade (usada pela tela Ajustes e pelo cache do service worker).
 // A cada publicação: aumente APP_VERSION (corrige = 1.0.1, novidade = 1.1.0, mudança grande = 2.0.0) e acrescente uma linha no topo de APP_NOTES.
-var APP_VERSION = '1.19.0';
+var APP_VERSION = '1.20.0';
 var APP_DATE = '2026-11-27';
 var APP_NOTES = [
   // a cada nova versão, acrescente aqui no topo uma linha { pt, en, es }
+  { pt: 'Depois do resultado do quiz, uma tela com a palheta animada enquanto o app personaliza sua experiência', en: 'After the quiz result, a screen with the animated pick while the app personalizes your experience', es: 'Después del resultado del quiz, una pantalla con la púa animada mientras la app personaliza tu experiencia' },
   { pt: 'Quiz: cada resposta mostra uma palheta com 1 a 4 traços, conforme o nível', en: 'Quiz: each answer shows a pick with 1 to 4 bars, according to the level', es: 'Quiz: cada respuesta muestra una púa con 1 a 4 trazos, según el nivel' },
   { pt: 'Logo com o formato de uma palheta de verdade', en: 'Logo shaped like a real guitar pick', es: 'Logo con la forma de una púa real' },
   { pt: 'O mesmo desenho de linhas finas em todos os diagramas: troca de acordes, sequência de prática e braço das notas', en: 'The same fine line drawing on every diagram: chord changes, practice sequence and the note fretboard', es: 'El mismo dibujo de líneas finas en todos los diagramas: cambio de acordes, secuencia de práctica y mástil de notas' },
