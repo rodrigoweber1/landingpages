@@ -731,6 +731,16 @@ body.dark #sl-root{--sl-ink:#F2EDE4;--sl-ink2:#D9D2C5;--sl-mute:#A39C8F;--sl-rul
 #sl-root .sl-h1{margin:0!important;font:400 clamp(36px,8vw,72px)/0.95 'Archivo Black','Inter',sans-serif!important;letter-spacing:-0.02em!important;color:var(--sl-ink)!important}
 #sl-root .sl-h1 em{font-style:normal;color:var(--sl-red)}
 #sl-root .sl-sub{margin:0!important;max-width:52ch;font-size:15px!important;line-height:22px!important;color:var(--sl-ink2)!important}
+/* objetivos del nivel, entre el título y los módulos */
+#sl-root .sl-goals{display:flex;flex-direction:column;gap:12px;margin:18px 0 0;padding:16px;border:1px solid var(--sl-rule);border-radius:16px;background:var(--sl-paper)}
+#sl-root .sl-goals h2,body.stage #app #sl-root .sl-goals h2{margin:0!important;font:700 12px/16px 'Inter',system-ui,sans-serif!important;letter-spacing:.12em!important;text-transform:uppercase;color:#8A5F00!important}
+body.dark #sl-root .sl-goals h2,body.dark.stage #app #sl-root .sl-goals h2{color:#FFC400!important}
+#sl-root .sl-goals ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+#sl-root .sl-goals li{display:flex;gap:12px;align-items:flex-start}
+#sl-root .sl-gn{flex:none;width:22px;font:400 17px/21px 'Archivo Black','Inter',sans-serif;color:var(--sl-red)}
+#sl-root .sl-gt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;font-size:14px;line-height:21px;color:var(--sl-ink)}
+#sl-root .sl-gt small{font-size:13px;line-height:19px;color:var(--sl-mute)}
+@media (min-width:900px){#sl-root .sl-goals{max-width:720px;padding:20px 24px}}
 #sl-root .sl-neck{position:relative;height:30px;margin:22px 0 6px;border-radius:4px;background:var(--sl-paper);border:1px solid var(--sl-rule);overflow:hidden}
 #sl-root .sl-fill{position:absolute;top:0;bottom:0;left:0;background:var(--sl-red);transition:width 500ms var(--sl-ease)}
 #sl-root .sl-fret{position:absolute;top:0;bottom:0;width:2px;background:var(--sl-rule)}
@@ -6036,6 +6046,33 @@ return { t: { langAria: T.langAria, backAria: T.backAria, title: T.title, eyebro
 }
  return Component; };
 // ===== 1.1 ¿Qué es una guitarra?: vídeo de introducción y qué pasa cuando vibra una cuerda =====
+// ===== 1.1: cuerda vibrando, aguda (rápida) y grave (despacio); la velocidad guarda la proporción 4:1 entre los dos Mi =====
+let qgVibOn = null; // null = según el ajuste «reducir movimiento» del dispositivo
+function qgVibRunning() {
+if (qgVibOn !== null) return qgVibOn;
+try { return !window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return true; }
+}
+function qgVibToggle(btn) {
+qgVibOn = !qgVibRunning();
+const fig = btn.closest('.qv');
+fig.classList.toggle('on', qgVibOn);
+btn.textContent = qgVibOn ? btn.dataset.stop : btn.dataset.play;
+}
+function qgVib(T) {
+const on = qgVibRunning();
+const row = (cls, title, text, hz) => '<div class="qv-row qv-' + cls + '">'
++ '<div class="qv-head"><h3>' + title + '</h3><span>' + text + '</span></div>'
++ '<svg viewBox="0 0 320 76" aria-hidden="true" data-nk="" data-fit="">'
++ '<path class="qv-env" d="M20 38Q160 -18 300 38M20 38Q160 94 300 38"/>'
++ '<g transform="translate(0 38)"><path class="qv-str" d="M20 0Q160 -56 300 0"/></g>'
++ '<rect class="qv-end" x="14" y="20" width="7" height="36" rx="2"/><rect class="qv-end" x="299" y="20" width="7" height="36" rx="2"/>'
++ '</svg><div class="qv-ends" aria-hidden="true"><span>' + T.nut + '</span><span>' + T.bridge + '</span></div>'
++ '<p class="qv-hz">' + hz + '</p></div>';
+return '<figure class="qv' + (on ? ' on' : '') + '" aria-label="' + T.aria + '">' + row('high', T.high, T.highX, T.highHz) + row('low', T.low, T.lowX, T.lowHz)
++ '<button type="button" class="qv-btn" data-play="' + T.play + '" data-stop="' + T.stop + '">' + (on ? T.stop : T.play) + '</button>'
++ '<figcaption>' + T.note + '</figcaption></figure>';
+}
+
 C["QueGuitarra"] = (DCLogic) => {
 const Base = C["ControlesTono"](DCLogic);
 class Component extends Base {
@@ -6047,7 +6084,9 @@ const T = this._cfg.t;
 const p = (x) => '<p class="pt-p">' + x + '</p>';
 root.innerHTML = truVideo(T.vT, T.vS)
 + '<h2 class="cr-h">' + T.h + '</h2>' + p(T.p1)
-+ T.cards.map((c) => '<div class="pt-card"><h3 class="bt-h3" style="margin:0">' + c[0] + '</h3>' + c.slice(1).map(p).join('') + '</div>').join('');
++ T.cards.map((c, i) => '<div class="pt-card"><h3 class="bt-h3" style="margin:0">' + c[0] + '</h3>' + c.slice(1).map(p).join('') + '</div>' + (i === 0 ? qgVib(T.vib) : '')).join('');
+const vb = root.querySelector('.qv-btn');
+if (vb) vb.addEventListener('click', () => qgVibToggle(vb));
 }
 renderVals() {
 const lang = this.state.lang, es = lang === 'es';
@@ -6057,11 +6096,11 @@ intro: 'La guitarra es un instrumento de cuerda: seis cuerdas tensadas sobre un 
 vT: 'Vídeo: introducción a la guitarra', vS: 'Aquí irá el vídeo de introducción',
 h: 'Qué pasa cuando vibra una cuerda',
 p1: 'Cuando pulsas una cuerda, empieza a ir y venir muy deprisa entre sus dos apoyos, la cejuela y el puente. Ese vaivén empuja el aire, el aire lleva esas pequeñas ondas hasta tu oído y tú oyes una nota.',
+vib: { aria: 'Dos cuerdas vibrando: la de la nota aguda se mueve muy rápido y la de la nota grave, despacio', high: 'Nota aguda', highX: 'La cuerda vibra muy rápido', highHz: 'Mi de la 1ª cuerda · 330 veces por segundo', low: 'Nota grave', lowX: 'La cuerda vibra despacio', lowHz: 'Mi de la 6ª cuerda · 82 veces por segundo', nut: 'cejuela', bridge: 'puente', play: '▶ Ver vibrar', stop: 'Parar', note: 'Las dos van a cámara lenta: a su velocidad real no podrías ver el movimiento.' },
 cards: [
-['Frecuencia', 'Es el número de idas y vueltas por segundo y se mide en hercios (Hz). Cuantas más haya, más aguda es la nota. La 5ª cuerda al aire (La) vibra 110 veces por segundo.'],
-['De qué depende la nota', '<b>Tensión:</b> cuanto más tensa está la cuerda, más aguda suena. Es lo que cambias con las clavijas.', '<b>Grosor:</b> cuanto más gruesa, más grave.', '<b>Longitud:</b> cuanto más corta, más aguda. Es lo que haces al pisar un traste: en el traste 12 queda la mitad de cuerda, vibra el doble de rápido y suena una octava más arriba.'],
-['El volumen', 'Cuanto más fuerte pulsas, más amplio es el vaivén y más alto suena. La nota sigue siendo la misma.'],
-['Cómo se oye', 'Una cuerda sola casi no mueve aire. En la guitarra acústica y en la española, la vibración pasa por el puente a la caja, que lo amplifica. En la eléctrica, las pastillas (imanes rodeados por una bobina) convierten la vibración en una señal eléctrica que va al amplificador.']
+['Frecuencia', 'Es el número de vibraciones por segundo y se mide en hercios (Hz). Cuantas más veces vibre, más aguda es la nota. Cuantas menos veces vibre, más grave.'],
+['¿Qué elementos afectan a una nota?', '<b>Tensión:</b> cuanto más tensa está la cuerda, más aguda suena. Esto se ajusta con las clavijas de afinación.', '<b>Longitud:</b> cuanto más corta, más aguda. Es lo que haces al pisar un traste: en el traste 12 queda la mitad de cuerda, vibra el doble de rápido y suena una octava más arriba.', '<b>Volumen:</b> cuando golpeas fuerte, el vaivén de la cuerda es mayor y, por tanto, suena más alto. La nota sigue siendo la misma.'],
+['¿Cómo suena una guitarra?', 'Una cuerda sola casi no mueve aire. En la guitarra acústica y en la española, la vibración pasa por el puente a la caja, que lo amplifica. En la eléctrica, las pastillas (imanes rodeados por una bobina) convierten la vibración en una señal eléctrica que va al amplificador.']
 ],
 cta: 'Siguiente'
 } : {
@@ -6070,11 +6109,11 @@ intro: 'The guitar is a string instrument: six strings stretched over a body and
 vT: 'Video: meet the guitar', vS: 'The intro video will go here',
 h: 'What happens when a string vibrates',
 p1: 'When you pluck a string, it starts moving back and forth really fast between its two supports, the nut and the bridge. That motion pushes the air, the air carries those tiny waves to your ear and you hear a note.',
+vib: { aria: 'Two vibrating strings: the high note moves very fast and the low note moves slowly', high: 'High note', highX: 'The string vibrates very fast', highHz: 'E on the 1st string · 330 times a second', low: 'Low note', lowX: 'The string vibrates slowly', lowHz: 'E on the 6th string · 82 times a second', nut: 'nut', bridge: 'bridge', play: '▶ Watch them vibrate', stop: 'Stop', note: 'Both are in slow motion: at real speed you wouldn’t see them move.' },
 cards: [
-['Frequency', 'It’s the number of back-and-forth trips per second, measured in hertz (Hz). The more there are, the higher the note. The open 5th string (A) vibrates 110 times a second.'],
-['What sets the note', '<b>Tension:</b> the tighter the string, the higher it sounds. That’s what you change with the tuning pegs.', '<b>Thickness:</b> the thicker the string, the lower.', '<b>Length:</b> the shorter, the higher. That’s what you do when you fret a note: at the 12th fret only half the string is left, it vibrates twice as fast and sounds an octave up.'],
-['Volume', 'The harder you pluck, the wider the swing and the louder it sounds. The note stays the same.'],
-['How you hear it', 'A string on its own barely moves any air. On acoustic and classical guitars, the vibration travels through the bridge into the body, which amplifies it. On an electric, the pickups (magnets wrapped in a coil) turn the vibration into an electrical signal that goes to the amp.']
+['Frequency', 'It’s the number of vibrations per second, measured in hertz (Hz). The more times it vibrates, the higher the note. The fewer times it vibrates, the lower.'],
+['What affects a note?', '<b>Tension:</b> the tighter the string, the higher it sounds. You adjust this with the tuning pegs.', '<b>Length:</b> the shorter, the higher. That’s what you do when you fret a note: at the 12th fret only half the string is left, it vibrates twice as fast and sounds an octave up.', '<b>Volume:</b> when you strike harder, the string swings wider, so it sounds louder. The note stays the same.'],
+['How does a guitar sound?', 'A string on its own barely moves any air. On acoustic and classical guitars, the vibration travels through the bridge into the body, which amplifies it. On an electric, the pickups (magnets wrapped in a coil) turn the vibration into an electrical signal that goes to the amp.']
 ],
 cta: 'Next'
 };
@@ -8922,7 +8961,15 @@ function rutaSetlist(root, lang, level) {
     mod: 'Módulo', done: 'Terminado', of: ' de ', screens: (n) => n + (n === 1 ? ' pantalla' : ' pantallas'),
     now: '¡Ahora!', mark: 'Hecho ✓', tag: 'Hecho', markAria: (l) => 'Marcar como hecho: ' + l, unAria: (l) => 'Quitar el hecho: ' + l,
     foot: '¡Y al final, a tocar con la banda!',
-    open: 'Abrir', side: 'Tienes todos los módulos en el menú de la izquierda.', fin: '¡Ruta completa!'
+    open: 'Abrir', side: 'Tienes todos los módulos en el menú de la izquierda.', fin: '¡Ruta completa!',
+    goalsT: 'Objetivos del Nivel 1', goals: [
+      ['Conocer la guitarra.'],
+      ['Ritmos básicos para poder tocar tus primeras canciones, con varios estilos y técnicas.'],
+      ['Empezar a desarrollar independencia de manos y coordinación al tocar.'],
+      ['Acordes básicos y las dos cejillas principales, A y E.'],
+      ['Aprender tu primera escala, la pentatónica menor, y cómo hacer música con ella.', 'Entenderás que en algunos estilos (blues, rock n’ roll, rock, algo de pop…) se puede usar la dualidad mayor/menor, y sabrás encontrar el relativo menor de un tono mayor (o verás que la posición 2 es la pentatónica mayor).'],
+      ['Adquirir repertorio de diversos estilos.']
+    ]
   } : {
     eye: 'Learn at your pace', h1a: 'Guitar ', h1b: 'Level 1',
     sub: (n) => n + ' modules, like the songs in a gig. Play them in order or jump to the one you need.',
@@ -8931,7 +8978,15 @@ function rutaSetlist(root, lang, level) {
     mod: 'Module', done: 'Done', of: ' of ', screens: (n) => n + (n === 1 ? ' screen' : ' screens'),
     now: 'Now!', mark: 'Done ✓', tag: 'Done', markAria: (l) => 'Mark as done: ' + l, unAria: (l) => 'Mark as not done: ' + l,
     foot: 'And then, play it with the band!',
-    open: 'Open', side: 'All the modules are in the menu on the left.', fin: 'Path complete!'
+    open: 'Open', side: 'All the modules are in the menu on the left.', fin: 'Path complete!',
+    goalsT: 'Level 1 goals', goals: [
+      ['Get to know the guitar.'],
+      ['Basic rhythms so you can play your first songs, across several styles and techniques.'],
+      ['Start building hand independence and coordination as you play.'],
+      ['Basic chords and the two main barre shapes, A and E.'],
+      ['Learn your first scale, the minor pentatonic, and how to make music with it.', 'You’ll see that some styles (blues, rock ’n’ roll, rock, a bit of pop…) can mix major and minor, and you’ll know how to find the relative minor of a major key (or see that position 2 is the major pentatonic).'],
+      ['Build a repertoire in different styles.']
+    ]
   };
   if (two) Object.assign(T, es ? { h1b: 'Nivel 2', sub: (n) => n + ' módulos para ir más lejos: manos, acordes y sonido. Tócalos en orden o salta al que te haga falta.', foot: '¡A sonar como tú quieras!' }
     : { h1b: 'Level 2', sub: (n) => n + ' modules to go further: hands, chords and tone. Play them in order or jump to the one you need.', foot: 'Go and sound the way you want!' });
@@ -8957,6 +9012,11 @@ function rutaSetlist(root, lang, level) {
           + '<div class="sl-meta"><span>' + T.prog(d, total) + '</span><span>' + Math.round(d / total * 100) + ' %</span></div>'
           + '<p class="sl-hint">' + T.hint + '</p>'
         : '');
+    if (!two) {
+      h += '<section class="sl-goals" aria-labelledby="sl-goals-t"><h2 id="sl-goals-t">' + T.goalsT + '</h2><ol>'
+        + T.goals.map((g, i) => '<li><span class="sl-gn" aria-hidden="true">' + (i + 1) + '</span><span class="sl-gt">' + esc(g[0]) + (g[1] ? '<small>' + esc(g[1]) + '</small>' : '') + '</span></li>').join('')
+        + '</ol></section>';
+    }
     h += '<ol class="sl-list">';
     mods.forEach((m, i) => {
       const n = m.steps.length, dn = m.steps.filter((s) => done.has(s.href)).length;
@@ -26557,6 +26617,27 @@ body.dark #af-root .af-h,body.dark.stage #app #af-root h2.af-h{color:#FFC400!imp
 #af-root .af-cap{margin:0;font:400 13px/19px 'Inter',system-ui,sans-serif;color:var(--st-ink2,#3A3A3A)}
 #app .po-list{margin:0;padding:0 0 0 20px;display:flex;flex-direction:column;gap:8px;list-style:disc}
 body.dark #app .po-list li{color:#F2EDE4!important}
+/* ===== 1.1: cuerdas vibrando ===== */
+#qg-root .qv{display:flex;flex-direction:column;gap:0;margin:0;padding:4px 14px 14px;border:1px solid var(--st-rule,#D9D9D9);border-radius:16px;background:rgba(244,238,230,0.04)}
+#qg-root .qv-row{display:flex;flex-direction:column;gap:4px;padding:12px 0}
+#qg-root .qv-row+.qv-row{border-top:1px dashed var(--st-rule,#D9D9D9)}
+#qg-root .qv-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 12px}
+#qg-root .qv-head h3,body.stage #app #qg-root .qv-head h3{margin:0!important;font:700 12px/18px 'Inter',system-ui,sans-serif!important;letter-spacing:.12em!important;text-transform:uppercase;color:#8A5F00!important}
+body.dark #qg-root .qv-head h3,body.dark.stage #app #qg-root .qv-head h3{color:#FFC400!important}
+#qg-root .qv-head span{font:600 14px/20px 'Inter',system-ui,sans-serif;color:var(--st-ink,#121212)}
+#qg-root .qv svg{display:block;width:100%;max-width:460px;height:auto;margin:0 auto;overflow:visible}
+#qg-root .qv-env{fill:none;stroke:var(--st-ink,#121212);stroke-width:1;stroke-dasharray:3 5;opacity:.45}
+#qg-root .qv-str{fill:none;stroke:var(--st-ink,#121212);stroke-linecap:round;vector-effect:non-scaling-stroke}
+#qg-root .qv.on .qv-str{animation:qvVib 360ms ease-in-out infinite alternate}
+#qg-root .qv.on .qv-high .qv-str{animation-duration:90ms}
+#qg-root .qv-high .qv-str{stroke-width:2}
+#qg-root .qv-low .qv-str{stroke-width:5}
+#qg-root .qv-end{fill:var(--st-ink,#121212)}
+#qg-root .qv-ends{display:flex;justify-content:space-between;width:100%;max-width:460px;margin:0 auto;font:500 12px/16px 'Inter',system-ui,sans-serif;color:var(--st-ink2,#5A5A5A)}
+#qg-root .qv-hz{margin:2px 0 0;text-align:center;font:500 13px/19px 'Inter',system-ui,sans-serif;color:var(--st-ink2,#3A3A3A)}
+#qg-root .qv figcaption{padding-top:10px;border-top:1px dashed var(--st-rule,#D9D9D9);font:400 12px/17px 'Inter',system-ui,sans-serif;color:var(--st-ink2,#5A5A5A)}
+@keyframes qvVib{from{transform:scaleY(1)}to{transform:scaleY(-1)}}
+#qg-root .qv .qv-btn,body.stage #app #qg-root .qv .qv-btn{align-self:center;min-height:44px;margin:0 0 12px;padding:0 22px!important;border:0!important;border-radius:999px!important;background:#E31B23!important;color:#FFFFFF!important;font:700 14px/20px 'Inter',system-ui,sans-serif!important;cursor:pointer}
 /* ===== Clavijero del afinador ===== */
 #hs-root{display:block;width:100%;max-width:310px;margin:0 auto;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 72px)}
 #hs-root .hs{display:block;width:100%;height:auto;--ink:#121212;--hs-on:#C98F00;--hs-ok:#1F8A46;-webkit-mask-image:linear-gradient(#000 88%,transparent);mask-image:linear-gradient(#000 88%,transparent)}
@@ -26728,8 +26809,8 @@ html body.stage #app .cnc .cnc-poster{display:block;width:100%;max-width:520px;h
   }
   // build stamp at the foot of the home, so it is easy to tell which copy of the app a phone is really running
   // BUILD_ID must match version.json (published next to this file): when they differ, the app offers an update
-  var BUILD = '27 nov 2026 · 19:58';
-  var BUILD_ID = '2026-11-27T19:58';
+  var BUILD = '28 nov 2026 · 12:26';
+  var BUILD_ID = '2026-11-28T12:26';
   function checkNew() {
     try {
       fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
